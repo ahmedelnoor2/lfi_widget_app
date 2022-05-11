@@ -34,7 +34,6 @@ class _AssetsState extends State<Assets> with SingleTickerProviderStateMixin {
   void initState() {
     _tabController = TabController(length: 3, vsync: this);
     checkLoginStatus();
-    getAccountBalance();
     super.initState();
   }
 
@@ -44,6 +43,9 @@ class _AssetsState extends State<Assets> with SingleTickerProviderStateMixin {
     });
     var auth = Provider.of<Auth>(context, listen: false);
     await auth.checkLogin(context);
+    if (auth.userInfo.isNotEmpty) {
+      getAccountBalance();
+    }
     setState(() {
       _checkAuthStatus = false;
     });

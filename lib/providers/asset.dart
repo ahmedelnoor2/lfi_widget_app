@@ -14,6 +14,8 @@ class Asset with ChangeNotifier {
   Map _p2pBalance = {};
   Map _marginBalance = {};
   Map _totalAccountBalance = {};
+  Map _getCost = {};
+  Map _changeAddress = {};
 
   Map<String, String> headers = {
     'Content-type': 'application/json;charset=utf-8',
@@ -35,6 +37,14 @@ class Asset with ChangeNotifier {
 
   Map get totalAccountBalance {
     return _totalAccountBalance;
+  }
+
+  Map get getCost {
+    return _getCost;
+  }
+
+  Map get changeAddress {
+    return _changeAddress;
   }
 
   Future<void> getTotalBalance(auth) async {
@@ -153,6 +163,68 @@ class Asset with ChangeNotifier {
         _marginBalance = responseData['data'];
       } else {
         _marginBalance = {};
+      }
+      notifyListeners();
+    } catch (error) {
+      notifyListeners();
+      // throw error;
+    }
+  }
+
+  Future<void> getCoinCosts(auth, coin) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/cost/Getcost',
+    );
+
+    var postData = json.encode({"symbol": coin});
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _getCost = responseData['data'];
+      } else {
+        _getCost = {};
+      }
+      notifyListeners();
+    } catch (error) {
+      notifyListeners();
+      // throw error;
+    }
+  }
+
+  Future<void> getChangeAddress(auth, coin) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/finance/get_charge_address',
+    );
+
+    var postData = json.encode({"symbol": coin});
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _changeAddress = responseData['data'];
+      } else {
+        _changeAddress = {};
       }
       notifyListeners();
     } catch (error) {

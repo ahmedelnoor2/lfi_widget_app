@@ -46,7 +46,7 @@ Widget assetsBar(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Total Assets in ${accountBalance['totalBalanceSymbol']}',
+            'Total Assets in ${accountBalance['totalBalanceSymbol'] ?? '0'}',
             style: TextStyle(
               fontSize: 12,
               color: secondaryTextColor,
@@ -66,7 +66,8 @@ Widget assetsBar(
                   '≈${getNumberFormat(
                     context,
                     public.rate[public.activeCurrency['fiat_symbol']
-                                .toUpperCase()] !=
+                                    .toUpperCase()]
+                                [accountBalance['totalBalanceSymbol']] !=
                             null
                         ? '${double.parse(totalAccountBalance['totalbalance'] ?? '0') * public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()][accountBalance['totalBalanceSymbol']]}'
                         : '0',
@@ -87,7 +88,7 @@ Widget assetsBar(
                 padding: EdgeInsets.only(right: width * 0.01),
                 child: OutlinedButton(
                   onPressed: () {
-                    debugPrint('Received click');
+                    Navigator.pushNamed(context, '/deposit_assets');
                   },
                   child: Row(
                     children: const [
