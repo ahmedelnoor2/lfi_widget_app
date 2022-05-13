@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lyotrade/screens/assets/deposit_assets.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/Number.utils.dart';
 
@@ -21,11 +24,20 @@ appBar(context, _handleDrawer) {
     title: const Text('LYOTRADE'),
     elevation: 0,
     shadowColor: Colors.transparent,
+    actions: _currentRoute == DepositAssets.routeName
+        ? [
+            IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.list_alt),
+            )
+          ]
+        : [],
   );
 }
 
 Widget assetsBar(
   context,
+  auth,
   width,
   innerBoxIsScrolled,
   tabController,
@@ -88,7 +100,17 @@ Widget assetsBar(
                 padding: EdgeInsets.only(right: width * 0.01),
                 child: OutlinedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/deposit_assets');
+                    if (auth.userInfo['realAuthType'] != null) {
+                      if (auth.userInfo['realAuthType'] == 0) {
+                        snackAlert(
+                          context,
+                          SnackTypes.warning,
+                          'Please verify your kyc to access deposits',
+                        );
+                      } else {
+                        Navigator.pushNamed(context, '/deposit_assets');
+                      }
+                    }
                   },
                   child: Row(
                     children: const [
@@ -111,10 +133,10 @@ Widget assetsBar(
                 padding: EdgeInsets.only(right: width * 0.01),
                 child: OutlinedButton(
                   onPressed: () {
-                    debugPrint('Received click');
+                    Navigator.pushNamed(context, '/withdraw_assets');
                   },
                   child: Row(
-                    children: [
+                    children: const [
                       Icon(
                         Icons.arrow_upward,
                         size: 11,

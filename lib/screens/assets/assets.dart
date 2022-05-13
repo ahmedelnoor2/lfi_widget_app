@@ -92,7 +92,6 @@ class _AssetsState extends State<Assets> with SingleTickerProviderStateMixin {
     var asset = Provider.of<Asset>(context, listen: true);
 
     return Scaffold(
-      // appBar: appBar(context, null),
       body: _checkAuthStatus
           ? const Center(
               child: CircularProgressIndicator(),
@@ -156,6 +155,7 @@ class _AssetsState extends State<Assets> with SingleTickerProviderStateMixin {
                     return <Widget>[
                       assetsBar(
                         context,
+                        auth,
                         width,
                         innerBoxIsScrolled,
                         _tabController,

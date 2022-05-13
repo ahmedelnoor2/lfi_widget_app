@@ -98,8 +98,6 @@ class _EmailVerificationState extends State<EmailVerification> {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
 
-    print('Token: ${widget.token}');
-
     return Container(
       padding: EdgeInsets.only(top: height * 0.03),
       height: height * 0.5,

@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/screens/assets/skeleton/deposit_skull.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
@@ -28,22 +30,78 @@ class DepositAssets extends StatefulWidget {
 class _DepositAssetsState extends State<DepositAssets> {
   //Create an instance of ScreenshotController
   ScreenshotController screenshotController = ScreenshotController();
+  final TextEditingController _searchController = TextEditingController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  bool _loadingAddress = false;
   String _defaultNetwork = 'ERC20';
-  final List _allNetworks = ['ERC20', 'Omni', 'TRC20', 'BSC'];
+  String _defaultCoin = 'USDT';
+  List _allNetworks = [];
+  // List _digAssets = [];
 
   @override
   void initState() {
-    getCoinCosts();
+    getCoinCosts('USDT');
     super.initState();
   }
 
-  Future<void> getCoinCosts() async {
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> getCoinCosts(netwrkType) async {
+    setState(() {
+      _loadingAddress = true;
+      _defaultCoin = netwrkType;
+    });
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
+    var public = Provider.of<Public>(context, listen: false);
 
-    await asset.getCoinCosts(auth, 'EUSDT');
-    await asset.getChangeAddress(auth, 'EUSDT');
+    if (public.publicInfoMarket['market']['followCoinList'][netwrkType] !=
+        null) {
+      setState(() {
+        _allNetworks.clear();
+      });
+
+      public.publicInfoMarket['market']['followCoinList'][netwrkType]
+          .forEach((k, v) {
+        setState(() {
+          _allNetworks.add(v);
+          _defaultCoin = netwrkType;
+          _defaultNetwork = '${v['mainChainName']}';
+        });
+      });
+    } else {
+      setState(() {
+        _allNetworks.clear();
+        _allNetworks
+            .add(public.publicInfoMarket['market']['coinList'][netwrkType]);
+        _defaultCoin = netwrkType;
+        _defaultNetwork =
+            '${public.publicInfoMarket['market']['coinList'][netwrkType]['mainChainName']}';
+      });
+    }
+
+    await asset.getCoinCosts(auth, _defaultNetwork);
+    await asset.getChangeAddress(auth, _defaultNetwork);
+
+    List _digitialAss = [];
+    asset.accountBalance['allCoinMap'].forEach((k, v) {
+      if (v['depositOpen'] == 1) {
+        _digitialAss.add({
+          'coin': k,
+          'values': v,
+        });
+      }
+    });
+
+    setState(() {
+      _loadingAddress = false;
+    });
+    asset.setDigAssets(_digitialAss);
   }
 
   Future<void> share(title, text) async {
@@ -61,10 +119,27 @@ class _DepositAssetsState extends State<DepositAssets> {
       await capturedFile.writeAsBytes(image!);
 
       GallerySaver.saveImage(capturedFile.path).then((path) {
-        print('saved');
+        // print('saved');
       });
     }).catchError((onError) {
-      print(onError);
+      // print(onError);
+    });
+  }
+
+  Future<void> changeCoinType(netwrk) async {
+    setState(() {
+      _loadingAddress = true;
+    });
+    var auth = Provider.of<Auth>(context, listen: false);
+    var asset = Provider.of<Asset>(context, listen: false);
+
+    setState(() {
+      _defaultNetwork = netwrk['mainChainName'];
+    });
+    await asset.getCoinCosts(auth, netwrk['showName']);
+    await asset.getChangeAddress(auth, netwrk['showName']);
+    setState(() {
+      _loadingAddress = false;
     });
   }
 
@@ -74,9 +149,98 @@ class _DepositAssetsState extends State<DepositAssets> {
     width = MediaQuery.of(context).size.width;
 
     var asset = Provider.of<Asset>(context, listen: true);
+    var public = Provider.of<Public>(context, listen: true);
 
     return Scaffold(
+      key: _scaffoldKey,
       appBar: appBar(context, null),
+      drawer: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey[850],
+        ),
+        width: width,
+        child: Column(
+          children: <Widget>[
+            Container(
+              padding: const EdgeInsets.only(top: 35),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(
+                      Icons.close,
+                      color: secondaryTextColor,
+                      size: 20,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.only(left: 70),
+                    child: const Text('Select Coin'),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.only(
+                left: 15,
+                right: 15,
+              ),
+              child: SizedBox(
+                height: width * 0.13,
+                child: TextField(
+                  onChanged: (value) async {
+                    await asset.filterSearchResults(value);
+                  },
+                  controller: _searchController,
+                  decoration: const InputDecoration(
+                    labelText: "Search",
+                    hintText: "Search",
+                    prefixIcon: Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(25.0),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: height * 0.8,
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: asset.allDigAsset.isNotEmpty
+                    ? asset.allDigAsset.length
+                    : asset.digitialAss.length,
+                itemBuilder: (context, index) {
+                  var _asset = asset.allDigAsset.isNotEmpty
+                      ? asset.allDigAsset[index]
+                      : asset.digitialAss[index];
+                  return ListTile(
+                    onTap: () {
+                      getCoinCosts(asset.allDigAsset.isNotEmpty
+                          ? asset.allDigAsset[index]['coin']
+                          : asset.digitialAss[index]['coin']);
+                      Navigator.pop(context);
+                    },
+                    leading: CircleAvatar(
+                      radius: width * 0.035,
+                      child: Image.network(
+                        '${public.publicInfoMarket['market']['coinList'][_asset['coin']]['icon']}',
+                      ),
+                    ),
+                    title: Text('${_asset['coin']}'),
+                    trailing: Text('${_asset['values']['total_balance']}'),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
       body: Screenshot(
         controller: screenshotController,
         child: SizedBox(
@@ -86,21 +250,108 @@ class _DepositAssetsState extends State<DepositAssets> {
             children: [
               Container(
                 padding: EdgeInsets.all(width * 0.05),
-                child: Text(
-                  'Deposit ${asset.getCost['withdrawLimitSymbol']}',
-                  style: TextStyle(
-                    fontSize: width * 0.05,
-                  ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Deposit $_defaultCoin',
+                      style: TextStyle(
+                        fontSize: width * 0.05,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        _scaffoldKey.currentState!.openDrawer();
+                      },
+                      child: Row(children: [
+                        Text(
+                          _defaultCoin,
+                          style: TextStyle(
+                            fontSize: width * 0.05,
+                          ),
+                        ),
+                        const Icon(Icons.arrow_drop_down),
+                      ]),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.only(bottom: width * 0.01),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      '0.00000',
+                      style: TextStyle(fontSize: width * 0.08),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.only(bottom: 3, left: 2),
+                      child: Text(
+                        _defaultCoin,
+                        style: TextStyle(
+                          fontSize: width * 0.05,
+                          color: secondaryTextColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.all(width * 0.03),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.only(right: 15),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Availalble: ',
+                            style: TextStyle(
+                              color: secondaryTextColor,
+                            ),
+                          ),
+                          Text(
+                            '0.00',
+                            style: TextStyle(
+                              fontSize: 18,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          'Freeze: ',
+                          style: TextStyle(
+                            color: secondaryTextColor,
+                          ),
+                        ),
+                        Text(
+                          '0.00',
+                          style: TextStyle(
+                            fontSize: 18,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
               Align(
                 alignment: Alignment.center,
-                child: asset.changeAddress['addressQRCode'] != null
-                    ? Image.memory(base64Decode(asset
-                        .changeAddress['addressQRCode']
-                        .split(',')[1]
-                        .replaceAll("\n", "")))
-                    : const CircularProgressIndicator(),
+                child: _loadingAddress
+                    ? depositQrSkull(context)
+                    : asset.changeAddress['addressQRCode'] != null
+                        ? Image.memory(base64Decode(asset
+                            .changeAddress['addressQRCode']
+                            .split(',')[1]
+                            .replaceAll("\n", "")))
+                        : const CircularProgressIndicator(),
               ),
               Container(
                 padding: EdgeInsets.only(
@@ -112,15 +363,22 @@ class _DepositAssetsState extends State<DepositAssets> {
                   children: [
                     Text(
                       'Network',
-                      style: TextStyle(color: secondaryTextColor, fontSize: 12),
+                      style: TextStyle(
+                        color: secondaryTextColor,
+                        fontSize: 12,
+                      ),
                     ),
                     Container(
-                      padding: const EdgeInsets.only(top: 10, right: 25),
+                      padding: const EdgeInsets.only(
+                        top: 10,
+                        right: 25,
+                      ),
                       child: GestureDetector(
                         onTap: () {
                           showModalBottomSheet<void>(
                             context: context,
                             builder: (BuildContext context) {
+                              print(asset.getCost);
                               return Container(
                                 padding: const EdgeInsets.all(20),
                                 // height: height * 0.3,
@@ -149,13 +407,15 @@ class _DepositAssetsState extends State<DepositAssets> {
                                         ),
                                       ],
                                     ),
-                                    Text(
-                                      '${asset.getCost['mainChainNameTip'].split('.')[asset.getCost['mainChainNameTip'].split('.').length - 2]}',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: secondaryTextColor,
-                                      ),
-                                    ),
+                                    asset.getCost['mainChainNameTip'] != null
+                                        ? Text(
+                                            '${asset.getCost['mainChainNameTip'].split('.')[asset.getCost['mainChainNameTip'].split('.').length - 1]}',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: secondaryTextColor,
+                                            ),
+                                          )
+                                        : Container(),
                                     Container(
                                       padding: const EdgeInsets.only(top: 15),
                                       child: Column(
@@ -163,9 +423,7 @@ class _DepositAssetsState extends State<DepositAssets> {
                                               .map(
                                                 (netwrk) => GestureDetector(
                                                   onTap: () {
-                                                    setState(() {
-                                                      _defaultNetwork = netwrk;
-                                                    });
+                                                    changeCoinType(netwrk);
                                                     Navigator.pop(context);
                                                   },
                                                   child: Container(
@@ -183,7 +441,7 @@ class _DepositAssetsState extends State<DepositAssets> {
                                                             Row(
                                                               children: [
                                                                 Text(
-                                                                  '$netwrk',
+                                                                  '${netwrk['mainChainName']}',
                                                                   style: const TextStyle(
                                                                       fontSize:
                                                                           18),
@@ -193,7 +451,8 @@ class _DepositAssetsState extends State<DepositAssets> {
                                                             Icon(
                                                               Icons.done,
                                                               size: 18,
-                                                              color: netwrk ==
+                                                              color: netwrk[
+                                                                          'mainChainName'] ==
                                                                       _defaultNetwork
                                                                   ? greenBTNBGColor
                                                                   : secondaryTextColor,
@@ -250,51 +509,98 @@ class _DepositAssetsState extends State<DepositAssets> {
                         fontSize: 12,
                       ),
                     ),
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.only(top: 12),
-                          width: width * 0.75,
-                          child: Text(
-                            '${asset.changeAddress['addressStr']}',
+                    _loadingAddress
+                        ? depositAddressSkull(context)
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.only(top: 12),
+                                    width: width * 0.75,
+                                    child: Text(
+                                      '${_defaultNetwork == 'XRP' ? asset.changeAddress['addressStr'].split('_')[0] : asset.changeAddress['addressStr']}',
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child: IconButton(
+                                      onPressed: () {
+                                        Clipboard.setData(
+                                          ClipboardData(
+                                            text: _defaultNetwork == 'XRP'
+                                                ? asset
+                                                    .changeAddress['addressStr']
+                                                    .split('_')[0]
+                                                : asset.changeAddress[
+                                                    'addressStr'],
+                                          ),
+                                        );
+                                        snackAlert(context, SnackTypes.success,
+                                            'Copied');
+                                      },
+                                      icon: const Icon(Icons.copy),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              _defaultNetwork == 'XRP'
+                                  ? Row(
+                                      children: [
+                                        Container(
+                                          padding:
+                                              const EdgeInsets.only(top: 12),
+                                          width: width * 0.75,
+                                          child: Text(
+                                            '${asset.changeAddress['addressStr'].split('_')[1]}',
+                                          ),
+                                        ),
+                                        Container(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: IconButton(
+                                            onPressed: () {
+                                              Clipboard.setData(
+                                                ClipboardData(
+                                                  text: asset.changeAddress[
+                                                          'addressStr']
+                                                      .split('_')[1],
+                                                ),
+                                              );
+                                              snackAlert(context,
+                                                  SnackTypes.success, 'Copied');
+                                            },
+                                            icon: const Icon(Icons.copy),
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : Container()
+                            ],
                           ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: IconButton(
-                            onPressed: () {
-                              Clipboard.setData(
-                                ClipboardData(
-                                  text: asset.changeAddress['addressStr'],
-                                ),
-                              );
-                              snackAlert(context, SnackTypes.success, 'Copied');
-                            },
-                            icon: const Icon(Icons.copy),
-                          ),
-                        )
-                      ],
-                    ),
                   ],
                 ),
               ),
               Container(
-                padding: EdgeInsets.all(40),
+                padding: const EdgeInsets.all(40),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     OutlinedButton(
                       onPressed: () {
                         captureScreen();
-                        snackAlert(
-                            context, SnackTypes.success, 'Address saved');
+                        snackAlert(context, SnackTypes.success,
+                            'Address saved to Gallery or Photos.');
                       },
                       child: const Text('Save Address'),
                     ),
                     OutlinedButton(
                       onPressed: () {
-                        share('${asset.getCost['withdrawLimitSymbol']} Address',
-                            asset.changeAddress['addressStr']);
+                        share(
+                          '${asset.getCost['withdrawLimitSymbol']} Address',
+                          asset.changeAddress['addressStr'],
+                        );
                       },
                       child: const Text('Share Address'),
                     ),
