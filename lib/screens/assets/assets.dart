@@ -34,7 +34,6 @@ class _AssetsState extends State<Assets> with SingleTickerProviderStateMixin {
   void initState() {
     _tabController = TabController(length: 3, vsync: this);
     checkLoginStatus();
-    getAccountBalance();
     super.initState();
   }
 
@@ -44,6 +43,9 @@ class _AssetsState extends State<Assets> with SingleTickerProviderStateMixin {
     });
     var auth = Provider.of<Auth>(context, listen: false);
     await auth.checkLogin(context);
+    if (auth.userInfo.isNotEmpty) {
+      getAccountBalance();
+    }
     setState(() {
       _checkAuthStatus = false;
     });
@@ -90,7 +92,6 @@ class _AssetsState extends State<Assets> with SingleTickerProviderStateMixin {
     var asset = Provider.of<Asset>(context, listen: true);
 
     return Scaffold(
-      // appBar: appBar(context, null),
       body: _checkAuthStatus
           ? const Center(
               child: CircularProgressIndicator(),
@@ -154,6 +155,7 @@ class _AssetsState extends State<Assets> with SingleTickerProviderStateMixin {
                     return <Widget>[
                       assetsBar(
                         context,
+                        auth,
                         width,
                         innerBoxIsScrolled,
                         _tabController,

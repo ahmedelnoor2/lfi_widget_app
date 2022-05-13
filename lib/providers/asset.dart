@@ -14,6 +14,10 @@ class Asset with ChangeNotifier {
   Map _p2pBalance = {};
   Map _marginBalance = {};
   Map _totalAccountBalance = {};
+  Map _getCost = {};
+  Map _changeAddress = {};
+  List _digitialAss = [];
+  List _allDigAsset = [];
 
   Map<String, String> headers = {
     'Content-type': 'application/json;charset=utf-8',
@@ -35,6 +39,49 @@ class Asset with ChangeNotifier {
 
   Map get totalAccountBalance {
     return _totalAccountBalance;
+  }
+
+  Map get getCost {
+    return _getCost;
+  }
+
+  Map get changeAddress {
+    return _changeAddress;
+  }
+
+  List get digitialAss {
+    return _digitialAss;
+  }
+
+  List get allDigAsset {
+    return _allDigAsset;
+  }
+
+  void setDigAssets(digAsset) {
+    _digitialAss = digAsset;
+    notifyListeners();
+  }
+
+  Future<void> filterSearchResults(query) async {
+    if (query.isNotEmpty) {
+      List dummyListData = [];
+      for (var item in _digitialAss) {
+        if (item['coin'].contains(query)) {
+          if (item['values']['depositOpen'] == 1) {
+            dummyListData.add(item);
+          }
+          notifyListeners();
+        }
+      }
+      _allDigAsset.clear();
+      _allDigAsset.addAll(dummyListData);
+      return;
+    } else {
+      _allDigAsset.clear();
+      _allDigAsset.addAll(_digitialAss);
+      notifyListeners();
+      return;
+    }
   }
 
   Future<void> getTotalBalance(auth) async {
@@ -153,6 +200,71 @@ class Asset with ChangeNotifier {
         _marginBalance = responseData['data'];
       } else {
         _marginBalance = {};
+      }
+      notifyListeners();
+    } catch (error) {
+      notifyListeners();
+      // throw error;
+    }
+  }
+
+  Future<void> getCoinCosts(auth, coin) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/cost/Getcost',
+    );
+
+    var postData = json.encode({"symbol": coin});
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _getCost = responseData['data'];
+      } else if (responseData['code'] == '10002') {
+        _getCost = {};
+      } else {
+        _getCost = {};
+      }
+      notifyListeners();
+    } catch (error) {
+      notifyListeners();
+      // throw error;
+    }
+  }
+
+  Future<void> getChangeAddress(auth, coin) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/finance/get_charge_address',
+    );
+
+    var postData = json.encode({"symbol": coin});
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        print(responseData['data']);
+        _changeAddress = responseData['data'];
+      } else {
+        _changeAddress = {};
       }
       notifyListeners();
     } catch (error) {
