@@ -378,10 +378,8 @@ class _DepositAssetsState extends State<DepositAssets> {
                           showModalBottomSheet<void>(
                             context: context,
                             builder: (BuildContext context) {
-                              print(asset.getCost);
                               return Container(
                                 padding: const EdgeInsets.all(20),
-                                // height: height * 0.3,
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,

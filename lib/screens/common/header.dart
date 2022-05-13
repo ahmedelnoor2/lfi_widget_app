@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lyotrade/screens/assets/deposit_assets.dart';
+import 'package:lyotrade/screens/assets/withdraw_assets.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
@@ -24,7 +25,8 @@ appBar(context, _handleDrawer) {
     title: const Text('LYOTRADE'),
     elevation: 0,
     shadowColor: Colors.transparent,
-    actions: _currentRoute == DepositAssets.routeName
+    actions: (_currentRoute == DepositAssets.routeName ||
+            _currentRoute == WithdrawAssets.routeName)
         ? [
             IconButton(
               onPressed: () {},
