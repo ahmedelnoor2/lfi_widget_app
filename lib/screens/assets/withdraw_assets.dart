@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,9 +7,13 @@ import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
+
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class WithdrawAssets extends StatefulWidget {
   static const routeName = '/withdraw_assets';
@@ -24,6 +28,11 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  bool _openQrScanner = false;
+  Barcode? result;
+  QRViewController? controller;
+  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
 
   String _defaultNetwork = 'ERC20';
   String _defaultCoin = 'USDT';
@@ -44,6 +53,15 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
     _addressController.dispose();
     _amountController.dispose();
     super.dispose();
+  }
+
+  @override
+  void reassemble() {
+    super.reassemble();
+    if (Platform.isAndroid) {
+      controller!.pauseCamera();
+    }
+    controller!.resumeCamera();
   }
 
   Future<void> getCoinCosts(netwrkType) async {
@@ -79,8 +97,8 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
       });
     }
 
-    await asset.getCoinCosts(auth, _defaultNetwork);
-    await asset.getChangeAddress(auth, _defaultNetwork);
+    await asset.getCoinCosts(auth, _defaultCoin);
+    await asset.getChangeAddress(auth, _defaultCoin);
 
     List _digitialAss = [];
     asset.accountBalance['allCoinMap'].forEach((k, v) {
@@ -101,6 +119,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
     setState(() {
       _defaultNetwork = netwrk['mainChainName'];
     });
+
     await asset.getCoinCosts(auth, netwrk['showName']);
     await asset.getChangeAddress(auth, netwrk['showName']);
   }
@@ -110,7 +129,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
 
     if (auth.userInfo.isNotEmpty) {
       if (auth.userInfo['googleStatus'] != 0 ||
-          auth.userInfo['mobileNumber'].isNotEmpty) {
+          auth.userInfo['mobileNumber'].isEmpty) {
         return showDialog<void>(
           context: context,
           barrierDismissible: false, // user must tap button!
@@ -274,7 +293,6 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                       ? asset.allDigAsset[index]
                       : asset.digitialAss[index];
 
-                  print(_asset);
                   return ListTile(
                     onTap: () {
                       getCoinCosts(asset.allDigAsset.isNotEmpty
@@ -282,12 +300,12 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                           : asset.digitialAss[index]['coin']);
                       Navigator.pop(context);
                     },
-                    // leading: CircleAvatar(
-                    //   radius: width * 0.035,
-                    //   child: Image.network(
-                    //     '${public.publicInfoMarket['market']['coinList'][_asset['coin']]['icon']}',
-                    //   ),
-                    // ),
+                    leading: CircleAvatar(
+                      radius: width * 0.035,
+                      child: Image.network(
+                        '${public.publicInfoMarket['market']['coinList'][_asset['coin']]['icon']}',
+                      ),
+                    ),
                     title: Text('${_asset['coin']}'),
                     trailing: Text('${_asset['values']['total_balance']}'),
                   );
@@ -297,174 +315,428 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
           ],
         ),
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          child: Column(
-            children: [
-              Card(
-                child: Column(
-                  children: [
-                    ListTile(
-                      leading: CircleAvatar(
-                        radius: 15,
-                        child: Image.network(
-                          '${public.publicInfoMarket['market']['coinList'][_defaultCoin]['icon']}',
-                        ),
-                      ),
-                      title: Text(_defaultCoin),
-                      trailing: IconButton(
-                        onPressed: () {
-                          _scaffoldKey.currentState!.openDrawer();
-                        },
-                        icon: Icon(Icons.chevron_right),
-                      ),
+      body: _openQrScanner
+          ? SizedBox(
+              height: height,
+              child: Column(
+                children: [
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: IconButton(
+                      onPressed: () async {
+                        await controller?.pauseCamera();
+                        setState(() {
+                          _openQrScanner = false;
+                        });
+                      },
+                      icon: const Icon(Icons.close),
                     ),
-                    ListTile(
-                      leading: Icon(Icons.account_balance_wallet),
-                      title: Text('Main Account'),
-                      subtitle: Text('0 $_defaultCoin'),
-                      trailing: IconButton(
-                        onPressed: () {},
-                        icon: Icon(Icons.currency_exchange),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                  Expanded(
+                    flex: 4,
+                    child: _buildQrView(context),
+                  ),
+                ],
               ),
-              Card(
+            )
+          : SingleChildScrollView(
+              child: SizedBox(
                 child: Column(
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.only(left: 15),
-                          child: Text('Wallet Address'),
-                        ),
-                        TextButton(
-                            onPressed: () {},
-                            child: const Text(
-                              'Address Book',
-                              style: TextStyle(fontSize: 12),
-                            ))
-                      ],
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      child: TextField(
-                        onChanged: (value) async {
-                          print(value);
-                        },
-                        controller: _addressController,
-                        decoration: const InputDecoration(
-                          // labelText: "Search",
-                          hintText: "Please enter withdraw address",
-                          suffix: Icon(Icons.qr_code_scanner),
-                        ),
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.only(left: 15),
-                          child: Text('Network'),
-                        ),
-                        IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            Icons.help,
-                            size: 15,
-                            color: Colors.grey,
-                          ),
-                        )
-                      ],
-                    ),
-                    Container(
-                      width: width,
-                      padding: const EdgeInsets.all(10),
-                      child: DropdownButton<String>(
-                        isDense: true,
-                        // underline: Container(),
-                        value: '$_defaultNetwork',
-                        // icon: const Icon(Icons.arrow_downward),
-                        elevation: 16,
-                        onChanged: (netwrk) async {
-                          print(netwrk);
-                          // changeCoinType(netwrk);
-                        },
-                        items: _allNetworks
-                            .map<DropdownMenuItem<String>>((netwrk) {
-                          return DropdownMenuItem<String>(
-                            value: '${netwrk['mainChainName']}',
-                            child: Text(
-                              '${netwrk['mainChainName']}',
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      child: TextField(
-                        onChanged: (value) async {
-                          print(value);
-                        },
-                        controller: _amountController,
-                        decoration: InputDecoration(
-                          isDense: true,
-                          labelText: "Amount",
-                          hintText: "Min. withdrawaal 0.0008 BTC",
-                          helperText: "24h withdrawal limit 0/1 BTC",
-                          suffix: TextButton(
-                            onPressed: () {},
-                            child: Text('Max'),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(13),
-                      width: width,
+                    Card(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Notice:'),
-                          Container(
-                            padding: EdgeInsets.only(top: 15),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Withdrawable:',
-                                  style: TextStyle(color: secondaryTextColor),
-                                ),
-                                Text('50000 USDT'),
-                              ],
+                          ListTile(
+                            leading: CircleAvatar(
+                              radius: 15,
+                              child: Image.network(
+                                '${public.publicInfoMarket['market']['coinList'][_defaultCoin]['icon']}',
+                              ),
+                            ),
+                            title: Text(_defaultCoin),
+                            trailing: IconButton(
+                              onPressed: () {
+                                _scaffoldKey.currentState!.openDrawer();
+                              },
+                              icon: const Icon(Icons.chevron_right),
                             ),
                           ),
-                          Container(
-                            padding: EdgeInsets.only(top: 15),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  '24h Withdrwal Limit:',
-                                  style: TextStyle(color: secondaryTextColor),
-                                ),
-                                Text('50000.00/50000.00 USDT'),
-                              ],
+                          ListTile(
+                            leading: const Icon(Icons.account_balance_wallet),
+                            title: const Text('Main Account'),
+                            subtitle: Text(
+                                '${asset.accountBalance['allCoinMap'][_defaultCoin]['normal_balance']} $_defaultCoin'),
+                            trailing: IconButton(
+                              onPressed: () {},
+                              icon: const Icon(Icons.currency_exchange),
                             ),
                           ),
                         ],
                       ),
                     ),
+                    Card(
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.only(left: 15),
+                                child: const Text('Wallet Address'),
+                              ),
+                              TextButton(
+                                  onPressed: () {},
+                                  child: const Text(
+                                    'Address Book',
+                                    style: TextStyle(fontSize: 12),
+                                  ))
+                            ],
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            child: TextField(
+                              onChanged: (value) async {
+                                print(value);
+                              },
+                              controller: _addressController,
+                              decoration: InputDecoration(
+                                // labelText: "Search",
+                                hintText: "Please enter withdraw address",
+                                suffix: SizedBox(
+                                  width: 112,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      TextButton(
+                                        onPressed: () async {
+                                          ClipboardData? data =
+                                              await Clipboard.getData(
+                                                  Clipboard.kTextPlain);
+                                          _addressController.text =
+                                              '${data!.text}';
+                                        },
+                                        child: const Text('PASTE'),
+                                      ),
+                                      IconButton(
+                                        onPressed: () async {
+                                          setState(() {
+                                            _openQrScanner = true;
+                                          });
+                                          await controller?.resumeCamera();
+                                        },
+                                        icon: const Icon(Icons.qr_code_scanner),
+                                        color: secondaryTextColor,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.only(left: 15),
+                                child: const Text('Network'),
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  asset.getCost['mainChainNameTip'].isNotEmpty
+                                      ? showDialog<void>(
+                                          context: context,
+                                          barrierDismissible:
+                                              false, // user must tap button!
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              content: SingleChildScrollView(
+                                                child: ListBody(
+                                                  children: <Widget>[
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        const Text('Tips:'),
+                                                        Align(
+                                                          alignment: Alignment
+                                                              .topRight,
+                                                          child: IconButton(
+                                                            onPressed: () {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            },
+                                                            icon: const Icon(
+                                                              Icons.close,
+                                                              size: 15,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Text(
+                                                      '${asset.getCost['mainChainNameTip']}',
+                                                      style: const TextStyle(
+                                                        fontSize: 12,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        )
+                                      : null;
+                                },
+                                icon: const Icon(
+                                  Icons.help,
+                                  size: 15,
+                                  color: Colors.grey,
+                                ),
+                              )
+                            ],
+                          ),
+                          Container(
+                            padding: const EdgeInsets.only(
+                              top: 10,
+                              right: 15,
+                              left: 15,
+                            ),
+                            child: GestureDetector(
+                              onTap: () {
+                                showModalBottomSheet<void>(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return Container(
+                                      padding: const EdgeInsets.all(20),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              IconButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                icon: Icon(
+                                                  Icons.close,
+                                                  color: secondaryTextColor,
+                                                  size: 20,
+                                                ),
+                                              ),
+                                              Container(
+                                                padding: const EdgeInsets.only(
+                                                    left: 70),
+                                                child: const Text(
+                                                    'Select Network'),
+                                              ),
+                                            ],
+                                          ),
+                                          asset.getCost['mainChainNameTip'] !=
+                                                  null
+                                              ? Text(
+                                                  '${asset.getCost['mainChainNameTip'].split('.')[asset.getCost['mainChainNameTip'].split('.').length - 1]}',
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: secondaryTextColor,
+                                                  ),
+                                                )
+                                              : Container(),
+                                          Container(
+                                            padding:
+                                                const EdgeInsets.only(top: 15),
+                                            child: Column(
+                                                children: _allNetworks
+                                                    .map(
+                                                      (netwrk) =>
+                                                          GestureDetector(
+                                                        onTap: () {
+                                                          changeCoinType(
+                                                              netwrk);
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                        child: Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                            bottom: 10,
+                                                          ),
+                                                          child: Column(
+                                                            children: [
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                children: [
+                                                                  Row(
+                                                                    children: [
+                                                                      Text(
+                                                                        '${netwrk['mainChainName']}',
+                                                                        style: const TextStyle(
+                                                                            fontSize:
+                                                                                18),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  Icon(
+                                                                    Icons.done,
+                                                                    size: 18,
+                                                                    color: netwrk['mainChainName'] ==
+                                                                            _defaultNetwork
+                                                                        ? greenBTNBGColor
+                                                                        : secondaryTextColor,
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              const Divider(),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )
+                                                    .toList()),
+                                          )
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        _defaultNetwork,
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const Icon(Icons.chevron_right),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            child: TextField(
+                              onChanged: (value) async {
+                                print(value);
+                              },
+                              controller: _amountController,
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                decimal: true,
+                              ),
+                              decoration: InputDecoration(
+                                isDense: true,
+                                labelText: "Amount",
+                                hintText:
+                                    "Min. withdrawal ${asset.getCost['withdraw_min']} ${asset.getCost['withdrawLimitSymbol']}",
+                                helperText:
+                                    "Fee: ${asset.getCost['defaultFee']}",
+                                suffix: TextButton(
+                                  onPressed: () {
+                                    _amountController.text =
+                                        asset.accountBalance['allCoinMap']
+                                            [_defaultCoin]['normal_balance'];
+                                  },
+                                  child: const Text('MAX'),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(13),
+                            width: width,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('Tips'),
+                                Container(
+                                  padding: const EdgeInsets.only(top: 15),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Withdrawable:',
+                                        style: TextStyle(
+                                            color: secondaryTextColor),
+                                      ),
+                                      Text(
+                                          '${asset.getCost['can_withdraw_amount']} $_defaultCoin'),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.only(top: 15),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        '24h Withdrwal Limit:',
+                                        style: TextStyle(
+                                            color: secondaryTextColor),
+                                      ),
+                                      Text(
+                                        '${double.parse(asset.getCost['left_withdraw_daily_amount'] ?? '0.00').toStringAsFixed(2)}/${double.parse(asset.getCost['total_withdraw_daily_max_limit'] ?? '0.00').toStringAsFixed(2)} ${asset.getCost['withdrawLimitSymbol']}',
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.only(top: 15),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Container(
+                                            padding:
+                                                const EdgeInsets.only(right: 5),
+                                            child: Icon(
+                                              Icons.warning,
+                                              size: 15,
+                                              color: orangeBGColor,
+                                            ),
+                                          ),
+                                          Text(
+                                            'Max Limit:',
+                                            style:
+                                                TextStyle(color: orangeBGColor),
+                                          ),
+                                        ],
+                                      ),
+                                      Text(
+                                        '${asset.getCost['withdraw_max']} ${asset.getCost['withdrawLimitSymbol']}',
+                                        style: TextStyle(color: orangeBGColor),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
                   ],
                 ),
-              )
-            ],
-          ),
-        ),
-      ),
+              ),
+            ),
       bottomNavigationBar: Container(
         height: height * 0.15,
         color: Colors.grey[800],
@@ -475,14 +747,14 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
               child: Align(
                 alignment: Alignment.bottomLeft,
                 child: Container(
-                  padding: EdgeInsets.only(left: 20),
-                  child: Text('Fee: 0.0005 BTC'),
+                  padding: const EdgeInsets.only(left: 20),
+                  child: const Text('Fee: 0.0005 BTC'),
                 ),
               ),
             ),
             SizedBox(
               width: width * 0.9,
-              child: ElevatedButton(
+              child: const ElevatedButton(
                 onPressed: null,
                 child: Text('Withdraw'),
               ),
@@ -491,5 +763,46 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
         ),
       ),
     );
+  }
+
+  Widget _buildQrView(BuildContext context) {
+    // For this example we check how width or tall the device is and change the scanArea and overlay accordingly.
+    var scanArea = (MediaQuery.of(context).size.width < 400 ||
+            MediaQuery.of(context).size.height < 400)
+        ? 150.0
+        : 300.0;
+    // To ensure the Scanner view is properly sizes after rotation
+    // we need to listen for Flutter SizeChanged notification and update controller
+    return QRView(
+      key: qrKey,
+      onQRViewCreated: _onQRViewCreated,
+      overlay: QrScannerOverlayShape(
+        borderColor: Colors.red,
+        borderRadius: 10,
+        borderLength: 30,
+        borderWidth: 10,
+        cutOutSize: scanArea,
+      ),
+      onPermissionSet: (ctrl, p) => _onPermissionSet(context, ctrl, p),
+    );
+  }
+
+  void _onQRViewCreated(QRViewController controller) {
+    setState(() {
+      this.controller = controller;
+    });
+    controller.scannedDataStream.listen((scanData) {
+      _addressController.text = '${scanData.code}';
+      setState(() {
+        _openQrScanner = false;
+      });
+    });
+  }
+
+  void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {
+    // print('${DateTime.now().toIso8601String()}_onPermissionSet $p');
+    if (!p) {
+      snackAlert(context, SnackTypes.errors, 'No permissions');
+    }
   }
 }

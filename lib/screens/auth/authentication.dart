@@ -70,7 +70,7 @@ class _AuthenticationState extends State<Authentication> {
 
     return Scaffold(
       appBar: appBar(context, null),
-      body: Container(
+      body: SingleChildScrollView(
         child: Column(
           children: [
             _verifyEmail
