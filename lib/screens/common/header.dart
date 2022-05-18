@@ -6,6 +6,13 @@ import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/Number.utils.dart';
 
+Widget headerImage() {
+  return const Image(
+    image: AssetImage('assets/img/logo.png'),
+    width: 150,
+  );
+}
+
 appBar(context, _handleDrawer) {
   var _currentRoute = ModalRoute.of(context)!.settings.name;
 
@@ -22,7 +29,7 @@ appBar(context, _handleDrawer) {
         }
       },
     ),
-    title: const Text('LYOTRADE'),
+    title: headerImage(),
     elevation: 0,
     shadowColor: Colors.transparent,
     actions: (_currentRoute == DepositAssets.routeName ||

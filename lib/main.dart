@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/providers/user.dart';
 import 'package:lyotrade/screens/assets/assets.dart';
 import 'package:lyotrade/screens/assets/deposit_assets.dart';
 import 'package:lyotrade/screens/assets/withdraw_assets.dart';
 import 'package:lyotrade/screens/auth/authentication.dart';
 import 'package:lyotrade/screens/dashboard.dart';
 import 'package:lyotrade/screens/market/market.dart';
+import 'package:lyotrade/screens/security/google_auth.dart';
+import 'package:lyotrade/screens/security/password.dart';
+import 'package:lyotrade/screens/security/security.dart';
 import 'package:lyotrade/screens/trade/trade.dart';
 import 'package:provider/provider.dart';
 
@@ -26,6 +30,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<Auth>(create: (_) => Auth()),
         ChangeNotifierProvider<Public>(create: (_) => Public()),
         ChangeNotifierProvider<Asset>(create: (_) => Asset()),
+        ChangeNotifierProvider<User>(create: (_) => User()),
       ],
       child: Consumer<Auth>(
         builder: (context, auth, _) {
@@ -54,6 +59,9 @@ class MyApp extends StatelessWidget {
               Assets.routeName: (context) => const Assets(),
               DepositAssets.routeName: (context) => const DepositAssets(),
               WithdrawAssets.routeName: (context) => const WithdrawAssets(),
+              Security.routeName: (context) => const Security(),
+              Password.routeName: (context) => const Password(),
+              GoogleAuth.routeName: (context) => const GoogleAuth(),
             },
           );
         },

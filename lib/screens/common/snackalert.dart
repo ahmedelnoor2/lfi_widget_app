@@ -5,13 +5,16 @@ import 'package:lyotrade/utils/Colors.utils.dart';
 getBgColor(type) {
   var color = Colors.blue;
 
-  switch(type) {
-    case SnackTypes.errors: color = errorColor;
-    break;
-    case SnackTypes.success: color = successColor;
-    break;
-    case SnackTypes.warning: color = warningColor;
-    break;
+  switch (type) {
+    case SnackTypes.errors:
+      color = errorColor;
+      break;
+    case SnackTypes.success:
+      color = successColor;
+      break;
+    case SnackTypes.warning:
+      color = warningColor;
+      break;
   }
 
   return color;

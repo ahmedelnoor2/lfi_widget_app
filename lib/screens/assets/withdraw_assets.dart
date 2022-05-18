@@ -2,6 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lyotrade/screens/assets/common/networks.dart';
+import 'package:lyotrade/screens/assets/common/qr_scanner.dart';
+import 'package:lyotrade/screens/common/alert.dart';
+import 'package:lyotrade/screens/common/drawer.dart';
 import 'package:lyotrade/screens/common/header.dart';
 
 import 'package:lyotrade/providers/asset.dart';
@@ -130,90 +134,57 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
     if (auth.userInfo.isNotEmpty) {
       if (auth.userInfo['googleStatus'] != 0 ||
           auth.userInfo['mobileNumber'].isEmpty) {
-        return showDialog<void>(
-          context: context,
-          barrierDismissible: false, // user must tap button!
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.only(right: 5),
-                        child: const Icon(
-                          Icons.featured_play_list,
-                        ),
-                      ),
-                      const Text(
-                        'Tips',
-                        style: TextStyle(fontSize: 15),
-                      ),
-                    ],
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    icon: const Icon(
-                      Icons.close,
-                      size: 15,
-                    ),
-                  ),
-                ],
+        return showAlert(
+          context,
+          'Tips',
+          const <Widget>[
+            Text(
+              'For the security of your account, please open at least one verification method',
+              style: TextStyle(
+                fontSize: 12,
               ),
-              content: SingleChildScrollView(
-                child: ListBody(
-                  children: const <Widget>[
-                    Text(
-                      'For the security of your account, please open at least one verification method',
-                      style: TextStyle(
-                        fontSize: 12,
-                      ),
-                    ),
-                    ListTile(
-                      title: Text(
-                        'Connect Google verification',
-                        style: TextStyle(
-                          fontSize: 12,
-                        ),
-                      ),
-                      trailing: Icon(
-                        Icons.check,
-                        size: 15,
-                      ),
-                    ),
-                    Divider(),
-                    ListTile(
-                      title: Text(
-                        'Connect mobile phone verification',
-                        style: TextStyle(
-                          fontSize: 12,
-                        ),
-                      ),
-                      trailing: Icon(
-                        Icons.check,
-                        size: 15,
-                      ),
-                    ),
-                    Divider(),
-                  ],
+            ),
+            ListTile(
+              title: Text(
+                'Connect Google verification',
+                style: TextStyle(
+                  fontSize: 12,
                 ),
               ),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('Settings'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
+              trailing: Icon(
+                Icons.check,
+                size: 15,
+              ),
+            ),
+            Divider(),
+            ListTile(
+              title: Text(
+                'Connect mobile phone verification',
+                style: TextStyle(
+                  fontSize: 12,
                 ),
-              ],
-            );
-          },
+              ),
+              trailing: Icon(
+                Icons.check,
+                size: 15,
+              ),
+            ),
+            Divider(),
+          ],
+          'Settings',
         );
       }
     }
+  }
+
+  void addressController(text) {
+    _addressController.text = text;
+  }
+
+  void toggleOpenQrScanner() {
+    setState(() {
+      _openQrScanner = !_openQrScanner;
+    });
   }
 
   @override
@@ -227,117 +198,19 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: appBar(context, null),
-      drawer: Container(
-        decoration: BoxDecoration(
-          color: Colors.grey[850],
-        ),
-        width: width,
-        child: Column(
-          children: <Widget>[
-            Container(
-              padding: const EdgeInsets.only(top: 35),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: Icon(
-                      Icons.close,
-                      color: secondaryTextColor,
-                      size: 20,
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.only(left: 70),
-                    child: const Text('Select Coin'),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.only(
-                left: 15,
-                right: 15,
-              ),
-              child: SizedBox(
-                height: width * 0.13,
-                child: TextField(
-                  onChanged: (value) async {
-                    await asset.filterSearchResults(value);
-                  },
-                  controller: _searchController,
-                  decoration: const InputDecoration(
-                    labelText: "Search",
-                    hintText: "Search",
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(25.0),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(
-              height: height * 0.8,
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: asset.allDigAsset.isNotEmpty
-                    ? asset.allDigAsset.length
-                    : asset.digitialAss.length,
-                itemBuilder: (context, index) {
-                  var _asset = asset.allDigAsset.isNotEmpty
-                      ? asset.allDigAsset[index]
-                      : asset.digitialAss[index];
-
-                  return ListTile(
-                    onTap: () {
-                      getCoinCosts(asset.allDigAsset.isNotEmpty
-                          ? asset.allDigAsset[index]['coin']
-                          : asset.digitialAss[index]['coin']);
-                      Navigator.pop(context);
-                    },
-                    leading: CircleAvatar(
-                      radius: width * 0.035,
-                      child: Image.network(
-                        '${public.publicInfoMarket['market']['coinList'][_asset['coin']]['icon']}',
-                      ),
-                    ),
-                    title: Text('${_asset['coin']}'),
-                    trailing: Text('${_asset['values']['total_balance']}'),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+      drawer: drawer(
+        context,
+        width,
+        height,
+        asset,
+        public,
+        _searchController,
+        getCoinCosts,
       ),
       body: _openQrScanner
-          ? SizedBox(
-              height: height,
-              child: Column(
-                children: [
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: IconButton(
-                      onPressed: () async {
-                        await controller?.pauseCamera();
-                        setState(() {
-                          _openQrScanner = false;
-                        });
-                      },
-                      icon: const Icon(Icons.close),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 4,
-                    child: _buildQrView(context),
-                  ),
-                ],
-              ),
+          ? QrScanner(
+              addressController: addressController,
+              toggleOpenQrScanner: toggleOpenQrScanner,
             )
           : SingleChildScrollView(
               child: SizedBox(
@@ -347,6 +220,9 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                       child: Column(
                         children: [
                           ListTile(
+                            onTap: () {
+                              _scaffoldKey.currentState!.openDrawer();
+                            },
                             leading: CircleAvatar(
                               radius: 15,
                               child: Image.network(
@@ -365,7 +241,8 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                             leading: const Icon(Icons.account_balance_wallet),
                             title: const Text('Main Account'),
                             subtitle: Text(
-                                '${asset.accountBalance['allCoinMap'][_defaultCoin]['normal_balance']} $_defaultCoin'),
+                              '${asset.accountBalance['allCoinMap'][_defaultCoin]['normal_balance']} $_defaultCoin',
+                            ),
                             trailing: IconButton(
                               onPressed: () {},
                               icon: const Icon(Icons.currency_exchange),
@@ -407,7 +284,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
-                                      TextButton(
+                                      IconButton(
                                         onPressed: () async {
                                           ClipboardData? data =
                                               await Clipboard.getData(
@@ -415,7 +292,8 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                           _addressController.text =
                                               '${data!.text}';
                                         },
-                                        child: const Text('PASTE'),
+                                        icon: const Icon(Icons.content_paste),
+                                        color: secondaryTextColor,
                                       ),
                                       IconButton(
                                         onPressed: () async {
@@ -507,103 +385,12 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                 showModalBottomSheet<void>(
                                   context: context,
                                   builder: (BuildContext context) {
-                                    return Container(
-                                      padding: const EdgeInsets.all(20),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              IconButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                icon: Icon(
-                                                  Icons.close,
-                                                  color: secondaryTextColor,
-                                                  size: 20,
-                                                ),
-                                              ),
-                                              Container(
-                                                padding: const EdgeInsets.only(
-                                                    left: 70),
-                                                child: const Text(
-                                                    'Select Network'),
-                                              ),
-                                            ],
-                                          ),
-                                          asset.getCost['mainChainNameTip'] !=
-                                                  null
-                                              ? Text(
-                                                  '${asset.getCost['mainChainNameTip'].split('.')[asset.getCost['mainChainNameTip'].split('.').length - 1]}',
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: secondaryTextColor,
-                                                  ),
-                                                )
-                                              : Container(),
-                                          Container(
-                                            padding:
-                                                const EdgeInsets.only(top: 15),
-                                            child: Column(
-                                                children: _allNetworks
-                                                    .map(
-                                                      (netwrk) =>
-                                                          GestureDetector(
-                                                        onTap: () {
-                                                          changeCoinType(
-                                                              netwrk);
-                                                          Navigator.pop(
-                                                              context);
-                                                        },
-                                                        child: Container(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .only(
-                                                            bottom: 10,
-                                                          ),
-                                                          child: Column(
-                                                            children: [
-                                                              Row(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .spaceBetween,
-                                                                children: [
-                                                                  Row(
-                                                                    children: [
-                                                                      Text(
-                                                                        '${netwrk['mainChainName']}',
-                                                                        style: const TextStyle(
-                                                                            fontSize:
-                                                                                18),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                  Icon(
-                                                                    Icons.done,
-                                                                    size: 18,
-                                                                    color: netwrk['mainChainName'] ==
-                                                                            _defaultNetwork
-                                                                        ? greenBTNBGColor
-                                                                        : secondaryTextColor,
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              const Divider(),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    )
-                                                    .toList()),
-                                          )
-                                        ],
-                                      ),
+                                    return networks(
+                                      context,
+                                      asset,
+                                      _allNetworks,
+                                      _defaultNetwork,
+                                      changeCoinType,
                                     );
                                   },
                                 );

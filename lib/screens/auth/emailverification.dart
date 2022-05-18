@@ -98,6 +98,8 @@ class _EmailVerificationState extends State<EmailVerification> {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
 
+    var auth = Provider.of<Auth>(context, listen: true);
+
     return Container(
       padding: EdgeInsets.only(top: height * 0.03),
       height: height * 0.5,
@@ -144,21 +146,25 @@ class _EmailVerificationState extends State<EmailVerification> {
                     },
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      labelText: 'Email verification code',
-                      suffix: TextButton(
-                        onPressed: _startTimer
-                            ? null
-                            : () {
-                                setState(() {
-                                  _start = 90;
-                                });
-                                startTimer();
-                                print('Send code');
-                              },
-                        child: Text(_startTimer
-                            ? '${_start}s Get it again'
-                            : 'Click to send'),
-                      ),
+                      labelText: auth.googleAuth
+                          ? 'Google verification code'
+                          : 'Email verification code',
+                      suffix: auth.googleAuth
+                          ? null
+                          : TextButton(
+                              onPressed: _startTimer
+                                  ? null
+                                  : () {
+                                      setState(() {
+                                        _start = 90;
+                                      });
+                                      startTimer();
+                                      print('Send code');
+                                    },
+                              child: Text(_startTimer
+                                  ? '${_start}s Get it again'
+                                  : 'Click to send'),
+                            ),
                     ),
                     controller: _emailVeirficationCode,
                   ),
@@ -172,8 +178,9 @@ class _EmailVerificationState extends State<EmailVerification> {
               style: ElevatedButton.styleFrom(
                   textStyle: const TextStyle(fontSize: 20)),
               onPressed: () async {
-                _timer.cancel();
-                print('Verify Email');
+                if (!auth.googleAuth) {
+                  _timer.cancel();
+                }
                 if (_formEmailVeriKey.currentState!.validate()) {
                   // If the form is valid, display a snackbar. In the real world,
                   // you'd often call a server or save the information in a database.

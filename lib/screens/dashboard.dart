@@ -137,12 +137,10 @@ class _DashboardState extends State<Dashboard> {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
 
-    var auth = Provider.of<Auth>(context, listen: true);
-
     return Scaffold(
       key: _key,
       appBar: appBar(context, _handleDrawer),
-      drawer: sideBar(context, auth),
+      drawer: const SideBar(),
       body: SingleChildScrollView(
         child: Container(
           width: width,
