@@ -31,6 +31,13 @@ class _GoogleAuthState extends State<GoogleAuth> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _password.dispose();
+    _googleCode.dispose();
+    super.dispose();
+  }
+
   Future<void> getGoogleAuth() async {
     var auth = Provider.of<Auth>(context, listen: false);
     var user = Provider.of<User>(context, listen: false);

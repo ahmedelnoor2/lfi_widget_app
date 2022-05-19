@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:provider/provider.dart';
@@ -69,6 +70,7 @@ class _EmailVerificationState extends State<EmailVerification> {
     var auth = Provider.of<Auth>(context, listen: false);
     await auth.sendEmailValidCode(context, {
       'token': widget.token,
+      'email': '',
       'operationType': widget.operationType,
     });
   }
@@ -150,7 +152,15 @@ class _EmailVerificationState extends State<EmailVerification> {
                           ? 'Google verification code'
                           : 'Email verification code',
                       suffix: auth.googleAuth
-                          ? null
+                          ? TextButton(
+                              onPressed: () async {
+                                ClipboardData? data = await Clipboard.getData(
+                                  Clipboard.kTextPlain,
+                                );
+                                _emailVeirficationCode.text = '${data!.text}';
+                              },
+                              child: const Icon(Icons.copy),
+                            )
                           : TextButton(
                               onPressed: _startTimer
                                   ? null

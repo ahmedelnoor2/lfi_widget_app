@@ -66,6 +66,8 @@ class _PasswordState extends State<Password> {
     await auth.sendMobileValidCode(context, {
       'code': _currentCoutnry,
       'mobile': _mobileNumber.text,
+      'smsType': '',
+      'operationType': 2,
     });
   }
 

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/screens/common/alert.dart';
 import 'package:lyotrade/screens/common/header.dart';
-import 'package:lyotrade/screens/security/password.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 
@@ -19,7 +18,7 @@ class _SecurityState extends State<Security> {
 
   @override
   Widget build(BuildContext context) {
-    var auth = Provider.of<Auth>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: true);
 
     return Scaffold(
       key: _key,
@@ -33,7 +32,8 @@ class _SecurityState extends State<Security> {
             subtitle: const Text('***********'),
             trailing: TextButton(
               onPressed: () {
-                if (auth.userInfo['mobileNumber'].isEmpty) {
+                if (auth.userInfo['mobileNumber'].isEmpty &&
+                    auth.userInfo['googleStatus'] == 0) {
                   showAlert(
                     context,
                     'Security Reminder',
@@ -73,24 +73,69 @@ class _SecurityState extends State<Security> {
                     ],
                     'Ok',
                   );
-                } else {}
+                } else {
+                  Navigator.pushNamed(context, '/password');
+                }
               },
               child: const Text('Change'),
             ),
           ),
           const Divider(),
           ListTile(
-            leading: Icon(Icons.email),
-            title: Text('Email'),
-            subtitle: Text(
+            leading: const Icon(Icons.email),
+            title: const Text('Email'),
+            subtitle: const Text(
               'Used when logging in, withdrawing and modifying security settings',
               style: TextStyle(fontSize: 12),
             ),
             trailing: TextButton(
               onPressed: () {
-                print('Change Pass');
+                if (auth.userInfo['mobileNumber'].isEmpty &&
+                    auth.userInfo['googleStatus'] == 0) {
+                  showAlert(
+                    context,
+                    'Security Reminder',
+                    const <Widget>[
+                      Text(
+                        'For the security of your account, please open at least one verification method',
+                        style: TextStyle(
+                          fontSize: 12,
+                        ),
+                      ),
+                      ListTile(
+                        title: Text(
+                          'Connect Google verification',
+                          style: TextStyle(
+                            fontSize: 12,
+                          ),
+                        ),
+                        trailing: Icon(
+                          Icons.check,
+                          size: 15,
+                        ),
+                      ),
+                      Divider(),
+                      ListTile(
+                        title: Text(
+                          'Connect mobile phone verification',
+                          style: TextStyle(
+                            fontSize: 12,
+                          ),
+                        ),
+                        trailing: Icon(
+                          Icons.check,
+                          size: 15,
+                        ),
+                      ),
+                      Divider(),
+                    ],
+                    'Ok',
+                  );
+                } else {
+                  Navigator.pushNamed(context, '/email_change');
+                }
               },
-              child: Text('Change'),
+              child: const Text('Change'),
             ),
           ),
           const Divider(),

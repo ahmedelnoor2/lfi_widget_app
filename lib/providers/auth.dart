@@ -226,6 +226,7 @@ class Auth with ChangeNotifier {
 
     var postData = json.encode({
       'token': formData['token'],
+      'email': formData['email'],
       'operationType': formData['operationType'],
     });
 
@@ -259,7 +260,8 @@ class Auth with ChangeNotifier {
     var postData = json.encode({
       'countryCode': formData['code'],
       'mobile': formData['mobile'],
-      'operationType': 2
+      'operationType': formData['operationType'],
+      'smsType': formData['smsType'],
     });
 
     try {
@@ -295,17 +297,11 @@ class Auth with ChangeNotifier {
       'smsAuthCode': formData['smsAuthCode'],
     });
 
-    print(postData);
-
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
-      print(responseData);
       if (responseData['code'] == '0') {
-        // _loginVerificationToken = responseData['data']['token'];
-        // final prefs = await SharedPreferences.getInstance();
-        // await prefs.setString('authToken', _loginVerificationToken);
         snackAlert(ctx, SnackTypes.success, 'Phone is successfully verified.');
       } else {
         print('Code: ${responseData['code']}');
@@ -353,6 +349,42 @@ class Auth with ChangeNotifier {
       print(error);
       snackAlert(ctx, SnackTypes.errors, 'Server Error!');
       return '0';
+      // throw error;
+    }
+  }
+
+  Future<void> emailUpdate(ctx, formData) async {
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/user/email_update',
+    );
+
+    var postData = json.encode({
+      'email': formData['email'],
+      'emailOldValidCode': formData['emailOldValidCode'],
+      'emailNewValidCode': formData['emailNewValidCode'],
+      'googleCode': formData['googleCode'],
+      'smsValidCode': formData['smsValidCode']
+    });
+
+    try {
+      final response = await http.post(url, body: postData, headers: headers);
+
+      final responseData = json.decode(response.body);
+      print(responseData);
+      if (responseData['code'] == '0') {
+        snackAlert(ctx, SnackTypes.success, 'Email is successfully updated.');
+        Navigator.pop(ctx);
+        return;
+      } else {
+        print('Code: ${responseData['code']}');
+        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+      }
+
+      return responseData['code'];
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server Error!');
+      return;
       // throw error;
     }
   }
