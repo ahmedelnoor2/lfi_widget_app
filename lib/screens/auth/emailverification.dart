@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:provider/provider.dart';
@@ -69,6 +70,7 @@ class _EmailVerificationState extends State<EmailVerification> {
     var auth = Provider.of<Auth>(context, listen: false);
     await auth.sendEmailValidCode(context, {
       'token': widget.token,
+      'email': '',
       'operationType': widget.operationType,
     });
   }
@@ -97,6 +99,8 @@ class _EmailVerificationState extends State<EmailVerification> {
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
+
+    var auth = Provider.of<Auth>(context, listen: true);
 
     return Container(
       padding: EdgeInsets.only(top: height * 0.03),
@@ -144,21 +148,33 @@ class _EmailVerificationState extends State<EmailVerification> {
                     },
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      labelText: 'Email verification code',
-                      suffix: TextButton(
-                        onPressed: _startTimer
-                            ? null
-                            : () {
-                                setState(() {
-                                  _start = 90;
-                                });
-                                startTimer();
-                                print('Send code');
+                      labelText: auth.googleAuth
+                          ? 'Google verification code'
+                          : 'Email verification code',
+                      suffix: auth.googleAuth
+                          ? TextButton(
+                              onPressed: () async {
+                                ClipboardData? data = await Clipboard.getData(
+                                  Clipboard.kTextPlain,
+                                );
+                                _emailVeirficationCode.text = '${data!.text}';
                               },
-                        child: Text(_startTimer
-                            ? '${_start}s Get it again'
-                            : 'Click to send'),
-                      ),
+                              child: const Icon(Icons.copy),
+                            )
+                          : TextButton(
+                              onPressed: _startTimer
+                                  ? null
+                                  : () {
+                                      setState(() {
+                                        _start = 90;
+                                      });
+                                      startTimer();
+                                      print('Send code');
+                                    },
+                              child: Text(_startTimer
+                                  ? '${_start}s Get it again'
+                                  : 'Click to send'),
+                            ),
                     ),
                     controller: _emailVeirficationCode,
                   ),
@@ -172,8 +188,9 @@ class _EmailVerificationState extends State<EmailVerification> {
               style: ElevatedButton.styleFrom(
                   textStyle: const TextStyle(fontSize: 20)),
               onPressed: () async {
-                _timer.cancel();
-                print('Verify Email');
+                if (!auth.googleAuth) {
+                  _timer.cancel();
+                }
                 if (_formEmailVeriKey.currentState!.validate()) {
                   // If the form is valid, display a snackbar. In the real world,
                   // you'd often call a server or save the information in a database.

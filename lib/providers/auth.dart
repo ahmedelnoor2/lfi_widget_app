@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
+import 'package:lyotrade/utils/Translate.utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Auth with ChangeNotifier {
@@ -16,6 +17,7 @@ class Auth with ChangeNotifier {
   String _emailVerificationToken = '';
   String _loginVerificationToken = '';
   String authToken = '';
+  bool _googleAuth = false;
 
   Map _userInfo = {};
 
@@ -29,6 +31,10 @@ class Auth with ChangeNotifier {
 
   Map get userInfo {
     return _userInfo;
+  }
+
+  bool get googleAuth {
+    return _googleAuth;
   }
 
   Future<void> checkLogin(ctx) async {
@@ -55,11 +61,15 @@ class Auth with ChangeNotifier {
       final responseData = json.decode(response.body);
       if (responseData['code'] == '0') {
         _userInfo = responseData['data'];
+        notifyListeners();
       } else {
         _userInfo = {};
+        notifyListeners();
       }
       return '';
     } catch (error) {
+      _userInfo = {};
+      notifyListeners();
       return '';
       // throw error;
     }
@@ -111,6 +121,11 @@ class Auth with ChangeNotifier {
 
       final responseData = json.decode(response.body);
       if (responseData['code'] == 0) {
+        if (responseData['data']['googleAuth'] == '1') {
+          _googleAuth = true;
+        } else {
+          _googleAuth = false;
+        }
         _loginVerificationToken = responseData['data']['token'];
         notifyListeners();
         return _loginVerificationToken;
@@ -136,13 +151,18 @@ class Auth with ChangeNotifier {
       'token': formData['token'],
     });
 
-    print(postData);
+    if (_googleAuth) {
+      postData = json.encode({
+        'googleCode': formData['emailCode'],
+        'token': formData['token'],
+      });
+    }
 
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
-      print(responseData);
+
       if (responseData['code'] == 0) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('authToken', _loginVerificationToken);
@@ -206,6 +226,7 @@ class Auth with ChangeNotifier {
 
     var postData = json.encode({
       'token': formData['token'],
+      'email': formData['email'],
       'operationType': formData['operationType'],
     });
 
@@ -226,6 +247,72 @@ class Auth with ChangeNotifier {
       print(error);
       snackAlert(ctx, SnackTypes.errors, 'Server Error!');
       return '';
+      // throw error;
+    }
+  }
+
+  Future<String> sendMobileValidCode(ctx, formData) async {
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/v4/common/smsValidCode',
+    );
+
+    var postData = json.encode({
+      'countryCode': formData['code'],
+      'mobile': formData['mobile'],
+      'operationType': formData['operationType'],
+      'smsType': formData['smsType'],
+    });
+
+    try {
+      final response = await http.post(url, body: postData, headers: headers);
+
+      final responseData = json.decode(response.body);
+      print(responseData);
+      if (responseData['code'] == '0') {
+        snackAlert(
+            ctx, SnackTypes.success, 'Verification code sent to your mobile.');
+      } else {
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
+      }
+
+      return '';
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server Error!');
+      return '';
+      // throw error;
+    }
+  }
+
+  Future<String> confirmMobileCode(ctx, formData) async {
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/user/mobile_bind_save',
+    );
+
+    var postData = json.encode({
+      'countryCode': formData['countryCode'],
+      'mobileNumber': formData['mobile'],
+      'googleCode': formData['googleCode'],
+      'smsAuthCode': formData['smsAuthCode'],
+    });
+
+    try {
+      final response = await http.post(url, body: postData, headers: headers);
+
+      final responseData = json.decode(response.body);
+      if (responseData['code'] == '0') {
+        snackAlert(ctx, SnackTypes.success, 'Phone is successfully verified.');
+      } else {
+        print('Code: ${responseData['code']}');
+        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+      }
+
+      return responseData['code'];
+    } catch (error) {
+      print(error);
+      snackAlert(ctx, SnackTypes.errors, 'Server Error!');
+      return '0';
       // throw error;
     }
   }
@@ -262,6 +349,42 @@ class Auth with ChangeNotifier {
       print(error);
       snackAlert(ctx, SnackTypes.errors, 'Server Error!');
       return '0';
+      // throw error;
+    }
+  }
+
+  Future<void> emailUpdate(ctx, formData) async {
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/user/email_update',
+    );
+
+    var postData = json.encode({
+      'email': formData['email'],
+      'emailOldValidCode': formData['emailOldValidCode'],
+      'emailNewValidCode': formData['emailNewValidCode'],
+      'googleCode': formData['googleCode'],
+      'smsValidCode': formData['smsValidCode']
+    });
+
+    try {
+      final response = await http.post(url, body: postData, headers: headers);
+
+      final responseData = json.decode(response.body);
+      print(responseData);
+      if (responseData['code'] == '0') {
+        snackAlert(ctx, SnackTypes.success, 'Email is successfully updated.');
+        Navigator.pop(ctx);
+        return;
+      } else {
+        print('Code: ${responseData['code']}');
+        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+      }
+
+      return responseData['code'];
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server Error!');
+      return;
       // throw error;
     }
   }

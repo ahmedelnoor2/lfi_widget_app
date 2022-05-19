@@ -6,7 +6,9 @@ import 'package:flutter/services.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/screens/assets/common/networks.dart';
 import 'package:lyotrade/screens/assets/skeleton/deposit_skull.dart';
+import 'package:lyotrade/screens/common/drawer.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
@@ -154,92 +156,14 @@ class _DepositAssetsState extends State<DepositAssets> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: appBar(context, null),
-      drawer: Container(
-        decoration: BoxDecoration(
-          color: Colors.grey[850],
-        ),
-        width: width,
-        child: Column(
-          children: <Widget>[
-            Container(
-              padding: const EdgeInsets.only(top: 35),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: Icon(
-                      Icons.close,
-                      color: secondaryTextColor,
-                      size: 20,
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.only(left: 70),
-                    child: const Text('Select Coin'),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.only(
-                left: 15,
-                right: 15,
-              ),
-              child: SizedBox(
-                height: width * 0.13,
-                child: TextField(
-                  onChanged: (value) async {
-                    await asset.filterSearchResults(value);
-                  },
-                  controller: _searchController,
-                  decoration: const InputDecoration(
-                    labelText: "Search",
-                    hintText: "Search",
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(25.0),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(
-              height: height * 0.8,
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: asset.allDigAsset.isNotEmpty
-                    ? asset.allDigAsset.length
-                    : asset.digitialAss.length,
-                itemBuilder: (context, index) {
-                  var _asset = asset.allDigAsset.isNotEmpty
-                      ? asset.allDigAsset[index]
-                      : asset.digitialAss[index];
-                  return ListTile(
-                    onTap: () {
-                      getCoinCosts(asset.allDigAsset.isNotEmpty
-                          ? asset.allDigAsset[index]['coin']
-                          : asset.digitialAss[index]['coin']);
-                      Navigator.pop(context);
-                    },
-                    leading: CircleAvatar(
-                      radius: width * 0.035,
-                      child: Image.network(
-                        '${public.publicInfoMarket['market']['coinList'][_asset['coin']]['icon']}',
-                      ),
-                    ),
-                    title: Text('${_asset['coin']}'),
-                    trailing: Text('${_asset['values']['total_balance']}'),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+      drawer: drawer(
+        context,
+        width,
+        height,
+        asset,
+        public,
+        _searchController,
+        getCoinCosts,
       ),
       body: Screenshot(
         controller: screenshotController,
@@ -378,97 +302,12 @@ class _DepositAssetsState extends State<DepositAssets> {
                           showModalBottomSheet<void>(
                             context: context,
                             builder: (BuildContext context) {
-                              print(asset.getCost);
-                              return Container(
-                                padding: const EdgeInsets.all(20),
-                                // height: height * 0.3,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        IconButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          icon: Icon(
-                                            Icons.close,
-                                            color: secondaryTextColor,
-                                            size: 20,
-                                          ),
-                                        ),
-                                        Container(
-                                          padding:
-                                              const EdgeInsets.only(left: 70),
-                                          child: const Text('Select Network'),
-                                        ),
-                                      ],
-                                    ),
-                                    asset.getCost['mainChainNameTip'] != null
-                                        ? Text(
-                                            '${asset.getCost['mainChainNameTip'].split('.')[asset.getCost['mainChainNameTip'].split('.').length - 1]}',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: secondaryTextColor,
-                                            ),
-                                          )
-                                        : Container(),
-                                    Container(
-                                      padding: const EdgeInsets.only(top: 15),
-                                      child: Column(
-                                          children: _allNetworks
-                                              .map(
-                                                (netwrk) => GestureDetector(
-                                                  onTap: () {
-                                                    changeCoinType(netwrk);
-                                                    Navigator.pop(context);
-                                                  },
-                                                  child: Container(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                      bottom: 10,
-                                                    ),
-                                                    child: Column(
-                                                      children: [
-                                                        Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
-                                                          children: [
-                                                            Row(
-                                                              children: [
-                                                                Text(
-                                                                  '${netwrk['mainChainName']}',
-                                                                  style: const TextStyle(
-                                                                      fontSize:
-                                                                          18),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            Icon(
-                                                              Icons.done,
-                                                              size: 18,
-                                                              color: netwrk[
-                                                                          'mainChainName'] ==
-                                                                      _defaultNetwork
-                                                                  ? greenBTNBGColor
-                                                                  : secondaryTextColor,
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        const Divider(),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              )
-                                              .toList()),
-                                    )
-                                  ],
-                                ),
+                              return networks(
+                                context,
+                                asset,
+                                _allNetworks,
+                                _defaultNetwork,
+                                changeCoinType,
                               );
                             },
                           );
