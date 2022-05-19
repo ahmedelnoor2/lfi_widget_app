@@ -13,7 +13,7 @@ Widget networks(
     child: Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
+      children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -45,47 +45,47 @@ Widget networks(
         Container(
           padding: const EdgeInsets.only(top: 15),
           child: Column(
-              children: allNetworks
-                  .map(
-                    (netwrk) => GestureDetector(
-                      onTap: () {
-                        changeCoinType(netwrk);
-                        Navigator.pop(context);
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.only(
-                          bottom: 10,
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      '${netwrk['mainChainName']}',
-                                      style: const TextStyle(fontSize: 18),
-                                    ),
-                                  ],
-                                ),
-                                Icon(
-                                  Icons.done,
-                                  size: 18,
-                                  color:
-                                      netwrk['mainChainName'] == defaultNetwork
-                                          ? greenBTNBGColor
-                                          : secondaryTextColor,
-                                ),
-                              ],
-                            ),
-                            const Divider(),
-                          ],
-                        ),
+            children: allNetworks
+                .map<Widget>(
+                  (netwrk) => GestureDetector(
+                    onTap: () {
+                      changeCoinType(netwrk);
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.only(
+                        bottom: 10,
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    '${netwrk['mainChainName']}',
+                                    style: const TextStyle(fontSize: 18),
+                                  ),
+                                ],
+                              ),
+                              Icon(
+                                Icons.done,
+                                size: 18,
+                                color: netwrk['mainChainName'] == defaultNetwork
+                                    ? greenBTNBGColor
+                                    : secondaryTextColor,
+                              ),
+                            ],
+                          ),
+                          const Divider(),
+                        ],
                       ),
                     ),
-                  )
-                  .toList()),
+                  ),
+                )
+                .toList(),
+          ),
         )
       ],
     ),

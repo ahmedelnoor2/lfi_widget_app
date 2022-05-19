@@ -299,7 +299,7 @@ class _EmailChangeState extends State<EmailChange> {
                                   );
                                   _securityVerification.text = '${data!.text}';
                                 },
-                                child: const Icon(Icons.copy),
+                                child: const Icon(Icons.paste),
                               )
                             : TextButton(
                                 onPressed: _startTimerSecur

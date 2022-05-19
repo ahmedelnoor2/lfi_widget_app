@@ -168,7 +168,7 @@ Widget assetsBar(
                     debugPrint('Received click');
                   },
                   child: Row(
-                    children: [
+                    children: const [
                       Icon(
                         Icons.currency_exchange,
                         size: 11,

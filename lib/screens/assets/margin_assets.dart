@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lyotrade/screens/assets/skeleton/assets_skull.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 
 import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/utils/Number.utils.dart';
 import 'package:provider/provider.dart';
 
 class MarginAssets extends StatefulWidget {
@@ -65,7 +67,15 @@ class _MarginAssetsState extends State<MarginAssets> {
                       Container(
                         padding: EdgeInsets.only(left: width * 0.03),
                         child: Text(
-                          '\$0.00',
+                          getNumberFormat(
+                            context,
+                            public.rate[public.activeCurrency['fiat_symbol']
+                                            .toUpperCase()]
+                                        [widget.totalBalanceSymbol] !=
+                                    null
+                                ? '${(widget.totalBalance ?? 0) * public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()][widget.totalBalanceSymbol]}'
+                                : '0',
+                          ),
                           style: TextStyle(
                             color: secondaryTextColor,
                           ),
@@ -80,142 +90,183 @@ class _MarginAssetsState extends State<MarginAssets> {
         ),
         SizedBox(
           height: height * widget.bottomBoxSize,
-          child: ListView.builder(
-            padding: EdgeInsets.zero,
-            itemCount: widget.assets.length,
-            itemBuilder: (BuildContext context, int index) {
-              var asset = widget.assets[index];
-              return Card(
-                child: Container(
-                  padding: EdgeInsets.all(width * 0.03),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          FittedBox(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.only(right: width * 0.02),
-                                  child: CircleAvatar(
-                                    radius: width * 0.035,
-                                    child: Image.network(
-                                      '${public.publicInfoMarket['market']['coinList'][asset['coin']]['icon']}',
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  '${asset['market']}',
-                                  style: TextStyle(
-                                    fontSize: width * 0.05,
-                                    color: secondaryTextColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Icon(
-                            Icons.chevron_right_sharp,
-                            size: width * 0.05,
-                          )
-                        ],
-                      ),
-                      Container(
-                        padding: EdgeInsets.only(top: width * 0.035),
-                        child: Row(
+          child: widget.assets.isEmpty
+              ? assetsSkull(context)
+              : ListView.builder(
+                  padding: EdgeInsets.zero,
+                  itemCount: widget.assets.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    var asset = widget.assets[index];
+                    return Card(
+                      child: Container(
+                        padding: EdgeInsets.all(width * 0.03),
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            SizedBox(
-                              height: width * 0.18,
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Total',
-                                    style: TextStyle(
-                                      fontSize: width * 0.035,
-                                      color: secondaryTextColor,
-                                    ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                FittedBox(
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.only(
+                                            right: width * 0.02),
+                                        child: CircleAvatar(
+                                          radius: width * 0.035,
+                                          child: Image.network(
+                                            '${public.publicInfoMarket['market']['coinList'][asset['coin']]['icon']}',
+                                          ),
+                                        ),
+                                      ),
+                                      Text(
+                                        '${asset['market']}',
+                                        style: TextStyle(
+                                          fontSize: width * 0.05,
+                                          color: secondaryTextColor,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  Text(
-                                    '${asset['values']['baseTotalBalance']}',
-                                    style: TextStyle(
-                                      fontSize: width * 0.045,
-                                      // color: secondaryTextColor,
-                                    ),
-                                  ),
-                                  Text(
-                                    '\$0.00',
-                                    style: TextStyle(
-                                      fontSize: width * 0.035,
-                                      color: secondaryTextColor,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                                Icon(
+                                  Icons.chevron_right_sharp,
+                                  size: width * 0.05,
+                                )
+                              ],
                             ),
-                            SizedBox(
-                              height: width * 0.18,
-                              child: Column(
+                            Container(
+                              padding: EdgeInsets.only(top: width * 0.035),
+                              child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    'Available',
-                                    style: TextStyle(
-                                      fontSize: width * 0.035,
-                                      color: secondaryTextColor,
+                                  SizedBox(
+                                    height: width * 0.18,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Total',
+                                          style: TextStyle(
+                                            fontSize: width * 0.035,
+                                            color: secondaryTextColor,
+                                          ),
+                                        ),
+                                        Text(
+                                          '${asset['values']['baseTotalBalance']}',
+                                          style: TextStyle(
+                                            fontSize: width * 0.045,
+                                            // color: secondaryTextColor,
+                                          ),
+                                        ),
+                                        Text(
+                                          getNumberFormat(
+                                            context,
+                                            public.rate[
+                                                        public.activeCurrency[
+                                                                'fiat_symbol']
+                                                            .toUpperCase()][widget
+                                                        .totalBalanceSymbol] !=
+                                                    null
+                                                ? '${(asset['values']['baseTotalBalance'] ?? 0) * public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()][asset['market'].split('/')[0]]}'
+                                                : '0',
+                                          ),
+                                          style: TextStyle(
+                                            fontSize: width * 0.035,
+                                            color: secondaryTextColor,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  Text(
-                                    '${asset['values']['quoteTotalBalance']}',
-                                    style: TextStyle(
-                                      fontSize: width * 0.045,
-                                      // color: secondaryTextColor,
+                                  SizedBox(
+                                    height: width * 0.18,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Available',
+                                          style: TextStyle(
+                                            fontSize: width * 0.035,
+                                            color: secondaryTextColor,
+                                          ),
+                                        ),
+                                        Text(
+                                          '${asset['values']['quoteTotalBalance']}',
+                                          style: TextStyle(
+                                            fontSize: width * 0.045,
+                                            // color: secondaryTextColor,
+                                          ),
+                                        ),
+                                        Text(
+                                          getNumberFormat(
+                                            context,
+                                            public.rate[
+                                                        public.activeCurrency[
+                                                                'fiat_symbol']
+                                                            .toUpperCase()][widget
+                                                        .totalBalanceSymbol] !=
+                                                    null
+                                                ? '${(asset['values']['quoteTotalBalance'] ?? 0) * public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()][asset['market'].split('/')[0]]}'
+                                                : '0',
+                                          ),
+                                          style: TextStyle(
+                                            fontSize: width * 0.035,
+                                            color: secondaryTextColor,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  Text(
-                                    '\$0.00',
-                                    style: TextStyle(
-                                      fontSize: width * 0.035,
-                                      color: secondaryTextColor,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              height: width * 0.18,
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    'In Orders',
-                                    style: TextStyle(
-                                      fontSize: width * 0.035,
-                                      color: secondaryTextColor,
-                                    ),
-                                  ),
-                                  Text(
-                                    '${asset['values']['baseLockBalance']}',
-                                    style: TextStyle(
-                                      fontSize: width * 0.045,
-                                      // color: secondaryTextColor,
-                                    ),
-                                  ),
-                                  Text(
-                                    '\$0.00',
-                                    style: TextStyle(
-                                      fontSize: width * 0.035,
-                                      color: secondaryTextColor,
+                                  SizedBox(
+                                    height: width * 0.18,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          'In Orders',
+                                          style: TextStyle(
+                                            fontSize: width * 0.035,
+                                            color: secondaryTextColor,
+                                          ),
+                                        ),
+                                        Text(
+                                          '${asset['values']['baseLockBalance']}',
+                                          style: TextStyle(
+                                            fontSize: width * 0.045,
+                                            // color: secondaryTextColor,
+                                          ),
+                                        ),
+                                        Text(
+                                          getNumberFormat(
+                                            context,
+                                            public.rate[
+                                                        public.activeCurrency[
+                                                                'fiat_symbol']
+                                                            .toUpperCase()][widget
+                                                        .totalBalanceSymbol] !=
+                                                    null
+                                                ? '${(asset['values']['baseLockBalance'] ?? 0) * public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()][asset['market'].split('/')[0]]}'
+                                                : '0',
+                                          ),
+                                          style: TextStyle(
+                                            fontSize: width * 0.035,
+                                            color: secondaryTextColor,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
@@ -224,12 +275,9 @@ class _MarginAssetsState extends State<MarginAssets> {
                           ],
                         ),
                       ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
         ),
       ],
     );

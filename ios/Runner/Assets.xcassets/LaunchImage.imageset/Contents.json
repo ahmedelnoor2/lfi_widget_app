@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "LYOTRADE_White_H.png",
+      "filename" : "logo_blue.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "LYOTRADE_White_H-1.png",
+      "filename" : "logo_blue-1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "LYOTRADE_White_H-2.png",
+      "filename" : "logo_blue-2.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

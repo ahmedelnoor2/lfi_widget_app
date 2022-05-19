@@ -17,6 +17,7 @@ class Public with ChangeNotifier {
     "icon": "/upload/aa.jpg",
     "fiat_icon": "\$",
   };
+  List _headerSymbols = [];
 
   Map get rate {
     return _rate;
@@ -32,6 +33,15 @@ class Public with ChangeNotifier {
 
   Map get publicInfoMarket {
     return _publicInfoMarket;
+  }
+
+  List get headerSymbols {
+    return _headerSymbols;
+  }
+
+  Future<void> setHeaderSymbols(headerSymb) async {
+    _headerSymbols = headerSymb;
+    return notifyListeners();
   }
 
   Future<void> changeCurrency(fiatSymbol) async {

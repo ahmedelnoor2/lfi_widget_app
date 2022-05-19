@@ -43,21 +43,24 @@ bottomNav(context) {
           );
           break;
         case 1:
-          Navigator.pushNamed(
+          Navigator.pushNamedAndRemoveUntil(
             context,
             '/market',
+            (route) => false,
           );
           break;
         case 2:
-          Navigator.pushNamed(
+          Navigator.pushNamedAndRemoveUntil(
             context,
             '/trade',
+            (route) => false,
           );
           break;
         case 3:
-          Navigator.pushNamed(
+          Navigator.pushNamedAndRemoveUntil(
             context,
             '/assets',
+            (route) => false,
           );
           break;
         default:
