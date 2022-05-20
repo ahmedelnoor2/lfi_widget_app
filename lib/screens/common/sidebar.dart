@@ -84,7 +84,6 @@ class _SideBarState extends State<SideBar> {
                             subtitle: const Text('Welcome to LYOTrade'),
                             trailing: const Icon(
                               Icons.chevron_right,
-                              color: Colors.grey,
                             ),
                           )
                         : ListTile(

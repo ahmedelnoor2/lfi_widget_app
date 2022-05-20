@@ -24,7 +24,6 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
   final GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
   var _channel;
-  List _headerSymbols = [];
 
   _handleDrawer() async {
     _key.currentState?.openDrawer();
@@ -38,8 +37,10 @@ class _DashboardState extends State<Dashboard> {
   }
 
   @override
-  void dispose() {
-    _channel.sink.close();
+  void dispose() async {
+    if (_channel != null) {
+      _channel.sink.close();
+    }
     super.dispose();
   }
 
@@ -48,13 +49,15 @@ class _DashboardState extends State<Dashboard> {
     await public.assetsRate();
     await public.getFiatCoins();
     await public.getPublicInfoMarket();
-    await setHeaderSymbols();
+    if (public.headerSymbols.isEmpty) {
+      await setHeaderSymbols();
+    }
     connectWebSocket();
   }
 
   Future<void> setHeaderSymbols() async {
     var public = Provider.of<Public>(context, listen: false);
-
+    List _headerSymbols = [];
     for (int i = 0;
         i < public.publicInfoMarket['market']['headerSymbol'].length;
         i++) {
@@ -65,10 +68,9 @@ class _DashboardState extends State<Dashboard> {
         'price': '0',
         'change': '0',
       });
-      setState(() {
-        _headerSymbols = _headerSymbols;
-      });
     }
+
+    await public.setHeaderSymbols(_headerSymbols);
     return;
   }
 
@@ -105,27 +107,28 @@ class _DashboardState extends State<Dashboard> {
     }));
 
     _channel.stream.listen((message) {
-      extractStreamData(message);
+      extractStreamData(message, public);
     });
     // _channel.stream.listen((message) {
     //   _channel.sink.add('received!');
     // });
   }
 
-  void extractStreamData(streamData) async {
+  void extractStreamData(streamData, public) async {
     if (streamData != null) {
       var inflated = zlib.decode(streamData as List<int>);
       var data = utf8.decode(inflated);
       if (json.decode(data)['channel'] != null) {
         var marketData = json.decode(data);
-        for (int i = 0; i < _headerSymbols.length; i++) {
-          if (marketData['channel'].contains(
-              RegExp("${_headerSymbols[i]['coin']}", caseSensitive: false))) {
-            setState(() {
-              _headerSymbols[i]['price'] = '${marketData['tick']['close']}';
-              _headerSymbols[i]['change'] =
-                  '${double.parse(marketData['tick']['rose']) * 100}';
-            });
+        for (int i = 0; i < public.headerSymbols.length; i++) {
+          if (marketData['channel'].contains(RegExp(
+              "${public.headerSymbols[i]['coin']}",
+              caseSensitive: false))) {
+            var _headerSymbols = public.headerSymbols;
+            _headerSymbols[i]['price'] = '${marketData['tick']['close']}';
+            _headerSymbols[i]['change'] =
+                '${double.parse(marketData['tick']['rose']) * 100}';
+            await public.setHeaderSymbols(_headerSymbols);
           }
         }
       }
@@ -136,6 +139,8 @@ class _DashboardState extends State<Dashboard> {
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
+
+    var public = Provider.of<Public>(context, listen: true);
 
     return Scaffold(
       key: _key,
@@ -155,7 +160,7 @@ class _DashboardState extends State<Dashboard> {
               SizedBox(
                 width: width,
                 child: LiveFeed(
-                  headerSymbols: _headerSymbols,
+                  headerSymbols: public.headerSymbols,
                 ),
               ),
               SizedBox(
@@ -165,7 +170,7 @@ class _DashboardState extends State<Dashboard> {
               SizedBox(
                 width: width,
                 child: AssetsInfo(
-                  headerSymbols: _headerSymbols,
+                  headerSymbols: public.headerSymbols,
                 ),
               ),
             ],

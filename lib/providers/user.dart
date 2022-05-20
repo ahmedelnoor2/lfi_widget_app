@@ -7,6 +7,7 @@ import 'package:lyotrade/utils/AppConstant.utils.dart';
 
 class User with ChangeNotifier {
   Map _googleAuth = {};
+  Map _depositList = {};
 
   Map<String, String> headers = {
     'Content-type': 'application/json;charset=utf-8',
@@ -122,6 +123,44 @@ class User with ChangeNotifier {
       }
     } catch (error) {
       snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return;
+    }
+  }
+
+  Future<void> getDepositLists(auth, formData) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/record/deposit_list',
+    );
+
+    var postData = json.encode({
+      "coinSymbol": formData['coinSymbol'],
+      "page": formData['page'],
+      "pageSize": formData['pageSize'],
+    });
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _depositList = responseData['data'];
+        notifyListeners();
+        return;
+      } else {
+        _depositList = {};
+        notifyListeners();
+        return;
+      }
+    } catch (error) {
+      print(error);
       return;
     }
   }

@@ -8,7 +8,8 @@ class Captcha extends StatelessWidget {
   }) : super(key: key);
 
   final onCaptchaVerification;
-  static final AliyunCaptchaController _captchaController = AliyunCaptchaController();
+  static final AliyunCaptchaController _captchaController =
+      AliyunCaptchaController();
 
   final AliyunCaptchaType _captchaType = AliyunCaptchaType.slide;
   final String _language = 'en';
@@ -46,9 +47,19 @@ class Captcha extends StatelessWidget {
         customStyle: '''
           .nc_scale {
             background: #eeeeee !important;
+            border-radius: 5px !important;
           }
           .nc_scale div.nc_bg {
             background: #4696ec !important;
+            border-radius: 5px !important;
+          }
+          .nc_scale .btn_slide {
+            border-color: transparent !important;
+            border-radius: 5px !important;
+          }
+          .nc_scale .btn_ok {
+            border-color: transparent !important;
+            border-radius: 5px !important;
           }
           .nc_scale .scale_text2 {
             color: #fff !important;

@@ -17,18 +17,23 @@ appBar(context, _handleDrawer) {
   var _currentRoute = ModalRoute.of(context)!.settings.name;
 
   return AppBar(
-    leading: IconButton(
-      icon: (_currentRoute == '/' || _currentRoute == '/dashboard')
-          ? const Icon(Icons.account_circle)
-          : const Icon(Icons.chevron_left),
-      onPressed: () {
-        if (_currentRoute == '/' || _currentRoute == '/dashboard') {
-          _handleDrawer();
-        } else {
-          Navigator.pop(context);
-        }
-      },
-    ),
+    leading: (_currentRoute == '/market' ||
+            _currentRoute == '/trade' ||
+            _currentRoute == '/assets' ||
+            _currentRoute == '/future_trade')
+        ? Container()
+        : IconButton(
+            icon: (_currentRoute == '/' || _currentRoute == '/dashboard')
+                ? const Icon(Icons.account_circle)
+                : const Icon(Icons.chevron_left),
+            onPressed: () {
+              if (_currentRoute == '/' || _currentRoute == '/dashboard') {
+                _handleDrawer();
+              } else {
+                Navigator.pop(context);
+              }
+            },
+          ),
     title: headerImage(),
     elevation: 0,
     shadowColor: Colors.transparent,
@@ -36,7 +41,9 @@ appBar(context, _handleDrawer) {
             _currentRoute == WithdrawAssets.routeName)
         ? [
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushNamed(context, '/transactions');
+              },
               icon: const Icon(Icons.list_alt),
             )
           ]
@@ -168,7 +175,7 @@ Widget assetsBar(
                     debugPrint('Received click');
                   },
                   child: Row(
-                    children: [
+                    children: const [
                       Icon(
                         Icons.currency_exchange,
                         size: 11,

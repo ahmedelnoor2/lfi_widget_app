@@ -11,11 +11,17 @@ class EmailVerification extends StatefulWidget {
     String? this.token,
     String? this.operationType,
     this.toggleEmailVerification,
+    bool? this.emailVerification,
+    String? this.currentCoutnry,
+    bool? this.isMobile,
   }) : super(key: key);
 
   final token;
   final operationType;
   final toggleEmailVerification;
+  final emailVerification;
+  final currentCoutnry;
+  final isMobile;
 
   @override
   State<EmailVerification> createState() => _EmailVerificationState();
@@ -67,31 +73,66 @@ class _EmailVerificationState extends State<EmailVerification> {
   }
 
   Future<void> sendVerificationCode() async {
+    print(widget.isMobile);
     var auth = Provider.of<Auth>(context, listen: false);
-    await auth.sendEmailValidCode(context, {
-      'token': widget.token,
-      'email': '',
-      'operationType': widget.operationType,
-    });
+
+    if (widget.emailVerification) {
+      await auth.sendEmailValidCode(context, {
+        'token': widget.token,
+        'email': '',
+        'operationType': widget.operationType,
+      });
+    } else if (widget.isMobile) {
+      await auth.sendMobileValidCode(context, {
+        'token': widget.token,
+        'operationType': '25',
+        'smsType': '0',
+      });
+    } else {
+      await auth.sendMobileValidCode(context, {
+        'token': widget.token,
+        'countryCode': widget.currentCoutnry,
+        'operationType': 1,
+        'smsType': '0',
+      });
+    }
   }
 
   Future<String> confirmEmailVeriCode(context) async {
     var auth = Provider.of<Auth>(context, listen: false);
 
-    if (widget.operationType == '4') {
-      String emailVeri = await auth.confirmLoginCode(context, {
-        'emailCode': _emailVeirficationCode.text,
-        'token': widget.token,
-      });
-      print(emailVeri);
-      return emailVeri;
+    if (widget.operationType == '4' || widget.operationType == '25') {
+      if (widget.isMobile) {
+        String mobileVeri = await auth.confirmLoginCode(context, {
+          'smsCode': _emailVeirficationCode.text,
+          'token': widget.token,
+        });
+        print(mobileVeri);
+        return mobileVeri;
+      } else {
+        String emailVeri = await auth.confirmLoginCode(context, {
+          'emailCode': _emailVeirficationCode.text,
+          'token': widget.token,
+        });
+        print(emailVeri);
+        return emailVeri;
+      }
     } else {
-      String emailVeri = await auth.confirmEmailCode(context, {
-        'emailCode': _emailVeirficationCode.text,
-        'token': widget.token,
-      });
-      print(emailVeri);
-      return emailVeri;
+      if (widget.emailVerification) {
+        String emailVeri = await auth.confirmEmailCode(context, {
+          'emailCode': _emailVeirficationCode.text,
+          'token': widget.token,
+        });
+        print(emailVeri);
+        return emailVeri;
+      } else {
+        String mobileVeri = await auth.confirmMobileVerification(context, {
+          'smsCode': _emailVeirficationCode.text,
+          'token': widget.token,
+        });
+        print(mobileVeri);
+        return mobileVeri;
+      }
     }
   }
 
@@ -107,16 +148,9 @@ class _EmailVerificationState extends State<EmailVerification> {
       height: height * 0.5,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         // mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Align(
-            alignment: Alignment.topRight,
-            child: IconButton(
-              icon: const Icon(Icons.close),
-              tooltip: 'Close',
-              onPressed: () => widget.toggleEmailVerification(),
-            ),
-          ),
           Column(
             children: [
               Container(
@@ -142,7 +176,7 @@ class _EmailVerificationState extends State<EmailVerification> {
                   TextFormField(
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter email verification code';
+                        return 'Please enter ${widget.emailVerification ? 'Email' : 'SMS'} verification code';
                       }
                       return null;
                     },
@@ -150,7 +184,7 @@ class _EmailVerificationState extends State<EmailVerification> {
                     decoration: InputDecoration(
                       labelText: auth.googleAuth
                           ? 'Google verification code'
-                          : 'Email verification code',
+                          : '${(widget.emailVerification || !widget.isMobile) ? 'Email' : 'SMS'} verification code',
                       suffix: auth.googleAuth
                           ? TextButton(
                               onPressed: () async {
@@ -159,7 +193,7 @@ class _EmailVerificationState extends State<EmailVerification> {
                                 );
                                 _emailVeirficationCode.text = '${data!.text}';
                               },
-                              child: const Icon(Icons.copy),
+                              child: const Icon(Icons.paste),
                             )
                           : TextButton(
                               onPressed: _startTimer
@@ -194,13 +228,24 @@ class _EmailVerificationState extends State<EmailVerification> {
                 if (_formEmailVeriKey.currentState!.validate()) {
                   // If the form is valid, display a snackbar. In the real world,
                   // you'd often call a server or save the information in a database.
-                  String verificationResponse =
-                      await confirmEmailVeriCode(context);
-                  if (verificationResponse == '0') {
-                    // Navigator.pop(context);
-                    Navigator.pushNamed(context, '/dashboard');
+                  if (widget.emailVerification) {
+                    String verificationResponse =
+                        await confirmEmailVeriCode(context);
+                    if (verificationResponse == '0') {
+                      // Navigator.pop(context);
+                      Navigator.pushNamed(context, '/dashboard');
+                    } else {
+                      widget.toggleEmailVerification();
+                    }
                   } else {
-                    widget.toggleEmailVerification();
+                    String verificationResponse =
+                        await confirmEmailVeriCode(context);
+                    if (verificationResponse == '0') {
+                      // Navigator.pop(context);
+                      Navigator.pushNamed(context, '/dashboard');
+                    } else {
+                      widget.toggleEmailVerification();
+                    }
                   }
                 }
               },
