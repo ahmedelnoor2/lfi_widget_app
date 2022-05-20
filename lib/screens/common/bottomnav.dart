@@ -18,6 +18,10 @@ bottomNav(context) {
         label: 'Trade',
       ),
       BottomNavigationBarItem(
+        icon: Icon(Icons.currency_exchange),
+        label: 'Futures',
+      ),
+      BottomNavigationBarItem(
         icon: Icon(Icons.account_balance_wallet),
         label: 'Assets',
       ),
@@ -28,11 +32,14 @@ bottomNav(context) {
             ? 1
             : _currentRoute == '/trade'
                 ? 2
-                : _currentRoute == '/assets'
+                : _currentRoute == '/future_trade'
                     ? 3
-                    : 0,
-    selectedItemColor: Colors.blue[400],
-    unselectedItemColor: Colors.white60,
+                    : _currentRoute == '/assets'
+                        ? 4
+                        : 0,
+    // selectedItemColor: Colors.blue[400],
+    // unselectedItemColor: Colors.white60,
+    // backgroundColor: Colors.black,
     onTap: (value) {
       switch (value) {
         case 0:
@@ -57,6 +64,13 @@ bottomNav(context) {
           );
           break;
         case 3:
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/future_trade',
+            (route) => false,
+          );
+          break;
+        case 4:
           Navigator.pushNamedAndRemoveUntil(
             context,
             '/assets',

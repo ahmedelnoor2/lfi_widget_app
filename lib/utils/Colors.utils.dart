@@ -48,7 +48,8 @@ var whitebgColor = Colors.white;
 var blackTextColor = Colors.black;
 var secondaryTextColor = Colors.white70;
 var redPercentageIndicator = Color.fromARGB(50, 245, 42, 73);
-var greenPercentageIndicator = Color.fromARGB(49, 40, 198, 134);
+var greenPercentageIndicator = Color.fromARGB(30, 40, 198, 134);
+var linkColor = Color.fromARGB(255, 1, 254, 246);
 
 var geryTextColor = Color(0xFF39434a);
 var buttonBGColor = Color(0xFF10255c);

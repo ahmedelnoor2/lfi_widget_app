@@ -64,10 +64,10 @@ class _PasswordState extends State<Password> {
   Future<void> sendVerificationCode() async {
     var auth = Provider.of<Auth>(context, listen: false);
     await auth.sendMobileValidCode(context, {
-      'code': _currentCoutnry,
+      'countryCode': _currentCoutnry,
       'mobile': _mobileNumber.text,
-      'smsType': '',
       'operationType': 2,
+      'smsType': '',
     });
   }
 

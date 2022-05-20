@@ -146,10 +146,7 @@ class Auth with ChangeNotifier {
       '$exApi/user/confirm_login',
     );
 
-    var postData = json.encode({
-      'emailCode': formData['emailCode'],
-      'token': formData['token'],
-    });
+    var postData = json.encode(formData);
 
     if (_googleAuth) {
       postData = json.encode({
@@ -218,6 +215,48 @@ class Auth with ChangeNotifier {
     }
   }
 
+  Future<String> checkMobileRegistration(ctx, formData) async {
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/user/reg_mobile_chk_info',
+    );
+
+    var postData = json.encode({
+      'csessionid': formData['csessionid'],
+      'countryCode': formData['countryCode'],
+      'mobileNumber': formData['mobileNumber'],
+      'invitedCode': formData['invitedCode'],
+      'loginPword': formData['loginPword'],
+      'newPassword': formData['newPassword'],
+      'scene': formData['scene'],
+      'sig': formData['sig'],
+      'token': formData['token'],
+      'verificationType': formData['verificationType'],
+    });
+
+    print(postData);
+
+    try {
+      final response = await http.post(url, body: postData, headers: headers);
+
+      final responseData = json.decode(response.body);
+      print(responseData);
+      if (responseData['code'] == '0') {
+        _emailVerificationToken = responseData['data']['token'];
+        _loginVerificationToken = _emailVerificationToken;
+        return _emailVerificationToken;
+      } else {
+        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+      }
+
+      return '';
+    } catch (error) {
+      print(error);
+      return '';
+      // throw error;
+    }
+  }
+
   Future<String> sendEmailValidCode(ctx, formData) async {
     var url = Uri.https(
       apiUrl,
@@ -257,18 +296,13 @@ class Auth with ChangeNotifier {
       '$exApi/v4/common/smsValidCode',
     );
 
-    var postData = json.encode({
-      'countryCode': formData['code'],
-      'mobile': formData['mobile'],
-      'operationType': formData['operationType'],
-      'smsType': formData['smsType'],
-    });
+    var postData = json.encode(formData);
 
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
-      print(responseData);
+
       if (responseData['code'] == '0') {
         snackAlert(
             ctx, SnackTypes.success, 'Verification code sent to your mobile.');
@@ -317,6 +351,40 @@ class Auth with ChangeNotifier {
     }
   }
 
+  Future<String> confirmMobileVerification(ctx, formData) async {
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/user/reg_mobile_confirm',
+    );
+
+    var postData = json.encode({
+      'smsCode': formData['smsCode'],
+      'token': formData['token'],
+    });
+
+    try {
+      final response = await http.post(url, body: postData, headers: headers);
+
+      final responseData = json.decode(response.body);
+      if (responseData['code'] == '0') {
+        _loginVerificationToken = responseData['data']['token'];
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('authToken', _loginVerificationToken);
+        snackAlert(ctx, SnackTypes.success, 'Phone is successfully verified.');
+      } else {
+        print('Code: ${responseData['code']}');
+        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+      }
+
+      return responseData['code'];
+    } catch (error) {
+      print(error);
+      snackAlert(ctx, SnackTypes.errors, 'Server Error!');
+      return '0';
+      // throw error;
+    }
+  }
+
   Future<String> confirmEmailCode(ctx, formData) async {
     var url = Uri.https(
       apiUrl,
@@ -328,13 +396,11 @@ class Auth with ChangeNotifier {
       'token': formData['token'],
     });
 
-    print(postData);
-
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
-      print(responseData);
+
       if (responseData['code'] == '0') {
         _loginVerificationToken = responseData['data']['token'];
         final prefs = await SharedPreferences.getInstance();
@@ -371,7 +437,6 @@ class Auth with ChangeNotifier {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
-      print(responseData);
       if (responseData['code'] == '0') {
         snackAlert(ctx, SnackTypes.success, 'Email is successfully updated.');
         Navigator.pop(ctx);

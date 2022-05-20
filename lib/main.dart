@@ -5,9 +5,11 @@ import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/user.dart';
 import 'package:lyotrade/screens/assets/assets.dart';
 import 'package:lyotrade/screens/assets/deposit_assets.dart';
+import 'package:lyotrade/screens/assets/transactions.dart';
 import 'package:lyotrade/screens/assets/withdraw_assets.dart';
 import 'package:lyotrade/screens/auth/authentication.dart';
 import 'package:lyotrade/screens/dashboard.dart';
+import 'package:lyotrade/screens/future_trade/future_trade.dart';
 import 'package:lyotrade/screens/market/market.dart';
 import 'package:lyotrade/screens/security/email_change.dart';
 import 'package:lyotrade/screens/security/google_auth.dart';
@@ -48,17 +50,26 @@ class MyApp extends StatelessWidget {
               // or simply save your changes to "hot reload" in a Flutter IDE).
               // Notice that the counter didn't reset back to zero; the application
               // is not restarted.
-              fontFamily: 'Inter',
-              bottomAppBarTheme: BottomAppBarTheme(
-                color: Colors.black,
+              brightness: Brightness.dark,
+              appBarTheme: AppBarTheme(
+                backgroundColor: Color.fromARGB(255, 26, 29, 63),
               ),
-              // primaryColor: Color(0x001a1d3f),
+              fontFamily: 'Inter',
+              // bottomAppBarTheme: BottomAppBarTheme(
+              //   color: Color.fromARGB(255, 26, 29, 63),
+              // ),
+              // bottomAppBarColor: Color.fromARGB(255, 26, 29, 63),
+              bottomNavigationBarTheme: BottomNavigationBarThemeData(
+                backgroundColor: Color.fromARGB(255, 26, 29, 63),
+                selectedItemColor: Color.fromARGB(255, 1, 254, 246),
+                unselectedItemColor: secondaryTextColor,
+                showUnselectedLabels: true,
+                type: BottomNavigationBarType.fixed,
+              ),
               primarySwatch:
                   createMaterialColor(Color.fromARGB(255, 1, 254, 246)),
-              // primarySwatch:
-              //     createMaterialColor(Color.fromARGB(255, 1, 254, 246)),
-              scaffoldBackgroundColor: Color.fromARGB(255, 41, 44, 81),
-              backgroundColor: Color.fromARGB(255, 41, 44, 81),
+              scaffoldBackgroundColor: Color.fromARGB(255, 26, 29, 63),
+              backgroundColor: Color.fromARGB(255, 26, 29, 63),
               textTheme: TextTheme(
                 headline1: TextStyle(
                     fontSize: 72.0,
@@ -80,15 +91,17 @@ class MyApp extends StatelessWidget {
                 overline: TextStyle(color: Colors.white),
               ),
               drawerTheme: DrawerThemeData(
-                  backgroundColor: Color.fromARGB(255, 26, 29, 63)),
+                backgroundColor: Color.fromARGB(255, 26, 29, 63),
+              ),
               cardTheme: CardTheme(
                 color: Color.fromARGB(255, 41, 44, 81),
               ),
-              iconTheme: IconThemeData(color: Colors.white),
+              iconTheme: IconThemeData().copyWith(color: Colors.white),
+              primaryIconTheme: IconThemeData().copyWith(color: Colors.white),
               inputDecorationTheme: InputDecorationTheme(
                 enabledBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                    color: Color.fromARGB(255, 0, 164, 159),
+                    color: secondaryTextColor,
                   ),
                 ),
                 focusedBorder: UnderlineInputBorder(
@@ -101,6 +114,14 @@ class MyApp extends StatelessWidget {
                 ),
                 labelStyle: TextStyle(color: Colors.white),
               ),
+              elevatedButtonTheme: ElevatedButtonThemeData(
+                style: ElevatedButton.styleFrom(
+                    minimumSize: Size(0, 45),
+                    textStyle: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17,
+                    )),
+              ),
             ),
 
             // darkTheme: ThemeData.dark(),
@@ -111,6 +132,7 @@ class MyApp extends StatelessWidget {
               Authentication.routeName: (context) => const Authentication(),
               Market.routeName: (context) => const Market(),
               Trade.routeName: (context) => const Trade(),
+              FutureTrade.routeName: (context) => const FutureTrade(),
               Assets.routeName: (context) => const Assets(),
               DepositAssets.routeName: (context) => const DepositAssets(),
               WithdrawAssets.routeName: (context) => const WithdrawAssets(),
@@ -118,6 +140,7 @@ class MyApp extends StatelessWidget {
               Password.routeName: (context) => const Password(),
               GoogleAuth.routeName: (context) => const GoogleAuth(),
               EmailChange.routeName: (context) => const EmailChange(),
+              Transactions.routeName: (context) => const Transactions(),
             },
           );
         },
