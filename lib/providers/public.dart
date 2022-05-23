@@ -19,6 +19,10 @@ class Public with ChangeNotifier {
   };
   List _headerSymbols = [];
 
+  List _asks = [];
+  List _bids = [];
+  String _lastPrice = '0';
+
   Map get rate {
     return _rate;
   }
@@ -39,9 +43,32 @@ class Public with ChangeNotifier {
     return _headerSymbols;
   }
 
+  List get asks {
+    return _asks;
+  }
+
+  List get bids {
+    return _bids;
+  }
+
+  String get lastPrice {
+    return _lastPrice;
+  }
+
   Future<void> setHeaderSymbols(headerSymb) async {
     _headerSymbols = headerSymb;
     return notifyListeners();
+  }
+
+  Future<void> setAsksAndBids(tickerData) async {
+    _asks = tickerData['asks'];
+    _bids = tickerData['buys'];
+    notifyListeners();
+  }
+
+  Future<void> setLastPrice(price) async {
+    _lastPrice = price;
+    notifyListeners();
   }
 
   Future<void> changeCurrency(fiatSymbol) async {
