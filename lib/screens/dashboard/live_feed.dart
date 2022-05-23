@@ -84,10 +84,12 @@ class _LiveFeedState extends State<LiveFeed> {
                 Container(
                   padding: EdgeInsets.only(bottom: width * 0.01),
                   child: Text(
-                    NumberFormat.currency(
-                      locale: "en_US",
-                      symbol: "",
-                    ).format(double.parse(market['price'])),
+                    double.parse(market['price']) > 1
+                        ? NumberFormat.currency(
+                            locale: "en_US",
+                            symbol: "",
+                          ).format(double.parse(market['price']))
+                        : double.parse(market['price']).toStringAsPrecision(4),
                     style: TextStyle(fontSize: width * 0.02),
                   ),
                 ),
