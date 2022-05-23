@@ -142,8 +142,11 @@ class _AssetsInfoState extends State<AssetsInfo>
                                         MainAxisAlignment.spaceBetween,
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
-                                      Text(
-                                        '${item['price']}',
+                                      Flexible(
+                                        child: Text(
+                                          double.parse(item['price'])
+                                              .toStringAsPrecision(7),
+                                        ),
                                       ),
                                       Text(
                                         getNumberFormat(

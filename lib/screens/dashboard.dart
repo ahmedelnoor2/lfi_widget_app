@@ -58,16 +58,43 @@ class _DashboardState extends State<Dashboard> {
   Future<void> setHeaderSymbols() async {
     var public = Provider.of<Public>(context, listen: false);
     List _headerSymbols = [];
+    List _headerSybolsToAdd = [];
+
     for (int i = 0;
-        i < public.publicInfoMarket['market']['headerSymbol'].length;
+        i <
+            public
+                .publicInfoMarket['market']['home_symbol_show']
+                    ['recommend_symbol_list']
+                .length;
         i++) {
+      _headerSybolsToAdd.add(public.publicInfoMarket['market']
+          ['home_symbol_show']['recommend_symbol_list'][i]);
       _headerSymbols.add({
-        'coin':
-            public.publicInfoMarket['market']['headerSymbol'][i].split("/")[0],
-        'market': public.publicInfoMarket['market']['headerSymbol'][i],
+        'coin': public.publicInfoMarket['market']['home_symbol_show']
+                ['recommend_symbol_list'][i]
+            .split("/")[0],
+        'market': public.publicInfoMarket['market']['home_symbol_show']
+            ['recommend_symbol_list'][i],
         'price': '0',
         'change': '0',
       });
+    }
+
+    for (int i = 0;
+        i < public.publicInfoMarket['market']['headerSymbol'].length;
+        i++) {
+      if (!_headerSybolsToAdd
+          .contains(public.publicInfoMarket['market']['headerSymbol'][i])) {
+        _headerSybolsToAdd
+            .add(public.publicInfoMarket['market']['headerSymbol'][i]);
+        _headerSymbols.add({
+          'coin': public.publicInfoMarket['market']['headerSymbol'][i]
+              .split("/")[0],
+          'market': public.publicInfoMarket['market']['headerSymbol'][i],
+          'price': '0',
+          'change': '0',
+        });
+      }
     }
 
     await public.setHeaderSymbols(_headerSymbols);
@@ -86,13 +113,9 @@ class _DashboardState extends State<Dashboard> {
       Uri.parse('${public.publicInfoMarket["market"]["wsUrl"]}'),
     );
 
-    for (int i = 0;
-        i < public.publicInfoMarket['market']['headerSymbol'].length;
-        i++) {
-      String marketCoin = public.publicInfoMarket['market']['headerSymbol'][i]
-          .split('/')
-          .join("")
-          .toLowerCase();
+    for (int i = 0; i < public.headerSymbols.length; i++) {
+      String marketCoin =
+          public.headerSymbols[i]['market'].split('/').join("").toLowerCase();
       _channel.sink.add(jsonEncode({
         "event": "sub",
         "params": {
