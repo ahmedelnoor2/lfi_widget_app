@@ -539,7 +539,8 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                 ),
               ),
             ),
-            SizedBox(
+            Container(
+              padding: EdgeInsets.only(bottom: 15),
               width: width * 0.9,
               child: const ElevatedButton(
                 onPressed: null,

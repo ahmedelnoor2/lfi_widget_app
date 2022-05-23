@@ -219,8 +219,6 @@ class _EmailVerificationState extends State<EmailVerification> {
           SizedBox(
             width: width * 0.85,
             child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  textStyle: const TextStyle(fontSize: 20)),
               onPressed: () async {
                 if (!auth.googleAuth) {
                   _timer.cancel();
