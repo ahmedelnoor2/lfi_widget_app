@@ -57,7 +57,7 @@ class _KlineChartState extends State<KlineChart> {
       var data = utf8.decode(inflated);
       if (json.decode(data)['channel'] != null) {
         var marketData = json.decode(data);
-        print(marketData);
+        // print(marketData);
       }
     }
   }
