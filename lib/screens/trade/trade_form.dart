@@ -7,12 +7,10 @@ import 'package:provider/provider.dart';
 class TradeForm extends StatefulWidget {
   const TradeForm({
     Key? key,
-    this.lastPrice,
     this.isLastPriceUpdate,
     this.toggleIsPriceUpdate,
   }) : super(key: key);
 
-  final lastPrice;
   final isLastPriceUpdate;
   final toggleIsPriceUpdate;
 

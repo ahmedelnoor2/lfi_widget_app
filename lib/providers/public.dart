@@ -11,12 +11,20 @@ class Public with ChangeNotifier {
 
   Map _rate = {};
   Map _publicInfoMarket = {};
+  Map _allMarkets = {};
   List _currencies = [];
   Map _activeCurrency = {
     "fiat_symbol": "usd",
     "icon": "/upload/aa.jpg",
     "fiat_icon": "\$",
   };
+  Map _activeMarket = {
+    "showName": "BTC/USDT",
+    "symbol": "btcusdt",
+  };
+  Map _activeMarketTick = {};
+  Map _activeMarketAllTicks = {};
+
   List _headerSymbols = [];
 
   List _asks = [];
@@ -55,6 +63,22 @@ class Public with ChangeNotifier {
     return _lastPrice;
   }
 
+  Map get activeMarket {
+    return _activeMarket;
+  }
+
+  Map get activeMarketTick {
+    return _activeMarketTick;
+  }
+
+  Map get activeMarketAllTicks {
+    return _activeMarketAllTicks;
+  }
+
+  Map get allMarkets {
+    return _allMarkets;
+  }
+
   Future<void> setHeaderSymbols(headerSymb) async {
     _headerSymbols = headerSymb;
     return notifyListeners();
@@ -68,6 +92,21 @@ class Public with ChangeNotifier {
 
   Future<void> setLastPrice(price) async {
     _lastPrice = price;
+    notifyListeners();
+  }
+
+  Future<void> setActiveMarket(market) async {
+    _activeMarket = market;
+    return notifyListeners();
+  }
+
+  Future<void> setActiveMarketTick(tick) async {
+    _activeMarketTick = tick;
+    notifyListeners();
+  }
+
+  Future<void> setActiveMarketAllTicks(tick, market) async {
+    _activeMarketAllTicks[market.split('_')[1]] = tick;
     notifyListeners();
   }
 
@@ -118,6 +157,28 @@ class Public with ChangeNotifier {
       final responseData = json.decode(response.body);
       if (responseData['code'] == "0") {
         _publicInfoMarket = responseData['data'];
+
+        var _allMarketsMap =
+            Map<String, dynamic>.from(responseData['data']['market']['market']);
+
+        for (var k in _allMarketsMap.keys) {
+          _allMarkets[k] = [];
+          var _allMarketsMapo = Map<String, dynamic>.from(_allMarketsMap[k]);
+          for (var m in _allMarketsMapo.values) {
+            _allMarkets[k].add(m);
+          }
+        }
+        // responseData['data']['market']['market'].values((val) => print(val));
+        // _allMarketsMap.values((_allMarketVal) {
+        //   var _allMarketValMap = Map<String, dynamic>.from(_allMarketVal);
+        //   var alMarket =
+        //       _allMarketValMap.map((mkey, _allMarketValO) => _allMarketValO);
+        //   print(alMarket);
+        //   // print(_allMarketValMap['HNT/USDT']);
+        //   // return _allMarketVal;
+        // });
+        // print(_allMarketsMap.runtimeType);
+
         return notifyListeners();
       }
     } catch (error) {

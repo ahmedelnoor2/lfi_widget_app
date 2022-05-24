@@ -5,6 +5,7 @@ import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/bottomnav.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/trade/common/header.dart';
+import 'package:lyotrade/screens/trade/common/market_drawer.dart';
 import 'package:lyotrade/screens/trade/market_header.dart';
 import 'package:lyotrade/screens/trade/open_orders.dart';
 import 'package:lyotrade/screens/trade/order_book.dart';
@@ -23,12 +24,12 @@ class Trade extends StatefulWidget {
 }
 
 class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   var _channel;
 
   late final TabController _tabController =
       TabController(length: 2, vsync: this);
 
-  String _lastPrice = '';
   bool _isLastPriceUpdate = false;
 
   @override
@@ -52,63 +53,74 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
       Uri.parse('${public.publicInfoMarket["market"]["wsUrl"]}'),
     );
 
-    for (int i = 0; i < public.headerSymbols.length; i++) {
-      String marketCoin =
-          public.headerSymbols[i]['market'].split('/').join("").toLowerCase();
-      _channel.sink.add(jsonEncode({
-        "event": "sub",
-        "params": {
-          "channel": "market_btcusdt_trade_ticker",
-          "cb_id": marketCoin,
-          "top": 100
-        }
-      }));
-    }
+    String marketCoin = public.activeMarket['symbol'];
+    // for (int i = 0; i < public.headerSymbols.length; i++) {
+    //   _channel.sink.add(jsonEncode({
+    //     "event": "sub",
+    //     "params": {
+    //       "channel": "market_${marketCoin}_trade_ticker",
+    //       "cb_id": marketCoin,
+    //       "top": 100
+    //     }
+    //   }));
+    // }
     _channel.sink.add(jsonEncode({
       "event": "sub",
-      "params": {"channel": "market_btcusdt_depth_step0", "cb_id": "btcusdt"}
+      "params": {
+        "channel": "market_${marketCoin}_depth_step0",
+        "cb_id": marketCoin
+      }
+    }));
+
+    _channel.sink.add(jsonEncode({
+      "event": "sub",
+      "params": {
+        "channel": "market_${marketCoin}_ticker",
+        "cb_id": marketCoin,
+      }
     }));
 
     _channel.stream.listen((message) {
       extractStreamData(message, public);
     });
-    // _channel.stream.listen((message) {
-    //   _channel.sink.add('received!');
-    // });
   }
 
   void extractStreamData(streamData, public) async {
+    String marketCoin = public.activeMarket['symbol'];
     if (streamData != null) {
       var inflated = zlib.decode(streamData as List<int>);
       var data = utf8.decode(inflated);
       if (json.decode(data)['channel'] != null) {
         var marketData = json.decode(data);
-        if (marketData['channel'] == 'market_btcusdt_depth_step0') {
-          // print(marketData['tick']);
+        if (marketData['channel'] == 'market_${marketCoin}_depth_step0') {
           public.setAsksAndBids(marketData['tick']);
         }
-        if (marketData['channel'] == 'market_btcusdt_trade_ticker') {
-          public.setLastPrice('${marketData['tick']['data'][0]['price']}');
-          setState(() {
-            _lastPrice = '${marketData['tick']['data'][0]['price']}';
-          });
+        // if (marketData['channel'] == 'market_${marketCoin}_trade_ticker') {
+        //   public.setLastPrice('${marketData['tick']['data'][0]['price']}');
+        // }
+
+        if (marketData['channel'] == 'market_${marketCoin}_ticker') {
+          public.setActiveMarketTick(marketData['tick'] ?? []);
+          public.setLastPrice('${marketData['tick']['close']}');
         }
       }
     }
   }
 
-  void setAmountField(value) {
-    setState(() {
-      _lastPrice = '$value';
-      // _isLastPriceUpdate = true;
-    });
-  }
+  void setAmountField(value) {}
 
   void toggleIsPriceUpdate() {
     print('toggle');
     setState(() {
       _isLastPriceUpdate = false;
     });
+  }
+
+  void updateMarket() {
+    if (_channel != null) {
+      _channel.sink.close();
+    }
+    connectWebSocket();
   }
 
   @override
@@ -119,11 +131,16 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
     var public = Provider.of<Public>(context, listen: true);
 
     return Scaffold(
+      key: _scaffoldKey,
       appBar: appHeader(context, _tabController),
+      drawer: MarketDrawer(
+        scaffoldKey: _scaffoldKey,
+        updateMarket: updateMarket,
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            MarketHeader(),
+            MarketHeader(scaffoldKey: _scaffoldKey),
             Card(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -131,7 +148,7 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
                 children: [
                   Container(
                     padding: EdgeInsets.only(top: 10, bottom: 10, left: 10),
-                    width: width * 0.4,
+                    width: width * 0.45,
                     child: OrderBook(
                       asks: public.asks,
                       bids: public.bids,
@@ -143,7 +160,6 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
                     padding: EdgeInsets.only(right: 10),
                     width: width * 0.5,
                     child: TradeForm(
-                      lastPrice: _lastPrice,
                       isLastPriceUpdate: _isLastPriceUpdate,
                       toggleIsPriceUpdate: toggleIsPriceUpdate,
                     ),

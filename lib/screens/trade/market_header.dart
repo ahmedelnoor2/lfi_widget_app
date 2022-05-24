@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:provider/provider.dart';
 
 class MarketHeader extends StatefulWidget {
-  const MarketHeader({Key? key}) : super(key: key);
+  const MarketHeader({
+    Key? key,
+    this.scaffoldKey,
+  }) : super(key: key);
+
+  final scaffoldKey;
 
   @override
   State<MarketHeader> createState() => _MarketHeaderState();
@@ -14,6 +21,8 @@ class _MarketHeaderState extends State<MarketHeader> {
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
+
+    var public = Provider.of<Public>(context, listen: true);
 
     return Container(
       padding: EdgeInsets.only(
@@ -34,21 +43,36 @@ class _MarketHeaderState extends State<MarketHeader> {
                   size: 25,
                 ),
               ),
-              Container(
-                padding: EdgeInsets.only(right: 5),
-                child: Text(
-                  'BTC/USDT',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+              GestureDetector(
+                onTap: () {
+                  widget.scaffoldKey!.currentState.openDrawer();
+                },
+                child: Container(
+                  padding: EdgeInsets.only(right: 5),
+                  child: Text(
+                    public.activeMarket['showName'],
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Text(
-                  '+3.90%',
-                  style: TextStyle(color: greenlightchartColor, fontSize: 12),
+                  public.activeMarketTick.isNotEmpty
+                      ? '${(double.parse(public.activeMarketTick['rose']) * 100) > 0 ? '+' : ''}${(double.parse(public.activeMarketTick['rose']) * 100).toStringAsFixed(2)}%'
+                      : '0.00%',
+                  style: TextStyle(
+                      color: public.activeMarketTick.isEmpty
+                          ? secondaryTextColor
+                          : (double.parse(public.activeMarketTick['rose']) *
+                                      100) >
+                                  0
+                              ? greenlightchartColor
+                              : errorColor,
+                      fontSize: 12),
                 ),
               ),
             ],
@@ -58,10 +82,15 @@ class _MarketHeaderState extends State<MarketHeader> {
             children: [
               Container(
                 padding: EdgeInsets.only(left: 10),
-                child: Icon(
-                  Icons.candlestick_chart,
-                  color: secondaryTextColor,
-                  size: 20,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, '/kline_chart');
+                  },
+                  child: Icon(
+                    Icons.candlestick_chart,
+                    color: secondaryTextColor,
+                    size: 20,
+                  ),
                 ),
               ),
               Container(

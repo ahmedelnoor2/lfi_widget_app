@@ -30,24 +30,67 @@ class _OrderBookState extends State<OrderBook> {
 
   @override
   Widget build(BuildContext context) {
-    var list = [0.23, 0.45, 0.7, 0.15, 0.37, 0.90];
+    var list = [0.10, 0.20, 0.40, 0.60, 0.80, 1];
+
+    var public = Provider.of<Public>(context, listen: true);
 
     List? rasks = widget.asks!.isNotEmpty ? widget.asks!.sublist(0, 6) : [];
     List? asks = List.from(rasks.reversed);
     List? bids = widget.bids!.isNotEmpty ? widget.bids!.sublist(0, 6) : [];
+
+    var bidMax = bids.isNotEmpty
+        ? (bids.reduce((current, next) =>
+            double.parse('${current[1]}') > double.parse('${next[1]}')
+                ? current
+                : next)[1])
+        : 0;
+    var askMax = asks.isNotEmpty
+        ? (asks.reduce((current, next) =>
+            double.parse('${current[1]}') > double.parse('${next[1]}')
+                ? current
+                : next)[1])
+        : 0;
 
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Price',
-              style: TextStyle(color: secondaryTextColor),
+            Column(
+              children: [
+                Text(
+                  'Price',
+                  style: TextStyle(
+                    color: secondaryTextColor,
+                    fontSize: 12,
+                  ),
+                ),
+                Text(
+                  '(${public.activeMarket['showName'].split('/')[1]})',
+                  style: TextStyle(
+                    color: secondaryTextColor,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
             ),
-            Text(
-              'Amount',
-              style: TextStyle(color: secondaryTextColor),
+            Column(
+              children: [
+                Text(
+                  'Amount',
+                  style: TextStyle(
+                    color: secondaryTextColor,
+                    fontSize: 12,
+                  ),
+                ),
+                Text(
+                  '(${public.activeMarket['showName'].split('/')[0]})',
+                  style: TextStyle(
+                    color: secondaryTextColor,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -61,33 +104,42 @@ class _OrderBookState extends State<OrderBook> {
               onTap: () {
                 setPriceField(asks[index][0]);
               },
-              child: Container(
-                padding: const EdgeInsets.only(
-                  top: 3,
-                  bottom: 3,
-                ),
-                child: Stack(
-                  children: <Widget>[
-                    Row(
+              child: Stack(
+                children: <Widget>[
+                  Container(
+                    padding: const EdgeInsets.only(
+                      top: 3,
+                      bottom: 3,
+                    ),
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '${asks[index][0]}',
+                          double.parse('${asks[index][0]}')
+                              .toStringAsPrecision(7),
                           style: TextStyle(color: errorColor),
                         ),
-                        Text('${asks[index][1]}'),
+                        Text(
+                          double.parse('${asks[index][1]}') > 10
+                              ? double.parse('${asks[index][1]}')
+                                  .toStringAsFixed(2)
+                              : double.parse('${asks[index][1]}')
+                                  .toStringAsPrecision(4),
+                        ),
                       ],
                     ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Container(
-                        color: Color.fromARGB(73, 175, 86, 76),
-                        width: (asks[index][1] / list.reduce(max)) * 100,
-                        height: 17,
-                      ),
+                  ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Container(
+                      color: Color.fromARGB(73, 175, 86, 76),
+                      width: (double.parse('${asks[index][1]}') /
+                              double.parse('$askMax')) *
+                          100,
+                      height: 23,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             );
           },
@@ -98,7 +150,7 @@ class _OrderBookState extends State<OrderBook> {
             Container(
               padding: EdgeInsets.all(2),
               child: Text(
-                '${widget.lastPrice}',
+                double.parse('${widget.lastPrice}').toStringAsPrecision(7),
                 style: TextStyle(
                   fontSize: 16,
                 ),
@@ -123,33 +175,42 @@ class _OrderBookState extends State<OrderBook> {
               onTap: () {
                 setPriceField(bids[index][0]);
               },
-              child: Container(
-                padding: const EdgeInsets.only(
-                  top: 3,
-                  bottom: 3,
-                ),
-                child: Stack(
-                  children: <Widget>[
-                    Row(
+              child: Stack(
+                children: <Widget>[
+                  Container(
+                    padding: const EdgeInsets.only(
+                      top: 3,
+                      bottom: 3,
+                    ),
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '${bids[index][0]}',
+                          double.parse('${bids[index][0]}')
+                              .toStringAsPrecision(7),
                           style: TextStyle(color: greenlightchartColor),
                         ),
-                        Text('${bids[index][1]}'),
+                        Text(
+                          double.parse('${bids[index][1]}') > 10
+                              ? double.parse('${bids[index][1]}')
+                                  .toStringAsFixed(2)
+                              : double.parse('${bids[index][1]}')
+                                  .toStringAsPrecision(4),
+                        ),
                       ],
                     ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Container(
-                        color: Color.fromARGB(71, 72, 163, 65),
-                        width: (bids[index][1] / list.reduce(max)) * 100,
-                        height: 17,
-                      ),
+                  ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Container(
+                      color: Color.fromARGB(71, 72, 163, 65),
+                      width: (double.parse('${bids[index][1]}') /
+                              double.parse('$bidMax')) *
+                          100,
+                      height: 23,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             );
           },
@@ -164,7 +225,7 @@ class _OrderBookState extends State<OrderBook> {
                   print('Select preceision');
                 },
                 child: Container(
-                  width: width * 0.29,
+                  width: width * 0.34,
                   padding: EdgeInsets.all(3),
                   decoration: BoxDecoration(
                     border: Border.all(
