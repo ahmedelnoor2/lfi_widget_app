@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/providers/user.dart';
 import 'package:lyotrade/screens/assets/assets.dart';
 import 'package:lyotrade/screens/assets/deposit_assets.dart';
@@ -15,6 +16,7 @@ import 'package:lyotrade/screens/security/email_change.dart';
 import 'package:lyotrade/screens/security/google_auth.dart';
 import 'package:lyotrade/screens/security/password.dart';
 import 'package:lyotrade/screens/security/security.dart';
+import 'package:lyotrade/screens/trade/kline_chart.dart';
 import 'package:lyotrade/screens/trade/trade.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
@@ -35,6 +37,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<Public>(create: (_) => Public()),
         ChangeNotifierProvider<Asset>(create: (_) => Asset()),
         ChangeNotifierProvider<User>(create: (_) => User()),
+        ChangeNotifierProvider<Trading>(create: (_) => Trading()),
       ],
       child: Consumer<Auth>(
         builder: (context, auth, _) {
@@ -105,22 +108,25 @@ class MyApp extends StatelessWidget {
                   ),
                 ),
                 focusedBorder: UnderlineInputBorder(
-                  borderSide:
-                      BorderSide(color: Color.fromARGB(255, 1, 254, 246)),
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(255, 1, 254, 246),
+                  ),
                 ),
                 border: UnderlineInputBorder(
-                  borderSide:
-                      BorderSide(color: Color.fromARGB(255, 1, 254, 246)),
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(255, 1, 254, 246),
+                  ),
                 ),
                 labelStyle: TextStyle(color: Colors.white),
               ),
               elevatedButtonTheme: ElevatedButtonThemeData(
                 style: ElevatedButton.styleFrom(
-                    minimumSize: Size(0, 45),
-                    textStyle: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 17,
-                    )),
+                  minimumSize: Size(0, 45),
+                  textStyle: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                  ),
+                ),
               ),
             ),
 
@@ -141,6 +147,7 @@ class MyApp extends StatelessWidget {
               GoogleAuth.routeName: (context) => const GoogleAuth(),
               EmailChange.routeName: (context) => const EmailChange(),
               Transactions.routeName: (context) => const Transactions(),
+              KlineChart.routeName: (context) => const KlineChart(),
             },
           );
         },

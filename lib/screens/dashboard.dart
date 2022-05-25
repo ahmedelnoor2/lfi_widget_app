@@ -124,17 +124,10 @@ class _DashboardState extends State<Dashboard> {
         }
       }));
     }
-    _channel.sink.add(jsonEncode({
-      "event": "sub",
-      "params": {"channel": "market_btcusdt_ticker", "cb_id": "btcusdt"}
-    }));
 
     _channel.stream.listen((message) {
       extractStreamData(message, public);
     });
-    // _channel.stream.listen((message) {
-    //   _channel.sink.add('received!');
-    // });
   }
 
   void extractStreamData(streamData, public) async {

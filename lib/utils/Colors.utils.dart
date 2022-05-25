@@ -19,7 +19,6 @@ MaterialColor kToDark = const MaterialColor(
 );
 
 MaterialColor createMaterialColor(Color color) {
-  print(color.green);
   List strengths = <double>[.05];
   Map<int, Color> swatch = {};
   final int r = color.red, g = color.green, b = color.blue;
