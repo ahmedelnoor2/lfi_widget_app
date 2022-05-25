@@ -5,6 +5,7 @@ import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:candlesticks/candlesticks.dart';
 
 class KlineChart extends StatefulWidget {
   static const routeName = '/kline_chart';
@@ -15,10 +16,13 @@ class KlineChart extends StatefulWidget {
 }
 
 class _KlineChartState extends State<KlineChart> {
+  List<Candle> candles = [];
+  bool themeIsDark = true;
   var _channel;
 
   @override
   void initState() {
+    getKlineData();
     connectWebSocket();
     super.initState();
   }
@@ -62,12 +66,26 @@ class _KlineChartState extends State<KlineChart> {
     }
   }
 
+  Future<void> getKlineData() async {
+    var public = Provider.of<Public>(context, listen: false);
+    public.fetchCandles().then((value) {
+      setState(() {
+        candles = value;
+      });
+    });
+    await public.getKlineData();
+  }
+
   @override
   Widget build(BuildContext context) {
+    var public = Provider.of<Public>(context, listen: true);
+
     return Scaffold(
       appBar: appBar(context, null),
       body: Center(
-        child: Text('chart'),
+        child: Candlesticks(
+          candles: candles,
+        ),
       ),
     );
   }

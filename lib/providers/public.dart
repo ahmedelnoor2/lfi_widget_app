@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:lyotrade/utils/AppConstant.utils.dart';
+import 'package:candlesticks/candlesticks.dart';
 
 class Public with ChangeNotifier {
   Map<String, String> headers = {
@@ -32,6 +33,8 @@ class Public with ChangeNotifier {
   List _asks = [];
   List _bids = [];
   String _lastPrice = '0';
+
+  List _klineData = [];
 
   String _amountField = '';
   bool _amountFieldUpdate = false;
@@ -94,6 +97,10 @@ class Public with ChangeNotifier {
 
   Map get allSearchMarket {
     return _allSearchMarket;
+  }
+
+  List get klineData {
+    return _klineData;
   }
 
   Future<void> setAmountField(value) async {
@@ -268,5 +275,34 @@ class Public with ChangeNotifier {
       // throw error;
       return;
     }
+  }
+
+  Future<void> getKlineData() async {
+    var url = Uri.parse(
+        'https://$openApiUrl/sapi/v1/klines?symbol=btcusdt&interval=30min');
+
+    try {
+      final response = await http.get(url);
+
+      final responseData = json.decode(response.body);
+      _klineData = responseData;
+      return notifyListeners();
+    } catch (error) {
+      // throw error;
+      return;
+    }
+  }
+
+  Future<List<Candle>> fetchCandles() async {
+    final uri = Uri.parse(
+        "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h");
+    // var uri = Uri.parse(
+    //     'https://$openApiUrl/sapi/v1/klines?symbol=btcusdt&interval=30min');
+    final res = await http.get(uri);
+    return (jsonDecode(res.body) as List<dynamic>)
+        .map((e) => Candle.fromJson(e))
+        .toList()
+        .reversed
+        .toList();
   }
 }
