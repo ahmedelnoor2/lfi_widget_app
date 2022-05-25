@@ -25,6 +25,8 @@ class Public with ChangeNotifier {
   Map _activeMarketTick = {};
   Map _activeMarketAllTicks = {};
 
+  Map _allSearchMarket = {};
+
   List _headerSymbols = [];
 
   List _asks = [];
@@ -90,6 +92,10 @@ class Public with ChangeNotifier {
     return _amountFieldUpdate;
   }
 
+  Map get allSearchMarket {
+    return _allSearchMarket;
+  }
+
   Future<void> setAmountField(value) async {
     _amountField = '$value';
     _amountFieldUpdate = true;
@@ -139,6 +145,35 @@ class Public with ChangeNotifier {
     return notifyListeners();
   }
 
+  Future<void> setAllSearchMarket(allSearchmarket) async {
+    _allSearchMarket = allSearchMarket;
+    return notifyListeners();
+  }
+
+  Future<void> filterMarketSearchResults(
+    query,
+    _searchAllMarkets,
+    sMarketSort,
+  ) async {
+    if (query.isNotEmpty) {
+      List dummyListData = [];
+      for (var item in _searchAllMarkets) {
+        if (item['symbol'].contains(query.toLowerCase())) {
+          dummyListData.add(item);
+        }
+      }
+      _allSearchMarket[sMarketSort].clear();
+      _allSearchMarket[sMarketSort].addAll(dummyListData);
+      notifyListeners();
+      return;
+    } else {
+      _allSearchMarket[sMarketSort].clear();
+      _allSearchMarket[sMarketSort].addAll(_searchAllMarkets);
+      notifyListeners();
+      return;
+    }
+  }
+
   Future<void> getFiatCoins() async {
     var url = Uri.https(
       apiUrl,
@@ -185,9 +220,11 @@ class Public with ChangeNotifier {
 
         for (var k in _allMarketsMap.keys) {
           _allMarkets[k] = [];
+          _allSearchMarket[k] = [];
           var _allMarketsMapo = Map<String, dynamic>.from(_allMarketsMap[k]);
           for (var m in _allMarketsMapo.values) {
             _allMarkets[k].add(m);
+            _allSearchMarket[k].add(m);
           }
         }
         // responseData['data']['market']['market'].values((val) => print(val));

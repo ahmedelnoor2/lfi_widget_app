@@ -10,9 +10,11 @@ class TradeForm extends StatefulWidget {
   const TradeForm({
     Key? key,
     this.scaffoldKey,
+    this.lastPrice,
   }) : super(key: key);
 
   final scaffoldKey;
+  final lastPrice;
 
   @override
   State<TradeForm> createState() => _TradeFormState();
@@ -36,7 +38,6 @@ class _TradeFormState extends State<TradeForm>
 
   @override
   void initState() {
-    updateLastPrice();
     super.initState();
   }
 
@@ -49,10 +50,9 @@ class _TradeFormState extends State<TradeForm>
   }
 
   void updateLastPrice() {
-    var public = Provider.of<Public>(context, listen: false);
-    _priceField.text = public.lastPrice;
+    _priceField.text = widget.lastPrice;
     setState(() {
-      _price = double.parse(public.lastPrice);
+      _price = double.parse(widget.lastPrice);
     });
   }
 
@@ -206,6 +206,11 @@ class _TradeFormState extends State<TradeForm>
               : Container(
                   padding: EdgeInsets.only(bottom: 10),
                   child: TextFormField(
+                    onTap: () {
+                      if (_priceField.text.isEmpty) {
+                        updateLastPrice();
+                      }
+                    },
                     onChanged: (value) {
                       calculateTotal('price');
                     },

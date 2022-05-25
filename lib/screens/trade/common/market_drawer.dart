@@ -27,6 +27,7 @@ class _MarketDrawerState extends State<MarketDrawer>
   final TextEditingController _searchController = TextEditingController();
 
   var _channel;
+  String _currentMarketSort = 'USDT';
 
   @override
   void initState() {
@@ -46,7 +47,7 @@ class _MarketDrawerState extends State<MarketDrawer>
     var public = Provider.of<Public>(context, listen: false);
 
     _tabController = TabController(
-      length: public.allMarkets.length,
+      length: public.publicInfoMarket['market']['marketSort'].length,
       vsync: this,
     );
 
@@ -54,14 +55,20 @@ class _MarketDrawerState extends State<MarketDrawer>
       Uri.parse('${public.publicInfoMarket["market"]["wsUrl"]}'),
     );
 
-    for (int i = 0; i < public.allMarkets['USDT'].length; i++) {
-      _channel.sink.add(jsonEncode({
-        "event": "sub",
-        "params": {
-          "channel": "market_${public.allMarkets['USDT'][i]['symbol']}_ticker",
-          "cb_id": public.allMarkets['USDT'][i]['symbol'],
-        }
-      }));
+    for (int j = 0;
+        j < public.publicInfoMarket['market']['marketSort'].length;
+        j++) {
+      String cMarketSort = public.publicInfoMarket['market']['marketSort'][j];
+      for (int i = 0; i < public.allMarkets[cMarketSort].length; i++) {
+        _channel.sink.add(jsonEncode({
+          "event": "sub",
+          "params": {
+            "channel":
+                "market_${public.allMarkets[cMarketSort][i]['symbol']}_ticker",
+            "cb_id": public.allMarkets[cMarketSort][i]['symbol'],
+          }
+        }));
+      }
     }
 
     _channel.stream.listen((message) {
@@ -130,6 +137,11 @@ class _MarketDrawerState extends State<MarketDrawer>
               child: TextField(
                 onChanged: (value) async {
                   // await asset.filterSearchResults(value);
+                  await public.filterMarketSearchResults(
+                    value,
+                    public.allMarkets[_currentMarketSort],
+                    _currentMarketSort,
+                  );
                 },
                 controller: _searchController,
                 decoration: const InputDecoration(
@@ -148,23 +160,29 @@ class _MarketDrawerState extends State<MarketDrawer>
           SizedBox(
             height: 40,
             child: TabBar(
+              onTap: (value) {
+                setState(() {
+                  _currentMarketSort =
+                      public.publicInfoMarket['market']['marketSort'][value];
+                });
+              },
               controller: _tabController,
-              tabs: [
-                Tab(text: 'USDT'),
-                Tab(text: 'BTC'),
-                Tab(text: 'ETH'),
-              ],
+              tabs: public.publicInfoMarket['market']['marketSort']
+                  .map<Widget>(
+                    (mname) => Tab(text: '$mname'),
+                  )
+                  .toList(),
             ),
           ),
           SizedBox(
             height: height * 0.794,
             child: ListView.builder(
               shrinkWrap: true,
-              itemCount: public.allMarkets['USDT'].isNotEmpty
-                  ? public.allMarkets['USDT'].length
-                  : public.allMarkets['USDT'].length,
+              itemCount: public.allSearchMarket[_currentMarketSort].isNotEmpty
+                  ? public.allSearchMarket[_currentMarketSort].length
+                  : public.allSearchMarket[_currentMarketSort].length,
               itemBuilder: (context, index) {
-                var _market = public.allMarkets['USDT'][index];
+                var _market = public.allSearchMarket[_currentMarketSort][index];
 
                 return ListTile(
                   onTap: () async {
