@@ -149,6 +149,7 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
                     width: width * 0.5,
                     child: TradeForm(
                       scaffoldKey: _scaffoldKey,
+                      lastPrice: public.lastPrice,
                     ),
                   ),
                 ],
