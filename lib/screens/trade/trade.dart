@@ -30,8 +30,6 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
   late final TabController _tabController =
       TabController(length: 2, vsync: this);
 
-  bool _isLastPriceUpdate = false;
-
   @override
   void initState() {
     connectWebSocket();
@@ -107,15 +105,6 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
     }
   }
 
-  void setAmountField(value) {}
-
-  void toggleIsPriceUpdate() {
-    print('toggle');
-    setState(() {
-      _isLastPriceUpdate = false;
-    });
-  }
-
   void updateMarket() {
     if (_channel != null) {
       _channel.sink.close();
@@ -153,15 +142,13 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
                       asks: public.asks,
                       bids: public.bids,
                       lastPrice: public.lastPrice,
-                      setAmountField: setAmountField,
                     ),
                   ),
                   Container(
                     padding: EdgeInsets.only(right: 10),
                     width: width * 0.5,
                     child: TradeForm(
-                      isLastPriceUpdate: _isLastPriceUpdate,
-                      toggleIsPriceUpdate: toggleIsPriceUpdate,
+                      scaffoldKey: _scaffoldKey,
                     ),
                   ),
                 ],

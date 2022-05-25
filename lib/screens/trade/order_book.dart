@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
@@ -12,26 +11,22 @@ class OrderBook extends StatefulWidget {
     this.asks,
     this.bids,
     this.lastPrice,
-    this.setAmountField,
   }) : super(key: key);
   final List? asks;
   final List? bids;
   final String? lastPrice;
-  final Function? setAmountField;
 
   @override
   State<OrderBook> createState() => _OrderBookState();
 }
 
 class _OrderBookState extends State<OrderBook> {
-  Future<void> setPriceField(value) async {
-    widget.setAmountField!(value);
+  void setPriceField(public, value) {
+    public.setAmountField(value);
   }
 
   @override
   Widget build(BuildContext context) {
-    var list = [0.10, 0.20, 0.40, 0.60, 0.80, 1];
-
     var public = Provider.of<Public>(context, listen: true);
 
     List? rasks = widget.asks!.isNotEmpty ? widget.asks!.sublist(0, 6) : [];
@@ -102,7 +97,7 @@ class _OrderBookState extends State<OrderBook> {
           itemBuilder: (BuildContext context, int index) {
             return GestureDetector(
               onTap: () {
-                setPriceField(asks[index][0]);
+                setPriceField(public, asks[index][0]);
               },
               child: Stack(
                 children: <Widget>[
@@ -133,8 +128,9 @@ class _OrderBookState extends State<OrderBook> {
                     alignment: Alignment.centerRight,
                     child: Container(
                       color: Color.fromARGB(73, 175, 86, 76),
-                      width: (double.parse('${asks[index][1]}') /
-                              double.parse('$askMax')) *
+                      width: ((double.parse('${asks[index][1]}') /
+                                  double.parse('$askMax')) *
+                              2) *
                           100,
                       height: 23,
                     ),
@@ -173,7 +169,7 @@ class _OrderBookState extends State<OrderBook> {
           itemBuilder: (BuildContext context, int index) {
             return GestureDetector(
               onTap: () {
-                setPriceField(bids[index][0]);
+                setPriceField(public, bids[index][0]);
               },
               child: Stack(
                 children: <Widget>[
@@ -204,8 +200,9 @@ class _OrderBookState extends State<OrderBook> {
                     alignment: Alignment.centerRight,
                     child: Container(
                       color: Color.fromARGB(71, 72, 163, 65),
-                      width: (double.parse('${bids[index][1]}') /
-                              double.parse('$bidMax')) *
+                      width: ((double.parse('${bids[index][1]}') /
+                                  double.parse('$bidMax')) *
+                              2) *
                           100,
                       height: 23,
                     ),

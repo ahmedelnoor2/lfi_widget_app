@@ -31,6 +31,9 @@ class Public with ChangeNotifier {
   List _bids = [];
   String _lastPrice = '0';
 
+  String _amountField = '';
+  bool _amountFieldUpdate = false;
+
   Map get rate {
     return _rate;
   }
@@ -77,6 +80,25 @@ class Public with ChangeNotifier {
 
   Map get allMarkets {
     return _allMarkets;
+  }
+
+  String get amountField {
+    return _amountField;
+  }
+
+  bool get amountFieldUpdate {
+    return _amountFieldUpdate;
+  }
+
+  Future<void> setAmountField(value) async {
+    _amountField = '$value';
+    _amountFieldUpdate = true;
+    return notifyListeners();
+  }
+
+  Future<void> amountFieldDisable() async {
+    _amountFieldUpdate = false;
+    return notifyListeners();
   }
 
   Future<void> setHeaderSymbols(headerSymb) async {

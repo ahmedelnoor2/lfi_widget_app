@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/providers/user.dart';
 import 'package:lyotrade/screens/assets/assets.dart';
 import 'package:lyotrade/screens/assets/deposit_assets.dart';
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<Public>(create: (_) => Public()),
         ChangeNotifierProvider<Asset>(create: (_) => Asset()),
         ChangeNotifierProvider<User>(create: (_) => User()),
+        ChangeNotifierProvider<Trading>(create: (_) => Trading()),
       ],
       child: Consumer<Auth>(
         builder: (context, auth, _) {
@@ -106,12 +108,14 @@ class MyApp extends StatelessWidget {
                   ),
                 ),
                 focusedBorder: UnderlineInputBorder(
-                  borderSide:
-                      BorderSide(color: Color.fromARGB(255, 1, 254, 246)),
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(255, 1, 254, 246),
+                  ),
                 ),
                 border: UnderlineInputBorder(
-                  borderSide:
-                      BorderSide(color: Color.fromARGB(255, 1, 254, 246)),
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(255, 1, 254, 246),
+                  ),
                 ),
                 labelStyle: TextStyle(color: Colors.white),
               ),
