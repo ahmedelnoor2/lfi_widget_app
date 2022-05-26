@@ -84,7 +84,11 @@ class _MarketHeaderState extends State<MarketHeader> {
                 padding: EdgeInsets.only(left: 10),
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.pushNamed(context, '/kline_chart');
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/kline_chart',
+                      (route) => false,
+                    );
                   },
                   child: Icon(
                     Icons.candlestick_chart,
