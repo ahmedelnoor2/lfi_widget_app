@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:intl/intl.dart';
 import 'dart:io';
 import 'dart:ui';
 import 'dart:math' as math;
@@ -62,6 +63,8 @@ class _KlineChartState extends State<KlineChart>
   bool themeIsDark = true;
   var _mchannel;
   bool _loadingChart = false;
+  bool? _upDirection;
+  double _lastPriceCheck = 0.00;
 
   @override
   void initState() {
@@ -171,15 +174,34 @@ class _KlineChartState extends State<KlineChart>
         if (marketData['channel'] == 'market_${marketCoin}_ticker') {
           public.setActiveMarketTick(marketData['tick'] ?? []);
           public.setLastPrice('${marketData['tick']['close']}');
+
+          if (_lastPriceCheck >
+              double.parse('${marketData['tick']['close']}')) {
+            setState(() {
+              _upDirection = true;
+              _lastPriceCheck = double.parse('${marketData['tick']['close']}');
+            });
+          } else if (_lastPriceCheck <
+              double.parse('${marketData['tick']['close']}')) {
+            setState(() {
+              _upDirection = false;
+              _lastPriceCheck = double.parse('${marketData['tick']['close']}');
+            });
+          } else {
+            setState(() {
+              _upDirection = null;
+              _lastPriceCheck = double.parse('${marketData['tick']['close']}');
+            });
+          }
         }
 
         if (marketData['channel'] == 'market_${marketCoin}_trade_ticker') {
           var _latestTradesAll = latestTrades;
-          _latestTradesAll.addAll(marketData['tick']['data']);
-          if (_latestTradesAll.length > 30) {
-            _latestTradesAll.sublist(0, 30);
+          _latestTradesAll.insertAll(0, marketData['tick']['data']);
+          if (_latestTradesAll.length > 22) {
+            var _subLastTradesAll = _latestTradesAll.sublist(0, 22);
             setState(() {
-              latestTrades = _latestTradesAll;
+              latestTrades = _subLastTradesAll;
             });
           } else {
             setState(() {
@@ -265,19 +287,11 @@ class _KlineChartState extends State<KlineChart>
                                 '${getNumberString(context, double.parse('${public.activeMarketTick['close']}'))}',
                                 style: TextStyle(
                                     fontSize: 25,
-                                    color: (double.parse(
-                                                '${public.activeMarketTick['close']}') ==
-                                            double.parse(
-                                                '${public.activeMarketTick['open']}'))
-                                        ? Colors.white
-                                        : (((double.parse('${public.activeMarketTick['open']}') -
-                                                        double.parse(
-                                                            '${public.activeMarketTick['close']}')) /
-                                                    double.parse(
-                                                        '${public.activeMarketTick['open']}')) >
-                                                0)
-                                            ? greenlightchartColor
-                                            : errorColor),
+                                    color: _upDirection == false
+                                        ? greenlightchartColor
+                                        : _upDirection == true
+                                            ? errorColor
+                                            : Colors.white),
                               ),
                               Row(
                                 children: [
@@ -563,7 +577,7 @@ class _KlineChartState extends State<KlineChart>
                     ],
                   ),
                   SizedBox(
-                    height: height * 0.75,
+                    height: height * 0.77,
                     child: TabBarView(
                       controller: _tabController,
                       children: [
@@ -590,6 +604,7 @@ class _KlineChartState extends State<KlineChart>
                                 ),
                               ],
                             ),
+                            Divider(),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -663,66 +678,67 @@ class _KlineChartState extends State<KlineChart>
                                   padding: EdgeInsets.only(right: 10, top: 5),
                                   width: width * 0.50,
                                   child: ListView.builder(
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      shrinkWrap: true,
-                                      padding: EdgeInsets.zero,
-                                      itemCount: asks.length,
-                                      itemBuilder:
-                                          (BuildContext context, int index) {
-                                        return Stack(
-                                          children: <Widget>[
-                                            Container(
-                                              padding: EdgeInsets.only(
-                                                  bottom: 2, left: 5),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    double.parse(
-                                                            '${asks[index][0]}')
-                                                        .toStringAsPrecision(7),
-                                                    style: TextStyle(
-                                                      color: errorColor,
-                                                    ),
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    padding: EdgeInsets.zero,
+                                    itemCount: asks.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      return Stack(
+                                        children: <Widget>[
+                                          Container(
+                                            padding: EdgeInsets.only(
+                                                bottom: 2, left: 5),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  double.parse(
+                                                          '${asks[index][0]}')
+                                                      .toStringAsPrecision(7),
+                                                  style: TextStyle(
+                                                    color: errorColor,
                                                   ),
-                                                  Text(
-                                                    double.parse(
-                                                                '${asks[index][1]}') >
-                                                            10
-                                                        ? double.parse(
-                                                                '${asks[index][1]}')
-                                                            .toStringAsFixed(2)
-                                                        : double.parse(
-                                                                '${asks[index][1]}')
-                                                            .toStringAsPrecision(
-                                                                4),
-                                                    style: TextStyle(
-                                                      color: secondaryTextColor,
-                                                    ),
+                                                ),
+                                                Text(
+                                                  double.parse(
+                                                              '${asks[index][1]}') >
+                                                          10
+                                                      ? double.parse(
+                                                              '${asks[index][1]}')
+                                                          .toStringAsFixed(2)
+                                                      : double.parse(
+                                                              '${asks[index][1]}')
+                                                          .toStringAsPrecision(
+                                                              4),
+                                                  style: TextStyle(
+                                                    color: secondaryTextColor,
                                                   ),
-                                                ],
-                                              ),
+                                                ),
+                                              ],
                                             ),
-                                            Align(
-                                              alignment: Alignment.centerLeft,
-                                              child: Container(
-                                                color: Color.fromARGB(
-                                                    73, 175, 86, 76),
-                                                width: ((double.parse(
-                                                                '${asks[index][1]}') /
-                                                            double.parse(
-                                                                '$askMax')) *
-                                                        2) *
-                                                    100,
-                                                height: 20,
-                                              ),
+                                          ),
+                                          Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Container(
+                                              color: Color.fromARGB(
+                                                  73, 175, 86, 76),
+                                              width: ((double.parse(
+                                                              '${asks[index][1]}') /
+                                                          double.parse(
+                                                              '$askMax')) *
+                                                      2) *
+                                                  100,
+                                              height: 20,
                                             ),
-                                          ],
-                                        );
-                                      }),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  ),
                                 ),
                               ],
                             )
@@ -766,6 +782,63 @@ class _KlineChartState extends State<KlineChart>
                                   ),
                                 ),
                               ],
+                            ),
+                            Divider(),
+                            ListView.builder(
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              padding: EdgeInsets.zero,
+                              itemCount: latestTrades.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      padding:
+                                          EdgeInsets.only(left: 10, top: 10),
+                                      width: width * 0.33,
+                                      child: Text(
+                                        '${DateFormat('hh:mm:ss').format(DateTime.fromMillisecondsSinceEpoch(latestTrades[index]['ts']))}',
+                                        style: TextStyle(
+                                            color: secondaryTextColor),
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.only(top: 10),
+                                      width: width * 0.33,
+                                      child: Align(
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          '${getNumberString(context, double.parse('${latestTrades[index]['price']}'))}',
+                                          style: TextStyle(
+                                              color: latestTrades[index]
+                                                          ['side'] ==
+                                                      'SELL'
+                                                  ? errorColor
+                                                  : greenlightchartColor),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      padding:
+                                          EdgeInsets.only(top: 10, right: 10),
+                                      width: width * 0.33,
+                                      child: Align(
+                                        alignment: Alignment.centerRight,
+                                        child: Text(
+                                          double.parse(
+                                                  '${latestTrades[index]['vol']}')
+                                              .toStringAsFixed(6),
+                                          style: TextStyle(
+                                            color: secondaryTextColor,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
                             ),
                           ],
                         ),
