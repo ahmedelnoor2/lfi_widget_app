@@ -16,3 +16,24 @@ String getNumberFormat(context, item) {
     ).format(0);
   }
 }
+
+String getNumberString(context, item) {
+  try {
+    if (item.toString().split('.')[0].length > 5) {
+      return NumberFormat.compactCurrency(
+        locale: "en_US",
+        symbol: "",
+      ).format(item);
+    } else {
+      return NumberFormat.currency(
+        locale: "en_US",
+        symbol: "",
+      ).format(item);
+    }
+  } catch (e) {
+    return NumberFormat.currency(
+      locale: "en_US",
+      symbol: "",
+    ).format(0);
+  }
+}

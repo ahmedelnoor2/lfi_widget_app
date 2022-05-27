@@ -57,7 +57,7 @@ class MyApp extends StatelessWidget {
               appBarTheme: AppBarTheme(
                 backgroundColor: Color.fromARGB(255, 26, 29, 63),
               ),
-              fontFamily: 'Inter',
+              fontFamily: 'Yantramanav',
               // bottomAppBarTheme: BottomAppBarTheme(
               //   color: Color.fromARGB(255, 26, 29, 63),
               // ),
@@ -121,10 +121,10 @@ class MyApp extends StatelessWidget {
               ),
               elevatedButtonTheme: ElevatedButtonThemeData(
                 style: ElevatedButton.styleFrom(
-                  minimumSize: Size(0, 45),
+                  minimumSize: Size(0, 32),
                   textStyle: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 17,
+                    // fontWeight: FontWeight.bold,
+                    fontSize: 12,
                   ),
                 ),
               ),

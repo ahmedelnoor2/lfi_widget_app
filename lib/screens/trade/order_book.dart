@@ -103,8 +103,8 @@ class _OrderBookState extends State<OrderBook> {
                 children: <Widget>[
                   Container(
                     padding: const EdgeInsets.only(
-                      top: 3,
-                      bottom: 3,
+                      top: 2,
+                      bottom: 2,
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -143,21 +143,15 @@ class _OrderBookState extends State<OrderBook> {
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Container(
-              padding: EdgeInsets.all(2),
-              child: Text(
-                double.parse('${widget.lastPrice}').toStringAsPrecision(7),
-                style: TextStyle(
-                  fontSize: 16,
-                ),
+            Text(
+              double.parse('${widget.lastPrice}').toStringAsPrecision(7),
+              style: TextStyle(
+                fontSize: 20,
               ),
             ),
-            Container(
-              padding: EdgeInsets.all(2),
-              child: Text(
-                '≈ ${getNumberFormat(context, double.parse(widget.lastPrice ?? '0'))}',
-                style: TextStyle(fontSize: 12, color: secondaryTextColor),
-              ),
+            Text(
+              '≈ ${getNumberFormat(context, double.parse(widget.lastPrice ?? '0'))}',
+              style: TextStyle(fontSize: 14, color: secondaryTextColor),
             ),
           ],
         ),
@@ -175,8 +169,8 @@ class _OrderBookState extends State<OrderBook> {
                 children: <Widget>[
                   Container(
                     padding: const EdgeInsets.only(
-                      top: 3,
-                      bottom: 3,
+                      top: 2,
+                      bottom: 2,
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
