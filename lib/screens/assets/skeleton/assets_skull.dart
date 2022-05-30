@@ -5,136 +5,108 @@ import 'package:lyotrade/utils/AppConstant.utils.dart';
 
 Widget assetsSkull(context) {
   width = MediaQuery.of(context).size.width;
-  var list = List<int>.generate(3, (i) => i + 1);
+  var list = List<int>.generate(7, (i) => i + 1);
 
   return ListView.builder(
     padding: EdgeInsets.zero,
     itemCount: list.length,
     itemBuilder: (BuildContext context, int index) {
-      return Card(
-        child: Container(
-          padding: EdgeInsets.all(width * 0.02),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      return Container(
+        padding: EdgeInsets.only(
+          bottom: 8,
+          left: 5,
+          right: 5,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            SizedBox(
+              width: width * 0.33,
+              child: Row(
                 children: [
-                  FittedBox(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(right: width * 0.02),
-                          child: SkeletonAvatar(
-                            style: SkeletonAvatarStyle(
-                              shape: BoxShape.circle,
-                              width: width * 0.1,
-                            ),
-                          ),
-                        ),
-                        SkeletonLine(
-                          style: SkeletonLineStyle(
-                              height: 25,
-                              width: width * 0.2,
-                              borderRadius: BorderRadius.circular(8)),
-                        ),
-                      ],
+                  Container(
+                    padding: EdgeInsets.only(right: 8),
+                    child: SkeletonAvatar(
+                      style: SkeletonAvatarStyle(
+                        shape: BoxShape.circle,
+                        width: 24,
+                      ),
                     ),
                   ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(bottom: 5),
+                        child: SkeletonLine(
+                          style: SkeletonLineStyle(
+                              height: 10,
+                              width: width * 0.15,
+                              borderRadius: BorderRadius.circular(8)),
+                        ),
+                      ),
+                      SkeletonLine(
+                        style: SkeletonLineStyle(
+                            height: 10,
+                            width: width * 0.15,
+                            borderRadius: BorderRadius.circular(8)),
+                      ),
+                    ],
+                  )
                 ],
               ),
-              Container(
-                padding: EdgeInsets.only(top: width * 0.035),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            ),
+            SizedBox(
+              width: width * 0.27,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: SkeletonLine(
+                  style: SkeletonLineStyle(
+                      height: 10,
+                      width: width * 0.15,
+                      borderRadius: BorderRadius.circular(8)),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: width * 0.22,
+              child: Align(
+                  alignment: Alignment.center,
+                  child: SkeletonLine(
+                    style: SkeletonLineStyle(
+                        height: 10,
+                        width: width * 0.15,
+                        borderRadius: BorderRadius.circular(8)),
+                  )),
+            ),
+            SizedBox(
+              width: width * 0.10,
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    SizedBox(
-                      height: width * 0.18,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SkeletonLine(
-                            style: SkeletonLineStyle(
-                                height: 12,
-                                width: width * 0.1,
-                                borderRadius: BorderRadius.circular(8)),
-                          ),
-                          SkeletonLine(
-                            style: SkeletonLineStyle(
-                                height: 18,
-                                width: width * 0.2,
-                                borderRadius: BorderRadius.circular(8)),
-                          ),
-                          SkeletonLine(
-                            style: SkeletonLineStyle(
-                                height: 12,
-                                width: width * 0.1,
-                                borderRadius: BorderRadius.circular(8)),
-                          ),
-                        ],
+                    Container(
+                      padding: EdgeInsets.only(bottom: 5),
+                      child: SkeletonLine(
+                        style: SkeletonLineStyle(
+                            height: 10,
+                            width: width * 0.15,
+                            borderRadius: BorderRadius.circular(8)),
                       ),
                     ),
-                    SizedBox(
-                      height: width * 0.18,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SkeletonLine(
-                            style: SkeletonLineStyle(
-                                height: 12,
-                                width: width * 0.1,
-                                borderRadius: BorderRadius.circular(8)),
-                          ),
-                          SkeletonLine(
-                            style: SkeletonLineStyle(
-                                height: 18,
-                                width: width * 0.2,
-                                borderRadius: BorderRadius.circular(8)),
-                          ),
-                          SkeletonLine(
-                            style: SkeletonLineStyle(
-                                height: 12,
-                                width: width * 0.1,
-                                borderRadius: BorderRadius.circular(8)),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: width * 0.18,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          SkeletonLine(
-                            style: SkeletonLineStyle(
-                                height: 12,
-                                width: width * 0.1,
-                                borderRadius: BorderRadius.circular(8)),
-                          ),
-                          SkeletonLine(
-                            style: SkeletonLineStyle(
-                                height: 18,
-                                width: width * 0.2,
-                                borderRadius: BorderRadius.circular(8)),
-                          ),
-                          SkeletonLine(
-                            style: SkeletonLineStyle(
-                                height: 12,
-                                width: width * 0.1,
-                                borderRadius: BorderRadius.circular(8)),
-                          ),
-                        ],
-                      ),
+                    SkeletonLine(
+                      style: SkeletonLineStyle(
+                          height: 10,
+                          width: width * 0.15,
+                          borderRadius: BorderRadius.circular(8)),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+            Divider(),
+          ],
         ),
       );
     },

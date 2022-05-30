@@ -15,6 +15,8 @@ class Asset with ChangeNotifier {
   Map _changeAddress = {};
   List _digitialAss = [];
   List _allDigAsset = [];
+  bool _hideBalances = false;
+  final String _hideBalanceString = '******';
 
   Map<String, String> headers = {
     'Content-type': 'application/json;charset=utf-8',
@@ -52,6 +54,19 @@ class Asset with ChangeNotifier {
 
   List get allDigAsset {
     return _allDigAsset;
+  }
+
+  bool get hideBalances {
+    return _hideBalances;
+  }
+
+  String get hideBalanceString {
+    return _hideBalanceString;
+  }
+
+  void toggleHideBalances(value) {
+    _hideBalances = value;
+    notifyListeners();
   }
 
   void setDigAssets(digAsset) {

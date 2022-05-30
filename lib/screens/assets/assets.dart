@@ -1,17 +1,15 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/public.dart';
-import 'package:lyotrade/screens/assets/digital_assets.dart';
-import 'package:lyotrade/screens/assets/margin_assets.dart';
-import 'package:lyotrade/screens/assets/otc_assets.dart';
 import 'package:lyotrade/screens/common/bottomnav.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
+import 'package:lyotrade/utils/Number.utils.dart';
 
 class Assets extends StatefulWidget {
   static const routeName = '/assets';
@@ -21,18 +19,12 @@ class Assets extends StatefulWidget {
   State<Assets> createState() => _AssetsState();
 }
 
-class _AssetsState extends State<Assets> with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
-
+class _AssetsState extends State<Assets> {
   bool _checkAuthStatus = true;
-  List _digitalAssets = [];
-  List _marginAssets = [];
-  List _p2pAssets = [];
-  double _bottomBoxSize = 0.58;
+  String _totalBalanceSymbol = 'BTC';
 
   @override
   void initState() {
-    _tabController = TabController(length: 3, vsync: this);
     checkLoginStatus();
     super.initState();
   }
@@ -55,31 +47,11 @@ class _AssetsState extends State<Assets> with SingleTickerProviderStateMixin {
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
     await asset.getTotalBalance(auth);
-    await asset.getAccountBalance(auth, "");
-    await asset.getP2pBalance(auth);
-    await asset.getMarginBalance(auth);
-    List _digAssets = [];
-    asset.accountBalance['allCoinMap'].forEach((k, v) {
-      _digAssets.add({
-        'coin': k,
-        'values': v,
-      });
-    });
-    setState(() {
-      _digitalAssets = _digAssets;
-      _p2pAssets = asset.p2pBalance['allCoinMap'];
-    });
-    List _margAssets = [];
-    asset.marginBalance['leverMap'].forEach((k, v) {
-      _margAssets.add({
-        'coin': k.split('/')[0],
-        'market': k,
-        'values': v,
-      });
-    });
-    setState(() {
-      _marginAssets = _margAssets;
-    });
+  }
+
+  void toggleHideBalances() {
+    var asset = Provider.of<Asset>(context, listen: false);
+    asset.toggleHideBalances(!asset.hideBalances);
   }
 
   @override
@@ -92,11 +64,35 @@ class _AssetsState extends State<Assets> with SingleTickerProviderStateMixin {
     var asset = Provider.of<Asset>(context, listen: true);
 
     List _accounts = [
-      {'icon': 'digital.png', 'name': 'Digital Account'},
-      {'icon': 'p2p.png', 'name': 'P2P Account'},
-      {'icon': 'margin.png', 'name': 'Margin Account'},
-      {'icon': 'stake.png', 'name': 'Staking'},
+      {
+        'icon': 'digital.png',
+        'name': 'Digital Account',
+        'path': '/digital_assets',
+        'balance': asset.totalAccountBalance['balance'] ?? '0'
+      },
+      {
+        'icon': 'p2p.png',
+        'name': 'P2P Account',
+        'path': '/p2p_assets',
+        'balance': asset.totalAccountBalance['c2cBalance'] ?? '0'
+      },
+      {
+        'icon': 'margin.png',
+        'name': 'Margin Account',
+        'path': '/margin_assets',
+        'balance': asset.totalAccountBalance['leverBalance'] ?? '0'
+      },
+      {
+        'icon': 'stake.png',
+        'name': 'Staking',
+        'path': '/staking',
+        'balance': '0',
+      },
     ];
+
+    bool _hideBalances = asset.hideBalances;
+    String _hideBalanceString = asset.hideBalanceString;
+
     return Scaffold(
       body: _checkAuthStatus
           ? const Center(
@@ -147,34 +143,6 @@ class _AssetsState extends State<Assets> with SingleTickerProviderStateMixin {
                     shadowColor: Colors.transparent,
                     toolbarHeight: 0,
                   ),
-                  // headerSliverBuilder:
-                  //     (BuildContext context, bool innerBoxIsScrolled) {
-                  //   if (innerBoxIsScrolled) {
-                  //     Future.delayed(const Duration(seconds: 0), () async {
-                  //       setState(() {
-                  //         _bottomBoxSize = 0.78;
-                  //       });
-                  //     });
-                  //   } else {
-                  //     Future.delayed(const Duration(seconds: 0), () async {
-                  //       setState(() {
-                  //         _bottomBoxSize = 0.58;
-                  //       });
-                  //     });
-                  //   }
-                  //   return <Widget>[
-                  //     assetsBar(
-                  //       context,
-                  //       auth,
-                  //       width,
-                  //       innerBoxIsScrolled,
-                  //       _tabController,
-                  //       asset.accountBalance,
-                  //       public,
-                  //       asset.totalAccountBalance,
-                  //     ),
-                  //   ];
-                  // },
                   body: Container(
                     padding: EdgeInsets.all(width * 0.03),
                     child: Column(
@@ -196,7 +164,14 @@ class _AssetsState extends State<Assets> with SingleTickerProviderStateMixin {
                                       fontSize: 16,
                                     ),
                                   ),
-                                  Icon(Icons.remove_red_eye),
+                                  GestureDetector(
+                                    onTap: () {
+                                      toggleHideBalances();
+                                    },
+                                    child: _hideBalances
+                                        ? Icon(Icons.visibility)
+                                        : Icon(Icons.visibility_off),
+                                  ),
                                 ],
                               ),
                             ),
@@ -245,7 +220,7 @@ class _AssetsState extends State<Assets> with SingleTickerProviderStateMixin {
                                                     padding: EdgeInsets.only(
                                                         right: 10),
                                                     child: Text(
-                                                      '0.09244421 BTC',
+                                                      '${_hideBalances ? _hideBalanceString : asset.totalAccountBalance['totalbalance']} BTC',
                                                       style: TextStyle(
                                                           fontSize: 20,
                                                           fontWeight:
@@ -253,7 +228,18 @@ class _AssetsState extends State<Assets> with SingleTickerProviderStateMixin {
                                                     ),
                                                   ),
                                                   Text(
-                                                    '≈\$2,567.56 USD',
+                                                    '≈${_hideBalances ? _hideBalanceString : getNumberFormat(
+                                                        context,
+                                                        public.rate[public
+                                                                        .activeCurrency[
+                                                                            'fiat_symbol']
+                                                                        .toUpperCase()]
+                                                                    [
+                                                                    _totalBalanceSymbol] !=
+                                                                null
+                                                            ? '${double.parse(asset.totalAccountBalance['totalbalance'] ?? '0') * public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()][_totalBalanceSymbol]}'
+                                                            : '0',
+                                                      )}',
                                                     style: TextStyle(
                                                       color: secondaryTextColor,
                                                     ),
@@ -300,7 +286,7 @@ class _AssetsState extends State<Assets> with SingleTickerProviderStateMixin {
                                   ),
                                 ),
                                 SizedBox(
-                                  height: height * 0.21,
+                                  height: height * 0.177,
                                   child: Container(
                                     padding:
                                         EdgeInsets.only(top: 50, right: 12),
@@ -308,13 +294,13 @@ class _AssetsState extends State<Assets> with SingleTickerProviderStateMixin {
                                       alignment: Alignment.bottomRight,
                                       child: Image.asset(
                                         'assets/img/asset_background.png',
-                                        // height: 200,
                                       ),
                                     ),
                                   ),
                                 ),
                               ],
                             ),
+                            Divider(),
                             ListView.separated(
                               separatorBuilder: (context, index) => SizedBox(
                                 height: 4,
@@ -324,50 +310,75 @@ class _AssetsState extends State<Assets> with SingleTickerProviderStateMixin {
                               padding: EdgeInsets.zero,
                               itemCount: _accounts.length,
                               itemBuilder: (BuildContext context, int index) {
-                                return Card(
-                                  child: ListTile(
-                                    title: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Container(
-                                              padding:
-                                                  EdgeInsets.only(right: 16),
-                                              child: Image.asset(
-                                                'assets/img/${_accounts[index]['icon']}',
-                                                width: 25,
+                                return GestureDetector(
+                                  onTap: () {
+                                    if (_accounts[index]['path'] ==
+                                        '/staking') {
+                                      snackAlert(context, SnackTypes.warning,
+                                          'Coming Soon...');
+                                    } else {
+                                      Navigator.pushNamed(context,
+                                          '${_accounts[index]['path']}');
+                                    }
+                                  },
+                                  child: Card(
+                                    child: ListTile(
+                                      title: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Container(
+                                                padding:
+                                                    EdgeInsets.only(right: 16),
+                                                child: Image.asset(
+                                                  'assets/img/${_accounts[index]['icon']}',
+                                                  width: 25,
+                                                ),
                                               ),
-                                            ),
-                                            Text(
-                                              '${_accounts[index]['name']}',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
+                                              Text(
+                                                '${_accounts[index]['name']}',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                        Column(
-                                          children: [
-                                            Text(
-                                              '277.73 USD',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
+                                            ],
+                                          ),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
+                                            children: [
+                                              Text(
+                                                '${_hideBalances ? _hideBalanceString : double.parse('${_accounts[index]['balance']}').toStringAsFixed(6)} $_totalBalanceSymbol',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                               ),
-                                            ),
-                                            Text(
-                                              '= 0.0967474 BTC',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: secondaryTextColor,
+                                              Text(
+                                                '=${_hideBalances ? _hideBalanceString : getNumberFormat(
+                                                    context,
+                                                    public.rate[public
+                                                                    .activeCurrency[
+                                                                        'fiat_symbol']
+                                                                    .toUpperCase()]
+                                                                [
+                                                                _totalBalanceSymbol] !=
+                                                            null
+                                                        ? '${double.parse(_accounts[index]['balance'] ?? '0') * public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()][_totalBalanceSymbol]}'
+                                                        : '0',
+                                                  )}',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: secondaryTextColor,
+                                                ),
                                               ),
-                                            ),
-                                          ],
-                                        )
-                                      ],
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                      trailing: Icon(Icons.chevron_right),
                                     ),
-                                    trailing: Icon(Icons.chevron_right),
                                   ),
                                 );
                               },
@@ -382,14 +393,24 @@ class _AssetsState extends State<Assets> with SingleTickerProviderStateMixin {
                               SizedBox(
                                 width: width * 0.28,
                                 child: ElevatedButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/deposit_assets',
+                                    );
+                                  },
                                   child: Text('Deposit'),
                                 ),
                               ),
                               SizedBox(
                                 width: width * 0.28,
                                 child: ElevatedButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/withdraw_assets',
+                                    );
+                                  },
                                   child: Text('Withdraw'),
                                 ),
                               ),
@@ -406,32 +427,6 @@ class _AssetsState extends State<Assets> with SingleTickerProviderStateMixin {
                       ],
                     ),
                   ),
-                  //  TabBarView(
-                  //   controller: _tabController,
-                  //   children: [
-                  //     DigitalAssets(
-                  //       assets: _digitalAssets,
-                  //       bottomBoxSize: _bottomBoxSize,
-                  //       totalBalance: asset.accountBalance['totalBalance'],
-                  //       totalBalanceSymbol:
-                  //           asset.accountBalance['totalBalanceSymbol'],
-                  //     ),
-                  //     OtcAssets(
-                  //       assets: _p2pAssets,
-                  //       bottomBoxSize: _bottomBoxSize,
-                  //       totalBalance: asset.p2pBalance['totalBalance'],
-                  //       totalBalanceSymbol:
-                  //           asset.p2pBalance['totalBalanceSymbol'],
-                  //     ),
-                  //     MarginAssets(
-                  //       assets: _marginAssets,
-                  //       bottomBoxSize: _bottomBoxSize,
-                  //       totalBalance: asset.p2pBalance['totalBalance'],
-                  //       totalBalanceSymbol:
-                  //           asset.p2pBalance['totalBalanceSymbol'],
-                  //     ),
-                  //   ],
-                  // ),
                 ),
       bottomNavigationBar: bottomNav(context),
     );
