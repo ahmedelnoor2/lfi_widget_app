@@ -6,6 +6,9 @@ import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/providers/user.dart';
 import 'package:lyotrade/screens/assets/assets.dart';
 import 'package:lyotrade/screens/assets/deposit_assets.dart';
+import 'package:lyotrade/screens/assets/digital_assets.dart';
+import 'package:lyotrade/screens/assets/margin_assets.dart';
+import 'package:lyotrade/screens/assets/otc_assets.dart';
 import 'package:lyotrade/screens/assets/transactions.dart';
 import 'package:lyotrade/screens/assets/withdraw_assets.dart';
 import 'package:lyotrade/screens/auth/authentication.dart';
@@ -31,6 +34,8 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    double _letterSpacing = 0.3;
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<Auth>(create: (_) => Auth()),
@@ -77,21 +82,54 @@ class MyApp extends StatelessWidget {
                 headline1: TextStyle(
                     fontSize: 72.0,
                     fontWeight: FontWeight.bold,
+                    letterSpacing: _letterSpacing,
                     color: Colors.white),
-                headline2: TextStyle(color: Colors.white),
-                headline3: TextStyle(color: Colors.white),
-                headline4: TextStyle(color: Colors.white),
-                headline5: TextStyle(color: Colors.white),
+                headline2: TextStyle(
+                  color: Colors.white,
+                  letterSpacing: _letterSpacing,
+                ),
+                headline3: TextStyle(
+                  color: Colors.white,
+                  letterSpacing: _letterSpacing,
+                ),
+                headline4: TextStyle(
+                  color: Colors.white,
+                  letterSpacing: _letterSpacing,
+                ),
+                headline5: TextStyle(
+                  color: Colors.white,
+                  letterSpacing: _letterSpacing,
+                ),
                 headline6: TextStyle(
-                    fontSize: 36.0,
-                    fontStyle: FontStyle.italic,
-                    color: Colors.white),
-                bodyText2: TextStyle(color: Colors.white),
-                bodyText1: TextStyle(color: Colors.white),
-                subtitle1: TextStyle(color: Colors.white),
-                caption: TextStyle(color: secondaryTextColor),
-                button: TextStyle(color: Colors.white),
-                overline: TextStyle(color: Colors.white),
+                  fontSize: 36.0,
+                  fontStyle: FontStyle.italic,
+                  color: Colors.white,
+                  letterSpacing: _letterSpacing,
+                ),
+                bodyText2: TextStyle(
+                  color: Colors.white,
+                  letterSpacing: _letterSpacing,
+                ),
+                bodyText1: TextStyle(
+                  color: Colors.white,
+                  letterSpacing: _letterSpacing,
+                ),
+                subtitle1: TextStyle(
+                  color: Colors.white,
+                  letterSpacing: _letterSpacing,
+                ),
+                caption: TextStyle(
+                  color: secondaryTextColor,
+                  letterSpacing: _letterSpacing,
+                ),
+                button: TextStyle(
+                  color: Colors.white,
+                  letterSpacing: _letterSpacing,
+                ),
+                overline: TextStyle(
+                  color: Colors.white,
+                  letterSpacing: _letterSpacing,
+                ),
               ),
               drawerTheme: DrawerThemeData(
                 backgroundColor: Color.fromARGB(255, 26, 29, 63),
@@ -123,7 +161,7 @@ class MyApp extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(0, 32),
                   textStyle: TextStyle(
-                    // fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.bold,
                     fontSize: 12,
                   ),
                 ),
@@ -148,6 +186,9 @@ class MyApp extends StatelessWidget {
               EmailChange.routeName: (context) => const EmailChange(),
               Transactions.routeName: (context) => const Transactions(),
               KlineChart.routeName: (context) => const KlineChart(),
+              DigitalAssets.routeName: (context) => const DigitalAssets(),
+              MarginAssets.routeName: (context) => const MarginAssets(),
+              OtcAssets.routeName: (context) => const OtcAssets(),
             },
           );
         },
