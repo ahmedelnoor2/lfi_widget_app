@@ -22,6 +22,7 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  final TextEditingController _searchController = TextEditingController();
   final GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
   var _channel;
 
@@ -160,18 +161,45 @@ class _DashboardState extends State<Dashboard> {
 
     return Scaffold(
       key: _key,
-      appBar: appBar(context, _handleDrawer),
+      appBar: AppBar(
+        toolbarHeight: 0,
+      ),
       drawer: const SideBar(),
       body: SingleChildScrollView(
         child: Container(
           width: width,
-          padding: EdgeInsets.only(
-            top: width * 0.02,
-          ),
+          padding: EdgeInsets.all(width * 0.03),
           child: Column(
             // mainAxisAlignment: MainAxisAlignment.center,
             // crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 12,
+                    child: Image.asset('assets/img/user.png'),
+                  ),
+                  SizedBox(
+                    width: width * 0.5,
+                    child: TextFormField(
+                      onChanged: (value) async {
+                        // await asset.filterSearchResults(value);
+                      },
+                      controller: _searchController,
+                      decoration: const InputDecoration(
+                        labelText: "Search",
+                        hintText: "Search",
+                        prefixIcon: Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(25.0),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               const Text('Welcome to LYOTrade!'),
               SizedBox(
                 width: width,
