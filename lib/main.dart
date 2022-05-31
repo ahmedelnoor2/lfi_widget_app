@@ -140,23 +140,23 @@ class MyApp extends StatelessWidget {
               iconTheme: IconThemeData().copyWith(color: Colors.white),
               primaryIconTheme: IconThemeData().copyWith(color: Colors.white),
               inputDecorationTheme: InputDecorationTheme(
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(
-                    color: secondaryTextColor,
+                  // enabledBorder: UnderlineInputBorder(
+                  //   borderSide: BorderSide(
+                  //     color: secondaryTextColor,
+                  //   ),
+                  // ),
+                  // focusedBorder: UnderlineInputBorder(
+                  //   borderSide: BorderSide(
+                  //     color: Color.fromARGB(255, 1, 254, 246),
+                  //   ),
+                  // ),
+                  // border: UnderlineInputBorder(
+                  //   borderSide: BorderSide(
+                  //     color: Color.fromARGB(255, 1, 254, 246),
+                  //   ),
+                  // ),
+                  // labelStyle: TextStyle(color: Colors.white),
                   ),
-                ),
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Color.fromARGB(255, 1, 254, 246),
-                  ),
-                ),
-                border: UnderlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Color.fromARGB(255, 1, 254, 246),
-                  ),
-                ),
-                labelStyle: TextStyle(color: Colors.white),
-              ),
               elevatedButtonTheme: ElevatedButtonThemeData(
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(0, 32),

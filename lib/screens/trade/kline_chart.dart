@@ -286,12 +286,13 @@ class _KlineChartState extends State<KlineChart>
                               Text(
                                 '${getNumberString(context, double.parse('${public.activeMarketTick['close']}'))}',
                                 style: TextStyle(
-                                    fontSize: 25,
-                                    color: _upDirection == false
-                                        ? greenlightchartColor
-                                        : _upDirection == true
-                                            ? errorColor
-                                            : Colors.white),
+                                  fontSize: 25,
+                                  color: _upDirection == false
+                                      ? greenIndicator
+                                      : _upDirection == true
+                                          ? redIndicator
+                                          : Colors.white,
+                                ),
                               ),
                               Row(
                                 children: [
@@ -308,8 +309,8 @@ class _KlineChartState extends State<KlineChart>
                                                             'rose'] ??
                                                         '0') >
                                                 0
-                                            ? greenlightchartColor
-                                            : errorColor),
+                                            ? greenIndicator
+                                            : redIndicator),
                                   ),
                                 ],
                               )

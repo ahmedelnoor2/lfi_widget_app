@@ -70,8 +70,8 @@ class _MarketHeaderState extends State<MarketHeader> {
                           : (double.parse(public.activeMarketTick['rose']) *
                                       100) >
                                   0
-                              ? greenlightchartColor
-                              : errorColor,
+                              ? greenIndicator
+                              : redIndicator,
                       fontSize: 12),
                 ),
               ),

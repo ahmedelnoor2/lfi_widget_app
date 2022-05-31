@@ -27,14 +27,17 @@ class _LiveFeedState extends State<LiveFeed> {
 
     var public = Provider.of<Public>(context, listen: true);
 
-    return Card(
+    return Container(
       child: widget.headerSymbols.isEmpty
           ? liveFeedSkull(context)
           : Column(
               children: [
                 Container(
-                  height: height * 0.125,
-                  padding: EdgeInsets.all(width * 0.05),
+                  height: height * 0.12,
+                  padding: EdgeInsets.only(
+                    top: width * 0.055,
+                    bottom: width * 0.055,
+                  ),
                   child: headerList(widget.headerSymbols, public),
                 ),
               ],
@@ -49,67 +52,82 @@ class _LiveFeedState extends State<LiveFeed> {
       itemBuilder: (context, index) {
         final market = widget.headerSymbols[index];
 
-        return FittedBox(
-          fit: BoxFit.fill,
-          child: Container(
-            // width: width * 0.14,
-            padding: EdgeInsets.only(right: width * 0.015),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  padding: EdgeInsets.only(bottom: width * 0.01),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
+        return SizedBox(
+          width: width * 0.31,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.only(right: 3),
+                      child: Text(
                         '${market['market']}',
                         style: TextStyle(
-                          fontSize: width * 0.013,
+                          fontSize: 12,
                           color: secondaryTextColor,
                         ),
                       ),
-                      Text(
-                        '${double.parse(market['change']) > 0 ? '+' : ''}${double.parse(market['change']).toStringAsFixed(2)}%',
-                        style: TextStyle(
-                          fontSize: width * 0.013,
-                          color: double.parse(market['change']) > 0
-                              ? greenlightchartColor
-                              : errorColor,
+                    ),
+                    Container(
+                      height: 14,
+                      width: 32,
+                      decoration: BoxDecoration(
+                        color: double.parse(market['change']) > 0
+                            ? greenPercentageIndicator
+                            : redPercentageIndicator,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          '${double.parse(market['change']) > 0 ? '+' : ''}${double.parse(market['change']).toStringAsFixed(2)}%',
+                          style: TextStyle(
+                            fontSize: 8,
+                            color: double.parse(market['change']) > 0
+                                ? greenIndicator
+                                : errorColor,
+                          ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                Container(
-                  padding: EdgeInsets.only(bottom: width * 0.01),
-                  child: Text(
-                    double.parse(market['price']) > 1
-                        ? NumberFormat.currency(
-                            locale: "en_US",
-                            symbol: "",
-                          ).format(double.parse(market['price']))
-                        : double.parse(market['price']).toStringAsPrecision(4),
-                    style: TextStyle(fontSize: width * 0.02),
-                  ),
-                ),
-                Text(
-                  getNumberFormat(
-                    context,
-                    public.rate[public.activeCurrency['fiat_symbol']
-                                .toUpperCase()] !=
-                            null
-                        ? public.rate[public.activeCurrency['fiat_symbol']
-                            .toUpperCase()][market['coin']]
-                        : '0',
-                  ),
+              ),
+              SizedBox(
+                child: Text(
+                  double.parse(market['price']) > 1
+                      ? NumberFormat.currency(
+                          locale: "en_US",
+                          symbol: "",
+                        ).format(double.parse(market['price']))
+                      : double.parse(market['price']).toStringAsPrecision(4),
                   style: TextStyle(
-                    fontSize: width * 0.013,
-                    color: secondaryTextColor,
-                  ),
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: double.parse(market['change']) > 0
+                          ? greenIndicator
+                          : errorColor),
                 ),
-              ],
-            ),
+              ),
+              Text(
+                '≈${getNumberFormat(
+                  context,
+                  public.rate[public.activeCurrency['fiat_symbol']
+                              .toUpperCase()] !=
+                          null
+                      ? public.rate[public.activeCurrency['fiat_symbol']
+                          .toUpperCase()][market['coin']]
+                      : '0',
+                )}',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: secondaryTextColor,
+                ),
+              ),
+            ],
           ),
         );
       },

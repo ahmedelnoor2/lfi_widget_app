@@ -6,10 +6,16 @@ import 'package:lyotrade/screens/common/bottomnav.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/screens/common/sidebar.dart';
+import 'package:lyotrade/screens/dashboard/announcement.dart';
 import 'package:lyotrade/screens/dashboard/assets_info.dart';
 import 'package:lyotrade/screens/dashboard/buy_crypto.dart';
+import 'package:lyotrade/screens/dashboard/carousal.dart';
+import 'package:lyotrade/screens/dashboard/hotlinks.dart';
+import 'package:lyotrade/screens/dashboard/latest_listing.dart';
 import 'package:lyotrade/screens/dashboard/live_feed.dart';
+import 'package:lyotrade/screens/dashboard/search_bar.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
+import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -22,6 +28,7 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  final TextEditingController _searchController = TextEditingController();
   final GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
   var _channel;
 
@@ -160,34 +167,29 @@ class _DashboardState extends State<Dashboard> {
 
     return Scaffold(
       key: _key,
-      appBar: appBar(context, _handleDrawer),
+      appBar: AppBar(
+        toolbarHeight: 0,
+      ),
       drawer: const SideBar(),
       body: SingleChildScrollView(
         child: Container(
           width: width,
-          padding: EdgeInsets.only(
-            top: width * 0.02,
-          ),
+          padding: EdgeInsets.all(width * 0.03),
           child: Column(
             // mainAxisAlignment: MainAxisAlignment.center,
             // crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text('Welcome to LYOTrade!'),
-              SizedBox(
-                width: width,
-                child: LiveFeed(
-                  headerSymbols: public.headerSymbols,
-                ),
+              SearchBar(handleDrawer: _handleDrawer),
+              Carousal(),
+              Announcement(),
+              LiveFeed(
+                headerSymbols: public.headerSymbols,
               ),
-              SizedBox(
-                width: width,
-                child: const BuyCrypto(),
-              ),
-              SizedBox(
-                width: width,
-                child: AssetsInfo(
-                  headerSymbols: public.headerSymbols,
-                ),
+              BuyCrypto(),
+              LatestListing(),
+              Hotlinks(),
+              AssetsInfo(
+                headerSymbols: public.headerSymbols,
               ),
             ],
           ),
