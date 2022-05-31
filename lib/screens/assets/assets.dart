@@ -417,7 +417,12 @@ class _AssetsState extends State<Assets> {
                               SizedBox(
                                 width: width * 0.30,
                                 child: ElevatedButton(
-                                  onPressed: null,
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/transfer_assets',
+                                    );
+                                  },
                                   child: Text('Transfer'),
                                 ),
                               ),

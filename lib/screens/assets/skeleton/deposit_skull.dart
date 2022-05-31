@@ -10,7 +10,7 @@ Widget depositQrSkull(context) {
     style: SkeletonAvatarStyle(
       shape: BoxShape.rectangle,
       width: width * 0.5,
-      height: width * 0.5,
+      height: width * 0.3,
     ),
   );
 }
@@ -18,12 +18,11 @@ Widget depositQrSkull(context) {
 Widget depositAddressSkull(context) {
   width = MediaQuery.of(context).size.width;
 
-  return Container(
-    padding: const EdgeInsets.only(top: 12),
+  return SizedBox(
     width: width * 0.75,
     child: SkeletonLine(
       style: SkeletonLineStyle(
-        height: 10,
+        height: 15,
         width: width,
         borderRadius: BorderRadius.circular(8),
       ),

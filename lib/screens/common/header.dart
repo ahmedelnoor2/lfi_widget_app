@@ -13,6 +13,14 @@ Widget headerImage() {
   );
 }
 
+hiddenAppBar() {
+  return AppBar(
+    backgroundColor: Colors.transparent,
+    shadowColor: Colors.transparent,
+    toolbarHeight: 0,
+  );
+}
+
 appBar(context, _handleDrawer) {
   var _currentRoute = ModalRoute.of(context)!.settings.name;
 
