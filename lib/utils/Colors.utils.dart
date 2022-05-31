@@ -45,9 +45,12 @@ var warningColor = Colors.amber;
 var whiteTextColor = Colors.white;
 var whitebgColor = Colors.white;
 var blackTextColor = Colors.black;
-var secondaryTextColor = Colors.white70;
-var redPercentageIndicator = Color.fromARGB(50, 245, 42, 73);
-var greenPercentageIndicator = Color.fromARGB(30, 40, 198, 134);
+var secondaryTextColor = Color(0xffBABABA);
+
+var greenIndicator = Color(0xff46D88B);
+var redIndicator = Color(0xffD84646);
+var redPercentageIndicator = Color.fromARGB(77, 216, 70, 70);
+var greenPercentageIndicator = Color.fromARGB(77, 70, 216, 138);
 var linkColor = Color.fromARGB(255, 1, 254, 246);
 
 var geryTextColor = Color(0xFF39434a);

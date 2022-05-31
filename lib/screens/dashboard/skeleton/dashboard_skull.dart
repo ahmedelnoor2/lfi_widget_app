@@ -85,7 +85,7 @@ Widget assetsInfoSkull(context) {
                       children: [
                         Container(
                           padding: EdgeInsets.only(bottom: width * 0.05),
-                          width: width * 0.9,
+                          width: width * 0.8,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -99,7 +99,7 @@ Widget assetsInfoSkull(context) {
                               SkeletonLine(
                                 style: SkeletonLineStyle(
                                   height: 15,
-                                  width: width * 0.75,
+                                  width: width * 0.6,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                               ),

@@ -55,14 +55,15 @@ class _AssetsInfoState extends State<AssetsInfo>
     return widget.headerSymbols.isEmpty
         ? assetsInfoSkull(context)
         : SizedBox(
-            child: Card(
+            child: Container(
+              padding: EdgeInsets.all(5),
               child: Column(
                 children: [
                   Container(
                     padding: EdgeInsets.only(
-                      top: width * 0.025,
-                      right: width * 0.025,
-                      left: width * 0.025,
+                      top: width * 0.025, bottom: width * 0.025,
+                      // right: width * 0.025,
+                      // left: width * 0.025,
                     ),
                     child: Column(
                       children: [
@@ -80,7 +81,7 @@ class _AssetsInfoState extends State<AssetsInfo>
                               ),
                             ),
                             SizedBox(
-                              width: width * 0.26,
+                              width: width * 0.34,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
@@ -106,7 +107,6 @@ class _AssetsInfoState extends State<AssetsInfo>
                             ),
                           ],
                         ),
-                        const Divider(),
                       ],
                     ),
                   ),
@@ -114,58 +114,45 @@ class _AssetsInfoState extends State<AssetsInfo>
                     children: widget.headerSymbols
                         .map(
                           (item) => Container(
-                            padding: EdgeInsets.all(width * 0.025),
+                            padding: EdgeInsets.only(
+                              bottom: width * 0.02,
+                              top: width * 0.01,
+                            ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 SizedBox(
                                   width: width * 0.2,
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
+                                    mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      CircleAvatar(
-                                        radius: width * 0.03,
-                                        child: Image.network(
-                                          '${public.publicInfoMarket['market']['coinList'][item['coin']]['icon']}',
+                                      Container(
+                                        padding: EdgeInsets.only(right: 10),
+                                        child: CircleAvatar(
+                                          radius: 12,
+                                          child: Image.network(
+                                            '${public.publicInfoMarket['market']['coinList'][item['coin']]['icon']}',
+                                          ),
                                         ),
                                       ),
-                                      Text('${item['coin']}'),
+                                      Text(
+                                        '${item['coin']}',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
                                 SizedBox(
                                   height: height * 0.04,
-                                  width: width * 0.2,
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Flexible(
-                                        child: Text(
-                                          double.parse(item['price'])
-                                              .toStringAsPrecision(7),
-                                        ),
-                                      ),
-                                      Text(
-                                        getNumberFormat(
-                                          context,
-                                          public.rate[public.activeCurrency[
-                                                          'fiat_symbol']
-                                                      .toUpperCase()] !=
-                                                  null
-                                              ? public.rate[public
-                                                  .activeCurrency['fiat_symbol']
-                                                  .toUpperCase()][item['coin']]
-                                              : '0',
-                                        ),
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: secondaryTextColor,
-                                        ),
-                                      ),
-                                    ],
+                                  width: width * 0.25,
+                                  child: Align(
+                                    alignment: Alignment.centerRight,
+                                    child: Text(
+                                      double.parse(item['price'])
+                                          .toStringAsPrecision(7),
+                                    ),
                                   ),
                                 ),
                                 SizedBox(
