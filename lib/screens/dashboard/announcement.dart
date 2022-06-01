@@ -24,9 +24,9 @@ class _AnnouncementState extends State<Announcement> {
                 child: Image.asset('assets/img/announcement.png'),
               ),
               Text(
-                'LYO Credit is not listed on Coingecko',
+                'LYO Credit is now listed on Coingecko',
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: 13,
                   color: secondaryTextColor,
                 ),
               )

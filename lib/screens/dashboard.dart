@@ -167,14 +167,12 @@ class _DashboardState extends State<Dashboard> {
 
     return Scaffold(
       key: _key,
-      appBar: AppBar(
-        toolbarHeight: 0,
-      ),
+      appBar: hiddenAppBar(),
       drawer: const SideBar(),
       body: SingleChildScrollView(
         child: Container(
           width: width,
-          padding: EdgeInsets.all(width * 0.03),
+          padding: EdgeInsets.all(width * 0.015),
           child: Column(
             // mainAxisAlignment: MainAxisAlignment.center,
             // crossAxisAlignment: CrossAxisAlignment.center,

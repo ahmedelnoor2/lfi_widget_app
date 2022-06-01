@@ -21,8 +21,8 @@ class _BuyCryptoState extends State<BuyCrypto> {
         GestureDetector(
           onTap: () {},
           child: SizedBox(
-            width: width * 0.313,
-            height: height * 0.1,
+            width: width * 0.325,
+            height: height * 0.12,
             child: Card(
               child: Container(
                 padding: EdgeInsets.all(10),
@@ -34,19 +34,20 @@ class _BuyCryptoState extends State<BuyCrypto> {
                       padding: EdgeInsets.only(bottom: 10),
                       child: Image.asset(
                         'assets/img/buy_crypto.png',
-                        width: 16,
+                        width: 24,
                       ),
                     ),
                     Text(
                       'Buy Crypto',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
+                        fontSize: 16,
                       ),
                     ),
                     Text(
                       'SEPA, VISA, MC',
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 12,
                         color: secondaryTextColor,
                       ),
                     ),
@@ -59,8 +60,8 @@ class _BuyCryptoState extends State<BuyCrypto> {
         GestureDetector(
           onTap: () {},
           child: SizedBox(
-            width: width * 0.313,
-            height: height * 0.1,
+            width: width * 0.325,
+            height: height * 0.12,
             child: Card(
               child: Container(
                 padding: EdgeInsets.all(10),
@@ -72,19 +73,20 @@ class _BuyCryptoState extends State<BuyCrypto> {
                       padding: EdgeInsets.only(bottom: 10),
                       child: Image.asset(
                         'assets/img/deposit.png',
-                        width: 16,
+                        width: 24,
                       ),
                     ),
                     Text(
                       'Deposit',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
+                        fontSize: 16,
                       ),
                     ),
                     Text(
                       'BTC, ETH, LYO',
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 12,
                         color: secondaryTextColor,
                       ),
                     ),
@@ -99,8 +101,8 @@ class _BuyCryptoState extends State<BuyCrypto> {
             print('hit');
           },
           child: SizedBox(
-            width: width * 0.313,
-            height: height * 0.1,
+            width: width * 0.32,
+            height: height * 0.12,
             child: Card(
               child: Container(
                 padding: EdgeInsets.all(10),
@@ -112,19 +114,20 @@ class _BuyCryptoState extends State<BuyCrypto> {
                       padding: EdgeInsets.only(bottom: 10),
                       child: Image.asset(
                         'assets/img/earn.png',
-                        width: 16,
+                        width: 24,
                       ),
                     ),
                     Text(
                       'To Earn',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
+                        fontSize: 16,
                       ),
                     ),
                     Text(
                       'APY up to 72%!',
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 12,
                         color: secondaryTextColor,
                       ),
                     ),

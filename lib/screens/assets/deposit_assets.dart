@@ -57,7 +57,7 @@ class _DepositAssetsState extends State<DepositAssets> {
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
     await asset.getAccountBalance(auth, "");
-    getCoinCosts('USDT');
+    getCoinCosts(_defaultCoin);
   }
 
   Future<void> getCoinCosts(netwrkType) async {
@@ -374,8 +374,8 @@ class _DepositAssetsState extends State<DepositAssets> {
                                 color: Color(0xff5E6292),
                               ),
                             ),
-                            width: 134,
-                            height: 134,
+                            width: width * 0.45,
+                            height: width * 0.45,
                             child: _loadingAddress
                                 ? depositQrSkull(context)
                                 : asset.changeAddress['addressQRCode'] != null

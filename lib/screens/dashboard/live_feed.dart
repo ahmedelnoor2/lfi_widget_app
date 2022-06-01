@@ -33,10 +33,10 @@ class _LiveFeedState extends State<LiveFeed> {
           : Column(
               children: [
                 Container(
-                  height: height * 0.12,
+                  height: height * 0.115,
                   padding: EdgeInsets.only(
-                    top: width * 0.055,
-                    bottom: width * 0.055,
+                    top: width * 0.04,
+                    bottom: width * 0.04,
                   ),
                   child: headerList(widget.headerSymbols, public),
                 ),
@@ -53,7 +53,7 @@ class _LiveFeedState extends State<LiveFeed> {
         final market = widget.headerSymbols[index];
 
         return SizedBox(
-          width: width * 0.31,
+          width: width * 0.32,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -66,7 +66,7 @@ class _LiveFeedState extends State<LiveFeed> {
                       child: Text(
                         '${market['market']}',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 14,
                           color: secondaryTextColor,
                         ),
                       ),
@@ -85,7 +85,7 @@ class _LiveFeedState extends State<LiveFeed> {
                         child: Text(
                           '${double.parse(market['change']) > 0 ? '+' : ''}${double.parse(market['change']).toStringAsFixed(2)}%',
                           style: TextStyle(
-                            fontSize: 8,
+                            fontSize: 10,
                             color: double.parse(market['change']) > 0
                                 ? greenIndicator
                                 : errorColor,
@@ -105,7 +105,7 @@ class _LiveFeedState extends State<LiveFeed> {
                         ).format(double.parse(market['price']))
                       : double.parse(market['price']).toStringAsPrecision(4),
                   style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: double.parse(market['change']) > 0
                           ? greenIndicator
@@ -123,7 +123,7 @@ class _LiveFeedState extends State<LiveFeed> {
                       : '0',
                 )}',
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: 14,
                   color: secondaryTextColor,
                 ),
               ),

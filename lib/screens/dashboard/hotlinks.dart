@@ -11,7 +11,7 @@ class _HotlinksState extends State<Hotlinks> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(15),
+      padding: EdgeInsets.all(12),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -21,17 +21,17 @@ class _HotlinksState extends State<Hotlinks> {
               children: [
                 Container(
                   padding: EdgeInsets.only(
-                    bottom: 8,
+                    bottom: 2,
                   ),
                   child: Image.asset(
                     'assets/img/new_listing.png',
-                    width: 24,
+                    width: 28,
                   ),
                 ),
                 Text(
                   'New Listing',
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 12,
                   ),
                 )
               ],
@@ -43,17 +43,17 @@ class _HotlinksState extends State<Hotlinks> {
               children: [
                 Container(
                   padding: EdgeInsets.only(
-                    bottom: 8,
+                    bottom: 2,
                   ),
                   child: Image.asset(
                     'assets/img/refer.png',
-                    width: 24,
+                    width: 28,
                   ),
                 ),
                 Text(
                   'Referral',
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 12,
                   ),
                 )
               ],
@@ -65,17 +65,17 @@ class _HotlinksState extends State<Hotlinks> {
               children: [
                 Container(
                   padding: EdgeInsets.only(
-                    bottom: 8,
+                    bottom: 2,
                   ),
                   child: Image.asset(
                     'assets/img/deposit_pig.png',
-                    width: 24,
+                    width: 28,
                   ),
                 ),
                 Text(
                   'Deposit',
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 12,
                   ),
                 )
               ],
@@ -87,17 +87,17 @@ class _HotlinksState extends State<Hotlinks> {
               children: [
                 Container(
                   padding: EdgeInsets.only(
-                    bottom: 8,
+                    bottom: 2,
                   ),
                   child: Image.asset(
                     'assets/img/bot.png',
-                    width: 24,
+                    width: 28,
                   ),
                 ),
                 Text(
                   'Trading Bot',
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 12,
                   ),
                 )
               ],
@@ -109,17 +109,17 @@ class _HotlinksState extends State<Hotlinks> {
               children: [
                 Container(
                   padding: EdgeInsets.only(
-                    bottom: 8,
+                    bottom: 2,
                   ),
                   child: Image.asset(
                     'assets/img/applications.png',
-                    width: 24,
+                    width: 28,
                   ),
                 ),
                 Text(
                   'More',
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 12,
                   ),
                 )
               ],

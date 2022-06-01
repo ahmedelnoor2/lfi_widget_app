@@ -61,9 +61,8 @@ class _AssetsInfoState extends State<AssetsInfo>
                 children: [
                   Container(
                     padding: EdgeInsets.only(
-                      top: width * 0.025, bottom: width * 0.025,
-                      // right: width * 0.025,
-                      // left: width * 0.025,
+                      top: width * 0.025,
+                      bottom: width * 0.025,
                     ),
                     child: Column(
                       children: [
@@ -115,21 +114,21 @@ class _AssetsInfoState extends State<AssetsInfo>
                         .map(
                           (item) => Container(
                             padding: EdgeInsets.only(
-                              bottom: width * 0.02,
+                              bottom: width * 0.005,
                               top: width * 0.01,
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 SizedBox(
-                                  width: width * 0.2,
+                                  width: width * 0.25,
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Container(
                                         padding: EdgeInsets.only(right: 10),
                                         child: CircleAvatar(
-                                          radius: 12,
+                                          radius: 14,
                                           child: Image.network(
                                             '${public.publicInfoMarket['market']['coinList'][item['coin']]['icon']}',
                                           ),
@@ -139,6 +138,7 @@ class _AssetsInfoState extends State<AssetsInfo>
                                         '${item['coin']}',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
+                                          fontSize: 16,
                                         ),
                                       ),
                                     ],
@@ -146,12 +146,13 @@ class _AssetsInfoState extends State<AssetsInfo>
                                 ),
                                 SizedBox(
                                   height: height * 0.04,
-                                  width: width * 0.25,
+                                  width: width * 0.22,
                                   child: Align(
                                     alignment: Alignment.centerRight,
                                     child: Text(
                                       double.parse(item['price'])
-                                          .toStringAsPrecision(7),
+                                          .toStringAsPrecision(6),
+                                      style: TextStyle(fontSize: 15),
                                     ),
                                   ),
                                 ),
@@ -163,7 +164,7 @@ class _AssetsInfoState extends State<AssetsInfo>
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       SizedBox(
-                                        height: height * 0.04,
+                                        height: height * 0.045,
                                         width: width * 0.2,
                                         child: Card(
                                           shadowColor: Colors.transparent,
