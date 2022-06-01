@@ -130,14 +130,14 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
         child: Column(
           children: [
             MarketHeader(scaffoldKey: _scaffoldKey),
-            Card(
+            Container(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
                     padding: EdgeInsets.only(top: 10, bottom: 10, left: 10),
-                    width: width * 0.45,
+                    width: width * 0.4,
                     child: OrderBook(
                       asks: public.asks,
                       bids: public.bids,
@@ -146,7 +146,7 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
                   ),
                   Container(
                     padding: EdgeInsets.only(right: 10),
-                    width: width * 0.5,
+                    width: width * 0.58,
                     child: TradeForm(
                       scaffoldKey: _scaffoldKey,
                       lastPrice: public.lastPrice,
@@ -155,7 +155,7 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
                 ],
               ),
             ),
-            Card(
+            Container(
               child: SizedBox(
                 height: height,
                 child: OpenOrders(),

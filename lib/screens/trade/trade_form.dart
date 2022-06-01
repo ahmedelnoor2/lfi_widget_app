@@ -20,21 +20,21 @@ class TradeForm extends StatefulWidget {
   State<TradeForm> createState() => _TradeFormState();
 }
 
-class _TradeFormState extends State<TradeForm>
-    with SingleTickerProviderStateMixin {
+class _TradeFormState extends State<TradeForm> {
   final _formTradeKey = GlobalKey<FormState>();
   final TextEditingController _amountField = TextEditingController();
   final TextEditingController _priceField = TextEditingController();
   final TextEditingController _totalField = TextEditingController();
 
-  late final TabController _tabTradeController =
-      TabController(length: 2, vsync: this);
+  // late final TabController _tabTradeController =
+  //     TabController(length: 2, vsync: this);
 
   Color _tabIndicatorColor = Colors.green;
   int _orderType = 1;
   double _amount = 0;
   double _price = 0;
   double _total = 0;
+  bool _isBuy = true;
 
   @override
   void initState() {
@@ -76,6 +76,9 @@ class _TradeFormState extends State<TradeForm>
         });
         _totalField.text = '${double.parse(_priceField.text) * _amount}';
       } else {
+        setState(() {
+          _price = 0.00;
+        });
         _totalField.clear();
       }
     }
@@ -114,62 +117,77 @@ class _TradeFormState extends State<TradeForm>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          TabBar(
-            onTap: (value) => setState(() {
-              _tabIndicatorColor = value == 0 ? Colors.green : Colors.red;
-            }),
-            indicatorColor: _tabIndicatorColor,
-            tabs: const <Tab>[
-              Tab(text: 'Buy'),
-              Tab(text: 'Sell'),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                width: width * 0.27,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    primary: _isBuy ? Color(0xff26A160) : Color(0xff292C51),
+                    textStyle: TextStyle(),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _isBuy = true;
+                    });
+                  },
+                  child: Text(
+                    'Buy',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: width * 0.27,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    primary: _isBuy ? Color(0xff292C51) : Color(0xffD84646),
+                    textStyle: TextStyle(),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _isBuy = false;
+                    });
+                  },
+                  child: Text(
+                    'Sell',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
             ],
-            controller: _tabTradeController,
           ),
           PopupMenuButton(
             child: Container(
-              width: width * 0.5,
-              margin: EdgeInsets.only(top: 10, bottom: 10),
-              padding: EdgeInsets.all(5),
+              margin: EdgeInsets.only(bottom: 8),
+              padding: EdgeInsets.only(top: 5, bottom: 5, left: 10, right: 5),
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: Color.fromARGB(67, 118, 118, 118),
+                  color: Color(0xff292C51),
                 ),
-                color: Color.fromARGB(67, 118, 118, 118),
+                color: Color(0xff292C51),
                 borderRadius: BorderRadius.all(
-                  Radius.circular(5),
+                  Radius.circular(2),
                 ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      print('info');
-                    },
-                    child: Icon(
-                      Icons.info,
-                      size: 15,
-                      color: secondaryTextColor,
-                    ),
-                  ),
                   Text(
                     _orderType == 1 ? 'Limit' : 'Market',
-                    style: TextStyle(fontSize: 15),
                   ),
                   Icon(
                     Icons.expand_more,
-                    size: 15,
                     color: secondaryTextColor,
                   ),
                 ],
               ),
             ),
             onSelected: (value) {
-              print(value);
               setState(() {
                 _orderType = value as int;
               });
-              // _onMenuItemSelected(value as int);
             },
             itemBuilder: (ctx) => [
               _buildPopupMenuItem('Limit', 1),
@@ -178,16 +196,15 @@ class _TradeFormState extends State<TradeForm>
           ),
           (_orderType == 2)
               ? Container(
-                  width: width * 0.5,
-                  margin: EdgeInsets.only(bottom: 10),
-                  padding: EdgeInsets.all(15),
+                  margin: EdgeInsets.only(bottom: 8),
+                  padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Color.fromARGB(67, 118, 118, 118),
+                      color: Color(0xff292C51),
                     ),
-                    color: Color.fromARGB(67, 118, 118, 118),
+                    color: Color(0xff292C51),
                     borderRadius: BorderRadius.all(
-                      Radius.circular(5),
+                      Radius.circular(2),
                     ),
                   ),
                   child: Align(
@@ -201,132 +218,155 @@ class _TradeFormState extends State<TradeForm>
                   ),
                 )
               : Container(),
-          (_tabTradeController.index == 1 && _orderType == 2)
+          (!_isBuy && _orderType == 2)
               ? Container()
               : Container(
-                  padding: EdgeInsets.only(bottom: 10),
-                  child: TextFormField(
-                    onTap: () {
-                      if (_priceField.text.isEmpty) {
-                        updateLastPrice();
-                      }
-                    },
-                    onChanged: (value) {
-                      calculateTotal('price');
-                    },
-                    textAlign: TextAlign.center,
-                    validator: (value) {
-                      if ((value == null || value.isEmpty) && _orderType == 1) {
-                        widget.scaffoldKey!.currentState.hideCurrentSnackBar();
-                        snackAlert(
-                            context, SnackTypes.errors, 'Price is required');
-                        return '';
-                      }
-                      return null;
-                    },
-                    style: TextStyle(fontSize: 14),
-                    keyboardType:
-                        TextInputType.numberWithOptions(decimal: true),
-                    decoration: InputDecoration(
-                      errorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          width: 2,
-                          color: redPercentageIndicator,
-                        ),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(5),
-                        ),
-                      ),
-                      errorStyle: TextStyle(height: 0),
-                      labelText:
-                          'Price (${public.activeMarket['showName'].split('/')[1]})',
-                      labelStyle: TextStyle(fontSize: 12),
-                      isDense: true,
-                      filled: true,
-                      fillColor: Color.fromARGB(67, 118, 118, 118),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(width: 0),
-                        borderRadius: BorderRadius.all(Radius.circular(5)),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(width: 0),
-                        borderRadius: BorderRadius.all(Radius.circular(5)),
-                      ),
-                      focusedErrorBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(width: 0),
-                      ),
-                      floatingLabelAlignment: FloatingLabelAlignment.center,
-                      floatingLabelBehavior: FloatingLabelBehavior.never,
-                      // border: OutlineInputBorder(),
-                      suffixIcon: Icon(Icons.add),
-                      prefixIcon: Icon(Icons.remove),
-                      // labelText: '30534.21',
+                  margin: EdgeInsets.only(bottom: 8),
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Color(0xff292C51),
                     ),
-                    controller: _priceField,
+                    color: Color(0xff292C51),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(2),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Icon(
+                        Icons.remove,
+                        color: Color(0xff5E6292),
+                      ),
+                      SizedBox(
+                        width: 100,
+                        child: TextFormField(
+                          onChanged: (value) {
+                            calculateTotal('price');
+                          },
+                          onTap: () {},
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              widget.scaffoldKey!.currentState
+                                  .hideCurrentSnackBar();
+                              snackAlert(context, SnackTypes.errors,
+                                  'Price is required');
+                              return '';
+                            }
+                            return null;
+                          },
+                          controller: _priceField,
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                          ),
+                          textAlign: TextAlign.center,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.zero,
+                            isDense: true,
+                            errorStyle: TextStyle(height: 0),
+                            border: UnderlineInputBorder(
+                              borderSide: BorderSide.none,
+                            ),
+                            hintStyle: TextStyle(
+                              fontSize: 14,
+                            ),
+                            hintText:
+                                "Price (${public.activeMarket['showName'].split('/')[1]})",
+                          ),
+                        ),
+                      ),
+                      Icon(
+                        Icons.add,
+                        color: Color(0xff5E6292),
+                      ),
+                    ],
                   ),
                 ),
-          (_tabTradeController.index == 0 && _orderType == 2)
+          (_isBuy && _orderType == 2)
               ? Container()
               : Container(
-                  padding: EdgeInsets.only(bottom: 10),
-                  child: TextFormField(
-                    onChanged: (value) {
-                      calculateTotal('amount');
-                    },
-                    textAlign: TextAlign.center,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        widget.scaffoldKey!.currentState.hideCurrentSnackBar();
-                        snackAlert(
-                            context, SnackTypes.errors, 'Amount is required');
-                        return '';
-                      }
-                      return null;
-                    },
-                    style: TextStyle(fontSize: 14),
-                    keyboardType:
-                        TextInputType.numberWithOptions(decimal: true),
-                    decoration: InputDecoration(
-                      errorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          width: 2,
-                          color: redPercentageIndicator,
-                        ),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(5),
-                        ),
-                      ),
-                      errorStyle: TextStyle(height: 0),
-                      labelText:
-                          'Amount (${public.activeMarket['showName'].split('/')[0]})',
-                      labelStyle: TextStyle(fontSize: 12),
-                      isDense: true,
-                      filled: true,
-                      fillColor: Color.fromARGB(67, 118, 118, 118),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(width: 0),
-                        borderRadius: BorderRadius.all(Radius.circular(5)),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(width: 0),
-                        borderRadius: BorderRadius.all(Radius.circular(5)),
-                      ),
-                      focusedErrorBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(width: 0),
-                      ),
-                      floatingLabelBehavior: FloatingLabelBehavior.never,
-                      // floatingLabelAlignment: FloatingLabelAlignment.center,
-                      // border: OutlineInputBorder(),
-                      suffixIcon: Icon(Icons.add),
-                      prefixIcon: Icon(Icons.remove),
-                      // labelText: '30534.21',
+                  margin: EdgeInsets.only(bottom: 8),
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Color(0xff292C51),
                     ),
-                    controller: _amountField,
+                    color: Color(0xff292C51),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(2),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Icon(
+                        Icons.remove,
+                        color: Color(0xff5E6292),
+                      ),
+                      SizedBox(
+                        width: 100,
+                        child: TextFormField(
+                          onChanged: (value) {
+                            calculateTotal('amount');
+                          },
+                          textAlign: TextAlign.center,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              widget.scaffoldKey!.currentState
+                                  .hideCurrentSnackBar();
+                              snackAlert(context, SnackTypes.errors,
+                                  'Amount is required');
+                              return '';
+                            }
+                            return null;
+                          },
+                          style: TextStyle(fontSize: 14),
+                          keyboardType:
+                              TextInputType.numberWithOptions(decimal: true),
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.zero,
+                            isDense: true,
+                            border: UnderlineInputBorder(
+                              borderSide: BorderSide.none,
+                            ),
+                            hintStyle: TextStyle(
+                              fontSize: 14,
+                            ),
+                            errorStyle: TextStyle(height: 0),
+                            focusedErrorBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(width: 1, color: Colors.red),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(5),
+                              ),
+                            ),
+                            hintText:
+                                'Amount (${public.activeMarket['showName'].split('/')[0]})',
+                          ),
+                          controller: _amountField,
+                        ),
+                      ),
+                      Icon(
+                        Icons.add,
+                        color: Color(0xff5E6292),
+                      ),
+                    ],
                   ),
                 ),
           _selectAmountPecentage(),
           Container(
-            padding: EdgeInsets.only(bottom: 10),
+            margin: EdgeInsets.only(bottom: 5),
+            padding: EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Color(0xff292C51),
+              ),
+              color: Color(0xff292C51),
+              borderRadius: BorderRadius.all(
+                Radius.circular(2),
+              ),
+            ),
             child: TextFormField(
               onChanged: (value) {
                 calculateTotal('total');
@@ -347,47 +387,29 @@ class _TradeFormState extends State<TradeForm>
               style: TextStyle(fontSize: 14),
               keyboardType: TextInputType.numberWithOptions(decimal: true),
               decoration: InputDecoration(
-                errorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    width: 2,
-                    color: redPercentageIndicator,
-                  ),
+                contentPadding: EdgeInsets.zero,
+                isDense: true,
+                border: UnderlineInputBorder(
+                  borderSide: BorderSide.none,
+                ),
+                hintStyle: TextStyle(
+                  fontSize: 14,
+                ),
+                errorStyle: TextStyle(height: 0),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderSide: BorderSide(width: 1, color: Colors.red),
                   borderRadius: BorderRadius.all(
                     Radius.circular(5),
                   ),
                 ),
-                focusedErrorBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(width: 0),
-                ),
-                errorStyle: TextStyle(height: 0),
-                isDense: true,
-                filled: true,
-                fillColor: Color.fromARGB(67, 118, 118, 118),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(width: 0),
-                  borderRadius: BorderRadius.all(Radius.circular(5)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(width: 0),
-                  borderRadius: BorderRadius.all(Radius.circular(5)),
-                ),
-                floatingLabelBehavior: FloatingLabelBehavior.never,
-                // labelText: 'Total (USDT)',
-                label: Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                      'Total (${public.activeMarket['showName'].split('/')[1]})'),
-                ),
-                labelStyle: TextStyle(
-                  color: secondaryTextColor,
-                  fontSize: 15,
-                ),
+                hintText:
+                    'Total (${public.activeMarket['showName'].split('/')[1]})',
               ),
               controller: _totalField,
             ),
           ),
           Container(
-            padding: EdgeInsets.only(bottom: 10),
+            padding: EdgeInsets.only(top: 2),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -416,9 +438,8 @@ class _TradeFormState extends State<TradeForm>
               ],
             ),
           ),
-          Container(
-            padding: EdgeInsets.only(bottom: 10),
-            width: width * 0.5,
+          SizedBox(
+            width: width * 0.7,
             child: ElevatedButton(
               onPressed: () {
                 if (_formTradeKey.currentState!.validate()) {
@@ -440,11 +461,13 @@ class _TradeFormState extends State<TradeForm>
                 }
               },
               style: ElevatedButton.styleFrom(
-                  primary: _tabTradeController.index == 0
-                      ? greenBTNBGColor
-                      : pinkBTNBGColor),
+                primary: _isBuy ? Color(0xff26A160) : Color(0xffD84646),
+                textStyle: TextStyle(),
+              ),
               child: Text(
-                  '${_tabTradeController.index == 0 ? 'Buy' : 'Sell'} ${public.activeMarket['showName'].split('/')[0]}'),
+                '${_isBuy ? 'Buy' : 'Sell'} ${public.activeMarket['showName'].split('/')[0]}',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ),
         ],
@@ -454,7 +477,7 @@ class _TradeFormState extends State<TradeForm>
 
   Widget _selectAmountPecentage() {
     return Container(
-      padding: EdgeInsets.only(bottom: 10),
+      padding: EdgeInsets.only(bottom: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -465,25 +488,29 @@ class _TradeFormState extends State<TradeForm>
                   print('Select preceision');
                 },
                 child: Container(
-                  width: width * 0.1,
-                  margin: EdgeInsets.only(bottom: 2),
-                  padding: EdgeInsets.all(5),
+                  width: width * 0.13,
+                  padding: EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Color.fromARGB(67, 118, 118, 118),
+                      color: Color(0xff292C51),
                     ),
-                    color: Color.fromARGB(67, 118, 118, 118),
+                    color: Color(0xff292C51),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(2),
+                    ),
                   ),
-                  child: Container(),
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      '25%',
+                      style: TextStyle(
+                        color: secondaryTextColor,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-              Text(
-                '25%',
-                style: TextStyle(
-                  color: secondaryTextColor,
-                  fontSize: 12,
-                ),
-              )
             ],
           ),
           Column(
@@ -493,25 +520,29 @@ class _TradeFormState extends State<TradeForm>
                   print('Select preceision');
                 },
                 child: Container(
-                  width: width * 0.1,
-                  margin: EdgeInsets.only(bottom: 2),
-                  padding: EdgeInsets.all(5),
+                  width: width * 0.13,
+                  padding: EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Color.fromARGB(67, 118, 118, 118),
+                      color: Color(0xff292C51),
                     ),
-                    color: Color.fromARGB(67, 118, 118, 118),
+                    color: Color(0xff292C51),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(2),
+                    ),
                   ),
-                  child: Container(),
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      '50%',
+                      style: TextStyle(
+                        color: secondaryTextColor,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-              Text(
-                '50%',
-                style: TextStyle(
-                  color: secondaryTextColor,
-                  fontSize: 12,
-                ),
-              )
             ],
           ),
           Column(
@@ -521,25 +552,29 @@ class _TradeFormState extends State<TradeForm>
                   print('Select preceision');
                 },
                 child: Container(
-                  width: width * 0.1,
-                  margin: EdgeInsets.only(bottom: 2),
-                  padding: EdgeInsets.all(5),
+                  width: width * 0.13,
+                  padding: EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Color.fromARGB(67, 118, 118, 118),
+                      color: Color(0xff292C51),
                     ),
-                    color: Color.fromARGB(67, 118, 118, 118),
+                    color: Color(0xff292C51),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(2),
+                    ),
                   ),
-                  child: Container(),
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      '75%',
+                      style: TextStyle(
+                        color: secondaryTextColor,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-              Text(
-                '75%',
-                style: TextStyle(
-                  color: secondaryTextColor,
-                  fontSize: 12,
-                ),
-              )
             ],
           ),
           Column(
@@ -549,25 +584,29 @@ class _TradeFormState extends State<TradeForm>
                   print('Select preceision');
                 },
                 child: Container(
-                  width: width * 0.1,
-                  margin: EdgeInsets.only(bottom: 2),
-                  padding: EdgeInsets.all(5),
+                  width: width * 0.13,
+                  padding: EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Color.fromARGB(67, 118, 118, 118),
+                      color: Color(0xff292C51),
                     ),
-                    color: Color.fromARGB(67, 118, 118, 118),
+                    color: Color(0xff292C51),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(2),
+                    ),
                   ),
-                  child: Container(),
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      '100%',
+                      style: TextStyle(
+                        color: secondaryTextColor,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-              Text(
-                '100%',
-                style: TextStyle(
-                  color: secondaryTextColor,
-                  fontSize: 12,
-                ),
-              )
             ],
           ),
         ],
