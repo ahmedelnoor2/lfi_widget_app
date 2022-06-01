@@ -31,22 +31,25 @@ class _SearchBarState extends State<SearchBar> {
         children: [
           Row(
             children: [
-              GestureDetector(
-                onTap: () {
-                  // Navigator.pushNamed(context, '/authentication');
-                  if (_currentRoute == '/' || _currentRoute == '/dashboard') {
-                    widget.handleDrawer();
-                  } else {
-                    Navigator.pop(context);
-                  }
-                },
-                child: CircleAvatar(
-                  child: Image.asset('assets/img/user.png'),
-                  radius: 12,
+              Container(
+                padding: EdgeInsets.only(left: 10),
+                child: GestureDetector(
+                  onTap: () {
+                    // Navigator.pushNamed(context, '/authentication');
+                    if (_currentRoute == '/' || _currentRoute == '/dashboard') {
+                      widget.handleDrawer();
+                    } else {
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: CircleAvatar(
+                    child: Image.asset('assets/img/user.png'),
+                    radius: 12,
+                  ),
                 ),
               ),
               Container(
-                padding: EdgeInsets.only(left: 20),
+                padding: EdgeInsets.only(left: 15),
                 child: SizedBox(
                   width: width * 0.63,
                   child: Container(
@@ -76,26 +79,29 @@ class _SearchBarState extends State<SearchBar> {
               ),
             ],
           ),
-          Row(
-            children: [
-              GestureDetector(
-                onTap: () {},
-                child: Image.asset(
-                  'assets/img/scanner.png',
-                  width: 24,
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.only(left: 10),
-                child: GestureDetector(
+          Container(
+            padding: EdgeInsets.only(right: 8),
+            child: Row(
+              children: [
+                GestureDetector(
                   onTap: () {},
                   child: Image.asset(
-                    'assets/img/notification.png',
+                    'assets/img/scanner.png',
                     width: 24,
                   ),
                 ),
-              ),
-            ],
+                Container(
+                  padding: EdgeInsets.only(left: 10),
+                  child: GestureDetector(
+                    onTap: () {},
+                    child: Image.asset(
+                      'assets/img/notification.png',
+                      width: 24,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

@@ -10,6 +10,7 @@ import 'package:lyotrade/screens/assets/digital_assets.dart';
 import 'package:lyotrade/screens/assets/margin_assets.dart';
 import 'package:lyotrade/screens/assets/otc_assets.dart';
 import 'package:lyotrade/screens/assets/transactions.dart';
+import 'package:lyotrade/screens/assets/transfer_assets.dart';
 import 'package:lyotrade/screens/assets/withdraw_assets.dart';
 import 'package:lyotrade/screens/auth/authentication.dart';
 import 'package:lyotrade/screens/dashboard.dart';
@@ -159,10 +160,9 @@ class MyApp extends StatelessWidget {
                   ),
               elevatedButtonTheme: ElevatedButtonThemeData(
                 style: ElevatedButton.styleFrom(
-                  minimumSize: Size(0, 32),
+                  minimumSize: Size(0, 35),
                   textStyle: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
@@ -180,6 +180,7 @@ class MyApp extends StatelessWidget {
               Assets.routeName: (context) => const Assets(),
               DepositAssets.routeName: (context) => const DepositAssets(),
               WithdrawAssets.routeName: (context) => const WithdrawAssets(),
+              TransferAssets.routeName: (context) => const TransferAssets(),
               Security.routeName: (context) => const Security(),
               Password.routeName: (context) => const Password(),
               GoogleAuth.routeName: (context) => const GoogleAuth(),

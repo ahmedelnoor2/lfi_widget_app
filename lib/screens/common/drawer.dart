@@ -81,6 +81,8 @@ Widget drawer(
                   getCoinCosts(asset.allDigAsset.isNotEmpty
                       ? asset.allDigAsset[index]['coin']
                       : asset.digitialAss[index]['coin']);
+                  searchController.clear();
+                  asset.filterSearchResults('');
                   Navigator.pop(context);
                 },
                 leading: CircleAvatar(
@@ -91,6 +93,80 @@ Widget drawer(
                 ),
                 title: Text('${_asset['coin']}'),
                 trailing: Text('${_asset['values']['total_balance']}'),
+              );
+            },
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget transferDrawer(
+  context,
+  width,
+  height,
+  selectedP2pAssets,
+  p2pAccounts,
+  public,
+  selectP2pCoin,
+) {
+  return Container(
+    decoration: BoxDecoration(
+      color: Colors.grey[850],
+    ),
+    width: width,
+    child: Column(
+      children: <Widget>[
+        Container(
+          padding: const EdgeInsets.only(top: 35),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(
+                  Icons.close,
+                  color: secondaryTextColor,
+                  size: 20,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.only(left: 70),
+                child: const Text('Select Coin'),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: height * 0.8,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: p2pAccounts.length,
+            itemBuilder: (context, index) {
+              var _account = p2pAccounts[index];
+
+              return ListTile(
+                onTap: () {
+                  selectP2pCoin(_account);
+                  Navigator.pop(context);
+                },
+                leading: CircleAvatar(
+                  radius: width * 0.035,
+                  child: Image.network(
+                    '${public.publicInfoMarket['market']['coinList'][_account['coinSymbol']]['icon']}',
+                  ),
+                ),
+                title: Text('${_account['coinSymbol']}'),
+                trailing: Icon(
+                  Icons.check,
+                  color:
+                      selectedP2pAssets['coinSymbol'] == _account['coinSymbol']
+                          ? greenIndicator
+                          : secondaryTextColor,
+                ),
               );
             },
           ),

@@ -47,6 +47,8 @@ var whitebgColor = Colors.white;
 var blackTextColor = Colors.black;
 var secondaryTextColor = Color(0xffBABABA);
 
+var secondaryTextColor400 = Color(0xff5E6292);
+
 var greenIndicator = Color(0xff46D88B);
 var redIndicator = Color(0xffD84646);
 var redPercentageIndicator = Color.fromARGB(77, 216, 70, 70);

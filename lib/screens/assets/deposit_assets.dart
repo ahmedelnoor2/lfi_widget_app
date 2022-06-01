@@ -43,7 +43,7 @@ class _DepositAssetsState extends State<DepositAssets> {
 
   @override
   void initState() {
-    getCoinCosts('USDT');
+    getDigitalBalance();
     super.initState();
   }
 
@@ -51,6 +51,13 @@ class _DepositAssetsState extends State<DepositAssets> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  Future<void> getDigitalBalance() async {
+    var auth = Provider.of<Auth>(context, listen: false);
+    var asset = Provider.of<Asset>(context, listen: false);
+    await asset.getAccountBalance(auth, "");
+    getCoinCosts(_defaultCoin);
   }
 
   Future<void> getCoinCosts(netwrkType) async {
@@ -155,7 +162,7 @@ class _DepositAssetsState extends State<DepositAssets> {
 
     return Scaffold(
       key: _scaffoldKey,
-      appBar: appBar(context, null),
+      appBar: hiddenAppBar(),
       drawer: drawer(
         context,
         width,
@@ -165,288 +172,441 @@ class _DepositAssetsState extends State<DepositAssets> {
         _searchController,
         getCoinCosts,
       ),
-      body: Screenshot(
-        controller: screenshotController,
-        child: SizedBox(
-          width: width,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: EdgeInsets.all(width * 0.05),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Deposit $_defaultCoin',
-                      style: TextStyle(
-                        fontSize: width * 0.05,
+      body: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.only(
+            right: 15,
+            left: 15,
+            bottom: 15,
+          ),
+          child: Screenshot(
+            controller: screenshotController,
+            child: SizedBox(
+              width: width,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(
+                      bottom: 10,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.only(right: 20),
+                              child: IconButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                icon: Icon(Icons.chevron_left),
+                              ),
+                            ),
+                            Text(
+                              'Deposit',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/transactions');
+                          },
+                          icon: Icon(Icons.history),
+                        )
+                      ],
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      _scaffoldKey.currentState!.openDrawer();
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(
+                            style: BorderStyle.solid,
+                            width: 0.3,
+                            color: Color(0xff5E6292),
+                          )),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.only(right: 10),
+                                child: CircleAvatar(
+                                  radius: 12,
+                                  child: Image.network(
+                                    '${public.publicInfoMarket['market']['coinList'][_defaultCoin]['icon']}',
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.only(right: 5),
+                                child: Text(
+                                  '$_defaultCoin',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                '${public.publicInfoMarket['market']['coinList'][_defaultCoin]['longName']}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Icon(Icons.keyboard_arrow_down),
+                        ],
                       ),
                     ),
-                    TextButton(
-                      onPressed: () {
-                        _scaffoldKey.currentState!.openDrawer();
-                      },
-                      child: Row(children: [
-                        Text(
-                          _defaultCoin,
-                          style: TextStyle(
-                            fontSize: width * 0.05,
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(top: 20, bottom: 10),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.only(right: 5),
+                          child: Text('Chain name'),
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(right: 5),
+                          child: Icon(
+                            Icons.help_outline,
+                            size: 12,
+                            color: secondaryTextColor,
                           ),
                         ),
-                        const Icon(Icons.arrow_drop_down),
-                      ]),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.only(bottom: width * 0.01),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      '0.00000',
-                      style: TextStyle(fontSize: width * 0.08),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.only(bottom: 3, left: 2),
-                      child: Text(
-                        _defaultCoin,
-                        style: TextStyle(
-                          fontSize: width * 0.05,
-                          color: secondaryTextColor,
+                        Container(
+                          padding: EdgeInsets.only(right: 5),
+                          child: Text('Fee:'),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.all(width * 0.03),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.only(right: 15),
-                      child: Row(
-                        children: [
-                          Text(
-                            'Availalble: ',
+                        Container(
+                          padding: EdgeInsets.only(right: 5),
+                          child: Text(
+                            '${asset.getCost['defaultFee']}',
                             style: TextStyle(
-                              color: secondaryTextColor,
+                              color: linkColor,
                             ),
                           ),
-                          Text(
-                            '0.00',
-                            style: TextStyle(
-                              fontSize: 18,
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(right: 5),
+                          child: Text(_defaultCoin),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(bottom: 10),
+                    height: 45,
+                    child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _allNetworks.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          var network = _allNetworks[index];
+                          return GestureDetector(
+                            onTap: () {
+                              changeCoinType(network);
+                            },
+                            child: Container(
+                              padding: EdgeInsets.only(right: 10),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: (network['mainChainName'] ==
+                                          _defaultNetwork)
+                                      ? Color(0xff01FEF5)
+                                      : Color(0xff5E6292),
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: Container(
+                                  width: 62,
+                                  child: Align(
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      "${network['mainChainName']}",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(top: 20, bottom: 10),
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(bottom: 10),
+                            child: Text(
+                              'Deposit Address',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                style: BorderStyle.solid,
+                                width: 0.3,
+                                color: Color(0xff5E6292),
+                              ),
+                            ),
+                            width: width * 0.45,
+                            height: width * 0.45,
+                            child: _loadingAddress
+                                ? depositQrSkull(context)
+                                : asset.changeAddress['addressQRCode'] != null
+                                    ? Image.memory(
+                                        base64Decode(
+                                          asset.changeAddress['addressQRCode']
+                                              .split(',')[1]
+                                              .replaceAll("\n", ""),
+                                        ),
+                                      )
+                                    : const CircularProgressIndicator
+                                        .adaptive(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(
+                      top: 10,
+                      bottom: 10,
+                    ),
+                    child: Text('Wallet Address:'),
+                  ),
+                  Container(
+                    width: width,
+                    height: height * 0.058,
+                    padding: EdgeInsets.only(
+                      top: 5,
+                      bottom: 5,
+                    ),
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          style: BorderStyle.solid,
+                          width: 0.3,
+                          color: Color(0xff5E6292),
+                        ),
+                      ),
+                      child: _loadingAddress
+                          ? depositAddressSkull(context)
+                          : Row(
+                              children: [
+                                SizedBox(
+                                  width: width * 0.8,
+                                  child: Text(
+                                    '${_defaultNetwork == 'XRP' ? asset.changeAddress['addressStr'].split('_')[0] : asset.changeAddress['addressStr']}',
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    Clipboard.setData(
+                                      ClipboardData(
+                                        text: _defaultNetwork == 'XRP'
+                                            ? asset.changeAddress['addressStr']
+                                                .split('_')[0]
+                                            : asset.changeAddress['addressStr'],
+                                      ),
+                                    );
+                                    snackAlert(
+                                        context, SnackTypes.success, 'Copied');
+                                  },
+                                  child: Image.asset(
+                                    'assets/img/copy.png',
+                                    width: 18,
+                                  ),
+                                ),
+                              ],
+                            ),
+                    ),
+                  ),
+                  _defaultNetwork == 'XRP'
+                      ? Container(
+                          width: width,
+                          height: height * 0.058,
+                          padding: EdgeInsets.only(
+                            top: 5,
+                            bottom: 5,
+                          ),
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                style: BorderStyle.solid,
+                                width: 0.3,
+                                color: Color(0xff5E6292),
+                              ),
+                            ),
+                            child: _loadingAddress
+                                ? depositAddressSkull(context)
+                                : Row(
+                                    children: [
+                                      SizedBox(
+                                        width: width * 0.8,
+                                        child: Text(
+                                          '${_defaultNetwork == 'XRP' ? asset.changeAddress['addressStr'].split('_')[1] : asset.changeAddress['addressStr']}',
+                                        ),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          Clipboard.setData(
+                                            ClipboardData(
+                                              text: _defaultNetwork == 'XRP'
+                                                  ? asset.changeAddress[
+                                                          'addressStr']
+                                                      .split('_')[1]
+                                                  : asset.changeAddress[
+                                                      'addressStr'],
+                                            ),
+                                          );
+                                          snackAlert(context,
+                                              SnackTypes.success, 'Copied');
+                                        },
+                                        child: Image.asset(
+                                          'assets/img/copy.png',
+                                          width: 18,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                          ),
+                        )
+                      : Container(),
+                  Container(
+                    padding: EdgeInsets.only(
+                      top: 20,
+                      bottom: 10,
+                    ),
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.only(bottom: 15),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Balances',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              Text(
+                                '${asset.accountBalance['allCoinMap'] != null ? asset.accountBalance['allCoinMap'][_defaultCoin]['total_balance'] : '--'}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(bottom: 15),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Available',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              Text(
+                                '${asset.accountBalance['allCoinMap'] != null ? asset.accountBalance['allCoinMap'][_defaultCoin]['normal_balance'] : '--'}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(bottom: 15),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Freeze',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              Text(
+                                '${asset.accountBalance['allCoinMap'] != null ? asset.accountBalance['allCoinMap'][_defaultCoin]['lock_balance'] : '--'}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: SizedBox(
+                      // padding: const EdgeInsets.all(40),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            width: width * 0.44,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                captureScreen();
+                                snackAlert(context, SnackTypes.success,
+                                    'Address saved to Gallery or Photos.');
+                              },
+                              child: const Text('Save Address'),
+                            ),
+                          ),
+                          SizedBox(
+                            width: width * 0.44,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                share(
+                                  '${asset.getCost['withdrawLimitSymbol']} Address',
+                                  asset.changeAddress['addressStr'],
+                                );
+                              },
+                              child: const Text('Share Address'),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    Row(
-                      children: [
-                        Text(
-                          'Freeze: ',
-                          style: TextStyle(
-                            color: secondaryTextColor,
-                          ),
-                        ),
-                        Text(
-                          '0.00',
-                          style: TextStyle(
-                            fontSize: 18,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              Align(
-                alignment: Alignment.center,
-                child: _loadingAddress
-                    ? depositQrSkull(context)
-                    : asset.changeAddress['addressQRCode'] != null
-                        ? Image.memory(base64Decode(asset
-                            .changeAddress['addressQRCode']
-                            .split(',')[1]
-                            .replaceAll("\n", "")))
-                        : const CircularProgressIndicator(),
-              ),
-              Container(
-                padding: EdgeInsets.only(
-                  left: width * 0.05,
-                  top: 20,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Network',
-                      style: TextStyle(
-                        color: secondaryTextColor,
-                        fontSize: 12,
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.only(
-                        top: 10,
-                        right: 25,
-                      ),
-                      child: GestureDetector(
-                        onTap: () {
-                          showModalBottomSheet<void>(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return networks(
-                                context,
-                                asset,
-                                _allNetworks,
-                                _defaultNetwork,
-                                changeCoinType,
-                              );
-                            },
-                          );
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  _defaultNetwork,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Icon(Icons.chevron_right),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.only(
-                  left: width * 0.05,
-                  top: 20,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Deposit Address',
-                      style: TextStyle(
-                        color: secondaryTextColor,
-                        fontSize: 12,
-                      ),
-                    ),
-                    _loadingAddress
-                        ? depositAddressSkull(context)
-                        : Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.only(top: 12),
-                                    width: width * 0.75,
-                                    child: Text(
-                                      '${_defaultNetwork == 'XRP' ? asset.changeAddress['addressStr'].split('_')[0] : asset.changeAddress['addressStr']}',
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.only(left: 10),
-                                    child: IconButton(
-                                      onPressed: () {
-                                        Clipboard.setData(
-                                          ClipboardData(
-                                            text: _defaultNetwork == 'XRP'
-                                                ? asset
-                                                    .changeAddress['addressStr']
-                                                    .split('_')[0]
-                                                : asset.changeAddress[
-                                                    'addressStr'],
-                                          ),
-                                        );
-                                        snackAlert(context, SnackTypes.success,
-                                            'Copied');
-                                      },
-                                      icon: const Icon(Icons.copy),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              _defaultNetwork == 'XRP'
-                                  ? Row(
-                                      children: [
-                                        Container(
-                                          padding:
-                                              const EdgeInsets.only(top: 12),
-                                          width: width * 0.75,
-                                          child: Text(
-                                            '${asset.changeAddress['addressStr'].split('_')[1]}',
-                                          ),
-                                        ),
-                                        Container(
-                                          padding:
-                                              const EdgeInsets.only(left: 10),
-                                          child: IconButton(
-                                            onPressed: () {
-                                              Clipboard.setData(
-                                                ClipboardData(
-                                                  text: asset.changeAddress[
-                                                          'addressStr']
-                                                      .split('_')[1],
-                                                ),
-                                              );
-                                              snackAlert(context,
-                                                  SnackTypes.success, 'Copied');
-                                            },
-                                            icon: const Icon(Icons.copy),
-                                          ),
-                                        ),
-                                      ],
-                                    )
-                                  : Container()
-                            ],
-                          ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.all(40),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    OutlinedButton(
-                      onPressed: () {
-                        captureScreen();
-                        snackAlert(context, SnackTypes.success,
-                            'Address saved to Gallery or Photos.');
-                      },
-                      child: const Text('Save Address'),
-                    ),
-                    OutlinedButton(
-                      onPressed: () {
-                        share(
-                          '${asset.getCost['withdrawLimitSymbol']} Address',
-                          asset.changeAddress['addressStr'],
-                        );
-                      },
-                      child: const Text('Share Address'),
-                    ),
-                  ],
-                ),
-              )
-            ],
+            ),
           ),
         ),
       ),
