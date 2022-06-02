@@ -4,25 +4,40 @@ bottomNav(context) {
   var _currentRoute = ModalRoute.of(context)!.settings.name;
 
   return BottomNavigationBar(
-    items: const <BottomNavigationBarItem>[
+    items: <BottomNavigationBarItem>[
       BottomNavigationBarItem(
-        icon: Icon(Icons.home),
+        icon: Image.asset(
+          'assets/img/bottom_bar/${(_currentRoute == '/' || _currentRoute == '/dashboard') ? 'home_active' : 'home'}.png',
+          width: 24,
+        ),
         label: 'Home',
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.bar_chart),
+        icon: Image.asset(
+          'assets/img/bottom_bar/${(_currentRoute == '/market') ? 'market_active' : 'market'}.png',
+          width: 24,
+        ),
         label: 'Markets',
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.currency_exchange),
+        icon: Image.asset(
+          'assets/img/bottom_bar/${(_currentRoute == '/trade') ? 'trade_active' : 'trade'}.png',
+          width: 24,
+        ),
         label: 'Trade',
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.currency_exchange),
+        icon: Image.asset(
+          'assets/img/bottom_bar/${(_currentRoute == '/future_trade') ? 'future_active' : 'future'}.png',
+          width: 24,
+        ),
         label: 'Futures',
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.account_balance_wallet),
+        icon: Image.asset(
+          'assets/img/bottom_bar/${(_currentRoute == '/assets') ? 'asset_active' : 'asset'}.png',
+          width: 24,
+        ),
         label: 'Assets',
       ),
     ],

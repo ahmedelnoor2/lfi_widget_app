@@ -3,7 +3,6 @@ import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/dashboard/skeleton/dashboard_skull.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
-import 'package:lyotrade/utils/Number.utils.dart';
 import 'package:provider/provider.dart';
 
 class AssetsInfo extends StatefulWidget {

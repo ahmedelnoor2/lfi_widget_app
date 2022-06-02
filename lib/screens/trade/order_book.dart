@@ -95,7 +95,7 @@ class _OrderBookState extends State<OrderBook> {
           padding: EdgeInsets.zero,
           itemCount: asks.length,
           itemBuilder: (BuildContext context, int index) {
-            return GestureDetector(
+            return InkWell(
               onTap: () {
                 setPriceField(public, asks[index][0]);
               },
@@ -165,7 +165,7 @@ class _OrderBookState extends State<OrderBook> {
           padding: EdgeInsets.zero,
           itemCount: bids.length,
           itemBuilder: (BuildContext context, int index) {
-            return GestureDetector(
+            return InkWell(
               onTap: () {
                 setPriceField(public, bids[index][0]);
               },

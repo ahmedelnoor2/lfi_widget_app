@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
+import 'package:lyotrade/utils/Translate.utils.dart';
 
 class Trading with ChangeNotifier {
   Map<String, String> headers = {
@@ -17,7 +18,7 @@ class Trading with ChangeNotifier {
     return _openOrders;
   }
 
-  Future<void> getOpenOrders(ctx, auth, formData) async {
+  Future<void> getOrders(ctx, auth, formData) async {
     /**
      * params:
       "entrust": 1,
@@ -46,7 +47,7 @@ class Trading with ChangeNotifier {
       final responseData = json.decode(response.body);
 
       if (responseData['code'] == '0') {
-        _openOrders = responseData['data'];
+        _openOrders = responseData['data']['orders'];
         return notifyListeners();
       } else {
         _openOrders = [];
@@ -87,14 +88,62 @@ class Trading with ChangeNotifier {
       final responseData = json.decode(response.body);
 
       if (responseData['code'] == '0') {
-        snackAlert(ctx, SnackTypes.success, responseData['msg']);
+        snackAlert(ctx, SnackTypes.success, getTranslate(responseData['msg']));
+        return;
       } else {
-        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
+        return;
       }
     } catch (error) {
-      print(error);
-      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again.');
+      snackAlert(
+        ctx,
+        SnackTypes.errors,
+        'Error on placing order, please try again',
+      );
       return;
+      // throw error;
+    }
+  }
+
+  Future<void> cancellAllOrders(ctx, auth, formData) async {
+    /**
+     * params:
+      symbol: "btcusdt"
+      orderType: 1 = LIMIT and 2 = MARKET
+    */
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/order/cancel_all',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        snackAlert(ctx, SnackTypes.success, getTranslate(responseData['msg']));
+        return;
+      } else {
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
+        return;
+      }
+    } catch (error) {
+      snackAlert(
+        ctx,
+        SnackTypes.errors,
+        'Error on cancelling orders, please try again',
+      );
+      return;
+      // throw error;
     }
   }
 }

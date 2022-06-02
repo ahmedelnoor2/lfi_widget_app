@@ -6,9 +6,11 @@ appHeader(context, tabController) {
     shadowColor: Colors.transparent,
     toolbarHeight: 0,
     bottom: TabBar(
-      tabs: const <Tab>[
-        Tab(text: 'Trade'),
-        Tab(text: 'Margin'),
+      indicatorSize: TabBarIndicatorSize.label,
+      isScrollable: true,
+      tabs: <Tab>[
+        Tab(text: 'Spot'),
+        Tab(text: 'Cross Margin'),
       ],
       controller: tabController,
     ),

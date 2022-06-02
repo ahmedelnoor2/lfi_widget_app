@@ -22,6 +22,7 @@ import 'package:lyotrade/screens/security/password.dart';
 import 'package:lyotrade/screens/security/security.dart';
 import 'package:lyotrade/screens/trade/kline_chart.dart';
 import 'package:lyotrade/screens/trade/trade.dart';
+import 'package:lyotrade/screens/trade/trade_history.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 
@@ -59,6 +60,12 @@ class MyApp extends StatelessWidget {
               // or simply save your changes to "hot reload" in a Flutter IDE).
               // Notice that the counter didn't reset back to zero; the application
               // is not restarted.
+              pageTransitionsTheme: PageTransitionsTheme(
+                builders: {
+                  TargetPlatform.android: NoTransitionsBuilder(),
+                  TargetPlatform.iOS: NoTransitionsBuilder(),
+                },
+              ),
               brightness: Brightness.dark,
               appBarTheme: AppBarTheme(
                 backgroundColor: Color.fromARGB(255, 26, 29, 63),
@@ -176,6 +183,7 @@ class MyApp extends StatelessWidget {
               Authentication.routeName: (context) => const Authentication(),
               Market.routeName: (context) => const Market(),
               Trade.routeName: (context) => const Trade(),
+              TradeHistory.routeName: (context) => const TradeHistory(),
               FutureTrade.routeName: (context) => const FutureTrade(),
               Assets.routeName: (context) => const Assets(),
               DepositAssets.routeName: (context) => const DepositAssets(),
@@ -195,5 +203,21 @@ class MyApp extends StatelessWidget {
         },
       ),
     );
+  }
+}
+
+class NoTransitionsBuilder extends PageTransitionsBuilder {
+  const NoTransitionsBuilder();
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T>? route,
+    BuildContext? context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget? child,
+  ) {
+    // only return the child without warping it with animations
+    return child!;
   }
 }

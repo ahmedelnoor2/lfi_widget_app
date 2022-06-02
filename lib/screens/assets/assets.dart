@@ -144,7 +144,7 @@ class _AssetsState extends State<Assets> {
                     toolbarHeight: 0,
                   ),
                   body: Container(
-                    padding: EdgeInsets.all(width * 0.03),
+                    padding: EdgeInsets.all(width * 0.025),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

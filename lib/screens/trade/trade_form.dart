@@ -1,5 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/asset.dart';
+import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
@@ -26,6 +31,8 @@ class _TradeFormState extends State<TradeForm> {
   final TextEditingController _priceField = TextEditingController();
   final TextEditingController _totalField = TextEditingController();
 
+  var _timer;
+
   // late final TabController _tabTradeController =
   //     TabController(length: 2, vsync: this);
 
@@ -34,10 +41,12 @@ class _TradeFormState extends State<TradeForm> {
   double _amount = 0;
   double _price = 0;
   double _total = 0;
+  String _availableBalance = '0.000000';
   bool _isBuy = true;
 
   @override
   void initState() {
+    setAvailalbePrice();
     super.initState();
   }
 
@@ -46,6 +55,9 @@ class _TradeFormState extends State<TradeForm> {
     _amountField.dispose();
     _priceField.dispose();
     _totalField.dispose();
+    if (_timer != null) {
+      _timer.cancel();
+    }
     super.dispose();
   }
 
@@ -54,16 +66,46 @@ class _TradeFormState extends State<TradeForm> {
     setState(() {
       _price = double.parse(widget.lastPrice);
     });
+    calculateTotal('price');
+  }
+
+  Future<void> setAvailalbePrice() async {
+    var auth = Provider.of<Auth>(context, listen: false);
+    var public = Provider.of<Public>(context, listen: false);
+
+    if (auth.isAuthenticated) {
+      var asset = Provider.of<Asset>(context, listen: false);
+      await asset.getAccountBalance(
+        auth,
+        "${public.activeMarket['showName'].split('/')[0]},${public.activeMarket['showName'].split('/')[1]}",
+      );
+      setState(() {
+        _availableBalance = _isBuy
+            ? double.parse(asset.accountBalance['allCoinMap']
+                        [public.activeMarket['showName'].split('/')[1]]
+                    ['normal_balance'])
+                .toStringAsPrecision(6)
+            : double.parse(asset.accountBalance['allCoinMap']
+                        [public.activeMarket['showName'].split('/')[0]]
+                    ['normal_balance'])
+                .toStringAsPrecision(6);
+      });
+      getOpenOrders();
+    }
   }
 
   void calculateTotal(field) {
     if (field == 'amount') {
       if (_amountField.text.isNotEmpty) {
-        setState(() {
-          _amount = double.parse(_amountField.text);
-          _total = double.parse(_amountField.text) * _price;
-        });
-        _totalField.text = '${double.parse(_amountField.text) * _price}';
+        try {
+          setState(() {
+            _amount = double.parse(_amountField.text);
+            _total = double.parse(_amountField.text) * _price;
+          });
+          _totalField.text = '${double.parse(_amountField.text) * _price}';
+        } catch (e) {
+          //
+        }
       } else {
         _totalField.clear();
       }
@@ -84,21 +126,62 @@ class _TradeFormState extends State<TradeForm> {
     }
     if (field == 'total') {
       if (_totalField.text.isNotEmpty) {
-        setState(() {
-          _total = double.parse(_totalField.text);
-          _amount = double.parse(_totalField.text) / _price;
-        });
-        _amountField.text = '${double.parse(_totalField.text) / _price}';
+        try {
+          setState(() {
+            _total = double.parse(_totalField.text);
+            _amount = double.parse(_totalField.text) / _price;
+          });
+          _amountField.text = '${double.parse(_totalField.text) / _price}';
+        } catch (e) {
+          //
+        }
       } else {
         _amountField.clear();
       }
     }
   }
 
-  Future<void> setAmountField() async {
+  Future<void> setPriceField() async {
     var public = Provider.of<Public>(context, listen: false);
     _priceField.text = public.amountField;
-    await public.amountFieldDisable();
+    _timer = Timer(Duration(milliseconds: 400), () async {
+      await public.amountFieldDisable();
+    });
+    calculateTotal('price');
+  }
+
+  Future<void> createOrder() async {
+    var auth = Provider.of<Auth>(context, listen: false);
+    var trading = Provider.of<Trading>(context, listen: false);
+    var public = Provider.of<Public>(context, listen: false);
+    var formData = {
+      "price": _orderType == 1
+          ? _priceField.text
+          : (_orderType == 2)
+              ? null
+              : public.lastPrice,
+      "side": _isBuy ? "BUY" : "SELL",
+      "symbol": public.activeMarket['symbol'],
+      "type": _orderType,
+      "volume":
+          (_orderType == 2 && _isBuy) ? _totalField.text : _amountField.text,
+    };
+    await trading.createOrder(context, auth, formData);
+    getOpenOrders();
+  }
+
+  Future<void> getOpenOrders() async {
+    var trading = Provider.of<Trading>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
+
+    await trading.getOrders(context, auth, {
+      "entrust": 1,
+      "isShowCanceled": 0,
+      "orderType": _orderType,
+      "page": 1,
+      "pageSize": 10,
+      "symbol": "",
+    });
   }
 
   @override
@@ -107,9 +190,10 @@ class _TradeFormState extends State<TradeForm> {
     height = MediaQuery.of(context).size.height;
 
     var public = Provider.of<Public>(context, listen: true);
+    var auth = Provider.of<Auth>(context, listen: true);
 
     if (public.amountFieldUpdate) {
-      setAmountField();
+      setPriceField();
     }
 
     return Form(
@@ -131,6 +215,7 @@ class _TradeFormState extends State<TradeForm> {
                     setState(() {
                       _isBuy = true;
                     });
+                    setAvailalbePrice();
                   },
                   child: Text(
                     'Buy',
@@ -149,6 +234,7 @@ class _TradeFormState extends State<TradeForm> {
                     setState(() {
                       _isBuy = false;
                     });
+                    setAvailalbePrice();
                   },
                   child: Text(
                     'Sell',
@@ -197,7 +283,7 @@ class _TradeFormState extends State<TradeForm> {
           (_orderType == 2)
               ? Container(
                   margin: EdgeInsets.only(bottom: 8),
-                  padding: EdgeInsets.all(8),
+                  padding: EdgeInsets.all(13),
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: Color(0xff292C51),
@@ -218,7 +304,7 @@ class _TradeFormState extends State<TradeForm> {
                   ),
                 )
               : Container(),
-          (!_isBuy && _orderType == 2)
+          (_orderType == 2)
               ? Container()
               : Container(
                   margin: EdgeInsets.only(bottom: 8),
@@ -245,7 +331,11 @@ class _TradeFormState extends State<TradeForm> {
                           onChanged: (value) {
                             calculateTotal('price');
                           },
-                          onTap: () {},
+                          onTap: () {
+                            if (_priceField.text.isEmpty) {
+                              updateLastPrice();
+                            }
+                          },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               widget.scaffoldKey!.currentState
@@ -283,7 +373,7 @@ class _TradeFormState extends State<TradeForm> {
                     ],
                   ),
                 ),
-          (_isBuy && _orderType == 2)
+          (_orderType == 2 && _isBuy)
               ? Container()
               : Container(
                   margin: EdgeInsets.only(bottom: 8),
@@ -354,60 +444,64 @@ class _TradeFormState extends State<TradeForm> {
                     ],
                   ),
                 ),
-          _selectAmountPecentage(),
-          Container(
-            margin: EdgeInsets.only(bottom: 5),
-            padding: EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Color(0xff292C51),
-              ),
-              color: Color(0xff292C51),
-              borderRadius: BorderRadius.all(
-                Radius.circular(2),
-              ),
-            ),
-            child: TextFormField(
-              onChanged: (value) {
-                calculateTotal('total');
-              },
-              textAlign: TextAlign.center,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  widget.scaffoldKey!.currentState.hideCurrentSnackBar();
-                  snackAlert(
-                    context,
-                    SnackTypes.errors,
-                    'Error in placing and order, try again',
-                  );
-                  return '';
-                }
-                return null;
-              },
-              style: TextStyle(fontSize: 14),
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.zero,
-                isDense: true,
-                border: UnderlineInputBorder(
-                  borderSide: BorderSide.none,
-                ),
-                hintStyle: TextStyle(
-                  fontSize: 14,
-                ),
-                errorStyle: TextStyle(height: 0),
-                focusedErrorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(width: 1, color: Colors.red),
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(5),
+          _orderType == 1 ? _selectAmountPecentage() : Container(),
+          ((_orderType == 2 && _isBuy) || _orderType == 1)
+              ? Container(
+                  margin: EdgeInsets.only(bottom: 8),
+                  padding: EdgeInsets.all(13),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Color(0xff292C51),
+                    ),
+                    color: Color(0xff292C51),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(2),
+                    ),
                   ),
-                ),
-                hintText:
-                    'Total (${public.activeMarket['showName'].split('/')[1]})',
-              ),
-              controller: _totalField,
-            ),
-          ),
+                  child: TextFormField(
+                    onChanged: (value) {
+                      calculateTotal('total');
+                    },
+                    textAlign: TextAlign.center,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        widget.scaffoldKey!.currentState.hideCurrentSnackBar();
+                        snackAlert(
+                          context,
+                          SnackTypes.errors,
+                          'Error in placing and order, try again',
+                        );
+                        return '';
+                      }
+                      return null;
+                    },
+                    style: TextStyle(fontSize: 14),
+                    keyboardType:
+                        TextInputType.numberWithOptions(decimal: true),
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.zero,
+                      isDense: true,
+                      border: UnderlineInputBorder(
+                        borderSide: BorderSide.none,
+                      ),
+                      hintStyle: TextStyle(
+                        fontSize: 14,
+                      ),
+                      errorStyle: TextStyle(height: 0),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(width: 1, color: Colors.red),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(5),
+                        ),
+                      ),
+                      hintText:
+                          'Total (${public.activeMarket['showName'].split('/')[1]})',
+                    ),
+                    controller: _totalField,
+                  ),
+                )
+              : Container(),
+          _orderType == 2 ? _selectAmountPecentage() : Container(),
           Container(
             padding: EdgeInsets.only(top: 2),
             child: Row(
@@ -421,12 +515,12 @@ class _TradeFormState extends State<TradeForm> {
                   children: [
                     Container(
                       padding: EdgeInsets.only(right: 2),
-                      child: Text('0.0000'),
+                      child: Text(_availableBalance),
                     ),
                     Container(
                       padding: EdgeInsets.only(right: 5),
                       child: Text(
-                          '${public.activeMarket['showName'].split('/')[1]}'),
+                          '${_isBuy ? public.activeMarket['showName'].split('/')[1] : public.activeMarket['showName'].split('/')[0]}'),
                     ),
                     Icon(
                       Icons.add_circle,
@@ -442,22 +536,27 @@ class _TradeFormState extends State<TradeForm> {
             width: width * 0.7,
             child: ElevatedButton(
               onPressed: () {
-                if (_formTradeKey.currentState!.validate()) {
-                  // If the form is valid, display a snackbar. In the real world,
-                  // you'd often call a server or save the information in a database.
-                  widget.scaffoldKey!.currentState.hideCurrentSnackBar();
-                  snackAlert(
-                    context,
-                    SnackTypes.warning,
-                    'Feature is under process',
-                  );
+                if (auth.isAuthenticated) {
+                  if (_formTradeKey.currentState!.validate()) {
+                    // If the form is valid, display a snackbar. In the real world,
+                    // you'd often call a server or save the information in a database.
+                    // widget.scaffoldKey!.currentState.hideCurrentSnackBar();
+                    // snackAlert(
+                    //   context,
+                    //   SnackTypes.warning,
+                    //   'Feature is under process',
+                    // );
+                    createOrder();
+                  } else {
+                    // widget.scaffoldKey!.currentState.hideCurrentSnackBar();
+                    // snackAlert(
+                    //   context,
+                    //   SnackTypes.warning,
+                    //   'Feature is under process',
+                    // );
+                  }
                 } else {
-                  widget.scaffoldKey!.currentState.hideCurrentSnackBar();
-                  snackAlert(
-                    context,
-                    SnackTypes.warning,
-                    'Feature is under process',
-                  );
+                  Navigator.pushNamed(context, '/authentication');
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -465,7 +564,9 @@ class _TradeFormState extends State<TradeForm> {
                 textStyle: TextStyle(),
               ),
               child: Text(
-                '${_isBuy ? 'Buy' : 'Sell'} ${public.activeMarket['showName'].split('/')[0]}',
+                auth.isAuthenticated
+                    ? '${_isBuy ? 'Buy' : 'Sell'} ${public.activeMarket['showName'].split('/')[0]}'
+                    : 'Login / Sign Up',
                 style: TextStyle(color: Colors.white),
               ),
             ),

@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
-import 'package:lyotrade/screens/assets/common/networks.dart';
 import 'package:lyotrade/screens/assets/skeleton/deposit_skull.dart';
 import 'package:lyotrade/screens/common/drawer.dart';
 import 'package:lyotrade/screens/common/header.dart';
@@ -39,7 +38,6 @@ class _DepositAssetsState extends State<DepositAssets> {
   String _defaultNetwork = 'ERC20';
   String _defaultCoin = 'USDT';
   List _allNetworks = [];
-  // List _digAssets = [];
 
   @override
   void initState() {

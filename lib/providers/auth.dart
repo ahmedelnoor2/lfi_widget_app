@@ -20,6 +20,7 @@ class Auth with ChangeNotifier {
   bool _googleAuth = false;
 
   Map _userInfo = {};
+  bool _isAuthenticated = false;
 
   String get emailVerificationToken {
     return _emailVerificationToken;
@@ -31,6 +32,10 @@ class Auth with ChangeNotifier {
 
   Map get userInfo {
     return _userInfo;
+  }
+
+  bool get isAuthenticated {
+    return _isAuthenticated;
   }
 
   bool get googleAuth {
@@ -61,14 +66,17 @@ class Auth with ChangeNotifier {
       final responseData = json.decode(response.body);
       if (responseData['code'] == '0') {
         _userInfo = responseData['data'];
+        _isAuthenticated = true;
         notifyListeners();
       } else {
         _userInfo = {};
+        _isAuthenticated = false;
         notifyListeners();
       }
       return '';
     } catch (error) {
       _userInfo = {};
+      _isAuthenticated = false;
       notifyListeners();
       return '';
       // throw error;
@@ -90,6 +98,7 @@ class Auth with ChangeNotifier {
       if (responseData['code'] == "0") {
         _loginVerificationToken = '';
         _userInfo = {};
+        _isAuthenticated = false;
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('authToken', _loginVerificationToken);
         notifyListeners();
