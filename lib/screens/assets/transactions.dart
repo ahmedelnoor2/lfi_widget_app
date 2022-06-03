@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/screens/assets/transactions/deposit_lists.dart';
+import 'package:lyotrade/screens/assets/transactions/financial_records.dart';
+import 'package:lyotrade/screens/assets/transactions/orders_lists.dart';
+import 'package:lyotrade/screens/assets/transactions/withdraw_lists.dart';
 import 'package:lyotrade/screens/common/drawer.dart';
 import 'package:lyotrade/screens/common/header.dart';
+import 'package:lyotrade/screens/common/no_data.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
@@ -30,10 +34,12 @@ class _TransactionsState extends State<Transactions>
   String _defaultNetwork = 'ERC20';
   String _defaultCoin = 'USDT';
   List _allNetworks = [];
+  int _page = 1;
+  int _pageSize = 10;
 
   @override
   void initState() {
-    getDigitalBalance();
+    fetchRecords();
     super.initState();
   }
 
@@ -43,16 +49,51 @@ class _TransactionsState extends State<Transactions>
     super.dispose();
   }
 
-  Future<void> getDigitalBalance() async {
+  void fetchRecords() {
+    if (_tabTxHistoryController.index == 0) {
+      getDepositTransactions();
+    }
+    if (_tabTxHistoryController.index == 1) {
+      getWithdrawTransactions();
+    }
+    if (_tabTxHistoryController.index == 3) {
+      getFinancialRecords();
+    }
+  }
+
+  Future<void> getDepositTransactions() async {
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
-    await asset.getAccountBalance(auth, "");
-    getCoinCosts(_defaultCoin);
+    await asset.getDepositTransactions(auth, {
+      'coinSymbol': null,
+      'page': _page,
+      'pageSize': _pageSize,
+    });
+  }
+
+  Future<void> getWithdrawTransactions() async {
+    var auth = Provider.of<Auth>(context, listen: false);
+    var asset = Provider.of<Asset>(context, listen: false);
+    await asset.getWithdrawTransactions(auth, {
+      'coinSymbol': null,
+      'page': _page,
+      'pageSize': _pageSize,
+    });
+  }
+
+  Future<void> getFinancialRecords() async {
+    var auth = Provider.of<Auth>(context, listen: false);
+    var asset = Provider.of<Asset>(context, listen: false);
+    await asset.getFinancialRecords(auth, {
+      'financialType': 0,
+      'gainCoin': "",
+      'page': _page,
+      'pageSize': _pageSize,
+    });
   }
 
   Future<void> getCoinCosts(netwrkType) async {
     setState(() {
-      _loadingAddress = true;
       _defaultCoin = netwrkType;
     });
     var auth = Provider.of<Auth>(context, listen: false);
@@ -84,8 +125,7 @@ class _TransactionsState extends State<Transactions>
       });
     }
 
-    await asset.getCoinCosts(auth, _defaultNetwork);
-    await asset.getChangeAddress(auth, _defaultNetwork);
+    await asset.getCoinCosts(auth, _defaultCoin);
 
     List _digitialAss = [];
     asset.accountBalance['allCoinMap'].forEach((k, v) {
@@ -95,10 +135,6 @@ class _TransactionsState extends State<Transactions>
           'values': v,
         });
       }
-    });
-
-    setState(() {
-      _loadingAddress = false;
     });
     asset.setDigAssets(_digitialAss);
   }
@@ -125,7 +161,7 @@ class _TransactionsState extends State<Transactions>
       ),
       body: Container(
         padding: EdgeInsets.only(
-          bottom: 15,
+          // bottom: 15,
           right: 15,
           left: 15,
         ),
@@ -153,72 +189,76 @@ class _TransactionsState extends State<Transactions>
                 ),
                 IconButton(
                   onPressed: () {},
-                  icon: Icon(Icons.remove_red_eye),
+                  icon: Icon(Icons.visibility),
                 ),
               ],
             ),
+            // Container(
+            //   padding: EdgeInsets.only(bottom: 10),
+            //   child: Divider(),
+            // ),
+            // GestureDetector(
+            //   onTap: () {
+            //     _scaffoldKey.currentState!.openDrawer();
+            //   },
+            //   child: Container(
+            //     padding: EdgeInsets.all(8),
+            //     decoration: BoxDecoration(
+            //         borderRadius: BorderRadius.circular(5),
+            //         border: Border.all(
+            //           style: BorderStyle.solid,
+            //           width: 0.3,
+            //           color: Color(0xff5E6292),
+            //         )),
+            //     child: Row(
+            //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //       children: [
+            //         Row(
+            //           children: [
+            //             Container(
+            //               padding: EdgeInsets.only(right: 10),
+            //               child: CircleAvatar(
+            //                 radius: 12,
+            //                 child: Image.network(
+            //                   '${public.publicInfoMarket['market']['coinList'][_defaultCoin]['icon']}',
+            //                 ),
+            //               ),
+            //             ),
+            //             Container(
+            //               padding: EdgeInsets.only(right: 5),
+            //               child: Text(
+            //                 '$_defaultCoin',
+            //                 style: TextStyle(
+            //                   fontSize: 16,
+            //                   fontWeight: FontWeight.bold,
+            //                 ),
+            //               ),
+            //             ),
+            //             Text(
+            //               '${public.publicInfoMarket['market']['coinList'][_defaultCoin]['longName']}',
+            //               style: TextStyle(
+            //                 fontSize: 14,
+            //                 fontWeight: FontWeight.normal,
+            //               ),
+            //             ),
+            //           ],
+            //         ),
+            //         Icon(Icons.keyboard_arrow_down),
+            //       ],
+            //     ),
+            //   ),
+            // ),
             Container(
-              padding: EdgeInsets.only(bottom: 10),
-              child: Divider(),
-            ),
-            GestureDetector(
-              onTap: () {
-                _scaffoldKey.currentState!.openDrawer();
-              },
-              child: Container(
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    border: Border.all(
-                      style: BorderStyle.solid,
-                      width: 0.3,
-                      color: Color(0xff5E6292),
-                    )),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(right: 10),
-                          child: CircleAvatar(
-                            radius: 12,
-                            child: Image.network(
-                              '${public.publicInfoMarket['market']['coinList'][_defaultCoin]['icon']}',
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.only(right: 5),
-                          child: Text(
-                            '$_defaultCoin',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          '${public.publicInfoMarket['market']['coinList'][_defaultCoin]['longName']}',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Icon(Icons.keyboard_arrow_down),
-                  ],
-                ),
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.only(top: 20, bottom: 20),
+              padding: EdgeInsets.only(bottom: 20),
               width: width,
               child: TabBar(
                 indicatorSize: TabBarIndicatorSize.label,
                 isScrollable: true,
                 onTap: (value) => setState(() {
+                  _page = 1;
+                  _pageSize = 10;
+                  fetchRecords();
+                  print(_tabTxHistoryController.index);
                   // _tabIndicatorColor = value == 0 ? Colors.green : Colors.red;
                 }),
                 tabs: <Tab>[
@@ -235,236 +275,24 @@ class _TransactionsState extends State<Transactions>
               child: TabBarView(
                 controller: _tabTxHistoryController,
                 children: [
-                  depositList(context),
-                  withdrawList(context),
-                  Text(
-                    'Status',
-                    style: TextStyle(
-                      color: secondaryTextColor,
-                    ),
-                  ),
-                  Text(
-                    'Status',
-                    style: TextStyle(
-                      color: secondaryTextColor,
-                    ),
-                  ),
+                  asset.depositLists.isEmpty
+                      ? noData()
+                      : depositList(context, width, height, asset.depositLists),
+                  asset.withdrawLists.isEmpty
+                      ? noData()
+                      : withdrawList(
+                          context, width, height, asset.withdrawLists),
+                  noData(),
+                  asset.financialRecords.isEmpty
+                      ? noData()
+                      : financialRecords(
+                          context, width, height, asset.financialRecords),
                 ],
               ),
             ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget depositList(context) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            SizedBox(
-              width: width * 0.4,
-              child: Text(
-                'Currency',
-                style: TextStyle(
-                  color: secondaryTextColor,
-                ),
-              ),
-            ),
-            Text(
-              'Amount',
-              style: TextStyle(
-                color: secondaryTextColor,
-              ),
-            ),
-            Text(
-              'Status',
-              style: TextStyle(
-                color: secondaryTextColor,
-              ),
-            ),
-          ],
-        ),
-        Divider(
-          height: 0,
-        ),
-        SizedBox(
-          height: height * 0.63,
-          child: ListView.builder(
-            scrollDirection: Axis.vertical,
-            itemCount: _allNetworks.length,
-            itemBuilder: (BuildContext context, int index) {
-              return Container(
-                padding: EdgeInsets.only(top: 10, bottom: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(right: 10),
-                          child: CircleAvatar(
-                            radius: 15,
-                            child: Icon(Icons.person),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.only(right: 10),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('LYO/USDT'),
-                              Text(
-                                '${DateFormat('yyyy-mm-dd hh:mm:ss').format(DateTime.now())}',
-                                style: TextStyle(
-                                    color: secondaryTextColor, fontSize: 12),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      child: Text(
-                        '777.49',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      child: SizedBox(
-                        height: height * 0.035,
-                        width: width * 0.18,
-                        child: Card(
-                          shadowColor: Colors.transparent,
-                          color: greenPercentageIndicator,
-                          child: Center(
-                            child: Text(
-                              'Completed',
-                              style: TextStyle(
-                                color: greenIndicator,
-                                fontSize: 10,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget withdrawList(context) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            SizedBox(
-              width: width * 0.4,
-              child: Text(
-                'Currency',
-                style: TextStyle(
-                  color: secondaryTextColor,
-                ),
-              ),
-            ),
-            Text(
-              'Amount',
-              style: TextStyle(
-                color: secondaryTextColor,
-              ),
-            ),
-            Text(
-              'Status',
-              style: TextStyle(
-                color: secondaryTextColor,
-              ),
-            ),
-          ],
-        ),
-        Divider(
-          height: 0,
-        ),
-        SizedBox(
-          height: height * 0.63,
-          child: ListView.builder(
-            scrollDirection: Axis.vertical,
-            itemCount: _allNetworks.length,
-            itemBuilder: (BuildContext context, int index) {
-              return Container(
-                padding: EdgeInsets.only(top: 10, bottom: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(right: 10),
-                          child: CircleAvatar(
-                            radius: 15,
-                            child: Icon(Icons.person),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.only(right: 10),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('LYO/USDT'),
-                              Text(
-                                '${DateFormat('yyyy-mm-dd hh:mm:ss').format(DateTime.now())}',
-                                style: TextStyle(
-                                    color: secondaryTextColor, fontSize: 12),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      child: Text(
-                        '777.49',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      child: SizedBox(
-                        height: height * 0.035,
-                        width: width * 0.18,
-                        child: Card(
-                          shadowColor: Colors.transparent,
-                          color: greenPercentageIndicator,
-                          child: Center(
-                            child: Text(
-                              'Completed',
-                              style: TextStyle(
-                                color: greenIndicator,
-                                fontSize: 10,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
-      ],
     );
   }
 }

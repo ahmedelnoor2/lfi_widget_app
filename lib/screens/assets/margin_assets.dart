@@ -119,13 +119,27 @@ class _MarginAssetsState extends State<MarginAssets> {
                       ),
                     ],
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      toggleHideBalances();
-                    },
-                    child: _hideBalances
-                        ? Icon(Icons.visibility)
-                        : Icon(Icons.visibility_off),
+                  Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(right: 15),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pushNamed(
+                                context, '/margin_transactions');
+                          },
+                          child: Icon(Icons.history),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          toggleHideBalances();
+                        },
+                        child: _hideBalances
+                            ? Icon(Icons.visibility)
+                            : Icon(Icons.visibility_off),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -179,15 +193,18 @@ class _MarginAssetsState extends State<MarginAssets> {
                                   Text(
                                     '≈${_hideBalances ? _hideBalanceString : getNumberFormat(
                                         context,
-                                        public.rate[public.activeCurrency[
-                                                        'fiat_symbol']
-                                                    .toUpperCase()][asset
-                                                            .accountBalance[
-                                                        _totalBalanceSymbol] ??
-                                                    'BTC'] !=
+                                        public.rate[public.activeCurrency['fiat_symbol']
+                                                        .toUpperCase()][
+                                                    asset.accountBalance[
+                                                            _totalBalanceSymbol] ??
+                                                        'BTC'] !=
                                                 null
-                                            ? '${double.parse(asset.marginBalance['totalbalance'] ?? '0') * public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()][_totalBalanceSymbol]}'
-                                            : '0',
+                                            ? double.parse(asset.marginBalance['totalbalance'] ?? '0') *
+                                                public.rate[public.activeCurrency[
+                                                            'fiat_symbol']
+                                                        .toUpperCase()]
+                                                    [_totalBalanceSymbol]
+                                            : 0,
                                       )}',
                                     style: TextStyle(
                                       color: secondaryTextColor,
@@ -197,34 +214,34 @@ class _MarginAssetsState extends State<MarginAssets> {
                               ),
                             ],
                           ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Yesterday\'s PNL',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    '\$4.20',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: greenlightchartColor,
-                                    ),
-                                  ),
-                                  Text(
-                                    '/0.15%',
-                                    style: TextStyle(
-                                      color: greenlightchartColor,
-                                    ),
-                                  ),
-                                ],
-                              )
-                            ],
-                          )
+                          // Column(
+                          //   crossAxisAlignment: CrossAxisAlignment.start,
+                          //   children: [
+                          //     Text(
+                          //       'Yesterday\'s PNL',
+                          //       style: TextStyle(
+                          //         fontSize: 10,
+                          //       ),
+                          //     ),
+                          //     Row(
+                          //       children: [
+                          //         Text(
+                          //           '\$4.20',
+                          //           style: TextStyle(
+                          //             fontWeight: FontWeight.bold,
+                          //             color: greenlightchartColor,
+                          //           ),
+                          //         ),
+                          //         Text(
+                          //           '/0.15%',
+                          //           style: TextStyle(
+                          //             color: greenlightchartColor,
+                          //           ),
+                          //         ),
+                          //       ],
+                          //     )
+                          //   ],
+                          // )
                         ],
                       ),
                     ),
@@ -502,7 +519,9 @@ class _MarginAssetsState extends State<MarginAssets> {
                   SizedBox(
                     width: width * 0.28,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/transfer_assets');
+                      },
                       child: Text('Transfer'),
                     ),
                   ),

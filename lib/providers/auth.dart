@@ -129,6 +129,7 @@ class Auth with ChangeNotifier {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
+      print(responseData);
       if (responseData['code'] == 0) {
         if (responseData['data']['googleAuth'] == '1') {
           _googleAuth = true;
@@ -139,7 +140,7 @@ class Auth with ChangeNotifier {
         notifyListeners();
         return _loginVerificationToken;
       } else {
-        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
 
       return '';
@@ -174,12 +175,11 @@ class Auth with ChangeNotifier {
         await prefs.setString('authToken', _loginVerificationToken);
         snackAlert(ctx, SnackTypes.success, 'Email is successfully verified.');
       } else {
-        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
 
       return '${responseData['code']}';
     } catch (error) {
-      print(error);
       snackAlert(ctx, SnackTypes.errors, 'Server Error!');
       return '0';
       // throw error;

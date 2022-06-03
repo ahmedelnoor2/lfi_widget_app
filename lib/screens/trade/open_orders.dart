@@ -23,7 +23,7 @@ class _OpenOrdersState extends State<OpenOrders>
 
   @override
   void initState() {
-    // getOpenOrders();
+    getOpenOrders();
     super.initState();
   }
 
@@ -32,31 +32,49 @@ class _OpenOrdersState extends State<OpenOrders>
     super.dispose();
   }
 
-  // Future<void> getOpenOrders() async {
-  //   var trading = Provider.of<Trading>(context, listen: false);
-  //   var auth = Provider.of<Auth>(context, listen: false);
+  String getOrderType(orderType) {
+    return '$orderType' == '1' ? 'Limit' : 'Market';
+  }
 
-  //   if (auth.userInfo.isNotEmpty) {
-  //     await trading.getOrders(context, auth, {
-  //       "entrust": 1,
-  //       "isShowCanceled": 0,
-  //       "orderType": 1,
-  //       "page": 1,
-  //       "pageSize": 10,
-  //       "symbol": "",
-  //     });
-  //   }
-  // }
+  Future<void> getOpenOrders() async {
+    var trading = Provider.of<Trading>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
 
-  void cancelAllOrders() {
+    if (auth.userInfo.isNotEmpty) {
+      await trading.getOpenOrders(context, auth, {
+        "entrust": 1,
+        "isShowCanceled": 0,
+        "orderType": 1,
+        "page": 1,
+        "pageSize": 10,
+        "symbol": "",
+      });
+    }
+  }
+
+  Future<void> cancelOrder(formData) async {
     var trading = Provider.of<Trading>(context, listen: false);
 
     var auth = Provider.of<Auth>(context, listen: false);
 
-    trading.cancellAllOrders(context, auth, {
+    await trading.cancelOrder(
+      context,
+      auth,
+      formData,
+    );
+    getOpenOrders();
+  }
+
+  Future<void> cancelAllOrders() async {
+    var trading = Provider.of<Trading>(context, listen: false);
+
+    var auth = Provider.of<Auth>(context, listen: false);
+
+    await trading.cancellAllOrders(context, auth, {
       "orderType": "1",
       "symbol": "",
     });
+    getOpenOrders();
   }
 
   @override
@@ -140,7 +158,7 @@ class _OpenOrdersState extends State<OpenOrders>
                                 ),
                                 InkWell(
                                   onTap: () {
-                                    // cancelAllOrders();
+                                    cancelAllOrders();
                                   },
                                   child: Container(
                                     padding: EdgeInsets.only(
@@ -169,7 +187,8 @@ class _OpenOrdersState extends State<OpenOrders>
                           Divider(height: 0),
                           (trading.openOrders.length <= 0)
                               ? noData()
-                              : openOrderList(context, trading.openOrders),
+                              : openOrderList(
+                                  context, trading.openOrders, trading, auth),
                         ],
                       ),
               ),
@@ -206,7 +225,7 @@ class _OpenOrdersState extends State<OpenOrders>
     );
   }
 
-  Widget openOrderList(context, openOrders) {
+  Widget openOrderList(context, openOrders, trading, auth) {
     return Container(
       padding: EdgeInsets.all(15),
       child: ListView.builder(
@@ -215,6 +234,10 @@ class _OpenOrdersState extends State<OpenOrders>
         padding: EdgeInsets.zero,
         itemCount: openOrders.length,
         itemBuilder: (BuildContext context, int index) {
+          var openOrder = openOrders[index];
+          double filledVolume = double.parse(openOrder['volume']) -
+              double.parse(openOrder['remain_volume']);
+          var orderFilled = filledVolume * 100;
           return Column(
             children: [
               Row(
@@ -229,10 +252,12 @@ class _OpenOrdersState extends State<OpenOrders>
                             Container(
                               padding: EdgeInsets.only(bottom: 4),
                               child: Text(
-                                'Limit/Buy',
+                                '${getOrderType(openOrder['type'])}/${openOrder['side']}',
                                 style: TextStyle(
                                   fontSize: 10,
-                                  color: greenIndicator,
+                                  color: openOrder['side'] == 'BUY'
+                                      ? greenIndicator
+                                      : redIndicator,
                                 ),
                               ),
                             ),
@@ -251,7 +276,7 @@ class _OpenOrdersState extends State<OpenOrders>
                                   ),
                                   child: Center(
                                     child: Text(
-                                      '50%',
+                                      '$orderFilled%',
                                       style: TextStyle(fontSize: 10),
                                     ),
                                   ),
@@ -260,7 +285,7 @@ class _OpenOrdersState extends State<OpenOrders>
                                   padding: EdgeInsets.only(left: 20, top: 20),
                                   child: SemiCircleWidget(
                                     diameter: 0,
-                                    sweepAngle: (100.0).clamp(0.0, 80.0),
+                                    sweepAngle: (100.0).clamp(0.0, orderFilled),
                                     color: greenIndicator,
                                   ),
                                 ),
@@ -276,7 +301,7 @@ class _OpenOrdersState extends State<OpenOrders>
                               Container(
                                 padding: EdgeInsets.only(bottom: 5),
                                 child: Text(
-                                  'LYO/USDT',
+                                  '${openOrder['symbol']}',
                                   style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
@@ -323,13 +348,13 @@ class _OpenOrdersState extends State<OpenOrders>
                                           child: Row(
                                             children: [
                                               Text(
-                                                '0.00 / ',
+                                                '${double.parse(openOrder['remain_volume']).toStringAsPrecision(6)} / ',
                                                 style: TextStyle(
                                                   fontSize: 11,
                                                 ),
                                               ),
                                               Text(
-                                                '7589494',
+                                                '${double.parse(openOrder['volume']).toStringAsPrecision(6)}',
                                                 style: TextStyle(
                                                   fontSize: 11,
                                                   color: secondaryTextColor,
@@ -341,7 +366,7 @@ class _OpenOrdersState extends State<OpenOrders>
                                         Container(
                                           padding: EdgeInsets.only(right: 20),
                                           child: Text(
-                                            '45,687.67',
+                                            '${double.parse(openOrder['price']).toStringAsPrecision(6)}',
                                             style: TextStyle(
                                               fontSize: 11,
                                             ),
@@ -365,7 +390,7 @@ class _OpenOrdersState extends State<OpenOrders>
                         Container(
                           padding: EdgeInsets.only(bottom: 5),
                           child: Text(
-                            '${DateFormat('yyy-mm-dd hh:mm:ss').format(DateTime.now())}',
+                            '${DateFormat('yyy-mm-dd hh:mm:ss').format(DateTime.parse('${openOrder['created_at']}'))}',
                             style: TextStyle(
                               fontSize: 11,
                               color: secondaryTextColor,
@@ -375,6 +400,10 @@ class _OpenOrdersState extends State<OpenOrders>
                         InkWell(
                           onTap: () {
                             // cancelAllOrders();
+                            cancelOrder({
+                              "orderId": openOrder['id'],
+                              "symbol": openOrder['symbol'].toLowerCase(),
+                            });
                           },
                           child: Container(
                             padding: EdgeInsets.only(

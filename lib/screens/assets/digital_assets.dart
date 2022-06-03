@@ -125,13 +125,26 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                       ),
                     ],
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      toggleHideBalances();
-                    },
-                    child: _hideBalances
-                        ? Icon(Icons.visibility)
-                        : Icon(Icons.visibility_off),
+                  Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(right: 15),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/transactions');
+                          },
+                          child: Icon(Icons.history),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          toggleHideBalances();
+                        },
+                        child: _hideBalances
+                            ? Icon(Icons.visibility)
+                            : Icon(Icons.visibility_off),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -185,15 +198,17 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                                   Text(
                                     '≈${_hideBalances ? _hideBalanceString : getNumberFormat(
                                         context,
-                                        public.rate[public.activeCurrency[
-                                                        'fiat_symbol']
+                                        public.rate[public.activeCurrency['fiat_symbol']
                                                     .toUpperCase()][asset
                                                             .accountBalance[
                                                         _totalBalanceSymbol] ??
                                                     'BTC'] !=
                                                 null
-                                            ? '${double.parse(asset.totalAccountBalance['totalbalance'] ?? '0') * public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()][_totalBalanceSymbol]}'
-                                            : '0',
+                                            ? double.parse(asset.totalAccountBalance['totalbalance'] ?? '0') *
+                                                public.rate[public
+                                                    .activeCurrency['fiat_symbol']
+                                                    .toUpperCase()][_totalBalanceSymbol]
+                                            : 0,
                                       )}',
                                     style: TextStyle(
                                       color: secondaryTextColor,
@@ -215,14 +230,21 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                               Row(
                                 children: [
                                   Text(
-                                    '\$4.20',
+                                    getNumberFormat(
+                                        context,
+                                        ((double.parse(
+                                                '${(asset.accountBalance['yesterdayProfit'] == '--' || asset.accountBalance['yesterdayProfit'] == null) ? 0.00 : asset.accountBalance['yesterdayProfit']}')) *
+                                            public.rate[public.activeCurrency[
+                                                        'fiat_symbol']
+                                                    .toUpperCase()]
+                                                [_totalBalanceSymbol])),
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: greenlightchartColor,
                                     ),
                                   ),
                                   Text(
-                                    '/0.15%',
+                                    '/${asset.accountBalance.isNotEmpty ? getNumberString(context, double.parse(asset.accountBalance['yesterdayProfitRate'] == '--' ? '0' : asset.accountBalance['yesterdayProfitRate'])) : '0'}%',
                                     style: TextStyle(
                                       color: greenlightchartColor,
                                     ),
@@ -230,7 +252,7 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                                 ],
                               )
                             ],
-                          )
+                          ),
                         ],
                       ),
                     ),
@@ -469,8 +491,13 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                                                                 [asset[
                                                                     'coin']] !=
                                                             null
-                                                        ? '${(double.parse(asset['values']['total_balance'])) * public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()][asset['coin']]}'
-                                                        : '0',
+                                                        ? (double.parse(asset['values']['total_balance'])) *
+                                                            public.rate[public
+                                                                    .activeCurrency[
+                                                                        'fiat_symbol']
+                                                                    .toUpperCase()]
+                                                                [asset['coin']]
+                                                        : 0,
                                                   ),
                                             style: TextStyle(
                                               fontSize: 12,

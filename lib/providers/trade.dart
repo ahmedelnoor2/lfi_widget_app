@@ -13,12 +13,22 @@ class Trading with ChangeNotifier {
   };
 
   List _openOrders = [];
+  List _orderHistory = [];
+  List _transactionHistory = [];
 
   List get openOrders {
     return _openOrders;
   }
 
-  Future<void> getOrders(ctx, auth, formData) async {
+  List get orderHistory {
+    return _orderHistory;
+  }
+
+  List get transactionHistory {
+    return _transactionHistory;
+  }
+
+  Future<void> getOpenOrders(ctx, auth, formData) async {
     /**
      * params:
       "entrust": 1,
@@ -46,11 +56,96 @@ class Trading with ChangeNotifier {
 
       final responseData = json.decode(response.body);
 
-      if (responseData['code'] == '0') {
+      if (responseData['code'] == 0) {
         _openOrders = responseData['data']['orders'];
         return notifyListeners();
       } else {
         _openOrders = [];
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return;
+    }
+  }
+
+  Future<void> getOrderHistory(ctx, auth, formData) async {
+    /**
+     * params:
+      "entrust": 2,
+      "isShowCanceled": 1,
+      "orderType": 1,
+      "page": 1,
+      "pageSize": 10,
+      "symbol": "",
+      "status": null,
+     */
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/order/entrust_search',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == 0) {
+        _orderHistory = responseData['data']['orders'];
+        return notifyListeners();
+      } else {
+        _orderHistory = [];
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return;
+    }
+  }
+
+  Future<void> getTransactionHistory(ctx, auth, formData) async {
+    /**
+     * params:
+      "endTime": "",
+      "orderType": "1",
+      "page": 1,
+      "pageSize": 10,
+      "startTime": "",
+      "symbol": "",
+     */
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/order/trade_info_search',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _transactionHistory = responseData['data']['list'];
+        return notifyListeners();
+      } else {
+        _transactionHistory = [];
         return notifyListeners();
       }
     } catch (error) {
@@ -88,7 +183,8 @@ class Trading with ChangeNotifier {
       final responseData = json.decode(response.body);
 
       if (responseData['code'] == '0') {
-        snackAlert(ctx, SnackTypes.success, getTranslate(responseData['msg']));
+        snackAlert(ctx, SnackTypes.success,
+            getTranslate('Order successfully created.'));
         return;
       } else {
         snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
@@ -131,6 +227,49 @@ class Trading with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         snackAlert(ctx, SnackTypes.success, getTranslate(responseData['msg']));
+        return;
+      } else {
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
+        return;
+      }
+    } catch (error) {
+      snackAlert(
+        ctx,
+        SnackTypes.errors,
+        'Error on cancelling orders, please try again',
+      );
+      return;
+      // throw error;
+    }
+  }
+
+  Future<void> cancelOrder(ctx, auth, formData) async {
+    /**
+     * params:
+      orderId: "34523454654645",
+      symbol: "btcusdt"
+    */
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/order/cancel',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        snackAlert(ctx, SnackTypes.success,
+            getTranslate('Order successfully cancelled'));
         return;
       } else {
         snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));

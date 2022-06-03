@@ -6,6 +6,7 @@ import 'package:lyotrade/screens/common/captcha.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:lyotrade/utils/Country.utils.dart';
+import 'package:flutter_aliyun_captcha/flutter_aliyun_captcha.dart';
 
 class Signup extends StatefulWidget {
   const Signup({
@@ -22,6 +23,8 @@ class Signup extends StatefulWidget {
 }
 
 class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
+  static final AliyunCaptchaController _captchaController =
+      AliyunCaptchaController();
   late final TabController _tabController =
       TabController(length: 2, vsync: this);
   bool _enableSignup = false;
@@ -72,7 +75,7 @@ class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          padding: EdgeInsets.only(bottom: width * 0.05),
+          padding: EdgeInsets.only(bottom: width * 0.02),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -81,16 +84,16 @@ class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
                 child: const Text(
                   'Sign Up',
                   style: TextStyle(
-                    fontSize: 25,
+                    fontSize: 32,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: Text(
-                  'Sign Up to get started',
-                  style: TextStyle(color: secondaryTextColor),
+              Text(
+                'Sign Up to get started',
+                style: TextStyle(
+                  color: secondaryTextColor,
+                  fontSize: 16,
                 ),
               ),
             ],
@@ -392,7 +395,7 @@ class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
                           'newPassword': _newPassword.text,
                           'invitedCode': _invitedCode.text,
                           'emailSignup': _emailSignup,
-                        });
+                        }, _captchaController);
                       } else {
                         widget.onRegister({
                           'countryCode': _currentCoutnry,
@@ -401,8 +404,10 @@ class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
                           'newPassword': _newPassword.text,
                           'invitedCode': _invitedCode.text,
                           'emailSignup': _emailSignup,
-                        });
+                        }, _captchaController);
                       }
+                    } else {
+                      _captchaController.reset();
                     }
                   }
                 : null,

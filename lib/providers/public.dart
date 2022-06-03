@@ -39,6 +39,8 @@ class Public with ChangeNotifier {
   String _amountField = '';
   bool _amountFieldUpdate = false;
 
+  Map _listingSymbol = {};
+
   Map get rate {
     return _rate;
   }
@@ -103,6 +105,10 @@ class Public with ChangeNotifier {
     return _klineData;
   }
 
+  Map get listingSymbol {
+    return _listingSymbol;
+  }
+
   Future<void> setAmountField(value) async {
     _amountField = '$value';
     _amountFieldUpdate = true;
@@ -154,6 +160,11 @@ class Public with ChangeNotifier {
 
   Future<void> setAllSearchMarket(allSearchmarket) async {
     _allSearchMarket = allSearchMarket;
+    return notifyListeners();
+  }
+
+  Future<void> setListingSymbol(listingSymbol) async {
+    _listingSymbol = listingSymbol;
     return notifyListeners();
   }
 

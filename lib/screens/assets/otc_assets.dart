@@ -106,13 +106,26 @@ class _OtcAssetsState extends State<OtcAssets> {
                       ),
                     ],
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      toggleHideBalances();
-                    },
-                    child: _hideBalances
-                        ? Icon(Icons.visibility)
-                        : Icon(Icons.visibility_off),
+                  Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(right: 15),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/p2p_transactions');
+                          },
+                          child: Icon(Icons.history),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          toggleHideBalances();
+                        },
+                        child: _hideBalances
+                            ? Icon(Icons.visibility)
+                            : Icon(Icons.visibility_off),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -166,15 +179,19 @@ class _OtcAssetsState extends State<OtcAssets> {
                                   Text(
                                     '≈${_hideBalances ? _hideBalanceString : getNumberFormat(
                                         context,
-                                        public.rate[public.activeCurrency[
-                                                        'fiat_symbol']
-                                                    .toUpperCase()][asset
-                                                            .p2pBalance[
-                                                        _totalBalanceSymbol] ??
-                                                    'BTC'] !=
+                                        public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()]
+                                                    [
+                                                    asset.p2pBalance[_totalBalanceSymbol] ??
+                                                        'BTC'] !=
                                                 null
-                                            ? '${double.parse(asset.totalAccountBalance['totalbalance'] ?? '0') * public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()][_totalBalanceSymbol]}'
-                                            : '0',
+                                            ? double.parse(
+                                                    asset.totalAccountBalance[
+                                                            'totalbalance'] ??
+                                                        '0') *
+                                                public.rate[public
+                                                    .activeCurrency['fiat_symbol']
+                                                    .toUpperCase()][_totalBalanceSymbol]
+                                            : 0,
                                       )}',
                                     style: TextStyle(
                                       color: secondaryTextColor,
@@ -184,34 +201,34 @@ class _OtcAssetsState extends State<OtcAssets> {
                               ),
                             ],
                           ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Yesterday\'s PNL',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    '\$4.20',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: greenlightchartColor,
-                                    ),
-                                  ),
-                                  Text(
-                                    '/0.15%',
-                                    style: TextStyle(
-                                      color: greenlightchartColor,
-                                    ),
-                                  ),
-                                ],
-                              )
-                            ],
-                          )
+                          // Column(
+                          //   crossAxisAlignment: CrossAxisAlignment.start,
+                          //   children: [
+                          //     Text(
+                          //       'Yesterday\'s PNL',
+                          //       style: TextStyle(
+                          //         fontSize: 10,
+                          //       ),
+                          //     ),
+                          //     Row(
+                          //       children: [
+                          //         Text(
+                          //           '\$4.20',
+                          //           style: TextStyle(
+                          //             fontWeight: FontWeight.bold,
+                          //             color: greenlightchartColor,
+                          //           ),
+                          //         ),
+                          //         Text(
+                          //           '/0.15%',
+                          //           style: TextStyle(
+                          //             color: greenlightchartColor,
+                          //           ),
+                          //         ),
+                          //       ],
+                          //     )
+                          //   ],
+                          // )
                         ],
                       ),
                     ),
@@ -430,7 +447,10 @@ class _OtcAssetsState extends State<OtcAssets> {
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       GestureDetector(
-                                        onTap: () {},
+                                        onTap: () {
+                                          Navigator.pushNamed(
+                                              context, '/transfer_assets');
+                                        },
                                         child: Text(
                                           'Transfer',
                                           style: TextStyle(

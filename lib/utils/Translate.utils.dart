@@ -8,6 +8,18 @@ String getTranslate(String text) {
       return 'Parameter error';
     case '可用余额不足':
       return 'Insufficient available balance';
+    case '谷歌校验码不正确':
+      return 'Google check code is incorrect';
+    case '用户不存在':
+      return 'User does not exist';
+    case '用户名或密码错误,您还有4次机会':
+      return 'Incorrect username or password, you have 4 more chances';
+    case '用户名或密码错误,您还有3次机会':
+      return 'Incorrect username or password, you have 3 more chances';
+    case '用户名或密码错误,您还有2次机会':
+      return 'Incorrect username or password, you have 2 more chances';
+    case '用户名或密码错误,您还有1次机会':
+      return 'Incorrect username or password, you have 1 more chances';
     default:
       return text;
   }

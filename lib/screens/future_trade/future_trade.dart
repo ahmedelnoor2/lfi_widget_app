@@ -16,7 +16,7 @@ class _FutureTradeState extends State<FutureTrade> {
     return Scaffold(
       appBar: appBar(context, null),
       body: const Center(
-        child: Text('100x Future Trades'),
+        child: Text('100x Future Trades coming soon...'),
       ),
       bottomNavigationBar: bottomNav(context),
     );

@@ -174,7 +174,7 @@ class _TradeFormState extends State<TradeForm> {
     var trading = Provider.of<Trading>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
 
-    await trading.getOrders(context, auth, {
+    await trading.getOpenOrders(context, auth, {
       "entrust": 1,
       "isShowCanceled": 0,
       "orderType": _orderType,

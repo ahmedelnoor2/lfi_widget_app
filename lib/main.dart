@@ -8,7 +8,10 @@ import 'package:lyotrade/screens/assets/assets.dart';
 import 'package:lyotrade/screens/assets/deposit_assets.dart';
 import 'package:lyotrade/screens/assets/digital_assets.dart';
 import 'package:lyotrade/screens/assets/margin_assets.dart';
+import 'package:lyotrade/screens/assets/margin_transactions.dart';
 import 'package:lyotrade/screens/assets/otc_assets.dart';
+import 'package:lyotrade/screens/assets/p2p_transactions.dart';
+import 'package:lyotrade/screens/assets/transaction_details.dart';
 import 'package:lyotrade/screens/assets/transactions.dart';
 import 'package:lyotrade/screens/assets/transfer_assets.dart';
 import 'package:lyotrade/screens/assets/withdraw_assets.dart';
@@ -184,6 +187,11 @@ class MyApp extends StatelessWidget {
               Market.routeName: (context) => const Market(),
               Trade.routeName: (context) => const Trade(),
               TradeHistory.routeName: (context) => const TradeHistory(),
+              TransactionDetails.routeName: (context) =>
+                  const TransactionDetails(),
+              P2pTransactions.routeName: (context) => const P2pTransactions(),
+              MarginTransactions.routeName: (context) =>
+                  const MarginTransactions(),
               FutureTrade.routeName: (context) => const FutureTrade(),
               Assets.routeName: (context) => const Assets(),
               DepositAssets.routeName: (context) => const DepositAssets(),

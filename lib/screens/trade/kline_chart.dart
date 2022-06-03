@@ -5,8 +5,10 @@ import 'dart:ui';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/screens/common/bottomnav.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/trade/common/header.dart';
+import 'package:lyotrade/screens/trade/common/market_drawer.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/Number.utils.dart';
@@ -24,6 +26,7 @@ class KlineChart extends StatefulWidget {
 
 class _KlineChartState extends State<KlineChart>
     with SingleTickerProviderStateMixin {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late final TabController _tabController = TabController(
     length: 2,
     vsync: this,
@@ -233,10 +236,24 @@ class _KlineChartState extends State<KlineChart>
     return;
   }
 
+  void updateMarket() {
+    if (_mchannel != null) {
+      _mchannel.sink.close();
+    }
+    setState(() {
+      candles = [];
+      _currentInterval = '30min';
+    });
+    connectWebSocket();
+    getKlineData();
+  }
+
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
+
+    var _currentRoute = ModalRoute.of(context)!.settings.name;
 
     var public = Provider.of<Public>(context, listen: true);
 
@@ -257,7 +274,13 @@ class _KlineChartState extends State<KlineChart>
         : 0;
 
     return Scaffold(
-      appBar: klineHeader(context),
+      key: _scaffoldKey,
+      drawer: MarketDrawer(
+        scaffoldKey: _scaffoldKey,
+        updateMarket: updateMarket,
+      ),
+      appBar:
+          klineHeader(context, _scaffoldKey, public.activeMarket['showName']),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -284,7 +307,9 @@ class _KlineChartState extends State<KlineChart>
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               Text(
-                                '${getNumberString(context, double.parse('${public.activeMarketTick['close']}'))}',
+                                public.activeMarketTick.isNotEmpty
+                                    ? '${getNumberString(context, double.parse('${public.activeMarketTick['close']}'))}'
+                                    : '0.00',
                                 style: TextStyle(
                                   fontSize: 25,
                                   color: _upDirection == false
@@ -301,16 +326,21 @@ class _KlineChartState extends State<KlineChart>
                                     style: TextStyle(fontSize: 12),
                                   ),
                                   Text(
-                                    ' ${(double.parse(public.activeMarketTick['rose']) * 100).toStringAsFixed(2)}%',
+                                    public.activeMarketTick.isNotEmpty
+                                        ? ' ${(double.parse(public.activeMarketTick['rose']) * 100).toStringAsFixed(2)}%'
+                                        : '--%',
                                     style: TextStyle(
                                         fontSize: 12,
-                                        color: double.parse(
-                                                    public.activeMarketTick[
-                                                            'rose'] ??
-                                                        '0') >
-                                                0
-                                            ? greenIndicator
-                                            : redIndicator),
+                                        color: public
+                                                .activeMarketTick.isNotEmpty
+                                            ? double.parse(
+                                                        public.activeMarketTick[
+                                                                'rose'] ??
+                                                            '0') >
+                                                    0
+                                                ? greenIndicator
+                                                : redIndicator
+                                            : secondaryTextColor),
                                   ),
                                 ],
                               )
@@ -342,7 +372,9 @@ class _KlineChartState extends State<KlineChart>
                                           ),
                                         ),
                                         Text(
-                                          '${getNumberString(context, double.parse('${public.activeMarketTick['high']}'))}',
+                                          public.activeMarketTick.isNotEmpty
+                                              ? '${getNumberString(context, double.parse('${public.activeMarketTick['high']}'))}'
+                                              : '0.00',
                                           style: TextStyle(
                                             fontSize: 10,
                                           ),
@@ -366,7 +398,9 @@ class _KlineChartState extends State<KlineChart>
                                             ),
                                           ),
                                           Text(
-                                            '${getNumberString(context, double.parse('${public.activeMarketTick['vol']}'))}',
+                                            public.activeMarketTick.isNotEmpty
+                                                ? '${getNumberString(context, double.parse('${public.activeMarketTick['vol']}'))}'
+                                                : '0.00',
                                             style: TextStyle(
                                               fontSize: 10,
                                             ),
@@ -396,7 +430,9 @@ class _KlineChartState extends State<KlineChart>
                                           ),
                                         ),
                                         Text(
-                                          '${getNumberString(context, double.parse('${public.activeMarketTick['low']}'))}',
+                                          public.activeMarketTick.isNotEmpty
+                                              ? '${getNumberString(context, double.parse('${public.activeMarketTick['low']}'))}'
+                                              : '0.00',
                                           style: TextStyle(
                                             fontSize: 10,
                                           ),
@@ -420,7 +456,9 @@ class _KlineChartState extends State<KlineChart>
                                             ),
                                           ),
                                           Text(
-                                            '${getNumberString(context, double.parse('${public.activeMarketTick['amount']}'))}',
+                                            public.activeMarketTick.isNotEmpty
+                                                ? '${getNumberString(context, double.parse('${public.activeMarketTick['amount']}'))}'
+                                                : '0.00',
                                             style: TextStyle(
                                               fontSize: 10,
                                             ),
@@ -852,6 +890,8 @@ class _KlineChartState extends State<KlineChart>
           ],
         ),
       ),
+      bottomNavigationBar:
+          _currentRoute == '/market' ? bottomNav(context) : null,
     );
   }
 }

@@ -15,7 +15,6 @@ import 'package:lyotrade/screens/dashboard/latest_listing.dart';
 import 'package:lyotrade/screens/dashboard/live_feed.dart';
 import 'package:lyotrade/screens/dashboard/search_bar.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
-import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -123,6 +122,7 @@ class _DashboardState extends State<Dashboard> {
     for (int i = 0; i < public.headerSymbols.length; i++) {
       String marketCoin =
           public.headerSymbols[i]['market'].split('/').join("").toLowerCase();
+
       _channel.sink.add(jsonEncode({
         "event": "sub",
         "params": {
@@ -144,6 +144,9 @@ class _DashboardState extends State<Dashboard> {
       if (json.decode(data)['channel'] != null) {
         var marketData = json.decode(data);
         for (int i = 0; i < public.headerSymbols.length; i++) {
+          if (public.headerSymbols[i]['coin'] == 'LYO1') {
+            public.setListingSymbol(public.headerSymbols[i]);
+          }
           if (marketData['channel'].contains(RegExp(
               "${public.headerSymbols[i]['coin']}",
               caseSensitive: false))) {

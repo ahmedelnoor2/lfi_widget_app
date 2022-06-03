@@ -157,6 +157,9 @@ class _TransferAssetsState extends State<TransferAssets> {
 
   @override
   Widget build(BuildContext context) {
+    height = MediaQuery.of(context).size.height;
+    width = MediaQuery.of(context).size.width;
+
     var public = Provider.of<Public>(context, listen: true);
     var asset = Provider.of<Asset>(context, listen: true);
 

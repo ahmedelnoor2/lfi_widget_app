@@ -17,7 +17,7 @@ appHeader(context, tabController) {
   );
 }
 
-klineHeader(context) {
+klineHeader(context, scaffoldKey, market) {
   return AppBar(
     shadowColor: Colors.transparent,
     // toolbarHeight: 1,
@@ -31,13 +31,16 @@ klineHeader(context) {
           );
         },
         icon: Icon(Icons.chevron_left)),
-    title: Container(
+    title: InkWell(
+      onTap: () {
+        scaffoldKey!.currentState.openDrawer();
+      },
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.swap_horiz),
           Text(
-            'BTC/USDT',
+            '$market',
             style: TextStyle(
               fontSize: 18,
               fontStyle: FontStyle.normal,

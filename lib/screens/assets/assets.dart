@@ -68,13 +68,13 @@ class _AssetsState extends State<Assets> {
         'icon': 'digital.png',
         'name': 'Digital Account',
         'path': '/digital_assets',
-        'balance': asset.totalAccountBalance['balance'] ?? '0'
+        'balance': asset.totalAccountBalance['balance'] ?? '0',
       },
       {
         'icon': 'p2p.png',
         'name': 'P2P Account',
         'path': '/p2p_assets',
-        'balance': asset.totalAccountBalance['c2cBalance'] ?? '0'
+        'balance': asset.totalAccountBalance['c2cBalance'] ?? '0',
       },
       {
         'icon': 'margin.png',
@@ -164,7 +164,7 @@ class _AssetsState extends State<Assets> {
                                       fontSize: 16,
                                     ),
                                   ),
-                                  GestureDetector(
+                                  InkWell(
                                     onTap: () {
                                       toggleHideBalances();
                                     },
@@ -237,8 +237,14 @@ class _AssetsState extends State<Assets> {
                                                                     [
                                                                     _totalBalanceSymbol] !=
                                                                 null
-                                                            ? '${double.parse(asset.totalAccountBalance['totalbalance'] ?? '0') * public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()][_totalBalanceSymbol]}'
-                                                            : '0',
+                                                            ? double.parse(
+                                                                    asset.totalAccountBalance['totalbalance'] ??
+                                                                        '0') *
+                                                                public.rate[public
+                                                                    .activeCurrency[
+                                                                        'fiat_symbol']
+                                                                    .toUpperCase()][_totalBalanceSymbol]
+                                                            : 0,
                                                       )}',
                                                     style: TextStyle(
                                                       color: secondaryTextColor,
@@ -261,7 +267,16 @@ class _AssetsState extends State<Assets> {
                                               Row(
                                                 children: [
                                                   Text(
-                                                    '\$4.20',
+                                                    getNumberFormat(
+                                                        context,
+                                                        ((double.parse(
+                                                                '${(asset.accountBalance['yesterdayProfit'] == '--' || asset.accountBalance['yesterdayProfit'] == null) ? 0.00 : asset.accountBalance['yesterdayProfit']}')) *
+                                                            public.rate[public
+                                                                    .activeCurrency[
+                                                                        'fiat_symbol']
+                                                                    .toUpperCase()]
+                                                                [
+                                                                _totalBalanceSymbol])),
                                                     style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold,
@@ -270,7 +285,7 @@ class _AssetsState extends State<Assets> {
                                                     ),
                                                   ),
                                                   Text(
-                                                    '/0.15%',
+                                                    '/${asset.accountBalance.isNotEmpty ? getNumberString(context, double.parse(asset.accountBalance['yesterdayProfitRate'] == '--' ? '0' : asset.accountBalance['yesterdayProfitRate'])) : '0'}%',
                                                     style: TextStyle(
                                                       color:
                                                           greenlightchartColor,
@@ -279,7 +294,7 @@ class _AssetsState extends State<Assets> {
                                                 ],
                                               )
                                             ],
-                                          )
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -310,7 +325,7 @@ class _AssetsState extends State<Assets> {
                               padding: EdgeInsets.zero,
                               itemCount: _accounts.length,
                               itemBuilder: (BuildContext context, int index) {
-                                return GestureDetector(
+                                return InkWell(
                                   onTap: () {
                                     if (_accounts[index]['path'] ==
                                         '/staking') {
@@ -358,15 +373,19 @@ class _AssetsState extends State<Assets> {
                                               Text(
                                                 '=${_hideBalances ? _hideBalanceString : getNumberFormat(
                                                     context,
-                                                    public.rate[public
+                                                    public.rate[public.activeCurrency['fiat_symbol']
+                                                                    .toUpperCase()][
+                                                                _totalBalanceSymbol] !=
+                                                            null
+                                                        ? double.parse(_accounts[index][
+                                                                    'balance'] ??
+                                                                '0') *
+                                                            public.rate[public
                                                                     .activeCurrency[
                                                                         'fiat_symbol']
                                                                     .toUpperCase()]
-                                                                [
-                                                                _totalBalanceSymbol] !=
-                                                            null
-                                                        ? '${double.parse(_accounts[index]['balance'] ?? '0') * public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()][_totalBalanceSymbol]}'
-                                                        : '0',
+                                                                [_totalBalanceSymbol]
+                                                        : 0,
                                                   )}',
                                                 style: TextStyle(
                                                   fontSize: 12,

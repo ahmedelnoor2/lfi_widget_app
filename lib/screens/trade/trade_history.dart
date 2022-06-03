@@ -1,9 +1,13 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/screens/common/header.dart';
+import 'package:lyotrade/screens/common/no_data.dart';
 import 'package:lyotrade/screens/trade/common/percentage_indicator.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:provider/provider.dart';
 
 class TradeHistory extends StatefulWidget {
   static const routeName = '/trade_history';
@@ -19,7 +23,58 @@ class _TradeHistoryState extends State<TradeHistory>
       TabController(length: 3, vsync: this);
 
   @override
+  void initState() {
+    getOpenOrders();
+    getOrderHistory();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  String getOrderType(orderType) {
+    return '$orderType' == '1' ? 'Limit' : 'Market';
+  }
+
+  Future<void> getOpenOrders() async {
+    var trading = Provider.of<Trading>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
+
+    if (auth.userInfo.isNotEmpty) {
+      await trading.getOpenOrders(context, auth, {
+        "entrust": 1,
+        "isShowCanceled": 0,
+        "orderType": 1,
+        "page": 1,
+        "pageSize": 10,
+        "symbol": "",
+      });
+    }
+  }
+
+  Future<void> getOrderHistory() async {
+    var trading = Provider.of<Trading>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
+
+    if (auth.userInfo.isNotEmpty) {
+      await trading.getOrderHistory(context, auth, {
+        "entrust": 2,
+        "isShowCanceled": 1,
+        "orderType": 1,
+        "page": 1,
+        "pageSize": 10,
+        "symbol": "",
+        "status": null,
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    var trading = Provider.of<Trading>(context, listen: false);
+
     return Scaffold(
       appBar: hiddenAppBar(),
       body: Container(
@@ -67,9 +122,15 @@ class _TradeHistoryState extends State<TradeHistory>
               child: TabBarView(
                 controller: _tabTradeHistoryController,
                 children: [
-                  openOrders(),
-                  orderHistory(),
-                  tradeHistory(),
+                  trading.openOrders.isEmpty
+                      ? noData()
+                      : openOrders(trading.openOrders),
+                  trading.orderHistory.isEmpty
+                      ? noData()
+                      : orderHistory(trading.orderHistory),
+                  trading.transactionHistory.isEmpty
+                      ? noData()
+                      : tradeHistory(trading.transactionHistory),
                 ],
               ),
             ),
@@ -79,13 +140,16 @@ class _TradeHistoryState extends State<TradeHistory>
     );
   }
 
-  Widget openOrders() {
+  Widget openOrders(openOrders) {
     return Container(
       padding: EdgeInsets.all(9),
       child: ListView.builder(
-        itemCount: [greenIndicator, redIndicator].length,
+        itemCount: openOrders.length,
         itemBuilder: (BuildContext context, int index) {
-          var item = [greenIndicator, redIndicator][index];
+          var openOrder = openOrders[index];
+          double filledVolume = double.parse(openOrder['volume']) -
+              double.parse(openOrder['remain_volume']);
+          var orderFilled = filledVolume * 100;
           return Column(
             children: [
               Row(
@@ -100,10 +164,12 @@ class _TradeHistoryState extends State<TradeHistory>
                             Container(
                               padding: EdgeInsets.only(bottom: 4),
                               child: Text(
-                                'Limit/${item == greenIndicator ? 'Buy' : 'Sell'}',
+                                '${getOrderType(openOrder['type'])}/${openOrder['side']}',
                                 style: TextStyle(
                                   fontSize: 10,
-                                  color: item,
+                                  color: openOrder['side'] == 'BUY'
+                                      ? greenIndicator
+                                      : redIndicator,
                                 ),
                               ),
                             ),
@@ -122,7 +188,7 @@ class _TradeHistoryState extends State<TradeHistory>
                                   ),
                                   child: Center(
                                     child: Text(
-                                      '50%',
+                                      '$orderFilled%',
                                       style: TextStyle(fontSize: 10),
                                     ),
                                   ),
@@ -131,8 +197,10 @@ class _TradeHistoryState extends State<TradeHistory>
                                   padding: EdgeInsets.only(left: 20, top: 20),
                                   child: SemiCircleWidget(
                                     diameter: 0,
-                                    sweepAngle: (100.0).clamp(0.0, 80.0),
-                                    color: item,
+                                    sweepAngle: (100.0).clamp(0.0, orderFilled),
+                                    color: openOrder['side'] == 'BUY'
+                                        ? greenIndicator
+                                        : redIndicator,
                                   ),
                                 ),
                               ],
@@ -147,7 +215,7 @@ class _TradeHistoryState extends State<TradeHistory>
                               Container(
                                 padding: EdgeInsets.only(bottom: 5),
                                 child: Text(
-                                  'LYO/USDT',
+                                  '${openOrder['symbol']}',
                                   style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
@@ -194,13 +262,13 @@ class _TradeHistoryState extends State<TradeHistory>
                                           child: Row(
                                             children: [
                                               Text(
-                                                '0.00 / ',
+                                                '${double.parse(openOrder['remain_volume']).toStringAsPrecision(6)} / ',
                                                 style: TextStyle(
                                                   fontSize: 11,
                                                 ),
                                               ),
                                               Text(
-                                                '7589494',
+                                                '${double.parse(openOrder['volume']).toStringAsPrecision(6)}',
                                                 style: TextStyle(
                                                   fontSize: 11,
                                                   color: secondaryTextColor,
@@ -212,7 +280,7 @@ class _TradeHistoryState extends State<TradeHistory>
                                         Container(
                                           padding: EdgeInsets.only(right: 20),
                                           child: Text(
-                                            '45,687.67',
+                                            '${double.parse(openOrder['price']).toStringAsPrecision(6)}',
                                             style: TextStyle(
                                               fontSize: 11,
                                             ),
@@ -236,7 +304,7 @@ class _TradeHistoryState extends State<TradeHistory>
                         Container(
                           padding: EdgeInsets.only(bottom: 5),
                           child: Text(
-                            '${DateFormat('yyy-mm-dd hh:mm:ss').format(DateTime.now())}',
+                            '${DateFormat('yyy-mm-dd hh:mm:ss').format(DateTime.parse(openOrder['created_at']))}',
                             style: TextStyle(
                               fontSize: 11,
                               color: secondaryTextColor,
@@ -281,12 +349,13 @@ class _TradeHistoryState extends State<TradeHistory>
     );
   }
 
-  Widget orderHistory() {
+  Widget orderHistory(orderHistories) {
     return Container(
       padding: EdgeInsets.all(9),
       child: ListView.builder(
-        itemCount: [1, 2].length,
+        itemCount: orderHistories.length,
         itemBuilder: (BuildContext context, int index) {
+          var orderHistory = orderHistories[index];
           return Column(
             children: [
               Row(
@@ -307,7 +376,7 @@ class _TradeHistoryState extends State<TradeHistory>
                                     padding:
                                         EdgeInsets.only(bottom: 5, right: 5),
                                     child: Text(
-                                      'LYO/USDT',
+                                      '${orderHistory['symbol']}',
                                       style: TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w600,
@@ -317,7 +386,7 @@ class _TradeHistoryState extends State<TradeHistory>
                                   Container(
                                     padding: EdgeInsets.only(bottom: 4),
                                     child: Text(
-                                      'Limit/Buy',
+                                      '${getOrderType(orderHistory['type'])}/${orderHistory['side']}',
                                       style: TextStyle(
                                         fontSize: 10,
                                         color: greenIndicator,
@@ -366,13 +435,15 @@ class _TradeHistoryState extends State<TradeHistory>
                                           child: Row(
                                             children: [
                                               Text(
-                                                '0.00 / ',
+                                                '${double.parse(orderHistory['remain_volume']).toStringAsPrecision(4)} / ',
                                                 style: TextStyle(
                                                   fontSize: 11,
                                                 ),
                                               ),
                                               Text(
-                                                '7589494',
+                                                double.parse(
+                                                        orderHistory['volume'])
+                                                    .toStringAsPrecision(4),
                                                 style: TextStyle(
                                                   fontSize: 11,
                                                   color: secondaryTextColor,
@@ -384,7 +455,7 @@ class _TradeHistoryState extends State<TradeHistory>
                                         Container(
                                           padding: EdgeInsets.only(right: 20),
                                           child: Text(
-                                            '45,687.67',
+                                            '${double.parse(orderHistory['price'])}',
                                             style: TextStyle(
                                               fontSize: 11,
                                             ),
@@ -408,7 +479,7 @@ class _TradeHistoryState extends State<TradeHistory>
                         Container(
                           padding: EdgeInsets.only(bottom: 5),
                           child: Text(
-                            '${DateFormat('yyy-mm-dd hh:mm:ss').format(DateTime.now())}',
+                            '${DateFormat('yyy-mm-dd hh:mm:ss').format(DateTime.parse(orderHistory['created_at']))}',
                             style: TextStyle(
                               fontSize: 11,
                               color: secondaryTextColor,
@@ -426,16 +497,21 @@ class _TradeHistoryState extends State<TradeHistory>
                               border: Border.all(
                                 color: Color(0xff292C51),
                               ),
-                              color: Color(0xff292C51),
+                              color: orderHistory['status_text'] == 'Filled'
+                                  ? greenPercentageIndicator
+                                  : Color(0xff292C51),
                               borderRadius: BorderRadius.all(
                                 Radius.circular(2),
                               ),
                             ),
                             child: Text(
-                              'Cancel',
+                              '${orderHistory['status_text']}',
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
+                                color: orderHistory['status_text'] == 'Filled'
+                                    ? greenIndicator
+                                    : Colors.white,
                               ),
                             ),
                           ),
@@ -453,12 +529,13 @@ class _TradeHistoryState extends State<TradeHistory>
     );
   }
 
-  Widget tradeHistory() {
+  Widget tradeHistory(transactionHistories) {
     return Container(
       padding: EdgeInsets.all(9),
       child: ListView.builder(
-        itemCount: [1, 2].length,
+        itemCount: transactionHistories.length,
         itemBuilder: (BuildContext context, int index) {
+          var tradeHistory = transactionHistories[index];
           return Column(
             children: [
               Row(
@@ -479,7 +556,7 @@ class _TradeHistoryState extends State<TradeHistory>
                                     padding:
                                         EdgeInsets.only(bottom: 5, right: 5),
                                     child: Text(
-                                      'LYO/USDT',
+                                      '${tradeHistory['symbol']}',
                                       style: TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w600,
@@ -489,7 +566,7 @@ class _TradeHistoryState extends State<TradeHistory>
                                   Container(
                                     padding: EdgeInsets.only(bottom: 4),
                                     child: Text(
-                                      'Limit/Buy',
+                                      '${getOrderType(tradeHistory['orderType'])}/${tradeHistory['side']}',
                                       style: TextStyle(
                                         fontSize: 10,
                                         color: greenIndicator,
@@ -542,7 +619,7 @@ class _TradeHistoryState extends State<TradeHistory>
                         Container(
                           padding: EdgeInsets.only(bottom: 5),
                           child: Text(
-                            '${DateFormat('yyy-mm-dd hh:mm:ss').format(DateTime.now())}',
+                            '${DateFormat('yyy-mm-dd hh:mm:ss').format(DateTime.fromMillisecondsSinceEpoch(tradeHistory['ctime']))}',
                             style: TextStyle(
                               fontSize: 11,
                               color: secondaryTextColor,
@@ -554,16 +631,9 @@ class _TradeHistoryState extends State<TradeHistory>
                           child: Row(
                             children: [
                               Text(
-                                '0.00 / ',
+                                '${tradeHistory['tradeVolume']}',
                                 style: TextStyle(
                                   fontSize: 12,
-                                ),
-                              ),
-                              Text(
-                                '7589494',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: secondaryTextColor,
                                 ),
                               ),
                             ],
@@ -572,7 +642,7 @@ class _TradeHistoryState extends State<TradeHistory>
                         Container(
                           // padding: EdgeInsets.only(right: 20),
                           child: Text(
-                            '45,687.67',
+                            '${tradeHistory['tradePrice']}',
                             style: TextStyle(
                               fontSize: 12,
                             ),

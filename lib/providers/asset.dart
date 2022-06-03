@@ -16,6 +16,13 @@ class Asset with ChangeNotifier {
   Map _changeAddress = {};
   List _digitialAss = [];
   List _allDigAsset = [];
+  List _depositLists = [];
+  List _withdrawLists = [];
+  List _p2pLists = [];
+  List _marginLoanLists = [];
+  List _marginHistoryLists = [];
+  List _marginTransferLists = [];
+  List _financialRecords = [];
   bool _hideBalances = false;
   final String _hideBalanceString = '******';
 
@@ -63,6 +70,34 @@ class Asset with ChangeNotifier {
 
   String get hideBalanceString {
     return _hideBalanceString;
+  }
+
+  List get depositLists {
+    return _depositLists;
+  }
+
+  List get withdrawLists {
+    return _withdrawLists;
+  }
+
+  List get p2pLists {
+    return _p2pLists;
+  }
+
+  List get marginLoanLists {
+    return _marginLoanLists;
+  }
+
+  List get marginHistoryLists {
+    return _marginHistoryLists;
+  }
+
+  List get marginTransferLists {
+    return _marginTransferLists;
+  }
+
+  List get financialRecords {
+    return _financialRecords;
   }
 
   void toggleHideBalances(value) {
@@ -277,6 +312,223 @@ class Asset with ChangeNotifier {
         _changeAddress = responseData['data'];
       } else {
         _changeAddress = {};
+      }
+      notifyListeners();
+    } catch (error) {
+      notifyListeners();
+      // throw error;
+    }
+  }
+
+  Future<void> getDepositTransactions(auth, formData) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/record/deposit_list',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _depositLists = responseData['data']['financeList'];
+      } else {
+        _depositLists = [];
+      }
+      notifyListeners();
+    } catch (error) {
+      notifyListeners();
+      // throw error;
+    }
+  }
+
+  Future<void> getWithdrawTransactions(auth, formData) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/record/withdraw_list',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _withdrawLists = responseData['data']['financeList'];
+      } else {
+        _withdrawLists = [];
+      }
+      notifyListeners();
+    } catch (error) {
+      notifyListeners();
+      // throw error;
+    }
+  }
+
+  Future<void> getP2pTransactions(auth, formData) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/record/otc_transfer_list',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _p2pLists = responseData['data']['financeList'];
+      } else {
+        _p2pLists = [];
+      }
+      notifyListeners();
+    } catch (error) {
+      notifyListeners();
+      // throw error;
+    }
+  }
+
+  Future<void> getMarginLoanTransactions(auth, formData) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/lever/borrow/new',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _marginLoanLists = responseData['data']['financeList'];
+      } else {
+        _marginLoanLists = [];
+      }
+      notifyListeners();
+    } catch (error) {
+      notifyListeners();
+      // throw error;
+    }
+  }
+
+  Future<void> getMarginHistoryTransactions(auth, formData) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/lever/borrow/history',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _marginHistoryLists = responseData['data']['financeList'];
+      } else {
+        _marginHistoryLists = [];
+      }
+      notifyListeners();
+    } catch (error) {
+      notifyListeners();
+      // throw error;
+    }
+  }
+
+  Future<void> getMarginTransferTransactions(auth, formData) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/lever/finance/transfer/list',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _marginTransferLists = responseData['data']['financeList'];
+      } else {
+        _marginTransferLists = [];
+      }
+      notifyListeners();
+    } catch (error) {
+      notifyListeners();
+      // throw error;
+    }
+  }
+
+  Future<void> getFinancialRecords(auth, formData) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$incrementApi/increment/financial_management',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _financialRecords = responseData['data']['financeList'];
+      } else {
+        _financialRecords = [];
       }
       notifyListeners();
     } catch (error) {
