@@ -146,6 +146,9 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
           auth.userInfo['mobileNumber'].isEmpty) {
         return showAlert(
           context,
+          Icon(
+            Icons.featured_play_list,
+          ),
           'Tips',
           const <Widget>[
             Text(

@@ -36,6 +36,10 @@ class _SecurityState extends State<Security> {
                     auth.userInfo['googleStatus'] == 0) {
                   showAlert(
                     context,
+                    Icon(
+                      Icons.warning,
+                      color: Colors.amber,
+                    ),
                     'Security Reminder',
                     const <Widget>[
                       Text(
@@ -94,6 +98,10 @@ class _SecurityState extends State<Security> {
                     auth.userInfo['googleStatus'] == 0) {
                   showAlert(
                     context,
+                    Icon(
+                      Icons.warning,
+                      color: Colors.amber,
+                    ),
                     'Security Reminder',
                     const <Widget>[
                       Text(

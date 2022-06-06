@@ -166,7 +166,7 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
       "volume":
           (_orderType == 2 && _isBuy) ? _totalField.text : _amountField.text,
     };
-    await trading.createOrder(context, auth, formData);
+    await trading.createMarginOrder(context, auth, formData);
     getOpenOrders();
   }
 

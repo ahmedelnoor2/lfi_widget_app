@@ -8,6 +8,7 @@ import 'package:lyotrade/screens/trade/common/header.dart';
 import 'package:lyotrade/screens/trade/common/market_drawer.dart';
 import 'package:lyotrade/screens/trade/common/market_margin_drawer.dart';
 import 'package:lyotrade/screens/trade/margin/margin_details.dart';
+import 'package:lyotrade/screens/trade/margin/margin_open_orders.dart';
 import 'package:lyotrade/screens/trade/margin/margin_trade_form.dart';
 import 'package:lyotrade/screens/trade/market_header.dart';
 import 'package:lyotrade/screens/trade/market_margin_header.dart';
@@ -210,6 +211,10 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
                       ),
                     ),
                   ],
+                ),
+                SizedBox(
+                  height: height,
+                  child: MarginOpenOrders(),
                 ),
               ],
             ),

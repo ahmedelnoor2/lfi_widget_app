@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/screens/common/drawer.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
@@ -153,6 +154,23 @@ class _TransferAssetsState extends State<TransferAssets> {
     return _defaultMarginCoin == _selectedMarginAssets['coin']
         ? '${_selectedMarginAssets['values']['baseTotalBalance']}'
         : '${_selectedMarginAssets['values']['quoteTotalBalance']}';
+  }
+
+  Future<void> transferringAsset() async {
+    var auth = Provider.of<Auth>(context, listen: false);
+    var trading = Provider.of<Trading>(context, listen: false);
+
+    Map formData = {
+      "amount": _amountController.text,
+      "coinSymbol": _defaultMarginCoin,
+      "fromAccount": _fromDigitalAccountToOtherAccount ? "1" : "2",
+      "symbol": _selectedMarginAssets['values']['symbol'],
+      "toAccount": _fromDigitalAccountToOtherAccount ? "2" : "1",
+    };
+
+    await trading.transferAsset(context, auth, formData);
+    getDigitalBalance();
+    getMarginlBalance();
   }
 
   @override
@@ -633,7 +651,8 @@ class _TransferAssetsState extends State<TransferAssets> {
                 width: width * 0.9,
                 child: ElevatedButton(
                   onPressed: () {
-                    snackAlert(context, SnackTypes.warning, 'Coming soon...');
+                    transferringAsset();
+                    // snackAlert(context, SnackTypes.warning, 'Coming soon...');
                   },
                   child: Text('Transfer'),
                 ),

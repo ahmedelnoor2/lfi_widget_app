@@ -155,6 +155,52 @@ class Trading with ChangeNotifier {
     }
   }
 
+  Future<void> createMarginOrder(ctx, auth, formData) async {
+    /**
+     * params:
+      price: "29695.06" (Price only for LIMIT orders null for MARKET)
+      side: "BUY" (BUY or SELL)
+      symbol: "btcusdt"
+      type: 1 = LIMIT and 2 = MARKET
+      volume: "1.000000" (Amount)
+    */
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/lever/order/create',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        snackAlert(ctx, SnackTypes.success,
+            getTranslate('Order successfully created.'));
+        return;
+      } else {
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
+        return;
+      }
+    } catch (error) {
+      snackAlert(
+        ctx,
+        SnackTypes.errors,
+        'Error on placing order, please try again',
+      );
+      return;
+      // throw error;
+    }
+  }
+
   Future<void> createOrder(ctx, auth, formData) async {
     /**
      * params:
@@ -270,6 +316,53 @@ class Trading with ChangeNotifier {
       if (responseData['code'] == '0') {
         snackAlert(ctx, SnackTypes.success,
             getTranslate('Order successfully cancelled'));
+        return;
+      } else {
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
+        return;
+      }
+    } catch (error) {
+      snackAlert(
+        ctx,
+        SnackTypes.errors,
+        'Error on cancelling orders, please try again',
+      );
+      return;
+      // throw error;
+    }
+  }
+
+  Future<void> transferAsset(ctx, auth, formData) async {
+    /**
+     * params:
+      amount: "0.00000020",
+      coinSymbol: "BTC",
+      fromAccount: "1" 1 = Digital and 2 = Marging,
+      symbol: "btcusdt" ,
+      toAccount: "2" 1 = Digital and 2 = Margin,
+    */
+
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/ever/finance/transfer',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        snackAlert(ctx, SnackTypes.success,
+            getTranslate('Amount successfully transferred.'));
         return;
       } else {
         snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
