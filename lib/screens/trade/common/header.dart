@@ -1,18 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 
-appHeader(context, tabController) {
+appHeader(context, tabController, onTabChange) {
   return AppBar(
     shadowColor: Colors.transparent,
     toolbarHeight: 0,
-    bottom: TabBar(
-      indicatorSize: TabBarIndicatorSize.label,
-      isScrollable: true,
-      tabs: <Tab>[
-        Tab(text: 'Spot'),
-        Tab(text: 'Cross Margin'),
-      ],
-      controller: tabController,
+    bottom: PreferredSize(
+      preferredSize: Size.fromHeight(48),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: TabBar(
+          onTap: (value) {
+            onTabChange();
+          },
+          indicatorSize: TabBarIndicatorSize.label,
+          isScrollable: true,
+          tabs: <Tab>[
+            Tab(text: 'Spot'),
+            Tab(text: 'Cross Margin'),
+          ],
+          controller: tabController,
+        ),
+      ),
     ),
   );
 }

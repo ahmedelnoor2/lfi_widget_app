@@ -6,7 +6,11 @@ import 'package:lyotrade/screens/common/bottomnav.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/trade/common/header.dart';
 import 'package:lyotrade/screens/trade/common/market_drawer.dart';
+import 'package:lyotrade/screens/trade/common/market_margin_drawer.dart';
+import 'package:lyotrade/screens/trade/margin/margin_details.dart';
+import 'package:lyotrade/screens/trade/margin/margin_trade_form.dart';
 import 'package:lyotrade/screens/trade/market_header.dart';
+import 'package:lyotrade/screens/trade/market_margin_header.dart';
 import 'package:lyotrade/screens/trade/open_orders.dart';
 import 'package:lyotrade/screens/trade/order_book.dart';
 import 'package:lyotrade/screens/trade/trade_form.dart';
@@ -112,6 +116,17 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
     connectWebSocket();
   }
 
+  void onTabChange() {
+    if (_tabController.index == 1) {
+      var public = Provider.of<Public>(context, listen: false);
+      public.setActiveMarket({
+        "showName": "BTC/USDT",
+        "symbol": "btcusdt",
+      });
+      updateMarket();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
@@ -121,48 +136,85 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
 
     return Scaffold(
       key: _scaffoldKey,
-      appBar: appHeader(context, _tabController),
-      drawer: MarketDrawer(
-        scaffoldKey: _scaffoldKey,
-        updateMarket: updateMarket,
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            MarketHeader(scaffoldKey: _scaffoldKey),
-            Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: EdgeInsets.only(top: 10, bottom: 10, left: 10),
-                    width: width * 0.4,
-                    child: OrderBook(
-                      asks: public.asks,
-                      bids: public.bids,
-                      lastPrice: public.lastPrice,
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.only(right: 10),
-                    width: width * 0.58,
-                    child: TradeForm(
-                      scaffoldKey: _scaffoldKey,
-                      lastPrice: public.lastPrice,
-                    ),
-                  ),
-                ],
-              ),
+      appBar: appHeader(context, _tabController, onTabChange),
+      drawer: _tabController.index == 0
+          ? MarketDrawer(
+              scaffoldKey: _scaffoldKey,
+              updateMarket: updateMarket,
+            )
+          : MarketMarginDrawer(
+              scaffoldKey: _scaffoldKey,
+              updateMarket: updateMarket,
             ),
-            Container(
-              child: SizedBox(
-                height: height,
-                child: OpenOrders(),
-              ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                MarketHeader(scaffoldKey: _scaffoldKey),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.only(top: 10, bottom: 10, left: 10),
+                      width: width * 0.4,
+                      child: OrderBook(
+                        asks: public.asks,
+                        bids: public.bids,
+                        lastPrice: public.lastPrice,
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.only(right: 10),
+                      width: width * 0.58,
+                      child: TradeForm(
+                        scaffoldKey: _scaffoldKey,
+                        lastPrice: public.lastPrice,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: height,
+                  child: OpenOrders(),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                MarketMarginHeader(scaffoldKey: _scaffoldKey),
+                MarginDetails(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.only(top: 10, bottom: 10, left: 10),
+                      width: width * 0.4,
+                      child: OrderBook(
+                        asks: public.asks,
+                        bids: public.bids,
+                        lastPrice: public.lastPrice,
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.only(right: 10),
+                      width: width * 0.58,
+                      child: MarginTradeForm(
+                        scaffoldKey: _scaffoldKey,
+                        lastPrice: public.lastPrice,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: bottomNav(context),
     );

@@ -4,8 +4,8 @@ import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 
-class MarketHeader extends StatefulWidget {
-  const MarketHeader({
+class MarketMarginHeader extends StatefulWidget {
+  const MarketMarginHeader({
     Key? key,
     this.scaffoldKey,
   }) : super(key: key);
@@ -13,10 +13,10 @@ class MarketHeader extends StatefulWidget {
   final scaffoldKey;
 
   @override
-  State<MarketHeader> createState() => _MarketHeaderState();
+  State<MarketMarginHeader> createState() => _MarketMarginHeaderState();
 }
 
-class _MarketHeaderState extends State<MarketHeader> {
+class _MarketMarginHeaderState extends State<MarketMarginHeader> {
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;

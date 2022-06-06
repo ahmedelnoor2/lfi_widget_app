@@ -1,12 +1,9 @@
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'dart:io';
-import 'dart:ui';
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/bottomnav.dart';
-import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/trade/common/header.dart';
 import 'package:lyotrade/screens/trade/common/market_drawer.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';

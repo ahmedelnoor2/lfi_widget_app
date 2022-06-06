@@ -13,6 +13,7 @@ class Public with ChangeNotifier {
   Map _rate = {};
   Map _publicInfoMarket = {};
   Map _allMarkets = {};
+  Map _allMarginMarkets = {};
   List _currencies = [];
   Map _activeCurrency = {
     "fiat_symbol": "usd",
@@ -26,7 +27,16 @@ class Public with ChangeNotifier {
   Map _activeMarketTick = {};
   Map _activeMarketAllTicks = {};
 
+  Map _activeMarginMarket = {
+    "showName": "BTC/USDT",
+    "symbol": "btcusdt",
+  };
+  Map _activeMarginMarketTick = {};
+  Map _activeMarginMarketAllTicks = {};
+
   Map _allSearchMarket = {};
+
+  Map _allMarginSearchMarket = {};
 
   List _headerSymbols = [];
 
@@ -77,16 +87,32 @@ class Public with ChangeNotifier {
     return _activeMarket;
   }
 
+  Map get activeMarginMarket {
+    return _activeMarginMarket;
+  }
+
   Map get activeMarketTick {
     return _activeMarketTick;
+  }
+
+  Map get activeMarginMarketTick {
+    return _activeMarginMarketTick;
   }
 
   Map get activeMarketAllTicks {
     return _activeMarketAllTicks;
   }
 
+  Map get activeMarginMarketAllTicks {
+    return _activeMarginMarketAllTicks;
+  }
+
   Map get allMarkets {
     return _allMarkets;
+  }
+
+  Map get allMarginMarkets {
+    return _allMarginMarkets;
   }
 
   String get amountField {
@@ -99,6 +125,10 @@ class Public with ChangeNotifier {
 
   Map get allSearchMarket {
     return _allSearchMarket;
+  }
+
+  Map get allMarginSearchMarket {
+    return _allMarginSearchMarket;
   }
 
   List get klineData {
@@ -141,13 +171,28 @@ class Public with ChangeNotifier {
     return notifyListeners();
   }
 
+  Future<void> setActiveMarginMarket(market) async {
+    _activeMarginMarket = market;
+    return notifyListeners();
+  }
+
   Future<void> setActiveMarketTick(tick) async {
     _activeMarketTick = tick;
     notifyListeners();
   }
 
+  Future<void> setActiveMarginMarketTick(tick) async {
+    _activeMarginMarketTick = tick;
+    notifyListeners();
+  }
+
   Future<void> setActiveMarketAllTicks(tick, market) async {
     _activeMarketAllTicks[market.split('_')[1]] = tick;
+    notifyListeners();
+  }
+
+  Future<void> setActiveMarginMarketAllTicks(tick, market) async {
+    _activeMarginMarketAllTicks[market.split('_')[1]] = tick;
     notifyListeners();
   }
 
@@ -169,6 +214,30 @@ class Public with ChangeNotifier {
   }
 
   Future<void> filterMarketSearchResults(
+    query,
+    _searchAllMarkets,
+    sMarketSort,
+  ) async {
+    if (query.isNotEmpty) {
+      List dummyListData = [];
+      for (var item in _searchAllMarkets) {
+        if (item['symbol'].contains(query.toLowerCase())) {
+          dummyListData.add(item);
+        }
+      }
+      _allSearchMarket[sMarketSort].clear();
+      _allSearchMarket[sMarketSort].addAll(dummyListData);
+      notifyListeners();
+      return;
+    } else {
+      _allSearchMarket[sMarketSort].clear();
+      _allSearchMarket[sMarketSort].addAll(_searchAllMarkets);
+      notifyListeners();
+      return;
+    }
+  }
+
+  Future<void> filterMarginMarketSearchResults(
     query,
     _searchAllMarkets,
     sMarketSort,
@@ -239,8 +308,15 @@ class Public with ChangeNotifier {
         for (var k in _allMarketsMap.keys) {
           _allMarkets[k] = [];
           _allSearchMarket[k] = [];
+          _allMarginMarkets[k] = [];
+          _allMarginSearchMarket[k] = [];
           var _allMarketsMapo = Map<String, dynamic>.from(_allMarketsMap[k]);
           for (var m in _allMarketsMapo.values) {
+            if (m['is_open_lever'] == 1) {
+              _allMarginMarkets[k].add(m);
+              _allMarginSearchMarket[k].add(m);
+            }
+
             _allMarkets[k].add(m);
             _allSearchMarket[k].add(m);
           }
