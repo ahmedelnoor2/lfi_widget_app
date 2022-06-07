@@ -40,7 +40,7 @@ class _OpenOrdersState extends State<OpenOrders>
     var trading = Provider.of<Trading>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
 
-    if (auth.userInfo.isNotEmpty) {
+    if (auth.isAuthenticated) {
       await trading.getOpenOrders(context, auth, {
         "entrust": 1,
         "isShowCanceled": 0,
@@ -108,7 +108,9 @@ class _OpenOrdersState extends State<OpenOrders>
             ),
             IconButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/trade_history');
+                auth.isAuthenticated
+                    ? Navigator.pushNamed(context, '/trade_history')
+                    : Navigator.pushNamed(context, '/authentication');
               },
               icon: Icon(
                 Icons.insert_drive_file,
@@ -123,9 +125,8 @@ class _OpenOrdersState extends State<OpenOrders>
             controller: _tabOpenOrderController,
             children: [
               Container(
-                child: auth.userInfo.isEmpty
-                    ? noAuth(context)
-                    : Column(
+                child: auth.isAuthenticated
+                    ? Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Container(
@@ -190,9 +191,10 @@ class _OpenOrdersState extends State<OpenOrders>
                               : openOrderList(
                                   context, trading.openOrders, trading, auth),
                         ],
-                      ),
+                      )
+                    : noAuth(context),
               ),
-              auth.userInfo.isEmpty ? noAuth(context) : noData(),
+              auth.isAuthenticated ? noData() : noAuth(context),
             ],
           ),
         ),

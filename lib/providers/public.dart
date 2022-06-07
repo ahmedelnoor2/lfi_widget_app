@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:k_chart/entity/index.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
-import 'package:candlesticks/candlesticks.dart';
+import 'package:k_chart/entity/k_line_entity.dart';
 
 class Public with ChangeNotifier {
   Map<String, String> headers = {
@@ -316,7 +317,10 @@ class Public with ChangeNotifier {
               _allMarginMarkets[k].add(m);
               _allMarginSearchMarket[k].add(m);
             }
-
+            if (m['symbol'] == 'btcusdt') {
+              _activeMarket = m;
+              _activeMarginMarket = m;
+            }
             _allMarkets[k].add(m);
             _allSearchMarket[k].add(m);
           }
@@ -380,25 +384,22 @@ class Public with ChangeNotifier {
     }
   }
 
-  Future<List<Candle>> fetchCandles(interval, symbol) async {
-    // final uri = Uri.parse(
-    //     "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=300");
+  Future<List<KLineEntity>> fetchKlkines(interval, symbol) async {
     var uri = Uri.parse(
         'https://$openApiUrl/sapi/v1/klines?symbol=${symbol}&interval=$interval&limit=500');
     final res = await http.get(uri);
-    return (jsonDecode(res.body) as List<dynamic>)
-        // .map((e) => Candle.fromJson(e))
-        .map(
-          (e) => Candle(
-            date: DateTime.fromMillisecondsSinceEpoch(e['idx']),
-            high: double.parse(e['high']),
-            low: double.parse(e['low']),
-            open: double.parse(e['open']),
-            close: double.parse(e['close']),
-            volume: double.parse(e['vol']),
-          ),
-        )
-        .toList();
+    return (jsonDecode(res.body) as List<dynamic>).map(
+      (e) {
+        return KLineEntity.fromCustom(
+          time: e['idx'],
+          high: double.parse(e['high']),
+          low: double.parse(e['low']),
+          open: double.parse(e['open']),
+          close: double.parse(e['close']),
+          vol: double.parse(e['vol']),
+        );
+      },
+    ).toList();
     // .reversed
     // .toList();
   }

@@ -35,8 +35,10 @@ class _AssetsState extends State<Assets> {
     });
     var auth = Provider.of<Auth>(context, listen: false);
     await auth.checkLogin(context);
-    if (auth.userInfo.isNotEmpty) {
+    if (auth.isAuthenticated) {
       getAccountBalance();
+    } else {
+      Navigator.pushNamed(context, '/authentication');
     }
     setState(() {
       _checkAuthStatus = false;
@@ -413,10 +415,15 @@ class _AssetsState extends State<Assets> {
                                 width: width * 0.28,
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/deposit_assets',
-                                    );
+                                    if (auth.userInfo['realAuthType'] == 0) {
+                                      snackAlert(context, SnackTypes.warning,
+                                          'Deposit limited(Please check KYC status)');
+                                    } else {
+                                      Navigator.pushNamed(
+                                        context,
+                                        '/deposit_assets',
+                                      );
+                                    }
                                   },
                                   child: Text('Deposit'),
                                 ),
@@ -452,7 +459,7 @@ class _AssetsState extends State<Assets> {
                     ),
                   ),
                 ),
-      bottomNavigationBar: bottomNav(context),
+      bottomNavigationBar: bottomNav(context, auth),
     );
   }
 }

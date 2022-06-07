@@ -15,13 +15,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0"
-  candlesticks:
-    dependency: "direct main"
-    description:
-      name: candlesticks
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.1.0"
   carousel_slider:
     dependency: "direct main"
     description:
@@ -163,6 +156,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.6.3"
+  k_chart:
+    dependency: "direct main"
+    description:
+      name: k_chart
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.6.1"
   lints:
     dependency: transitive
     description:

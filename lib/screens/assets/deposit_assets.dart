@@ -93,7 +93,7 @@ class _DepositAssetsState extends State<DepositAssets> {
     }
 
     await asset.getCoinCosts(auth, _defaultNetwork);
-    await asset.getChangeAddress(auth, _defaultNetwork);
+    await asset.getChangeAddress(context, auth, _defaultNetwork);
 
     List _digitialAss = [];
     asset.accountBalance['allCoinMap'].forEach((k, v) {
@@ -144,7 +144,7 @@ class _DepositAssetsState extends State<DepositAssets> {
       _defaultNetwork = netwrk['mainChainName'];
     });
     await asset.getCoinCosts(auth, netwrk['showName']);
-    await asset.getChangeAddress(auth, netwrk['showName']);
+    await asset.getChangeAddress(context, auth, netwrk['showName']);
     setState(() {
       _loadingAddress = false;
     });

@@ -167,6 +167,7 @@ class _DashboardState extends State<Dashboard> {
     width = MediaQuery.of(context).size.width;
 
     var public = Provider.of<Public>(context, listen: true);
+    var auth = Provider.of<Auth>(context, listen: true);
 
     return Scaffold(
       key: _key,
@@ -196,7 +197,7 @@ class _DashboardState extends State<Dashboard> {
           ),
         ),
       ),
-      bottomNavigationBar: bottomNav(context),
+      bottomNavigationBar: bottomNav(context, auth),
     );
   }
 }

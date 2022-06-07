@@ -47,7 +47,13 @@ klineHeader(context, scaffoldKey, market) {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.swap_horiz),
+          Container(
+            padding: EdgeInsets.only(right: 2),
+            child: Icon(
+              Icons.sync,
+              size: 20,
+            ),
+          ),
           Text(
             '$market',
             style: TextStyle(

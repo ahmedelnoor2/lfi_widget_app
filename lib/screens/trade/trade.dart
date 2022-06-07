@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/bottomnav.dart';
 import 'package:lyotrade/screens/common/header.dart';
@@ -120,10 +121,7 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
   void onTabChange() {
     if (_tabController.index == 1) {
       var public = Provider.of<Public>(context, listen: false);
-      public.setActiveMarket({
-        "showName": "BTC/USDT",
-        "symbol": "btcusdt",
-      });
+      public.setActiveMarket(public.activeMarginMarket);
       updateMarket();
     }
   }
@@ -134,6 +132,7 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
     height = MediaQuery.of(context).size.height;
 
     var public = Provider.of<Public>(context, listen: true);
+    var auth = Provider.of<Auth>(context, listen: true);
 
     return Scaffold(
       key: _scaffoldKey,
@@ -221,7 +220,7 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
           ),
         ],
       ),
-      bottomNavigationBar: bottomNav(context),
+      bottomNavigationBar: bottomNav(context, auth),
     );
   }
 }

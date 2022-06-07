@@ -289,7 +289,7 @@ class Asset with ChangeNotifier {
     }
   }
 
-  Future<void> getChangeAddress(auth, coin) async {
+  Future<void> getChangeAddress(ctx, auth, coin) async {
     headers['exchange-token'] = auth.loginVerificationToken;
 
     var url = Uri.https(
@@ -312,6 +312,8 @@ class Asset with ChangeNotifier {
         _changeAddress = responseData['data'];
       } else {
         _changeAddress = {};
+        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+        auth.checkResponseCode(ctx, responseData['code']);
       }
       notifyListeners();
     } catch (error) {

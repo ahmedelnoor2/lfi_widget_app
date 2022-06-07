@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
+import 'package:provider/provider.dart';
 
 class Hotlinks extends StatefulWidget {
   const Hotlinks({Key? key}) : super(key: key);
@@ -10,6 +14,8 @@ class Hotlinks extends StatefulWidget {
 class _HotlinksState extends State<Hotlinks> {
   @override
   Widget build(BuildContext context) {
+    var auth = Provider.of<Auth>(context, listen: true);
+
     return Container(
       padding: EdgeInsets.all(12),
       child: Row(
@@ -60,7 +66,18 @@ class _HotlinksState extends State<Hotlinks> {
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              if (auth.isAuthenticated) {
+                if (auth.userInfo['realAuthType'] == 0) {
+                  snackAlert(context, SnackTypes.warning,
+                      'Deposit limited(Please check KYC status)');
+                } else {
+                  Navigator.pushNamed(context, '/deposit_assets');
+                }
+              } else {
+                Navigator.pushNamed(context, '/authentication');
+              }
+            },
             child: Column(
               children: [
                 Container(

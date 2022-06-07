@@ -108,7 +108,9 @@ class _MarginOpenOrdersState extends State<MarginOpenOrders>
             ),
             IconButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/margin_trade_history');
+                auth.isAuthenticated
+                    ? Navigator.pushNamed(context, '/margin_trade_history')
+                    : Navigator.pushNamed(context, '/authentication');
               },
               icon: Icon(
                 Icons.insert_drive_file,
@@ -123,9 +125,8 @@ class _MarginOpenOrdersState extends State<MarginOpenOrders>
             controller: _tabOpenOrderController,
             children: [
               Container(
-                child: auth.userInfo.isEmpty
-                    ? noAuth(context)
-                    : Column(
+                child: auth.isAuthenticated
+                    ? Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Container(
@@ -190,9 +191,10 @@ class _MarginOpenOrdersState extends State<MarginOpenOrders>
                               : openOrderList(
                                   context, trading.openOrders, trading, auth),
                         ],
-                      ),
+                      )
+                    : noAuth(context),
               ),
-              auth.userInfo.isEmpty ? noAuth(context) : noData(),
+              auth.isAuthenticated ? noData() : noAuth(context),
             ],
           ),
         ),

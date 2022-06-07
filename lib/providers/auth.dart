@@ -46,6 +46,7 @@ class Auth with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final String? catchedAuthToken = prefs.getString('authToken');
     authToken = catchedAuthToken ?? '';
+    _isAuthenticated = catchedAuthToken!.isNotEmpty ? true : false;
     _loginVerificationToken = authToken;
     headers['exchange-token'] = authToken;
     await getUserInfo();
@@ -80,6 +81,19 @@ class Auth with ChangeNotifier {
       notifyListeners();
       return '';
       // throw error;
+    }
+  }
+
+  Future<void> checkResponseCode(ctx, code) async {
+    print(code);
+    if ('$code' == '10002') {
+      _loginVerificationToken = '';
+      _userInfo = {};
+      _isAuthenticated = false;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('authToken', _loginVerificationToken);
+      notifyListeners();
+      Navigator.pushNamedAndRemoveUntil(ctx, '/', (route) => false);
     }
   }
 

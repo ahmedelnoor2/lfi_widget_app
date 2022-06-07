@@ -42,7 +42,7 @@ class _TradeHistoryState extends State<TradeHistory>
     var trading = Provider.of<Trading>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
 
-    if (auth.userInfo.isNotEmpty) {
+    if (auth.isAuthenticated) {
       await trading.getOpenOrders(context, auth, {
         "entrust": 1,
         "isShowCanceled": 0,
@@ -58,7 +58,7 @@ class _TradeHistoryState extends State<TradeHistory>
     var trading = Provider.of<Trading>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
 
-    if (auth.userInfo.isNotEmpty) {
+    if (auth.isAuthenticated) {
       await trading.getOrderHistory(context, auth, {
         "entrust": 2,
         "isShowCanceled": 1,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-bottomNav(context) {
+bottomNav(context, auth) {
   var _currentRoute = ModalRoute.of(context)!.settings.name;
 
   return BottomNavigationBar(
@@ -86,11 +86,16 @@ bottomNav(context) {
           );
           break;
         case 4:
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            '/assets',
-            (route) => false,
-          );
+          auth.isAuthenticated
+              ? Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/assets',
+                  (route) => false,
+                )
+              : Navigator.pushNamed(
+                  context,
+                  '/authentication',
+                );
           break;
         default:
           Navigator.pushNamedAndRemoveUntil(

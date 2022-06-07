@@ -62,35 +62,35 @@ class _MarginDetailsState extends State<MarginDetails> {
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
 
-    await asset.getMarginBalance(auth);
-    List _margAssets = [];
-    asset.marginBalance['leverMap'].forEach((k, v) {
-      if (k.split('/')[0] == _defaultMarginCoin) {
-        setState(() {
-          _selectedMarginAssets = {
-            'coin': k.split('/')[0],
-            'market': k,
-            'values': v,
-          };
+    if (auth.isAuthenticated) {
+      await asset.getMarginBalance(auth);
+      List _margAssets = [];
+      asset.marginBalance['leverMap'].forEach((k, v) {
+        if (k.split('/')[0] == _defaultMarginCoin) {
+          setState(() {
+            _selectedMarginAssets = {
+              'coin': k.split('/')[0],
+              'market': k,
+              'values': v,
+            };
+          });
+        }
+        _margAssets.add({
+          'coin': k.split('/')[0],
+          'market': k,
+          'values': v,
         });
-      }
-      _margAssets.add({
-        'coin': k.split('/')[0],
-        'market': k,
-        'values': v,
       });
-    });
-    setState(() {
-      _marginAssets = _margAssets;
-    });
+      setState(() {
+        _marginAssets = _margAssets;
+      });
+    }
   }
 
   Future<void> getCoinCosts(netwrkType) async {
     setState(() {
       _defaultCoin = netwrkType;
     });
-    var auth = Provider.of<Auth>(context, listen: false);
-    var asset = Provider.of<Asset>(context, listen: false);
     var public = Provider.of<Public>(context, listen: false);
 
     if (public.publicInfoMarket['market']['followCoinList'][netwrkType] !=
@@ -126,6 +126,15 @@ class _MarginDetailsState extends State<MarginDetails> {
   @override
   Widget build(BuildContext context) {
     var public = Provider.of<Public>(context, listen: true);
+    var auth = Provider.of<Auth>(context, listen: true);
+    var asset = Provider.of<Asset>(context, listen: true);
+
+    String _riskRate = '--';
+    if (auth.isAuthenticated) {
+      _riskRate = asset.marginBalance.isEmpty
+          ? '--'
+          : '${asset.marginBalance['leverMap'][public.activeMarket['showName']]['riskRate']}';
+    }
 
     return Container(
       padding: EdgeInsets.only(
@@ -148,7 +157,7 @@ class _MarginDetailsState extends State<MarginDetails> {
               Container(
                 padding: EdgeInsets.only(right: 10),
                 child: Text(
-                  '3x',
+                  '${public.activeMarket['multiple']}x',
                   style: TextStyle(color: linkColor),
                 ),
               ),
@@ -156,21 +165,23 @@ class _MarginDetailsState extends State<MarginDetails> {
                 padding: EdgeInsets.only(right: 10),
                 child: InkWell(
                   onTap: () {
-                    showModalBottomSheet<void>(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return StatefulBuilder(
-                          builder:
-                              (BuildContext context, StateSetter setState) {
-                            return transferAsset(
-                              context,
-                              public,
-                              setState,
-                            );
-                          },
-                        );
-                      },
-                    );
+                    auth.isAuthenticated
+                        ? showModalBottomSheet<void>(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return StatefulBuilder(
+                                builder: (BuildContext context,
+                                    StateSetter setState) {
+                                  return transferAsset(
+                                    context,
+                                    public,
+                                    setState,
+                                  );
+                                },
+                              );
+                            },
+                          )
+                        : Navigator.pushNamed(context, '/authentication');
                   },
                   child: Container(
                     padding:
@@ -198,21 +209,23 @@ class _MarginDetailsState extends State<MarginDetails> {
                 padding: EdgeInsets.only(right: 5),
                 child: InkWell(
                   onTap: () {
-                    showModalBottomSheet<void>(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return StatefulBuilder(
-                          builder:
-                              (BuildContext context, StateSetter setState) {
-                            return borrowAsset(
-                              context,
-                              public,
-                              setState,
-                            );
-                          },
-                        );
-                      },
-                    );
+                    auth.isAuthenticated
+                        ? showModalBottomSheet<void>(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return StatefulBuilder(
+                                builder: (BuildContext context,
+                                    StateSetter setState) {
+                                  return borrowAsset(
+                                    context,
+                                    public,
+                                    setState,
+                                  );
+                                },
+                              );
+                            },
+                          )
+                        : Navigator.pushNamed(context, '/authentication');
                   },
                   child: Container(
                     padding:
@@ -251,9 +264,13 @@ class _MarginDetailsState extends State<MarginDetails> {
               ),
               SizedBox(
                 child: Text(
-                  '999.99',
+                  _riskRate,
                   style: TextStyle(
-                    color: greenIndicator,
+                    color: (_riskRate == '--' || _riskRate == '0')
+                        ? secondaryTextColor
+                        : (double.parse(_riskRate) > 0)
+                            ? greenIndicator
+                            : redIndicator,
                   ),
                 ),
               ),

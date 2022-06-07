@@ -112,7 +112,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
     }
 
     await asset.getCoinCosts(auth, _defaultCoin);
-    await asset.getChangeAddress(auth, _defaultCoin);
+    await asset.getChangeAddress(context, auth, _defaultCoin);
 
     List _digitialAss = [];
     asset.accountBalance['allCoinMap'].forEach((k, v) {
@@ -135,7 +135,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
     });
 
     await asset.getCoinCosts(auth, netwrk['showName']);
-    await asset.getChangeAddress(auth, netwrk['showName']);
+    await asset.getChangeAddress(context, auth, netwrk['showName']);
   }
 
   Future<void> checkUserAuthMethods() async {
