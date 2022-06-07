@@ -26,7 +26,7 @@ Widget liveFeedSkull(context) {
                     children: list
                         .map(
                           (e) => SizedBox(
-                            height: height * 0.07,
+                            height: height * 0.063,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -38,7 +38,7 @@ Widget liveFeedSkull(context) {
                                 ),
                                 SkeletonLine(
                                   style: SkeletonLineStyle(
-                                      height: 15,
+                                      height: 14,
                                       width: width * 0.25,
                                       borderRadius: BorderRadius.circular(8)),
                                 ),

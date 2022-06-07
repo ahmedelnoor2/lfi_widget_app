@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/screens/common/alert.dart';
 import 'package:lyotrade/screens/common/header.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 
@@ -78,7 +80,8 @@ class _SecurityState extends State<Security> {
                     'Ok',
                   );
                 } else {
-                  Navigator.pushNamed(context, '/password');
+                  // Navigator.pushNamed(context, '/password');
+                  snackAlert(context, SnackTypes.warning, 'Coming Soon...');
                 }
               },
               child: const Text('Change'),
@@ -157,7 +160,7 @@ class _SecurityState extends State<Security> {
             trailing: TextButton(
               onPressed: () {
                 if (auth.userInfo['mobileNumber'].isEmpty) {
-                  Navigator.pushNamed(context, '/password');
+                  Navigator.pushNamed(context, '/phone_number');
                 }
               },
               child: Text(

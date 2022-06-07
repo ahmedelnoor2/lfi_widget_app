@@ -262,6 +262,7 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
                 children: [
                   Text(
                     _orderType == 1 ? 'Limit' : 'Market',
+                    style: TextStyle(fontSize: 16),
                   ),
                   Icon(
                     Icons.expand_more,
@@ -347,6 +348,7 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
                             return null;
                           },
                           controller: _priceField,
+                          style: TextStyle(fontSize: 16),
                           keyboardType: const TextInputType.numberWithOptions(
                             decimal: true,
                           ),
@@ -359,7 +361,7 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
                               borderSide: BorderSide.none,
                             ),
                             hintStyle: TextStyle(
-                              fontSize: 14,
+                              fontSize: 16,
                             ),
                             hintText:
                                 "Price (${public.activeMarket['showName'].split('/')[1]})",
@@ -411,7 +413,7 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
                             }
                             return null;
                           },
-                          style: TextStyle(fontSize: 14),
+                          style: TextStyle(fontSize: 16),
                           keyboardType:
                               TextInputType.numberWithOptions(decimal: true),
                           decoration: InputDecoration(
@@ -421,7 +423,7 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
                               borderSide: BorderSide.none,
                             ),
                             hintStyle: TextStyle(
-                              fontSize: 14,
+                              fontSize: 16,
                             ),
                             errorStyle: TextStyle(height: 0),
                             focusedErrorBorder: OutlineInputBorder(
@@ -475,7 +477,7 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
                       }
                       return null;
                     },
-                    style: TextStyle(fontSize: 14),
+                    style: TextStyle(fontSize: 16),
                     keyboardType:
                         TextInputType.numberWithOptions(decimal: true),
                     decoration: InputDecoration(
@@ -485,7 +487,7 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
                         borderSide: BorderSide.none,
                       ),
                       hintStyle: TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                       ),
                       errorStyle: TextStyle(height: 0),
                       focusedErrorBorder: OutlineInputBorder(
@@ -606,7 +608,7 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
                       '25%',
                       style: TextStyle(
                         color: secondaryTextColor,
-                        fontSize: 10,
+                        fontSize: 12,
                       ),
                     ),
                   ),
@@ -638,7 +640,7 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
                       '50%',
                       style: TextStyle(
                         color: secondaryTextColor,
-                        fontSize: 10,
+                        fontSize: 12,
                       ),
                     ),
                   ),
@@ -670,7 +672,7 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
                       '75%',
                       style: TextStyle(
                         color: secondaryTextColor,
-                        fontSize: 10,
+                        fontSize: 12,
                       ),
                     ),
                   ),
@@ -702,7 +704,7 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
                       '100%',
                       style: TextStyle(
                         color: secondaryTextColor,
-                        fontSize: 10,
+                        fontSize: 12,
                       ),
                     ),
                   ),

@@ -124,10 +124,10 @@ class _SideBarState extends State<SideBar> {
                 children: [
                   ListTile(
                     onTap: () {
-                      if (auth.userInfo.isEmpty) {
-                        Navigator.pushNamed(context, '/authentication');
+                      if (auth.isAuthenticated) {
+                        Navigator.pushNamed(context, '/transactions');
                       } else {
-                        print('Hit');
+                        Navigator.pushNamed(context, '/authentication');
                       }
                     },
                     leading: const Icon(Icons.list_alt),
@@ -158,15 +158,15 @@ class _SideBarState extends State<SideBar> {
                     trailing: Switch(
                       value: auth.userInfo.isEmpty ? false : _payWithLyoCred,
                       onChanged: (val) async {
-                        if (auth.userInfo.isEmpty) {
-                          Navigator.pushNamed(context, '/authentication');
-                        } else {
+                        if (auth.isAuthenticated) {
                           setState(() {
                             _payWithLyoCred = val;
                           });
                           await user.toggleFeeCoinOpen(
                               context, auth, val ? 1 : 0);
                           await auth.getUserInfo();
+                        } else {
+                          Navigator.pushNamed(context, '/authentication');
                         }
                       },
                     ),
@@ -188,10 +188,10 @@ class _SideBarState extends State<SideBar> {
                       ),
                     ),
                     onTap: () {
-                      if (auth.userInfo.isEmpty) {
-                        Navigator.pushNamed(context, '/authentication');
-                      } else {
+                      if (auth.isAuthenticated) {
                         Navigator.pushNamed(context, '/security');
+                      } else {
+                        Navigator.pushNamed(context, '/authentication');
                       }
                     },
                   ),

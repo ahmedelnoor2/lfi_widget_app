@@ -282,15 +282,39 @@ class _AssetsState extends State<Assets> {
                                                     style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold,
-                                                      color:
-                                                          greenlightchartColor,
+                                                      color: asset
+                                                              .accountBalance
+                                                              .isNotEmpty
+                                                          ? asset.accountBalance[
+                                                                      'yesterdayProfitRate'] ==
+                                                                  '--'
+                                                              ? secondaryTextColor
+                                                              : double.parse(asset
+                                                                              .accountBalance[
+                                                                          'yesterdayProfitRate']) >
+                                                                      0
+                                                                  ? greenIndicator
+                                                                  : redIndicator
+                                                          : secondaryTextColor,
                                                     ),
                                                   ),
                                                   Text(
                                                     '/${asset.accountBalance.isNotEmpty ? getNumberString(context, double.parse(asset.accountBalance['yesterdayProfitRate'] == '--' ? '0' : asset.accountBalance['yesterdayProfitRate'])) : '0'}%',
                                                     style: TextStyle(
-                                                      color:
-                                                          greenlightchartColor,
+                                                      color: asset
+                                                              .accountBalance
+                                                              .isNotEmpty
+                                                          ? asset.accountBalance[
+                                                                      'yesterdayProfitRate'] ==
+                                                                  '--'
+                                                              ? secondaryTextColor
+                                                              : double.parse(asset
+                                                                              .accountBalance[
+                                                                          'yesterdayProfitRate']) >
+                                                                      0
+                                                                  ? greenIndicator
+                                                                  : redIndicator
+                                                          : secondaryTextColor,
                                                     ),
                                                   ),
                                                 ],

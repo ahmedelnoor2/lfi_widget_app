@@ -247,7 +247,7 @@ class _TradeFormState extends State<TradeForm> {
           PopupMenuButton(
             child: Container(
               margin: EdgeInsets.only(bottom: 8),
-              padding: EdgeInsets.only(top: 5, bottom: 5, left: 10, right: 5),
+              padding: EdgeInsets.only(top: 6, bottom: 6, left: 10, right: 5),
               decoration: BoxDecoration(
                 border: Border.all(
                   color: Color(0xff292C51),
@@ -262,6 +262,7 @@ class _TradeFormState extends State<TradeForm> {
                 children: [
                   Text(
                     _orderType == 1 ? 'Limit' : 'Market',
+                    style: TextStyle(fontSize: 16),
                   ),
                   Icon(
                     Icons.expand_more,
@@ -347,6 +348,7 @@ class _TradeFormState extends State<TradeForm> {
                             return null;
                           },
                           controller: _priceField,
+                          style: TextStyle(fontSize: 16),
                           keyboardType: const TextInputType.numberWithOptions(
                             decimal: true,
                           ),
@@ -359,7 +361,7 @@ class _TradeFormState extends State<TradeForm> {
                               borderSide: BorderSide.none,
                             ),
                             hintStyle: TextStyle(
-                              fontSize: 14,
+                              fontSize: 16,
                             ),
                             hintText:
                                 "Price (${public.activeMarket['showName'].split('/')[1]})",
@@ -411,7 +413,7 @@ class _TradeFormState extends State<TradeForm> {
                             }
                             return null;
                           },
-                          style: TextStyle(fontSize: 14),
+                          style: TextStyle(fontSize: 16),
                           keyboardType:
                               TextInputType.numberWithOptions(decimal: true),
                           decoration: InputDecoration(
@@ -421,7 +423,7 @@ class _TradeFormState extends State<TradeForm> {
                               borderSide: BorderSide.none,
                             ),
                             hintStyle: TextStyle(
-                              fontSize: 14,
+                              fontSize: 16,
                             ),
                             errorStyle: TextStyle(height: 0),
                             focusedErrorBorder: OutlineInputBorder(
@@ -475,7 +477,7 @@ class _TradeFormState extends State<TradeForm> {
                       }
                       return null;
                     },
-                    style: TextStyle(fontSize: 14),
+                    style: TextStyle(fontSize: 16),
                     keyboardType:
                         TextInputType.numberWithOptions(decimal: true),
                     decoration: InputDecoration(
@@ -485,7 +487,7 @@ class _TradeFormState extends State<TradeForm> {
                         borderSide: BorderSide.none,
                       ),
                       hintStyle: TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                       ),
                       errorStyle: TextStyle(height: 0),
                       focusedErrorBorder: OutlineInputBorder(
@@ -606,7 +608,7 @@ class _TradeFormState extends State<TradeForm> {
                       '25%',
                       style: TextStyle(
                         color: secondaryTextColor,
-                        fontSize: 10,
+                        fontSize: 12,
                       ),
                     ),
                   ),
@@ -638,7 +640,7 @@ class _TradeFormState extends State<TradeForm> {
                       '50%',
                       style: TextStyle(
                         color: secondaryTextColor,
-                        fontSize: 10,
+                        fontSize: 12,
                       ),
                     ),
                   ),
@@ -670,7 +672,7 @@ class _TradeFormState extends State<TradeForm> {
                       '75%',
                       style: TextStyle(
                         color: secondaryTextColor,
-                        fontSize: 10,
+                        fontSize: 12,
                       ),
                     ),
                   ),
@@ -702,7 +704,7 @@ class _TradeFormState extends State<TradeForm> {
                       '100%',
                       style: TextStyle(
                         color: secondaryTextColor,
-                        fontSize: 10,
+                        fontSize: 12,
                       ),
                     ),
                   ),

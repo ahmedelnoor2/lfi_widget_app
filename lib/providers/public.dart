@@ -9,6 +9,7 @@ class Public with ChangeNotifier {
   Map<String, String> headers = {
     'Content-type': 'application/json;charset=utf-8',
     'Accept': 'application/json',
+    'Access-Control-Allow-Origin': '*',
   };
 
   Map _rate = {};
@@ -300,6 +301,8 @@ class Public with ChangeNotifier {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
+
+      print(responseData);
       if (responseData['code'] == "0") {
         _publicInfoMarket = responseData['data'];
 
@@ -358,12 +361,14 @@ class Public with ChangeNotifier {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
+      print(responseData);
       if (responseData['code'] == "0") {
         _rate = responseData['data']['rate'];
         return notifyListeners();
       }
     } catch (error) {
       // throw error;
+      print(error);
       return;
     }
   }

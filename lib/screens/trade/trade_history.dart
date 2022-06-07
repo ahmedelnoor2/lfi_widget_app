@@ -73,12 +73,11 @@ class _TradeHistoryState extends State<TradeHistory>
 
   @override
   Widget build(BuildContext context) {
-    var trading = Provider.of<Trading>(context, listen: false);
+    var trading = Provider.of<Trading>(context, listen: true);
 
     return Scaffold(
       appBar: hiddenAppBar(),
-      body: Container(
-        padding: EdgeInsets.all(10),
+      body: SizedBox(
         child: Column(
           children: [
             Row(
@@ -97,7 +96,10 @@ class _TradeHistoryState extends State<TradeHistory>
                     ),
                   ],
                 ),
-                Icon(Icons.remove_red_eye)
+                Container(
+                  padding: EdgeInsets.only(right: 10),
+                  child: Icon(Icons.visibility),
+                ),
               ],
             ),
             TabBar(
@@ -365,109 +367,105 @@ class _TradeHistoryState extends State<TradeHistory>
                     width: width * 0.65,
                     child: Row(
                       children: [
-                        Container(
-                          padding: EdgeInsets.only(left: 15),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    padding:
-                                        EdgeInsets.only(bottom: 5, right: 5),
-                                    child: Text(
-                                      '${orderHistory['symbol']}',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w600,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.only(bottom: 5, right: 5),
+                                  child: Text(
+                                    '${orderHistory['symbol']}',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.only(bottom: 4),
+                                  child: Text(
+                                    '${getOrderType(orderHistory['type'])}/${orderHistory['side']}',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: greenIndicator,
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                SizedBox(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.only(right: 20),
+                                        child: Text(
+                                          'Amount',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: secondaryTextColor,
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.only(bottom: 4),
-                                    child: Text(
-                                      '${getOrderType(orderHistory['type'])}/${orderHistory['side']}',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        color: greenIndicator,
+                                      Container(
+                                        padding: EdgeInsets.only(right: 20),
+                                        child: Text(
+                                          'Price',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: secondaryTextColor,
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  SizedBox(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          padding: EdgeInsets.only(right: 20),
-                                          child: Text(
-                                            'Amount',
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              color: secondaryTextColor,
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          padding: EdgeInsets.only(right: 20),
-                                          child: Text(
-                                            'Price',
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              color: secondaryTextColor,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                    ],
                                   ),
-                                  SizedBox(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          padding: EdgeInsets.only(right: 20),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                '${double.parse(orderHistory['remain_volume']).toStringAsPrecision(4)} / ',
-                                                style: TextStyle(
-                                                  fontSize: 11,
-                                                ),
+                                ),
+                                SizedBox(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.only(right: 20),
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              '${double.parse(orderHistory['remain_volume']).toStringAsPrecision(4)} / ',
+                                              style: TextStyle(
+                                                fontSize: 11,
                                               ),
-                                              Text(
-                                                double.parse(
-                                                        orderHistory['volume'])
-                                                    .toStringAsPrecision(4),
-                                                style: TextStyle(
-                                                  fontSize: 11,
-                                                  color: secondaryTextColor,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          padding: EdgeInsets.only(right: 20),
-                                          child: Text(
-                                            '${double.parse(orderHistory['price'])}',
-                                            style: TextStyle(
-                                              fontSize: 11,
                                             ),
+                                            Text(
+                                              double.parse(
+                                                      orderHistory['volume'])
+                                                  .toStringAsPrecision(4),
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                color: secondaryTextColor,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.only(right: 20),
+                                        child: Text(
+                                          '${double.parse(orderHistory['price'])}',
+                                          style: TextStyle(
+                                            fontSize: 11,
                                           ),
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              )
-                            ],
-                          ),
+                                ),
+                              ],
+                            )
+                          ],
                         ),
                       ],
                     ),

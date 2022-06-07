@@ -55,9 +55,9 @@ class _DashboardState extends State<Dashboard> {
     await public.assetsRate();
     await public.getFiatCoins();
     await public.getPublicInfoMarket();
-    if (public.headerSymbols.isEmpty) {
-      await setHeaderSymbols();
-    }
+    // if (public.headerSymbols.isEmpty) {
+    //   await setHeaderSymbols();
+    // }
     connectWebSocket();
   }
 
@@ -65,6 +65,9 @@ class _DashboardState extends State<Dashboard> {
     var public = Provider.of<Public>(context, listen: false);
     List _headerSymbols = [];
     List _headerSybolsToAdd = [];
+
+    print(public);
+    print(public.publicInfoMarket);
 
     for (int i = 0;
         i <
@@ -102,6 +105,8 @@ class _DashboardState extends State<Dashboard> {
         });
       }
     }
+
+    print(_headerSymbols);
 
     await public.setHeaderSymbols(_headerSymbols);
     return;
@@ -184,15 +189,15 @@ class _DashboardState extends State<Dashboard> {
               SearchBar(handleDrawer: _handleDrawer),
               Carousal(),
               Announcement(),
-              LiveFeed(
-                headerSymbols: public.headerSymbols,
-              ),
+              // LiveFeed(
+              //   headerSymbols: public.headerSymbols,
+              // ),
               BuyCrypto(),
               LatestListing(),
               Hotlinks(),
-              AssetsInfo(
-                headerSymbols: public.headerSymbols,
-              ),
+              // AssetsInfo(
+              //   headerSymbols: public.headerSymbols,
+              // ),
             ],
           ),
         ),

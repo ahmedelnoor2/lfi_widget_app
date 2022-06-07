@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/screens/assets/skeleton/assets_skull.dart';
+import 'package:lyotrade/screens/common/alert.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 
@@ -24,6 +25,20 @@ class _MarginAssetsState extends State<MarginAssets> {
   List _smallBalancesMarginAssets = [];
   String _totalBalanceSymbol = 'BTC';
   bool _hideSmallBalances = false;
+
+  final TextEditingController _amountController = TextEditingController();
+
+  String _defaultCoin = 'LYO1';
+  String _selectedToAccount = 'Margin Account';
+  String _defaultMarginCoin = 'BTC';
+  String _defaultMarginPair = 'BTC/USDT';
+  List _allNetworks = [];
+  List _p2pAssets = [];
+  Map _selectedMarginAssets = {};
+  bool _fromDigitalAccountToOtherAccount = true;
+
+  String _availableBalanceFrom = '0.000';
+  String _availableBalanceTo = '0.000';
 
   @override
   void initState() {
@@ -380,7 +395,7 @@ class _MarginAssetsState extends State<MarginAssets> {
                             : _marginAssets[index];
                         return Container(
                           padding: EdgeInsets.only(
-                            bottom: 8,
+                            bottom: 10,
                             left: 5,
                             right: 5,
                           ),
@@ -394,7 +409,7 @@ class _MarginAssetsState extends State<MarginAssets> {
                                     Container(
                                       padding: EdgeInsets.only(right: 8),
                                       child: CircleAvatar(
-                                        radius: 12,
+                                        radius: 15,
                                         child: Image.network(
                                           '${public.publicInfoMarket['market']['coinList'][asset['values']['baseCoin']]['icon']}',
                                         ),
@@ -408,12 +423,13 @@ class _MarginAssetsState extends State<MarginAssets> {
                                           '${asset['values']['name']}',
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
+                                            fontSize: 16,
                                           ),
                                         ),
                                         Text(
                                           'LYO Credit',
                                           style: TextStyle(
-                                            fontSize: 11,
+                                            fontSize: 12,
                                             color: secondaryTextColor,
                                           ),
                                         ),
@@ -528,14 +544,32 @@ class _MarginAssetsState extends State<MarginAssets> {
                   SizedBox(
                     width: width * 0.28,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        showModalBottomSheet<void>(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return StatefulBuilder(
+                              builder:
+                                  (BuildContext context, StateSetter setState) {
+                                return borrowAsset(
+                                  context,
+                                  public,
+                                  setState,
+                                );
+                              },
+                            );
+                          },
+                        );
+                      },
                       child: Text('Loans'),
                     ),
                   ),
                   SizedBox(
                     width: width * 0.28,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/trade');
+                      },
                       child: Text('Trade'),
                     ),
                   ),
@@ -544,6 +578,524 @@ class _MarginAssetsState extends State<MarginAssets> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget borrowAsset(context, public, setState) {
+    height = MediaQuery.of(context).size.height;
+    var asset = Provider.of<Asset>(context, listen: false);
+
+    List _marginCoins = _defaultMarginPair.split('/');
+
+    return Container(
+      padding: EdgeInsets.all(10),
+      height: height * 0.65,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Loans',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(
+                  Icons.close,
+                  size: 20,
+                ),
+              )
+            ],
+          ),
+          Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              border: Border.all(
+                width: 0.3,
+                color: Color(0xff5E6292),
+              ),
+            ),
+            child: DropdownButton<String>(
+              isExpanded: true,
+              isDense: true,
+              value: _defaultMarginPair,
+              icon: Icon(
+                Icons.keyboard_arrow_down,
+                color: Colors.white,
+              ),
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+              underline: Container(
+                height: 0,
+              ),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _defaultMarginPair = newValue!;
+                  _defaultMarginCoin = newValue.split('/')[0];
+                });
+              },
+              items: _marginAssets.map<DropdownMenuItem<String>>(
+                (marginAsset) {
+                  List _marginPairCoins = marginAsset['market'].split('/');
+                  return DropdownMenuItem<String>(
+                      value: marginAsset['market'],
+                      child: Row(
+                        children: [
+                          Stack(
+                            children: [
+                              SizedBox(
+                                child: CircleAvatar(
+                                  radius: 12,
+                                  child: Image.network(
+                                    '${public.publicInfoMarket['market']['coinList'][_marginPairCoins[0]]['icon']}',
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.only(left: 15),
+                                child: CircleAvatar(
+                                  radius: 12,
+                                  child: Image.network(
+                                    '${public.publicInfoMarket['market']['coinList'][_marginPairCoins[1]]['icon']}',
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(left: 10, right: 5),
+                            child: Text(marginAsset['market']),
+                          ),
+                          Text(
+                            '${public.publicInfoMarket['market']['coinList'][_marginPairCoins[0]]['longName']}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ));
+                },
+              ).toList(),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.only(
+              bottom: 10,
+              top: 10,
+            ),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Coins',
+                style: TextStyle(
+                  color: secondaryTextColor,
+                ),
+              ),
+            ),
+          ),
+          Container(
+            width: width,
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              border: Border.all(
+                width: 0.3,
+                color: Color(0xff5E6292),
+              ),
+            ),
+            child: DropdownButton<String>(
+              isExpanded: true,
+              isDense: true,
+              value: _defaultMarginCoin,
+              icon: Container(
+                // padding: EdgeInsets.only(left: width * 0.24),
+                child: Icon(
+                  Icons.keyboard_arrow_down,
+                  color: Colors.white,
+                ),
+              ),
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+              underline: Container(
+                height: 0,
+              ),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _defaultMarginCoin = newValue!;
+                });
+              },
+              items: _marginCoins.map<DropdownMenuItem<String>>(
+                (value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.only(right: 10),
+                              child: CircleAvatar(
+                                radius: 12,
+                                child: Image.network(
+                                  '${public.publicInfoMarket['market']['coinList'][value]['icon']}',
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding: EdgeInsets.only(right: 5),
+                              child: Text(value),
+                            ),
+                            Text(
+                              '${public.publicInfoMarket['market']['coinList'][value]['longName']}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ).toList(),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.only(top: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: EdgeInsets.only(bottom: 5),
+                  child: Text(
+                    'The number of tranfers',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.only(top: 5, bottom: 5),
+                  child: Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(
+                        style: BorderStyle.solid,
+                        width: 0.3,
+                        color: Color(0xff5E6292),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(
+                          width: width * 0.69,
+                          child: TextField(
+                            onChanged: (value) async {
+                              print(value);
+                            },
+                            controller: _amountController,
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.zero,
+                              isDense: true,
+                              border: UnderlineInputBorder(
+                                borderSide: BorderSide.none,
+                              ),
+                              hintStyle: TextStyle(
+                                fontSize: 14,
+                              ),
+                              hintText: "Please enter the number of transfers",
+                            ),
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.only(right: 10),
+                              child: GestureDetector(
+                                onTap: () async {
+                                  _amountController.text =
+                                      asset.accountBalance['allCoinMap']
+                                          [_defaultCoin]['normal_balance'];
+                                },
+                                child: Text(
+                                  'ALL',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: linkColor,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.only(
+                    top: 5,
+                    right: 5,
+                    left: 5,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              print('Select preceision');
+                            },
+                            child: Container(
+                              width: width * 0.22,
+                              padding: EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Color(0xff292C51),
+                                ),
+                                color: Color(0xff292C51),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(2),
+                                ),
+                              ),
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  '25%',
+                                  style: TextStyle(
+                                    color: secondaryTextColor,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              print('Select preceision');
+                            },
+                            child: Container(
+                              width: width * 0.22,
+                              padding: EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Color(0xff292C51),
+                                ),
+                                color: Color(0xff292C51),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(2),
+                                ),
+                              ),
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  '50%',
+                                  style: TextStyle(
+                                    color: secondaryTextColor,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              print('Select preceision');
+                            },
+                            child: Container(
+                              width: width * 0.22,
+                              padding: EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Color(0xff292C51),
+                                ),
+                                color: Color(0xff292C51),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(2),
+                                ),
+                              ),
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  '75%',
+                                  style: TextStyle(
+                                    color: secondaryTextColor,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              print('Select preceision');
+                            },
+                            child: Container(
+                              width: width * 0.22,
+                              padding: EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Color(0xff292C51),
+                                ),
+                                color: Color(0xff292C51),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(2),
+                                ),
+                              ),
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  '100%',
+                                  style: TextStyle(
+                                    color: secondaryTextColor,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.only(
+                    top: 5,
+                    right: 5,
+                    left: 5,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Interest rate:',
+                        style: TextStyle(
+                          color: secondaryTextColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        _availableBalanceFrom,
+                        style: TextStyle(
+                          color: secondaryTextColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.only(
+                    top: 5,
+                    right: 5,
+                    left: 5,
+                    bottom: 5,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Lent:',
+                        style: TextStyle(
+                          color: secondaryTextColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        _availableBalanceFrom,
+                        style: TextStyle(
+                          color: secondaryTextColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.only(
+                    right: 5,
+                    left: 5,
+                    bottom: 15,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Maximum amount:',
+                        style: TextStyle(
+                          color: secondaryTextColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        _availableBalanceFrom,
+                        style: TextStyle(
+                          color: secondaryTextColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.only(bottom: 15),
+                  width: width,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      showAlert(
+                        context,
+                        Container(),
+                        'Alert',
+                        [
+                          Text('Coming soon...'),
+                        ],
+                        'Ok',
+                      );
+                    },
+                    child: Text('Borrow'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

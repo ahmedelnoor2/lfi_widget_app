@@ -567,7 +567,9 @@ class _KlineChartState extends State<KlineChart>
                         SizedBox(
                           height: width * 0.87,
                           child: _loadingChart
-                              ? CircularProgressIndicator.adaptive()
+                              ? Center(
+                                  child: CircularProgressIndicator.adaptive(),
+                                )
                               : KChartWidget(
                                   datas, // Required，Data must be an ordered list，(history=>now)
                                   chartStyle, // Required for styling purposes
@@ -624,7 +626,7 @@ class _KlineChartState extends State<KlineChart>
                     ],
                   ),
                   SizedBox(
-                    height: height * 0.77,
+                    height: height * 0.79,
                     child: TabBarView(
                       controller: _tabController,
                       children: [
@@ -843,7 +845,7 @@ class _KlineChartState extends State<KlineChart>
                                   children: [
                                     Container(
                                       padding:
-                                          EdgeInsets.only(left: 10, top: 10),
+                                          EdgeInsets.only(left: 10, top: 5),
                                       width: width * 0.33,
                                       child: Text(
                                         '${DateFormat('hh:mm:ss').format(DateTime.fromMillisecondsSinceEpoch(latestTrades[index]['ts']))}',
@@ -852,7 +854,7 @@ class _KlineChartState extends State<KlineChart>
                                       ),
                                     ),
                                     Container(
-                                      padding: EdgeInsets.only(top: 10),
+                                      padding: EdgeInsets.only(top: 5),
                                       width: width * 0.33,
                                       child: Align(
                                         alignment: Alignment.center,
@@ -869,7 +871,7 @@ class _KlineChartState extends State<KlineChart>
                                     ),
                                     Container(
                                       padding:
-                                          EdgeInsets.only(top: 10, right: 10),
+                                          EdgeInsets.only(top: 5, right: 10),
                                       width: width * 0.33,
                                       child: Align(
                                         alignment: Alignment.centerRight,

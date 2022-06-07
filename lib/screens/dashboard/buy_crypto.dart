@@ -34,7 +34,7 @@ class _BuyCryptoState extends State<BuyCrypto> {
           },
           child: SizedBox(
             width: width * 0.325,
-            height: height * 0.12,
+            height: 100,
             child: Card(
               child: Container(
                 padding: EdgeInsets.all(10),
@@ -84,7 +84,7 @@ class _BuyCryptoState extends State<BuyCrypto> {
           },
           child: SizedBox(
             width: width * 0.325,
-            height: height * 0.12,
+            height: 100,
             child: Card(
               child: Container(
                 padding: EdgeInsets.all(10),
@@ -125,7 +125,7 @@ class _BuyCryptoState extends State<BuyCrypto> {
           },
           child: SizedBox(
             width: width * 0.32,
-            height: height * 0.12,
+            height: 100,
             child: Card(
               child: Container(
                 padding: EdgeInsets.all(10),

@@ -133,7 +133,7 @@ class _MarketDrawerState extends State<MarketDrawer>
               right: 15,
             ),
             child: SizedBox(
-              height: width * 0.13,
+              height: width * 0.11,
               child: TextField(
                 onChanged: (value) async {
                   // await asset.filterSearchResults(value);
@@ -175,7 +175,7 @@ class _MarketDrawerState extends State<MarketDrawer>
             ),
           ),
           SizedBox(
-            height: height * 0.794,
+            height: height * 0.79,
             child: ListView.builder(
               shrinkWrap: true,
               itemCount: public.allSearchMarket[_currentMarketSort].isNotEmpty

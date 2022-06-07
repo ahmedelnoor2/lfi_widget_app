@@ -382,7 +382,7 @@ class _OtcAssetsState extends State<OtcAssets> {
                                     Container(
                                       padding: EdgeInsets.only(right: 8),
                                       child: CircleAvatar(
-                                        radius: 12,
+                                        radius: 15,
                                         child: Image.network(
                                           '${public.publicInfoMarket['market']['coinList'][asset['coinSymbol']]['icon']}',
                                         ),
@@ -396,12 +396,13 @@ class _OtcAssetsState extends State<OtcAssets> {
                                           '${asset['coinSymbol']}',
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
+                                            fontSize: 16,
                                           ),
                                         ),
                                         Text(
                                           'LYO Credit',
                                           style: TextStyle(
-                                            fontSize: 11,
+                                            fontSize: 12,
                                             color: secondaryTextColor,
                                           ),
                                         ),
@@ -420,12 +421,13 @@ class _OtcAssetsState extends State<OtcAssets> {
                                         : '${double.parse('${asset['normal']}').toStringAsFixed(4)}',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
+                                      fontSize: 16,
                                     ),
                                   ),
                                 ),
                               ),
                               SizedBox(
-                                width: width * 0.12,
+                                width: width * 0.13,
                                 child: Align(
                                   alignment: Alignment.centerLeft,
                                   child: Text(
@@ -435,6 +437,7 @@ class _OtcAssetsState extends State<OtcAssets> {
                                             .toStringAsFixed(4),
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
+                                      fontSize: 16,
                                     ),
                                   ),
                                 ),
@@ -455,6 +458,7 @@ class _OtcAssetsState extends State<OtcAssets> {
                                           'Transfer',
                                           style: TextStyle(
                                             color: linkColor,
+                                            fontSize: 16,
                                           ),
                                         ),
                                       ),

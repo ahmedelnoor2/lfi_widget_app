@@ -9,17 +9,20 @@ appHeader(context, tabController, onTabChange) {
       preferredSize: Size.fromHeight(48),
       child: Align(
         alignment: Alignment.centerLeft,
-        child: TabBar(
-          onTap: (value) {
-            onTabChange();
-          },
-          indicatorSize: TabBarIndicatorSize.label,
-          isScrollable: true,
-          tabs: <Tab>[
-            Tab(text: 'Spot'),
-            Tab(text: 'Cross Margin'),
-          ],
-          controller: tabController,
+        child: SizedBox(
+          height: 30,
+          child: TabBar(
+            onTap: (value) {
+              onTabChange();
+            },
+            indicatorSize: TabBarIndicatorSize.label,
+            isScrollable: true,
+            tabs: <Tab>[
+              Tab(text: 'Spot'),
+              Tab(text: 'Cross Margin'),
+            ],
+            controller: tabController,
+          ),
         ),
       ),
     ),

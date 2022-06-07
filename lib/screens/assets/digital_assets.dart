@@ -240,13 +240,35 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                                                 [_totalBalanceSymbol])),
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      color: greenlightchartColor,
+                                      color: asset.accountBalance.isNotEmpty
+                                          ? asset.accountBalance[
+                                                      'yesterdayProfitRate'] ==
+                                                  '--'
+                                              ? secondaryTextColor
+                                              : double.parse(asset
+                                                              .accountBalance[
+                                                          'yesterdayProfitRate']) >
+                                                      0
+                                                  ? greenIndicator
+                                                  : redIndicator
+                                          : secondaryTextColor,
                                     ),
                                   ),
                                   Text(
                                     '/${asset.accountBalance.isNotEmpty ? getNumberString(context, double.parse(asset.accountBalance['yesterdayProfitRate'] == '--' ? '0' : asset.accountBalance['yesterdayProfitRate'])) : '0'}%',
                                     style: TextStyle(
-                                      color: greenlightchartColor,
+                                      color: asset.accountBalance.isNotEmpty
+                                          ? asset.accountBalance[
+                                                      'yesterdayProfitRate'] ==
+                                                  '--'
+                                              ? secondaryTextColor
+                                              : double.parse(asset
+                                                              .accountBalance[
+                                                          'yesterdayProfitRate']) >
+                                                      0
+                                                  ? greenIndicator
+                                                  : redIndicator
+                                          : secondaryTextColor,
                                     ),
                                   ),
                                 ],
@@ -405,7 +427,7 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                                     Container(
                                       padding: EdgeInsets.only(right: 8),
                                       child: CircleAvatar(
-                                        radius: 12,
+                                        radius: 15,
                                         child: Image.network(
                                           '${public.publicInfoMarket['market']['coinList'][asset['coin']]['icon']}',
                                         ),
@@ -418,13 +440,13 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                                         Text(
                                           '${asset['coin']}',
                                           style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16),
                                         ),
                                         Text(
                                           'LYO Credit',
                                           style: TextStyle(
-                                            fontSize: 11,
+                                            fontSize: 12,
                                             color: secondaryTextColor,
                                           ),
                                         ),
@@ -441,12 +463,13 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                                     '${_hideBalances ? _hideBalanceString : double.parse(asset['values']['normal_balance']).toStringAsFixed(4)}',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
+                                      fontSize: 16,
                                     ),
                                   ),
                                 ),
                               ),
                               SizedBox(
-                                width: width * 0.12,
+                                width: width * 0.13,
                                 child: Align(
                                   alignment: Alignment.centerLeft,
                                   child: Text(
@@ -457,6 +480,7 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                                             .toStringAsFixed(4),
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
+                                      fontSize: 16,
                                     ),
                                   ),
                                 ),

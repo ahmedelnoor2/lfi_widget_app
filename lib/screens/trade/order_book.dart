@@ -103,8 +103,8 @@ class _OrderBookState extends State<OrderBook> {
                 children: <Widget>[
                   Container(
                     padding: const EdgeInsets.only(
-                      top: 2,
-                      bottom: 2,
+                      top: 1,
+                      bottom: 1,
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -114,7 +114,7 @@ class _OrderBookState extends State<OrderBook> {
                               .toStringAsPrecision(7),
                           style: TextStyle(
                             color: redIndicator,
-                            fontSize: 12,
+                            fontSize: 15,
                           ),
                         ),
                         Text(
@@ -123,7 +123,7 @@ class _OrderBookState extends State<OrderBook> {
                                   .toStringAsFixed(2)
                               : double.parse('${asks[index][1]}')
                                   .toStringAsPrecision(4),
-                          style: TextStyle(fontSize: 12),
+                          style: TextStyle(fontSize: 15),
                         ),
                       ],
                     ),
@@ -136,7 +136,7 @@ class _OrderBookState extends State<OrderBook> {
                                   double.parse('$askMax')) *
                               2) *
                           100,
-                      height: 20,
+                      height: 21,
                     ),
                   ),
                 ],
@@ -182,7 +182,10 @@ class _OrderBookState extends State<OrderBook> {
                         Text(
                           double.parse('${bids[index][0]}')
                               .toStringAsPrecision(7),
-                          style: TextStyle(color: greenIndicator, fontSize: 12),
+                          style: TextStyle(
+                            color: greenIndicator,
+                            fontSize: 15,
+                          ),
                         ),
                         Text(
                           double.parse('${bids[index][1]}') > 10
@@ -190,7 +193,7 @@ class _OrderBookState extends State<OrderBook> {
                                   .toStringAsFixed(2)
                               : double.parse('${bids[index][1]}')
                                   .toStringAsPrecision(4),
-                          style: TextStyle(fontSize: 12),
+                          style: TextStyle(fontSize: 15),
                         ),
                       ],
                     ),
@@ -203,7 +206,7 @@ class _OrderBookState extends State<OrderBook> {
                                   double.parse('$bidMax')) *
                               2) *
                           100,
-                      height: 20,
+                      height: 21,
                     ),
                   ),
                 ],
@@ -221,7 +224,7 @@ class _OrderBookState extends State<OrderBook> {
                   print('Select preceision');
                 },
                 child: Container(
-                  width: width * 0.29,
+                  width: width * 0.31,
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: Color.fromARGB(67, 118, 118, 118),
@@ -234,9 +237,12 @@ class _OrderBookState extends State<OrderBook> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        '0.1',
-                        style: TextStyle(fontSize: 15),
+                      Container(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Text(
+                          '0.1',
+                          style: TextStyle(fontSize: 15),
+                        ),
                       ),
                       Icon(
                         Icons.expand_more,
