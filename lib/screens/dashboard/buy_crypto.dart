@@ -119,9 +119,9 @@ class _BuyCryptoState extends State<BuyCrypto> {
             ),
           ),
         ),
-        GestureDetector(
+        InkWell(
           onTap: () {
-            print('hit');
+            Navigator.pushNamed(context, '/staking');
           },
           child: SizedBox(
             width: width * 0.32,

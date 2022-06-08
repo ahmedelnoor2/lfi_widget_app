@@ -24,6 +24,7 @@ import 'package:lyotrade/screens/security/google_auth.dart';
 import 'package:lyotrade/screens/security/password.dart';
 import 'package:lyotrade/screens/security/phone.dart';
 import 'package:lyotrade/screens/security/security.dart';
+import 'package:lyotrade/screens/staking/stake.dart';
 import 'package:lyotrade/screens/trade/kline_chart.dart';
 import 'package:lyotrade/screens/trade/margin/margin_trade_history.dart';
 import 'package:lyotrade/screens/trade/trade.dart';
@@ -65,12 +66,12 @@ class MyApp extends StatelessWidget {
               // or simply save your changes to "hot reload" in a Flutter IDE).
               // Notice that the counter didn't reset back to zero; the application
               // is not restarted.
-              pageTransitionsTheme: PageTransitionsTheme(
-                builders: {
-                  TargetPlatform.android: NoTransitionsBuilder(),
-                  TargetPlatform.iOS: NoTransitionsBuilder(),
-                },
-              ),
+              // pageTransitionsTheme: PageTransitionsTheme(
+              //   builders: {
+              //     TargetPlatform.android: NoTransitionsBuilder(),
+              //     TargetPlatform.iOS: NoTransitionsBuilder(),
+              //   },
+              // ),
               brightness: Brightness.dark,
               appBarTheme: AppBarTheme(
                 backgroundColor: Color.fromARGB(255, 26, 29, 63),
@@ -191,6 +192,7 @@ class MyApp extends StatelessWidget {
               Authentication.routeName: (context) => const Authentication(),
               Market.routeName: (context) => const Market(),
               Trade.routeName: (context) => const Trade(),
+              Stake.routeName: (context) => const Stake(),
               TradeHistory.routeName: (context) => const TradeHistory(),
               MarginTradeHistory.routeName: (context) =>
                   const MarginTradeHistory(),

@@ -52,7 +52,7 @@ class _MarketHeaderState extends State<MarketHeader> {
                   child: Text(
                     public.activeMarket['showName'],
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lyotrade/screens/assets/assets.dart';
+import 'package:lyotrade/screens/auth/authentication.dart';
+import 'package:lyotrade/screens/dashboard.dart';
+import 'package:lyotrade/screens/future_trade/future_trade.dart';
+import 'package:lyotrade/screens/market/market.dart';
+import 'package:lyotrade/screens/trade/trade.dart';
 
 bottomNav(context, auth) {
   var _currentRoute = ModalRoute.of(context)!.settings.name;
@@ -58,24 +64,33 @@ bottomNav(context, auth) {
     onTap: (value) {
       switch (value) {
         case 0:
-          Navigator.pushNamedAndRemoveUntil(
+          Navigator.pushReplacement(
             context,
-            '/dashboard',
-            (route) => false,
+            PageRouteBuilder(
+              settings: RouteSettings(name: Dashboard.routeName),
+              pageBuilder: (context, animation1, animation2) => Dashboard(),
+              transitionDuration: Duration(seconds: 0),
+            ),
           );
           break;
         case 1:
-          Navigator.pushNamedAndRemoveUntil(
+          Navigator.pushReplacement(
             context,
-            '/market',
-            (route) => false,
+            PageRouteBuilder(
+              settings: RouteSettings(name: Market.routeName),
+              pageBuilder: (context, animation1, animation2) => Market(),
+              transitionDuration: Duration(seconds: 0),
+            ),
           );
           break;
         case 2:
-          Navigator.pushNamedAndRemoveUntil(
+          Navigator.pushReplacement(
             context,
-            '/trade',
-            (route) => false,
+            PageRouteBuilder(
+              settings: RouteSettings(name: Trade.routeName),
+              pageBuilder: (context, animation1, animation2) => Trade(),
+              transitionDuration: Duration(seconds: 0),
+            ),
           );
           break;
         case 3:
@@ -84,17 +99,33 @@ bottomNav(context, auth) {
             '/future_trade',
             (route) => false,
           );
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              settings: RouteSettings(name: FutureTrade.routeName),
+              pageBuilder: (context, animation1, animation2) => FutureTrade(),
+              transitionDuration: Duration(seconds: 0),
+            ),
+          );
           break;
         case 4:
           auth.isAuthenticated
-              ? Navigator.pushNamedAndRemoveUntil(
+              ? Navigator.pushReplacement(
                   context,
-                  '/assets',
-                  (route) => false,
+                  PageRouteBuilder(
+                    settings: RouteSettings(name: Assets.routeName),
+                    pageBuilder: (context, animation1, animation2) => Assets(),
+                    transitionDuration: Duration(seconds: 0),
+                  ),
                 )
-              : Navigator.pushNamed(
+              : Navigator.push(
                   context,
-                  '/authentication',
+                  PageRouteBuilder(
+                    settings: RouteSettings(name: Authentication.routeName),
+                    pageBuilder: (context, animation1, animation2) =>
+                        Authentication(),
+                    transitionDuration: Duration(seconds: 0),
+                  ),
                 );
           break;
         default:

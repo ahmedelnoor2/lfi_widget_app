@@ -9,7 +9,6 @@ class Public with ChangeNotifier {
   Map<String, String> headers = {
     'Content-type': 'application/json;charset=utf-8',
     'Accept': 'application/json',
-    'Access-Control-Allow-Origin': '*',
   };
 
   Map _rate = {};
@@ -45,6 +44,9 @@ class Public with ChangeNotifier {
   List _asks = [];
   List _bids = [];
   String _lastPrice = '0';
+
+  List _stakeLists = [];
+  Map _stakeInfo = {};
 
   List _klineData = [];
 
@@ -135,6 +137,14 @@ class Public with ChangeNotifier {
 
   List get klineData {
     return _klineData;
+  }
+
+  List get stakeLists {
+    return _stakeLists;
+  }
+
+  Map get stakeInfo {
+    return _stakeInfo;
   }
 
   Map get listingSymbol {
@@ -302,7 +312,6 @@ class Public with ChangeNotifier {
 
       final responseData = json.decode(response.body);
 
-      print(responseData);
       if (responseData['code'] == "0") {
         _publicInfoMarket = responseData['data'];
 
@@ -361,9 +370,62 @@ class Public with ChangeNotifier {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
-      print(responseData);
       if (responseData['code'] == "0") {
         _rate = responseData['data']['rate'];
+        return notifyListeners();
+      }
+    } catch (error) {
+      // throw error;
+      print(error);
+      return;
+    }
+  }
+
+  Future<void> getStakeLists() async {
+    var url = Uri.https(
+      apiUrl,
+      '$incrementApi/noToken/increment/project_list',
+    );
+
+    var postData = json.encode({});
+
+    try {
+      final response = await http.post(url, body: postData, headers: headers);
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == 0) {
+        _stakeLists = responseData['data'];
+        return notifyListeners();
+      } else {
+        _stakeLists = [];
+        return notifyListeners();
+      }
+    } catch (error) {
+      // throw error;
+      print(error);
+      return;
+    }
+  }
+
+  Future<void> getStakeInfo(stakeId) async {
+    var url = Uri.https(
+      apiUrl,
+      '$incrementApi/noToken/increment/project_info',
+    );
+
+    var postData = json.encode({'id': stakeId});
+
+    try {
+      final response = await http.post(url, body: postData, headers: headers);
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == 0) {
+        _stakeInfo = responseData['data'];
+        return notifyListeners();
+      } else {
+        _stakeInfo = {};
         return notifyListeners();
       }
     } catch (error) {

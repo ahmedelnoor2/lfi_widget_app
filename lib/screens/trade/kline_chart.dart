@@ -260,8 +260,6 @@ class _KlineChartState extends State<KlineChart>
     var public = Provider.of<Public>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
 
-    // print(datas.length);
-
     List? asks = public.asks;
     List? bids = public.bids;
 
