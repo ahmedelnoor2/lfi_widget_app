@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/future_market.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 
-class MarketHeader extends StatefulWidget {
-  const MarketHeader({
+class FutureMarketHeader extends StatefulWidget {
+  const FutureMarketHeader({
     Key? key,
     this.scaffoldKey,
   }) : super(key: key);
@@ -13,16 +14,16 @@ class MarketHeader extends StatefulWidget {
   final scaffoldKey;
 
   @override
-  State<MarketHeader> createState() => _MarketHeaderState();
+  State<FutureMarketHeader> createState() => _FutureMarketHeaderState();
 }
 
-class _MarketHeaderState extends State<MarketHeader> {
+class _FutureMarketHeaderState extends State<FutureMarketHeader> {
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
 
-    var public = Provider.of<Public>(context, listen: true);
+    var futureMarket = Provider.of<FutureMarket>(context, listen: true);
 
     return Container(
       padding: EdgeInsets.only(
@@ -50,7 +51,7 @@ class _MarketHeaderState extends State<MarketHeader> {
                 child: Container(
                   padding: EdgeInsets.only(right: 5),
                   child: Text(
-                    public.activeMarket['showName'],
+                    futureMarket.activeMarket['symbol'],
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -61,13 +62,14 @@ class _MarketHeaderState extends State<MarketHeader> {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Text(
-                  public.activeMarketTick.isNotEmpty
-                      ? '${(double.parse(public.activeMarketTick['rose']) * 100) > 0 ? '+' : ''}${(double.parse(public.activeMarketTick['rose']) * 100).toStringAsFixed(2)}%'
+                  futureMarket.activeMarketTick.isNotEmpty
+                      ? '${(double.parse(futureMarket.activeMarketTick['rose']) * 100) > 0 ? '+' : ''}${(double.parse(futureMarket.activeMarketTick['rose']) * 100).toStringAsFixed(2)}%'
                       : '0.00%',
                   style: TextStyle(
-                      color: public.activeMarketTick.isEmpty
+                      color: futureMarket.activeMarketTick.isEmpty
                           ? secondaryTextColor
-                          : (double.parse(public.activeMarketTick['rose']) *
+                          : (double.parse(futureMarket
+                                          .activeMarketTick['rose']) *
                                       100) >
                                   0
                               ? greenIndicator
@@ -82,7 +84,7 @@ class _MarketHeaderState extends State<MarketHeader> {
             children: [
               Container(
                 padding: EdgeInsets.only(left: 10),
-                child: GestureDetector(
+                child: InkWell(
                   onTap: () {
                     Navigator.pushNamed(context, '/kline_chart');
                   },
@@ -95,10 +97,15 @@ class _MarketHeaderState extends State<MarketHeader> {
               ),
               Container(
                 padding: EdgeInsets.only(left: 10),
-                child: Icon(
-                  Icons.monetization_on,
-                  color: secondaryTextColor,
-                  size: 20,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, '/kline_chart');
+                  },
+                  child: Icon(
+                    Icons.calculate,
+                    color: secondaryTextColor,
+                    size: 20,
+                  ),
                 ),
               ),
               Container(

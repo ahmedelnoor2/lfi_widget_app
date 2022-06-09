@@ -58,16 +58,7 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
     );
 
     String marketCoin = public.activeMarket['symbol'];
-    // for (int i = 0; i < public.headerSymbols.length; i++) {
-    //   _channel.sink.add(jsonEncode({
-    //     "event": "sub",
-    //     "params": {
-    //       "channel": "market_${marketCoin}_trade_ticker",
-    //       "cb_id": marketCoin,
-    //       "top": 100
-    //     }
-    //   }));
-    // }
+
     _channel.sink.add(jsonEncode({
       "event": "sub",
       "params": {

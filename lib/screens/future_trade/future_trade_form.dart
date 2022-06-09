@@ -1,40 +1,34 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
-import 'package:lyotrade/providers/public.dart';
-import 'package:lyotrade/providers/trade.dart';
+import 'package:lyotrade/providers/future_market.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 
-class TradeForm extends StatefulWidget {
-  const TradeForm({
+class FutureTradeForm extends StatefulWidget {
+  const FutureTradeForm({
     Key? key,
     this.scaffoldKey,
     this.lastPrice,
   }) : super(key: key);
-
   final scaffoldKey;
   final lastPrice;
 
   @override
-  State<TradeForm> createState() => _TradeFormState();
+  State<FutureTradeForm> createState() => _FutureTradeFormState();
 }
 
-class _TradeFormState extends State<TradeForm> {
+class _FutureTradeFormState extends State<FutureTradeForm> {
   final _formTradeKey = GlobalKey<FormState>();
   final TextEditingController _amountField = TextEditingController();
   final TextEditingController _priceField = TextEditingController();
   final TextEditingController _totalField = TextEditingController();
 
   var _timer;
-
-  // late final TabController _tabTradeController =
-  //     TabController(length: 2, vsync: this);
 
   Color _tabIndicatorColor = greenIndicator;
   int _orderType = 1;
@@ -46,7 +40,7 @@ class _TradeFormState extends State<TradeForm> {
 
   @override
   void initState() {
-    setAvailalbePrice();
+    // setAvailalbePrice();
     super.initState();
   }
 
@@ -67,31 +61,6 @@ class _TradeFormState extends State<TradeForm> {
       _price = double.parse(widget.lastPrice);
     });
     calculateTotal('price');
-  }
-
-  Future<void> setAvailalbePrice() async {
-    var auth = Provider.of<Auth>(context, listen: false);
-    var public = Provider.of<Public>(context, listen: false);
-
-    if (auth.isAuthenticated) {
-      var asset = Provider.of<Asset>(context, listen: false);
-      await asset.getAccountBalance(
-        auth,
-        "${public.activeMarket['showName'].split('/')[0]},${public.activeMarket['showName'].split('/')[1]}",
-      );
-      setState(() {
-        _availableBalance = _isBuy
-            ? double.parse(asset.accountBalance['allCoinMap']
-                        [public.activeMarket['showName'].split('/')[1]]
-                    ['normal_balance'])
-                .toStringAsPrecision(6)
-            : double.parse(asset.accountBalance['allCoinMap']
-                        [public.activeMarket['showName'].split('/')[0]]
-                    ['normal_balance'])
-                .toStringAsPrecision(6);
-      });
-      getOpenOrders();
-    }
   }
 
   void calculateTotal(field) {
@@ -141,60 +110,22 @@ class _TradeFormState extends State<TradeForm> {
     }
   }
 
-  Future<void> setPriceField() async {
-    var public = Provider.of<Public>(context, listen: false);
-    _priceField.text = public.amountField;
-    _timer = Timer(Duration(milliseconds: 400), () async {
-      await public.amountFieldDisable();
-    });
-    calculateTotal('price');
-  }
-
-  Future<void> createOrder() async {
-    var auth = Provider.of<Auth>(context, listen: false);
-    var trading = Provider.of<Trading>(context, listen: false);
-    var public = Provider.of<Public>(context, listen: false);
-    var formData = {
-      "price": _orderType == 1
-          ? _priceField.text
-          : (_orderType == 2)
-              ? null
-              : public.lastPrice,
-      "side": _isBuy ? "BUY" : "SELL",
-      "symbol": public.activeMarket['symbol'],
-      "type": _orderType,
-      "volume":
-          (_orderType == 2 && _isBuy) ? _totalField.text : _amountField.text,
-    };
-    await trading.createOrder(context, auth, formData);
-    getOpenOrders();
-  }
-
-  Future<void> getOpenOrders() async {
-    var trading = Provider.of<Trading>(context, listen: false);
-    var auth = Provider.of<Auth>(context, listen: false);
-
-    await trading.getOpenOrders(context, auth, {
-      "entrust": 1,
-      "isShowCanceled": 0,
-      "orderType": _orderType,
-      "page": 1,
-      "pageSize": 10,
-      "symbol": "",
-    });
-  }
+  // Future<void> setPriceField() async {
+  //   var futureMarket = Provider.of<FutureMarket>(context, listen: false);
+  //   _priceField.text = futureMarket.amountField;
+  //   _timer = Timer(Duration(milliseconds: 400), () async {
+  //     await futureMarket.amountFieldDisable();
+  //   });
+  //   calculateTotal('price');
+  // }
 
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
 
-    var public = Provider.of<Public>(context, listen: true);
+    var futureMarket = Provider.of<FutureMarket>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
-
-    if (public.amountFieldUpdate) {
-      setPriceField();
-    }
 
     return Form(
       key: _formTradeKey,
@@ -215,7 +146,7 @@ class _TradeFormState extends State<TradeForm> {
                     setState(() {
                       _isBuy = true;
                     });
-                    setAvailalbePrice();
+                    // setAvailalbePrice();
                   },
                   child: Text(
                     'Buy',
@@ -234,7 +165,7 @@ class _TradeFormState extends State<TradeForm> {
                     setState(() {
                       _isBuy = false;
                     });
-                    setAvailalbePrice();
+                    // setAvailalbePrice();
                   },
                   child: Text(
                     'Sell',
@@ -364,7 +295,7 @@ class _TradeFormState extends State<TradeForm> {
                               fontSize: 16,
                             ),
                             hintText:
-                                "Price (${public.activeMarket['showName'].split('/')[1]})",
+                                "Price (${futureMarket.activeMarket['quote']})",
                           ),
                         ),
                       ),
@@ -434,7 +365,7 @@ class _TradeFormState extends State<TradeForm> {
                               ),
                             ),
                             hintText:
-                                'Amount (${public.activeMarket['showName'].split('/')[0]})',
+                                'Amount (${futureMarket.activeMarket['base']})',
                           ),
                           controller: _amountField,
                         ),
@@ -496,8 +427,7 @@ class _TradeFormState extends State<TradeForm> {
                           Radius.circular(5),
                         ),
                       ),
-                      hintText:
-                          'Total (${public.activeMarket['showName'].split('/')[1]})',
+                      hintText: 'Total (${futureMarket.activeMarket['quote']})',
                     ),
                     controller: _totalField,
                   ),
@@ -522,7 +452,7 @@ class _TradeFormState extends State<TradeForm> {
                     Container(
                       padding: EdgeInsets.only(right: 5),
                       child: Text(
-                          '${_isBuy ? public.activeMarket['showName'].split('/')[1] : public.activeMarket['showName'].split('/')[0]}'),
+                          '${_isBuy ? futureMarket.activeMarket['quote'] : futureMarket.activeMarket['base']}'),
                     ),
                     Icon(
                       Icons.add_circle,
@@ -548,7 +478,7 @@ class _TradeFormState extends State<TradeForm> {
                     //   SnackTypes.warning,
                     //   'Feature is under process',
                     // );
-                    createOrder();
+                    // createOrder();
                   } else {
                     // widget.scaffoldKey!.currentState.hideCurrentSnackBar();
                     // snackAlert(
@@ -567,12 +497,23 @@ class _TradeFormState extends State<TradeForm> {
               ),
               child: Text(
                 auth.isAuthenticated
-                    ? '${_isBuy ? 'Buy' : 'Sell'} ${public.activeMarket['showName'].split('/')[0]}'
+                    ? '${_isBuy ? 'Buy' : 'Sell'} ${futureMarket.activeMarket['base']}'
                     : 'Login / Sign Up',
                 style: TextStyle(color: Colors.white),
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  PopupMenuItem _buildPopupMenuItem(String title, int position) {
+    return PopupMenuItem(
+      value: position,
+      child: Row(
+        children: [
+          Text(title),
         ],
       ),
     );
@@ -712,17 +653,6 @@ class _TradeFormState extends State<TradeForm> {
               ),
             ],
           ),
-        ],
-      ),
-    );
-  }
-
-  PopupMenuItem _buildPopupMenuItem(String title, int position) {
-    return PopupMenuItem(
-      value: position,
-      child: Row(
-        children: [
-          Text(title),
         ],
       ),
     );

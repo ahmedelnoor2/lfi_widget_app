@@ -35,14 +35,11 @@ klineHeader(context, scaffoldKey, market) {
     // toolbarHeight: 1,
     centerTitle: true,
     leading: IconButton(
-        onPressed: () {
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            '/trade',
-            (route) => false,
-          );
-        },
-        icon: Icon(Icons.chevron_left)),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+      icon: Icon(Icons.chevron_left),
+    ),
     title: InkWell(
       onTap: () {
         scaffoldKey!.currentState.openDrawer();

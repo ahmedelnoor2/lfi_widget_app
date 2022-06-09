@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/future_market.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/Number.utils.dart';
-import 'package:lyotrade/providers/public.dart';
 import 'package:provider/provider.dart';
 
-class OrderBook extends StatefulWidget {
-  const OrderBook({
+class FutureOrderBook extends StatefulWidget {
+  const FutureOrderBook({
     Key? key,
     this.asks,
     this.bids,
@@ -17,19 +17,19 @@ class OrderBook extends StatefulWidget {
   final String? lastPrice;
 
   @override
-  State<OrderBook> createState() => _OrderBookState();
+  State<FutureOrderBook> createState() => _FutureOrderBookState();
 }
 
-class _OrderBookState extends State<OrderBook> {
-  void setPriceField(public, value) {
-    public.setAmountField(value);
-  }
+class _FutureOrderBookState extends State<FutureOrderBook> {
+  // void setPriceField(public, value) {
+  //   public.setAmountField(value);
+  // }
 
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
 
-    var public = Provider.of<Public>(context, listen: true);
+    var futureMarket = Provider.of<FutureMarket>(context, listen: true);
 
     List? rasks = widget.asks!.isNotEmpty ? widget.asks!.sublist(0, 6) : [];
     List? asks = List.from(rasks.reversed);
@@ -63,7 +63,7 @@ class _OrderBookState extends State<OrderBook> {
                   ),
                 ),
                 Text(
-                  '(${public.activeMarket['showName'].split('/')[1]})',
+                  '(${futureMarket.activeMarket['quote']})',
                   style: TextStyle(
                     color: secondaryTextColor,
                     fontSize: 10,
@@ -81,7 +81,7 @@ class _OrderBookState extends State<OrderBook> {
                   ),
                 ),
                 Text(
-                  '(${public.activeMarket['showName'].split('/')[0]})',
+                  '(${futureMarket.activeMarket['base']})',
                   style: TextStyle(
                     color: secondaryTextColor,
                     fontSize: 10,
@@ -99,7 +99,7 @@ class _OrderBookState extends State<OrderBook> {
           itemBuilder: (BuildContext context, int index) {
             return InkWell(
               onTap: () {
-                setPriceField(public, asks[index][0]);
+                // setPriceField(public, asks[index][0]);
               },
               child: Stack(
                 children: <Widget>[
@@ -169,7 +169,7 @@ class _OrderBookState extends State<OrderBook> {
           itemBuilder: (BuildContext context, int index) {
             return InkWell(
               onTap: () {
-                setPriceField(public, bids[index][0]);
+                // setPriceField(public, bids[index][0]);
               },
               child: Stack(
                 children: <Widget>[

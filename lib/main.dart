@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/future_market.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/providers/user.dart';
@@ -51,6 +52,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<Asset>(create: (_) => Asset()),
         ChangeNotifierProvider<User>(create: (_) => User()),
         ChangeNotifierProvider<Trading>(create: (_) => Trading()),
+        ChangeNotifierProvider<FutureMarket>(create: (_) => FutureMarket()),
       ],
       child: Consumer<Auth>(
         builder: (context, auth, _) {

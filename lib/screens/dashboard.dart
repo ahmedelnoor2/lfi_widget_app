@@ -103,8 +103,6 @@ class _DashboardState extends State<Dashboard> {
       }
     }
 
-    print(_headerSymbols);
-
     await public.setHeaderSymbols(_headerSymbols);
     return;
   }
