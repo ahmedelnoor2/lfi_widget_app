@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/staking.dart';
 import 'package:lyotrade/screens/common/header.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +17,9 @@ class StakeOrder extends StatefulWidget {
 }
 
 class _StakeOrderState extends State<StakeOrder> {
+  final _formStakeKey = GlobalKey<FormState>();
+  final TextEditingController _authCodeController = TextEditingController();
+
   @override
   void initState() {
     getOrderDetails();
@@ -38,6 +43,37 @@ class _StakeOrderState extends State<StakeOrder> {
         'appKey': staking.activeStakingOrder['appKey'],
       },
     );
+  }
+
+  Future<void> payStakeOrder() async {
+    var staking = Provider.of<Staking>(context, listen: false);
+
+    await staking.payStakeOrder(
+      context,
+      {
+        'appKey': staking.stakeOrderData["appKey"],
+        'assetType': staking.stakeOrderData["accountType"],
+        'googleCode': _authCodeController.text,
+        'orderNum': staking.stakeOrderData["orderNum"],
+        'smsAuthCode': "",
+        'userId': staking.stakeOrderData["userId"],
+      },
+    );
+  }
+
+  Future<void> processStakeOrder() async {
+    var staking = Provider.of<Staking>(context, listen: false);
+
+    print(staking.activeStakingOrder);
+
+    if (staking.stakeOrderData['googleStatus'] == "1") {
+      print('process goolge auth');
+    } else if (staking.stakeOrderData['isOpenMobileCheck'] == "1") {
+      print('process mobile auth');
+    } else {
+      snackAlert(context, SnackTypes.warning,
+          'You need to enable Google Auth or SMS verification');
+    }
   }
 
   @override
@@ -128,31 +164,9 @@ class _StakeOrderState extends State<StakeOrder> {
               padding: EdgeInsets.only(bottom: 15),
               width: width * 0.9,
               child: ElevatedButton(
-                onPressed: true
-                    ? () {
-                        // if (_formStakeKey.currentState!.validate()) {
-                        //   if (double.parse(_amountController.text) <=
-                        //       0) {
-                        //     showAlert(
-                        //       context,
-                        //       Icon(Icons.warning_amber),
-                        //       'Form Error',
-                        //       [Text('Amount is invalid')],
-                        //       'Ok',
-                        //     );
-                        //   } else {
-                        //     staking
-                        //         .createStakingOrder(context, auth, {
-                        //       'projectId': _activeStakeId,
-                        //       'amount': double.parse(
-                        //           _amountController.text),
-                        //       'returnUrl':
-                        //           'https://www.lyotrade.com/en_US/freeStaking/$_activeStakeId',
-                        //     });
-                        //   }
-                        // }
-                      }
-                    : null,
+                onPressed: () {
+                  processStakeOrder();
+                },
                 child: Text('Confirm'),
               ),
             ),
