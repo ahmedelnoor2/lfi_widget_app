@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/providers/staking.dart';
+import 'package:lyotrade/screens/common/alert.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
@@ -12,12 +17,23 @@ class AllStake extends StatefulWidget {
 }
 
 class _AllStakeState extends State<AllStake> {
+  final _formStakeKey = GlobalKey<FormState>();
+  final TextEditingController _amountController = TextEditingController();
+
   String _filterType = 'All';
+  bool _isAgree = false;
+  String _activeStakeId = '';
 
   @override
   void initState() {
     getAllStakes();
     super.initState();
+  }
+
+  @override
+  void dispose() async {
+    _amountController.dispose();
+    super.dispose();
   }
 
   Future<void> getAllStakes() async {
@@ -93,19 +109,13 @@ class _AllStakeState extends State<AllStake> {
             itemCount: public.stakeLists.length,
             itemBuilder: (BuildContext context, int index) {
               var stake = public.stakeLists[index];
-              if (_filterType == 'All') {
-                if (stake['status'] == 3) {
-                  return _stakeItem(public, stake);
-                } else {
-                  return Container();
-                }
-              } else if (_filterType == 'Pending') {
+              if (_filterType == 'Processing') {
                 if (stake['status'] == 1) {
                   return _stakeItem(public, stake);
                 } else {
                   return Container();
                 }
-              } else if (_filterType == 'Processing') {
+              } else if (_filterType == 'Pending') {
                 if (stake['status'] == 2) {
                   return _stakeItem(public, stake);
                 } else {
@@ -133,6 +143,9 @@ class _AllStakeState extends State<AllStake> {
   }
 
   Widget _stakeItem(public, stake) {
+    var auth = Provider.of<Auth>(context, listen: true);
+    var staking = Provider.of<Staking>(context, listen: true);
+
     return Column(
       children: [
         Column(
@@ -142,7 +155,9 @@ class _AllStakeState extends State<AllStake> {
                 Container(
                   padding: EdgeInsets.only(right: 5),
                   child: CircleAvatar(
-                      radius: 14, child: Image.network('${stake['logo']}')),
+                    radius: 14,
+                    child: Image.network('${stake['logo']}'),
+                  ),
                 ),
                 Text(
                   '${public.publicInfoMarket['market']['coinList'][stake['gainCoin']]['longName']}',
@@ -263,7 +278,36 @@ class _AllStakeState extends State<AllStake> {
                 width: width * 0.45,
                 height: 30,
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    setState(() {
+                      _isAgree = false;
+                      _activeStakeId = '${stake['id']}';
+                    });
+                    staking.getActiveStakeInfo(context, auth, stake['id']);
+                    if (stake['status'] == 1) {
+                      showModalBottomSheet<void>(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (BuildContext context) {
+                          return StatefulBuilder(
+                            builder:
+                                (BuildContext context, StateSetter setState) {
+                              return _activeStakeDetails(
+                                context,
+                                stake,
+                                setState,
+                              );
+                            },
+                          );
+                        },
+                      );
+                    } else {
+                      snackAlert(
+                        context,
+                        SnackTypes.warning,
+                        'This project is expired',
+                      );
+                    }
                     // setState(() {
                     //   _isBuy = true;
                     // });
@@ -428,6 +472,386 @@ class _AllStakeState extends State<AllStake> {
     );
   }
 
+  Widget _activeStakeDetails(context, stake, setState) {
+    height = MediaQuery.of(context).size.height;
+    var staking = Provider.of<Staking>(context, listen: true);
+    var auth = Provider.of<Auth>(context, listen: true);
+
+    return Container(
+      padding: EdgeInsets.only(
+        top: 10,
+        bottom: 20,
+        right: 10,
+        left: 10,
+      ),
+      child: Form(
+        key: _formStakeKey,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Process',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: Icon(
+                    Icons.close,
+                    size: 20,
+                  ),
+                )
+              ],
+            ),
+            staking.activeStakeInfo.isNotEmpty
+                ? Column(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(bottom: 20),
+                        child: IntrinsicHeight(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.only(right: 10),
+                                        child: CircleAvatar(
+                                          radius: 20,
+                                          child: Image.network(
+                                            '${staking.activeStakeInfo['logo']}',
+                                          ),
+                                        ),
+                                      ),
+                                      Text(
+                                        '${staking.activeStakeInfo['gainCoinName']}',
+                                        style: TextStyle(fontSize: 25),
+                                      ),
+                                    ],
+                                  ),
+                                  VerticalDivider(
+                                    thickness: 1,
+                                    width: 20,
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${staking.activeStakeInfo['name']}',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      Text(
+                                        '${staking.activeStakeInfo['gainRate']}%',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          color: linkColor,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Annualized returns',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: secondaryTextColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              OutlinedButton(
+                                onPressed: () {},
+                                child: Text('Notice'),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Locking process',
+                            style: TextStyle(
+                              color: secondaryTextColor,
+                            ),
+                          ),
+                          Text(
+                            'Total locking amount',
+                            style: TextStyle(
+                              color: secondaryTextColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        width: width,
+                        padding: EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          // border: Border.all(
+                          //   color: Color(0xff292C51),
+                          // ),
+                          color: Color(0xff292C51),
+                        ),
+                        child: LinearProgressIndicator(
+                          value: double.parse(
+                                  '${staking.activeStakeInfo['progress'].replaceAll('%', '')}') /
+                              100,
+                          semanticsLabel: 'Linear progress indicator',
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '${staking.activeStakeInfo['progress']}',
+                          ),
+                          Text(
+                            '${staking.activeStakeInfo['buyAmountMax']} ${staking.activeStakeInfo['gainCoinName']}',
+                          ),
+                        ],
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(top: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Locked quantity'),
+                            Row(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.only(right: 5),
+                                  child: Text(
+                                    '${staking.activeStakeInfo['totalAmount']}',
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      color: linkColor,
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  '${staking.activeStakeInfo['gainCoin']}',
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(top: 10),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Locked Quantity (Minimum quantity per lock ${staking.activeStakeInfo['buyAmountMin']} USDT; Maximum cumulative lock quantity ${staking.activeStakeInfo['buyAmountMax']} USDT)',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: secondaryTextColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(top: 10, bottom: 5),
+                        child: Container(
+                          padding: EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(
+                              style: BorderStyle.solid,
+                              width: 0.3,
+                              color: Color(0xff5E6292),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              SizedBox(
+                                width: width * 0.69,
+                                child: TextFormField(
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter amount';
+                                    }
+                                    return null;
+                                  },
+                                  controller: _amountController,
+                                  keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.zero,
+                                    isDense: true,
+                                    border: UnderlineInputBorder(
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    hintStyle: TextStyle(
+                                      fontSize: 14,
+                                    ),
+                                    hintText: "Enter Amount to Stake",
+                                  ),
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.only(right: 10),
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        _amountController.text =
+                                            staking.activeStakeInfo['balance'];
+                                      },
+                                      child: Text(
+                                        'ALL',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: linkColor,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(bottom: 5),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.only(right: 5),
+                                child: Text(
+                                  'Available Balance ',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: secondaryTextColor,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                '${staking.activeStakeInfo['balance'] ?? '--'} ${staking.activeStakeInfo['gainCoin'] ?? '--'}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: linkColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(top: 10, bottom: 5),
+                        child: Container(
+                          padding: EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Color.fromARGB(50, 160, 165, 181),
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(
+                              style: BorderStyle.solid,
+                              width: 0.3,
+                              // color: Colors.,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                '${staking.activeStakeInfo['lockDay'] ?? '--'} days prospective earnings: ${staking.activeStakeInfo['totalUserGainAmount']} ${staking.activeStakeInfo['gainCoin']}',
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(top: 15),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            '${staking.activeStakeInfo['info']}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: secondaryTextColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(top: 10),
+                        child: Row(
+                          children: [
+                            Checkbox(
+                              value: _isAgree,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  _isAgree = value!;
+                                });
+                              },
+                            ),
+                            Text(
+                              'I am fully aware of the project risks',
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(bottom: 15),
+                        width: width * 0.9,
+                        child: ElevatedButton(
+                          onPressed: _isAgree
+                              ? () {
+                                  if (_formStakeKey.currentState!.validate()) {
+                                    if (double.parse(_amountController.text) <=
+                                        0) {
+                                      showAlert(
+                                        context,
+                                        Icon(Icons.warning_amber),
+                                        'Form Error',
+                                        [Text('Amount is invalid')],
+                                        'Ok',
+                                      );
+                                    } else {
+                                      staking
+                                          .createStakingOrder(context, auth, {
+                                        'projectId': _activeStakeId,
+                                        'amount': double.parse(
+                                            _amountController.text),
+                                        'returnUrl':
+                                            'https://www.lyotrade.com/en_US/freeStaking/$_activeStakeId',
+                                      });
+                                    }
+                                  }
+                                }
+                              : null,
+                          child: Text('Agree to PoS'),
+                        ),
+                      ),
+                    ],
+                  )
+                : Container(),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _stakeDetails(context, stake, setState) {
     height = MediaQuery.of(context).size.height;
     var public = Provider.of<Public>(context, listen: true);
@@ -471,69 +895,69 @@ class _AllStakeState extends State<AllStake> {
               ? Column(
                   children: [
                     Container(
-                        padding: EdgeInsets.only(bottom: 20),
-                        child: IntrinsicHeight(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Row(
-                                    children: [
-                                      Container(
-                                        padding: EdgeInsets.only(right: 10),
-                                        child: CircleAvatar(
-                                          radius: 20,
-                                          child: Image.network(
-                                            '${public.stakeInfo['logo']}',
-                                          ),
+                      padding: EdgeInsets.only(bottom: 20),
+                      child: IntrinsicHeight(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.only(right: 10),
+                                      child: CircleAvatar(
+                                        radius: 20,
+                                        child: Image.network(
+                                          '${public.stakeInfo['logo']}',
                                         ),
                                       ),
-                                      Text(
-                                        '${public.stakeInfo['gainCoinName']}',
-                                        style: TextStyle(fontSize: 25),
+                                    ),
+                                    Text(
+                                      '${public.stakeInfo['gainCoinName']}',
+                                      style: TextStyle(fontSize: 25),
+                                    ),
+                                  ],
+                                ),
+                                VerticalDivider(
+                                  thickness: 1,
+                                  width: 20,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${public.stakeInfo['name']}',
+                                      style: TextStyle(
+                                        fontSize: 12,
                                       ),
-                                    ],
-                                  ),
-                                  VerticalDivider(
-                                    thickness: 1,
-                                    width: 20,
-                                  ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '${public.stakeInfo['title']}',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                        ),
+                                    ),
+                                    Text(
+                                      '${public.stakeInfo['gainRate']}%',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: linkColor,
                                       ),
-                                      Text(
-                                        '${public.stakeInfo['gainRate']}%',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          color: linkColor,
-                                        ),
+                                    ),
+                                    Text(
+                                      'Annualized returns',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: secondaryTextColor,
                                       ),
-                                      Text(
-                                        'Annualized returns',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: secondaryTextColor,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              OutlinedButton(
-                                onPressed: () {},
-                                child: Text('Notice'),
-                              )
-                            ],
-                          ),
-                        )),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            OutlinedButton(
+                              onPressed: () {},
+                              child: Text('Notice'),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

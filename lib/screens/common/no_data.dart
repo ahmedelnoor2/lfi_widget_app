@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-Widget noData() {
+Widget noData(text) {
   return Center(
-    child: Text('No Transactions'),
+    child: Text(text),
   );
 }

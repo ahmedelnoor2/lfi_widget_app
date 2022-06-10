@@ -125,13 +125,13 @@ class _TradeHistoryState extends State<TradeHistory>
                 controller: _tabTradeHistoryController,
                 children: [
                   trading.openOrders.isEmpty
-                      ? noData()
+                      ? noData('No Transactions')
                       : openOrders(trading.openOrders),
                   trading.orderHistory.isEmpty
-                      ? noData()
+                      ? noData('No Transactions')
                       : orderHistory(trading.orderHistory),
                   trading.transactionHistory.isEmpty
-                      ? noData()
+                      ? noData('No Transactions')
                       : tradeHistory(trading.transactionHistory),
                 ],
               ),

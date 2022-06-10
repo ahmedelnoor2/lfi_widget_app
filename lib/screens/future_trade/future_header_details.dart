@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
@@ -16,12 +18,78 @@ class FutureHeaderDetails extends StatefulWidget {
 }
 
 class _FutureHeaderDetailsState extends State<FutureHeaderDetails> {
+  late Timer _timer;
   String _filterType = '';
+  var time = DateTime.now();
+  DateTime? _timeRange;
+  String _countDown = '00:00:00';
+
+  @override
+  void initState() {
+    _timeRange = DateTime(
+      time.year,
+      time.month,
+      time.day,
+      0,
+      0,
+      0,
+      0,
+      0,
+    );
+    getMarketInfo();
+    super.initState();
+  }
+
+  @override
+  void dispose() async {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  void getCountDown(hour) {
+    if (hour > 0) {
+      _countDown =
+          '${DateTime(time.year, time.month, time.day, 24, 0, 0, 0, 0).subtract(Duration(hours: time.hour, minutes: time.minute, seconds: time.second))}';
+    } else if (hour > 8) {
+      // _countDown = '${DateTime.now().s}';
+      var _hour = 8 - DateTime.now().hour;
+      var _minute = DateTime.now().minute;
+      _countDown =
+          '${DateTime(time.year, time.month, time.day, 16, time.minute, time.second, time.millisecond, time.microsecond).subtract(Duration(hours: time.hour, minutes: time.minute, seconds: time.second))}';
+    } else if (hour > 16) {
+      _countDown =
+          '${DateTime.now().difference(DateTime(time.year, time.month, time.day, 24, 0, 0, 0, 0)).inHours}';
+    }
+  }
+
+  void startTimer() {
+    const oneSec = Duration(seconds: 2);
+    _timer = Timer.periodic(
+      oneSec,
+      (Timer timer) {
+        getCountDown(time.hour);
+      },
+    );
+  }
+
+  Future<void> getMarketInfo() async {
+    var futureMarket = Provider.of<FutureMarket>(context, listen: false);
+
+    if (futureMarket.activeMarket.isNotEmpty) {
+      await futureMarket.getMarketInfo(
+        context,
+        futureMarket.activeMarket['id'],
+      );
+      startTimer();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     var auth = Provider.of<Auth>(context, listen: true);
     var futureMarket = Provider.of<FutureMarket>(context, listen: true);
+
+    print(_countDown);
 
     return Container(
       padding: EdgeInsets.all(10),
@@ -193,11 +261,30 @@ class _FutureHeaderDetailsState extends State<FutureHeaderDetails> {
                     decoration: TextDecoration.underline,
                   ),
                 ),
-                Text(
-                  '0.0069%/03:12:30',
-                  style: TextStyle(
-                    fontSize: 11,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      futureMarket.marketInfo.isEmpty
+                          ? '--%'
+                          : '${(double.parse('${futureMarket.marketInfo['currentFundRate']}') * 100).toStringAsFixed(4)}%',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: futureMarket.marketInfo.isEmpty
+                            ? Colors.white
+                            : double.parse(
+                                        '${futureMarket.marketInfo['currentFundRate']}') >=
+                                    0
+                                ? greenIndicator
+                                : redIndicator,
+                      ),
+                    ),
+                    Text(
+                      '/03:12:30',
+                      style: TextStyle(
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

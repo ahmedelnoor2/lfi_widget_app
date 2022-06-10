@@ -237,15 +237,15 @@ class _MarginTransactionsState extends State<MarginTransactions>
                 controller: _tabmMarginHistoryController,
                 children: [
                   asset.depositLists.isEmpty
-                      ? noData()
+                      ? noData('No Transactions')
                       : marginLoanList(
                           context, width, height, asset.marginLoanLists),
                   asset.withdrawLists.isEmpty
-                      ? noData()
+                      ? noData('No Transactions')
                       : marginHistoryList(
                           context, width, height, asset.marginHistoryLists),
                   asset.financialRecords.isEmpty
-                      ? noData()
+                      ? noData('No Transactions')
                       : marginTransferList(
                           context, width, height, asset.marginTransferLists),
                 ],

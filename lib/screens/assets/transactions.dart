@@ -276,15 +276,15 @@ class _TransactionsState extends State<Transactions>
                 controller: _tabTxHistoryController,
                 children: [
                   asset.depositLists.isEmpty
-                      ? noData()
+                      ? noData('No Transactions')
                       : depositList(context, width, height, asset.depositLists),
                   asset.withdrawLists.isEmpty
-                      ? noData()
+                      ? noData('No Transactions')
                       : withdrawList(
                           context, width, height, asset.withdrawLists),
-                  noData(),
+                  noData('No Transactions'),
                   asset.financialRecords.isEmpty
-                      ? noData()
+                      ? noData('No Transactions')
                       : financialRecords(
                           context, width, height, asset.financialRecords),
                 ],

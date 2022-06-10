@@ -82,13 +82,13 @@ class FutureMarket with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getPublicInfoMarket(formData) async {
+  Future<void> getPublicInfoMarket() async {
     var url = Uri.https(
       futApiUrl,
       '$futExApi/common/public_info',
     );
 
-    var postData = json.encode(formData);
+    var postData = json.encode({});
 
     try {
       final response = await http.post(url, body: postData, headers: headers);
@@ -178,8 +178,7 @@ class FutureMarket with ChangeNotifier {
 
       final responseData = json.decode(response.body);
 
-      print(responseData);
-      if (responseData['code'] == 0) {
+      if (responseData['code'] == '0') {
         _marketInfo = responseData['data'];
         return notifyListeners();
       } else {

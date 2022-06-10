@@ -238,7 +238,7 @@ class _P2pTransactionsState extends State<P2pTransactions> {
               ),
             ),
             asset.p2pLists.isEmpty
-                ? Center(child: noData())
+                ? Center(child: noData('No Transactions'))
                 : p2pList(context, width, height, asset.p2pLists)
           ],
         ),

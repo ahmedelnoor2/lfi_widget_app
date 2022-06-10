@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lyotrade/screens/common/header.dart';
+import 'package:lyotrade/screens/common/no_data.dart';
 import 'package:lyotrade/screens/staking/common/all_stake.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 
@@ -80,7 +81,7 @@ class _StakeState extends State<Stake> with SingleTickerProviderStateMixin {
                 controller: _tabStakeController,
                 children: [
                   AllStake(),
-                  Tab(text: 'All'),
+                  noData('No Data'),
                   Tab(text: 'All'),
                 ],
               ),

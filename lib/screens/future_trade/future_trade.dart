@@ -107,7 +107,7 @@ class _FutureTradeState extends State<FutureTrade> {
   Future<void> getAllMarkets() async {
     var futureMarket = Provider.of<FutureMarket>(context, listen: false);
 
-    await futureMarket.getPublicInfoMarket({'contractId': 1});
+    await futureMarket.getPublicInfoMarket();
     connectWebSocket();
   }
 

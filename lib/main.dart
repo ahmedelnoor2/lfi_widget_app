@@ -3,6 +3,7 @@ import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/future_market.dart';
 import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/providers/staking.dart';
 import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/providers/user.dart';
 import 'package:lyotrade/screens/assets/assets.dart';
@@ -25,6 +26,7 @@ import 'package:lyotrade/screens/security/google_auth.dart';
 import 'package:lyotrade/screens/security/password.dart';
 import 'package:lyotrade/screens/security/phone.dart';
 import 'package:lyotrade/screens/security/security.dart';
+import 'package:lyotrade/screens/staking/common/stake_order.dart';
 import 'package:lyotrade/screens/staking/stake.dart';
 import 'package:lyotrade/screens/trade/kline_chart.dart';
 import 'package:lyotrade/screens/trade/margin/margin_trade_history.dart';
@@ -53,6 +55,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<User>(create: (_) => User()),
         ChangeNotifierProvider<Trading>(create: (_) => Trading()),
         ChangeNotifierProvider<FutureMarket>(create: (_) => FutureMarket()),
+        ChangeNotifierProvider<Staking>(create: (_) => Staking()),
       ],
       child: Consumer<Auth>(
         builder: (context, auth, _) {
@@ -195,6 +198,7 @@ class MyApp extends StatelessWidget {
               Market.routeName: (context) => const Market(),
               Trade.routeName: (context) => const Trade(),
               Stake.routeName: (context) => const Stake(),
+              StakeOrder.routeName: (context) => const StakeOrder(),
               TradeHistory.routeName: (context) => const TradeHistory(),
               MarginTradeHistory.routeName: (context) =>
                   const MarginTradeHistory(),
