@@ -6,6 +6,8 @@ String getTranslate(String text) {
       return 'The current currency does not allow market trading';
     case '参数错误':
       return 'Parameter error';
+    case '人机验证失败':
+      return 'CAPTCHA failed';
     case '可用余额不足':
       return 'Insufficient available balance';
     case '谷歌校验码不正确':

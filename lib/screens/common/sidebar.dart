@@ -228,13 +228,15 @@ class _SideBarState extends State<SideBar> {
               ),
             ),
             auth.userInfo.isNotEmpty
-                ? TextButton(
-                    onPressed: () {
-                      auth.logout(context);
-                    },
-                    child: const Text(
-                      'Logout',
-                      style: TextStyle(fontSize: 18),
+                ? SizedBox(
+                    width: width * 0.5,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        auth.logout(context);
+                      },
+                      child: const Text(
+                        'Logout',
+                      ),
                     ),
                   )
                 : Container()

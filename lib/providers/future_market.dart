@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:k_chart/entity/index.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:k_chart/entity/k_line_entity.dart';
 
@@ -35,7 +37,7 @@ class FutureMarket with ChangeNotifier {
     return _allSearchMarket;
   }
 
-  void setActiveMarket(market) {
+  Future<void> setActiveMarket(market) async {
     _activeMarket = market;
     return notifyListeners();
   }
@@ -184,6 +186,111 @@ class FutureMarket with ChangeNotifier {
       } else {
         _marketInfo = {};
         return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return;
+    }
+  }
+
+  // User Configuration
+  Map _userConfiguration = {};
+
+  Map get userConfiguration {
+    return _userConfiguration;
+  }
+
+  Future<void> getUserConfiguration(ctx, auth, contractId) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      futApiUrl,
+      '$futExApi/user/get_user_config',
+    );
+
+    var postData = json.encode({'contractId': contractId});
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _userConfiguration = responseData['data'];
+        return notifyListeners();
+      } else {
+        _userConfiguration = {};
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return;
+    }
+  }
+
+  // Update user marging model
+
+  Future<void> updateUserMarginModel(ctx, auth, formData) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      futApiUrl,
+      '$futExApi/user/margin_model_edit',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        snackAlert(ctx, SnackTypes.success, "Margin mode changed");
+      } else {
+        snackAlert(ctx, SnackTypes.errors, "${responseData['msg']}");
+      }
+    } catch (error) {
+      print(error);
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return;
+    }
+  }
+
+  // Update level
+  Future<void> updateLeverageLevel(ctx, auth, formData) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      futApiUrl,
+      '$futExApi/user/level_edit',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        snackAlert(ctx, SnackTypes.success, "Leverage level updated");
+      } else {
+        snackAlert(ctx, SnackTypes.errors, "${responseData['msg']}");
       }
     } catch (error) {
       print(error);

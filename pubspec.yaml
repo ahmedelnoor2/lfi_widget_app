@@ -50,6 +50,7 @@ dependencies:
   qr_code_scanner: ^0.7.0
   carousel_slider: ^4.1.1
   k_chart: ^0.6.1
+  syncfusion_flutter_sliders: ^20.1.59
 
 dev_dependencies:
   flutter_test:

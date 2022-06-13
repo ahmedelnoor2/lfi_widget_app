@@ -82,7 +82,7 @@ class _StakeState extends State<Stake> with SingleTickerProviderStateMixin {
                 children: [
                   AllStake(),
                   noData('No Data'),
-                  Tab(text: 'All'),
+                  noData('No Data'),
                 ],
               ),
             ),

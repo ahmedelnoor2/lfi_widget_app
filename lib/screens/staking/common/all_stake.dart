@@ -121,6 +121,12 @@ class _AllStakeState extends State<AllStake> {
                 } else {
                   return Container();
                 }
+              } else if (_filterType == 'Finished') {
+                if (stake['status'] == 3) {
+                  return _stakeItem(public, stake);
+                } else {
+                  return Container();
+                }
               } else {
                 return _stakeItem(public, stake);
               }

@@ -105,9 +105,17 @@ class _FutureTradeState extends State<FutureTrade> {
   }
 
   Future<void> getAllMarkets() async {
+    var auth = Provider.of<Auth>(context, listen: false);
     var futureMarket = Provider.of<FutureMarket>(context, listen: false);
 
     await futureMarket.getPublicInfoMarket();
+    await futureMarket.setActiveMarket(futureMarket.allMarkets['BTC']);
+    await futureMarket.getMarketInfo(
+      context,
+      futureMarket.activeMarket['id'],
+    );
+    futureMarket.getUserConfiguration(
+        context, auth, futureMarket.activeMarket['id']);
     connectWebSocket();
   }
 

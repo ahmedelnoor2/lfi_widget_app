@@ -175,13 +175,15 @@ class Staking with ChangeNotifier {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
-      print(responseData);
       if (responseData['code'] == "0") {
         Navigator.pop(ctx);
-        snackAlert(ctx, SnackTypes.success, '${responseData['msg']}');
+        Navigator.pop(ctx);
+        snackAlert(ctx, SnackTypes.success, 'Successfully paid');
       } else if (responseData['code'] == 10002) {
+        Navigator.pop(ctx);
         snackAlert(ctx, SnackTypes.warning, 'Please login to access');
       } else {
+        Navigator.pop(ctx);
         snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
       }
     } catch (error) {

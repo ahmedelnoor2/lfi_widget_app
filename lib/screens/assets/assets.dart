@@ -353,14 +353,8 @@ class _AssetsState extends State<Assets> {
                               itemBuilder: (BuildContext context, int index) {
                                 return InkWell(
                                   onTap: () {
-                                    if (_accounts[index]['path'] ==
-                                        '/staking') {
-                                      snackAlert(context, SnackTypes.warning,
-                                          'Coming Soon...');
-                                    } else {
-                                      Navigator.pushNamed(context,
-                                          '${_accounts[index]['path']}');
-                                    }
+                                    Navigator.pushNamed(
+                                        context, '${_accounts[index]['path']}');
                                   },
                                   child: Card(
                                     child: ListTile(
@@ -386,40 +380,44 @@ class _AssetsState extends State<Assets> {
                                               ),
                                             ],
                                           ),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            children: [
-                                              Text(
-                                                '${_hideBalances ? _hideBalanceString : double.parse('${_accounts[index]['balance']}').toStringAsFixed(6)} $_totalBalanceSymbol',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              Text(
-                                                '=${_hideBalances ? _hideBalanceString : getNumberFormat(
-                                                    context,
-                                                    public.rate[public.activeCurrency['fiat_symbol']
-                                                                    .toUpperCase()][
-                                                                _totalBalanceSymbol] !=
-                                                            null
-                                                        ? double.parse(_accounts[index][
-                                                                    'balance'] ??
-                                                                '0') *
-                                                            public.rate[public
-                                                                    .activeCurrency[
-                                                                        'fiat_symbol']
-                                                                    .toUpperCase()]
-                                                                [_totalBalanceSymbol]
-                                                        : 0,
-                                                  )}',
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: secondaryTextColor,
-                                                ),
-                                              ),
-                                            ],
-                                          )
+                                          _accounts[index]['path'] == '/staking'
+                                              ? Container()
+                                              : Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.end,
+                                                  children: [
+                                                    Text(
+                                                      '${_hideBalances ? _hideBalanceString : double.parse('${_accounts[index]['balance']}').toStringAsFixed(6)} $_totalBalanceSymbol',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '=${_hideBalances ? _hideBalanceString : getNumberFormat(
+                                                          context,
+                                                          public.rate[public.activeCurrency['fiat_symbol']
+                                                                          .toUpperCase()][
+                                                                      _totalBalanceSymbol] !=
+                                                                  null
+                                                              ? double.parse(
+                                                                      _accounts[index][
+                                                                              'balance'] ??
+                                                                          '0') *
+                                                                  public.rate[public
+                                                                      .activeCurrency[
+                                                                          'fiat_symbol']
+                                                                      .toUpperCase()][_totalBalanceSymbol]
+                                                              : 0,
+                                                        )}',
+                                                      style: TextStyle(
+                                                        fontSize: 12,
+                                                        color:
+                                                            secondaryTextColor,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )
                                         ],
                                       ),
                                       trailing: Icon(Icons.chevron_right),
