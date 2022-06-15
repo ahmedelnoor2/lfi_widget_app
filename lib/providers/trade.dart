@@ -56,6 +56,8 @@ class Trading with ChangeNotifier {
 
       final responseData = json.decode(response.body);
 
+      print(responseData);
+
       if (responseData['code'] == 0) {
         _openOrders = responseData['data']['orders'];
         return notifyListeners();
@@ -316,53 +318,6 @@ class Trading with ChangeNotifier {
       if (responseData['code'] == '0') {
         snackAlert(ctx, SnackTypes.success,
             getTranslate('Order successfully cancelled'));
-        return;
-      } else {
-        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
-        return;
-      }
-    } catch (error) {
-      snackAlert(
-        ctx,
-        SnackTypes.errors,
-        'Error on cancelling orders, please try again',
-      );
-      return;
-      // throw error;
-    }
-  }
-
-  Future<void> transferAsset(ctx, auth, formData) async {
-    /**
-     * params:
-      amount: "0.00000020",
-      coinSymbol: "BTC",
-      fromAccount: "1" 1 = Digital and 2 = Marging,
-      symbol: "btcusdt" ,
-      toAccount: "2" 1 = Digital and 2 = Margin,
-    */
-
-    headers['exchange-token'] = auth.loginVerificationToken;
-
-    var url = Uri.https(
-      apiUrl,
-      '$exApi/ever/finance/transfer',
-    );
-
-    var postData = json.encode(formData);
-
-    try {
-      final response = await http.post(
-        url,
-        body: postData,
-        headers: headers,
-      );
-
-      final responseData = json.decode(response.body);
-
-      if (responseData['code'] == '0') {
-        snackAlert(ctx, SnackTypes.success,
-            getTranslate('Amount successfully transferred.'));
         return;
       } else {
         snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));

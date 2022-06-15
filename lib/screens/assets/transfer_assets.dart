@@ -4,6 +4,7 @@ import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/trade.dart';
+import 'package:lyotrade/screens/assets/assets.dart';
 import 'package:lyotrade/screens/common/drawer.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
@@ -55,7 +56,7 @@ class _TransferAssetsState extends State<TransferAssets> {
   Future<void> getDigitalBalance() async {
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
-    await asset.getAccountBalance(auth, "");
+    await asset.getAccountBalance(context, auth, "");
     getCoinCosts(_defaultCoin);
   }
 
@@ -63,7 +64,8 @@ class _TransferAssetsState extends State<TransferAssets> {
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
 
-    await asset.getP2pBalance(auth);
+    await asset.getP2pBalance(context, auth);
+
     asset.p2pBalance['allCoinMap'].forEach((p2pAccount) {
       if (p2pAccount['coinSymbol'] == _defaultCoin) {
         setState(() {
@@ -158,19 +160,31 @@ class _TransferAssetsState extends State<TransferAssets> {
 
   Future<void> transferringAsset() async {
     var auth = Provider.of<Auth>(context, listen: false);
-    var trading = Provider.of<Trading>(context, listen: false);
+    var asset = Provider.of<Asset>(context, listen: false);
 
-    Map formData = {
-      "amount": _amountController.text,
-      "coinSymbol": _defaultMarginCoin,
-      "fromAccount": _fromDigitalAccountToOtherAccount ? "1" : "2",
-      "symbol": _selectedMarginAssets['values']['symbol'],
-      "toAccount": _fromDigitalAccountToOtherAccount ? "2" : "1",
-    };
+    if (_selectedToAccount == 'P2P Account') {
+      Map formData = {
+        "amount": _amountController.text,
+        "coinSymbol": _defaultMarginCoin,
+        "fromAccount": _fromDigitalAccountToOtherAccount ? "1" : "2",
+        "toAccount": _fromDigitalAccountToOtherAccount ? "2" : "1",
+      };
 
-    await trading.transferAsset(context, auth, formData);
+      await asset.makeOtcTransfer(context, auth, formData);
+      getP2pBalance();
+    } else {
+      Map formData = {
+        "amount": _amountController.text,
+        "coinSymbol": _defaultMarginCoin,
+        "fromAccount": _fromDigitalAccountToOtherAccount ? "1" : "2",
+        "symbol": _selectedMarginAssets['values']['symbol'],
+        "toAccount": _fromDigitalAccountToOtherAccount ? "2" : "1",
+      };
+
+      await asset.makeMarginTransfer(context, auth, formData);
+      getMarginlBalance();
+    }
     getDigitalBalance();
-    getMarginlBalance();
   }
 
   @override

@@ -42,6 +42,30 @@ class FutureMarket with ChangeNotifier {
     return notifyListeners();
   }
 
+  Future<void> filterMarketSearchResults(
+    query,
+    _searchAllMarkets,
+    sMarketSort,
+  ) async {
+    if (query.isNotEmpty) {
+      List dummyListData = [];
+      for (var item in _searchAllMarkets) {
+        if (item['symbol'].contains(query.toLowerCase())) {
+          dummyListData.add(item);
+        }
+      }
+      _allSearchMarket[sMarketSort].clear();
+      _allSearchMarket[sMarketSort].addAll(dummyListData);
+      notifyListeners();
+      return;
+    } else {
+      _allSearchMarket[sMarketSort].clear();
+      _allSearchMarket[sMarketSort].addAll(_searchAllMarkets);
+      notifyListeners();
+      return;
+    }
+  }
+
   // ASKS and BIDS
   List _asks = [];
   List _bids = [];
@@ -289,6 +313,38 @@ class FutureMarket with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         snackAlert(ctx, SnackTypes.success, "Leverage level updated");
+      } else {
+        snackAlert(ctx, SnackTypes.errors, "${responseData['msg']}");
+      }
+    } catch (error) {
+      print(error);
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return;
+    }
+  }
+
+  // Update level
+  Future<void> updateUserConfigs(ctx, auth, formData) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      futApiUrl,
+      '$futExApi/user/edit_user_page_config',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        snackAlert(ctx, SnackTypes.success, "Configuration updated");
       } else {
         snackAlert(ctx, SnackTypes.errors, "${responseData['msg']}");
       }

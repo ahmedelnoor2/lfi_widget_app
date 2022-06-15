@@ -269,7 +269,7 @@ class Auth with ChangeNotifier {
         _loginVerificationToken = _emailVerificationToken;
         return _emailVerificationToken;
       } else {
-        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
 
       return '';
@@ -301,7 +301,7 @@ class Auth with ChangeNotifier {
         snackAlert(
             ctx, SnackTypes.success, 'Verification code sent to your email.');
       } else {
-        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
 
       return '';
@@ -430,7 +430,7 @@ class Auth with ChangeNotifier {
         await prefs.setString('authToken', _loginVerificationToken);
         snackAlert(ctx, SnackTypes.success, 'Email is successfully verified.');
       } else {
-        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
 
       return responseData['code'];

@@ -84,10 +84,9 @@ class _MarketMarginHeaderState extends State<MarketMarginHeader> {
                 padding: EdgeInsets.only(left: 10),
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.pushNamedAndRemoveUntil(
+                    Navigator.pushNamed(
                       context,
                       '/kline_chart',
-                      (route) => false,
                     );
                   },
                   child: Icon(

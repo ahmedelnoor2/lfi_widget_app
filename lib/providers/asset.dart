@@ -163,7 +163,7 @@ class Asset with ChangeNotifier {
     }
   }
 
-  Future<void> getAccountBalance(auth, coinSymbols) async {
+  Future<void> getAccountBalance(ctx, auth, coinSymbols) async {
     headers['exchange-token'] = auth.loginVerificationToken;
 
     var url = Uri.https(
@@ -184,6 +184,10 @@ class Asset with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         _accountBalance = responseData['data'];
+      } else if (responseData['code'] == "10002") {
+        snackAlert(
+            ctx, SnackTypes.warning, 'Session Expired, Please login back');
+        Navigator.pushNamed(ctx, '/authentication');
       } else {
         _accountBalance = {};
       }
@@ -194,7 +198,7 @@ class Asset with ChangeNotifier {
     }
   }
 
-  Future<void> getP2pBalance(auth) async {
+  Future<void> getP2pBalance(ctx, auth) async {
     headers['exchange-token'] = auth.loginVerificationToken;
 
     var url = Uri.https(
@@ -215,6 +219,10 @@ class Asset with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         _p2pBalance = responseData['data'];
+      } else if (responseData['code'] == "10002") {
+        snackAlert(
+            ctx, SnackTypes.warning, 'Session Expired, Please login back');
+        Navigator.pushNamed(ctx, '/authentication');
       } else {
         _p2pBalance = {};
       }
@@ -535,6 +543,91 @@ class Asset with ChangeNotifier {
       notifyListeners();
     } catch (error) {
       notifyListeners();
+      // throw error;
+    }
+  }
+
+  Future<void> makeOtcTransfer(ctx, auth, formData) async {
+    /*
+    * Params
+      amount: "1"
+      coinSymbol: "LYO1"
+      fromAccount: "1" 1 = Digital Account
+      toAccount: "2" 2 = P2P Account 
+    */
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/finance/otc_transfer',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        snackAlert(ctx, SnackTypes.success, 'Transfer successful');
+      } else if (responseData['code'] == 10002) {
+        snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+      } else {
+        snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
+      }
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
+      // throw error;
+    }
+  }
+
+  Future<void> makeMarginTransfer(ctx, auth, formData) async {
+    /*
+    * Params
+      amount: "1"
+      coinSymbol: "USDT"
+      fromAccount: "1" 1 = Digital Account
+      symbol: "btcusdt"
+      toAccount: "2" 2 = Margin Account
+    */
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/lever/finance/transfer',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        if (responseData['msg'] == 'Failure to transfer leveraged funds！') {
+          snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
+        } else if (responseData['msg'] == 'Insufficient Balance') {
+          snackAlert(ctx, SnackTypes.errors, 'Insufficient Balance');
+        } else {
+          snackAlert(ctx, SnackTypes.success, 'Transfer Successful');
+        }
+      } else if (responseData['code'] == 10002) {
+        snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+      } else {
+        snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
+      }
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
       // throw error;
     }
   }

@@ -454,10 +454,19 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                       child: Text(
                           '${_isBuy ? futureMarket.activeMarket['quote'] : futureMarket.activeMarket['base']}'),
                     ),
-                    Icon(
-                      Icons.add_circle,
-                      size: 15,
-                      color: linkColor,
+                    InkWell(
+                      onTap: () {
+                        if (auth.isAuthenticated) {
+                          Navigator.pushNamed(context, '/transfer_assets');
+                        } else {
+                          Navigator.pushNamed(context, '/authentication');
+                        }
+                      },
+                      child: Icon(
+                        Icons.swap_horiz,
+                        size: 15,
+                        color: linkColor,
+                      ),
                     ),
                   ],
                 )
@@ -479,6 +488,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                     //   'Feature is under process',
                     // );
                     // createOrder();
+                    snackAlert(context, SnackTypes.warning, 'Coming Soon...');
                   } else {
                     // widget.scaffoldKey!.currentState.hideCurrentSnackBar();
                     // snackAlert(

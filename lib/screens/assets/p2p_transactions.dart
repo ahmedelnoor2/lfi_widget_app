@@ -51,7 +51,7 @@ class _P2pTransactionsState extends State<P2pTransactions> {
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
 
-    await asset.getP2pBalance(auth);
+    await asset.getP2pBalance(context, auth);
     asset.p2pBalance['allCoinMap'].forEach((p2pAccount) {
       if (p2pAccount['coinSymbol'] == _defaultCoin) {
         setState(() {

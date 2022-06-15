@@ -54,7 +54,7 @@ class _DepositAssetsState extends State<DepositAssets> {
   Future<void> getDigitalBalance() async {
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
-    await asset.getAccountBalance(auth, "");
+    await asset.getAccountBalance(context, auth, "");
     getCoinCosts(_defaultCoin);
   }
 

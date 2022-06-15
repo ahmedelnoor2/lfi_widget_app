@@ -18,6 +18,7 @@ import 'package:lyotrade/screens/assets/transactions.dart';
 import 'package:lyotrade/screens/assets/transfer_assets.dart';
 import 'package:lyotrade/screens/assets/withdraw_assets.dart';
 import 'package:lyotrade/screens/auth/authentication.dart';
+import 'package:lyotrade/screens/buy_sell/BuySellCrypto.dart';
 import 'package:lyotrade/screens/dashboard.dart';
 import 'package:lyotrade/screens/future_trade/future_trade.dart';
 import 'package:lyotrade/screens/market/market.dart';
@@ -222,6 +223,7 @@ class MyApp extends StatelessWidget {
               DigitalAssets.routeName: (context) => const DigitalAssets(),
               MarginAssets.routeName: (context) => const MarginAssets(),
               OtcAssets.routeName: (context) => const OtcAssets(),
+              BuySellCrypto.routeName: (context) => const BuySellCrypto(),
             },
           );
         },

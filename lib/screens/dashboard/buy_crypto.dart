@@ -27,7 +27,7 @@ class _BuyCryptoState extends State<BuyCrypto> {
         InkWell(
           onTap: () {
             if (auth.isAuthenticated) {
-              // Navigator.pushNamed(context, '/deposit_assets');
+              Navigator.pushNamed(context, '/buy_sell_crypto');
             } else {
               Navigator.pushNamed(context, '/authentication');
             }

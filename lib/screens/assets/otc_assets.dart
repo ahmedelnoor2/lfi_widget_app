@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/screens/assets/skeleton/assets_skull.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 
@@ -35,7 +37,7 @@ class _OtcAssetsState extends State<OtcAssets> {
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
 
-    await asset.getP2pBalance(auth);
+    await asset.getP2pBalance(context, auth);
     setState(() {
       _totalBalanceSymbol = asset.p2pBalance['totalBalanceSymbol'] ?? 'BTC';
       _p2pAssets = asset.p2pBalance['allCoinMap'];
@@ -480,21 +482,29 @@ class _OtcAssetsState extends State<OtcAssets> {
                   SizedBox(
                     width: width * 0.28,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        snackAlert(
+                            context, SnackTypes.warning, 'Coming Soon...');
+                      },
                       child: Text('Buy'),
                     ),
                   ),
                   SizedBox(
                     width: width * 0.28,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        snackAlert(
+                            context, SnackTypes.warning, 'Coming Soon...');
+                      },
                       child: Text('Sell'),
                     ),
                   ),
                   SizedBox(
                     width: width * 0.30,
                     child: ElevatedButton(
-                      onPressed: null,
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/transfer_assets');
+                      },
                       child: Text('Transfer'),
                     ),
                   ),

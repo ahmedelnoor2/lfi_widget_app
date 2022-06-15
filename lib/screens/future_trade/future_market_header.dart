@@ -46,7 +46,7 @@ class _FutureMarketHeaderState extends State<FutureMarketHeader> {
               ),
               InkWell(
                 onTap: () {
-                  widget.scaffoldKey!.currentState.openDrawer();
+                  // widget.scaffoldKey!.currentState.openDrawer();
                 },
                 child: Container(
                   padding: EdgeInsets.only(right: 5),

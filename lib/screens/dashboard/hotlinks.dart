@@ -112,7 +112,7 @@ class _HotlinksState extends State<Hotlinks> {
                   ),
                 ),
                 Text(
-                  'Trading Bot',
+                  'Crypto Loan',
                   style: TextStyle(
                     fontSize: 12,
                   ),

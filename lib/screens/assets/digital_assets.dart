@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/screens/assets/skeleton/assets_skull.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 
@@ -43,7 +45,7 @@ class _DigitalAssetsState extends State<DigitalAssets> {
   Future<void> getDigitalBalance() async {
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
-    await asset.getAccountBalance(auth, "");
+    await asset.getAccountBalance(context, auth, "");
     List _digAssets = [];
     asset.accountBalance['allCoinMap'].forEach((k, v) {
       _digAssets.add({
@@ -86,6 +88,7 @@ class _DigitalAssetsState extends State<DigitalAssets> {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
 
+    var auth = Provider.of<Auth>(context, listen: true);
     var public = Provider.of<Public>(context, listen: true);
     var asset = Provider.of<Asset>(context, listen: true);
 
@@ -545,10 +548,12 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                     width: width * 0.28,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushNamed(
-                          context,
-                          '/deposit_assets',
-                        );
+                        if (auth.userInfo['realAuthType'] == 0) {
+                          snackAlert(context, SnackTypes.warning,
+                              'Deposit limited(Please check KYC status)');
+                        } else {
+                          Navigator.pushNamed(context, '/deposit_assets');
+                        }
                       },
                       child: Text('Deposit'),
                     ),
@@ -568,7 +573,9 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                   SizedBox(
                     width: width * 0.30,
                     child: ElevatedButton(
-                      onPressed: null,
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/transfer_assets');
+                      },
                       child: Text('Transfer'),
                     ),
                   ),

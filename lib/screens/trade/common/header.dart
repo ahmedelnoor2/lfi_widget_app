@@ -30,16 +30,20 @@ appHeader(context, tabController, onTabChange) {
 }
 
 klineHeader(context, scaffoldKey, market) {
+  var _currentRoute = ModalRoute.of(context)!.settings.name;
+
   return AppBar(
     shadowColor: Colors.transparent,
     // toolbarHeight: 1,
     centerTitle: true,
-    leading: IconButton(
-      onPressed: () {
-        Navigator.pop(context);
-      },
-      icon: Icon(Icons.chevron_left),
-    ),
+    leading: _currentRoute == '/market'
+        ? Container()
+        : IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(Icons.chevron_left),
+          ),
     title: InkWell(
       onTap: () {
         scaffoldKey!.currentState.openDrawer();

@@ -76,6 +76,7 @@ class _TradeFormState extends State<TradeForm> {
     if (auth.isAuthenticated) {
       var asset = Provider.of<Asset>(context, listen: false);
       await asset.getAccountBalance(
+        context,
         auth,
         "${public.activeMarket['showName'].split('/')[0]},${public.activeMarket['showName'].split('/')[1]}",
       );

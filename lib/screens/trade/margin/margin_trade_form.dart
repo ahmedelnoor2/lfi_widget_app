@@ -41,7 +41,6 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
   double _amount = 0;
   double _price = 0;
   double _total = 0;
-  String _availableBalance = '0.000000';
   bool _isBuy = true;
 
   @override
@@ -76,20 +75,22 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
     if (auth.isAuthenticated) {
       var asset = Provider.of<Asset>(context, listen: false);
       await asset.getAccountBalance(
+        context,
         auth,
         "${public.activeMarket['showName'].split('/')[0]},${public.activeMarket['showName'].split('/')[1]}",
       );
-      setState(() {
-        _availableBalance = _isBuy
-            ? double.parse(asset.accountBalance['allCoinMap']
-                        [public.activeMarket['showName'].split('/')[1]]
-                    ['normal_balance'])
-                .toStringAsPrecision(6)
-            : double.parse(asset.accountBalance['allCoinMap']
-                        [public.activeMarket['showName'].split('/')[0]]
-                    ['normal_balance'])
-                .toStringAsPrecision(6);
-      });
+
+      await asset.getMarginBalance(auth);
+
+      // setState(() {
+      //   _availableBalance = _isBuy
+      //       ? double.parse(
+      //               '${asset.marginBalance['leverMap'][public.activeMarket['showName']]['quoteTotalBalance']}')
+      //           .toStringAsPrecision(6)
+      //       : double.parse(
+      //               '${asset.marginBalance['leverMap'][public.activeMarket['showName']]['baseTotalBalance']}')
+      //           .toStringAsPrecision(6);
+      // });
       getOpenOrders();
     }
   }
@@ -190,11 +191,22 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
     height = MediaQuery.of(context).size.height;
 
     var public = Provider.of<Public>(context, listen: true);
+    var asset = Provider.of<Asset>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
 
     if (public.amountFieldUpdate) {
       setPriceField();
     }
+
+    var _availableBalance = asset.marginBalance.isNotEmpty
+        ? _isBuy
+            ? double.parse(
+                    '${asset.marginBalance['leverMap'][public.activeMarket['showName']]['quoteTotalBalance']}')
+                .toStringAsPrecision(6)
+            : double.parse(
+                    '${asset.marginBalance['leverMap'][public.activeMarket['showName']]['baseTotalBalance']}')
+                .toStringAsPrecision(6)
+        : '0';
 
     return Form(
       key: _formTradeKey,
@@ -523,11 +535,6 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
                       padding: EdgeInsets.only(right: 5),
                       child: Text(
                           '${_isBuy ? public.activeMarket['showName'].split('/')[1] : public.activeMarket['showName'].split('/')[0]}'),
-                    ),
-                    Icon(
-                      Icons.add_circle,
-                      size: 15,
-                      color: linkColor,
                     ),
                   ],
                 )

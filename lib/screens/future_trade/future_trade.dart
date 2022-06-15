@@ -6,6 +6,7 @@ import 'package:lyotrade/providers/future_market.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/bottomnav.dart';
 import 'package:lyotrade/screens/common/header.dart';
+import 'package:lyotrade/screens/future_trade/common/future_market_drawer.dart';
 import 'package:lyotrade/screens/future_trade/future_header_details.dart';
 import 'package:lyotrade/screens/future_trade/future_market_header.dart';
 import 'package:lyotrade/screens/future_trade/future_open_orders.dart';
@@ -128,39 +129,48 @@ class _FutureTradeState extends State<FutureTrade> {
     var auth = Provider.of<Auth>(context, listen: true);
 
     return Scaffold(
+      key: _scaffoldKey,
       appBar: hiddenAppBar(),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            FutureMarketHeader(scaffoldKey: _scaffoldKey),
-            FutureHeaderDetails(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
+      drawer: FutureMarketDrawer(
+        scaffoldKey: _scaffoldKey,
+        updateMarket: updateMarket,
+      ),
+      body: GestureDetector(
+          onTap: () {
+            FocusManager.instance.primaryFocus?.unfocus();
+          },
+          child: SingleChildScrollView(
+            child: Column(
               children: [
-                Container(
-                  padding: EdgeInsets.only(top: 10, bottom: 10, left: 10),
-                  width: width * 0.4,
-                  child: FutureOrderBook(
-                    asks: futureMarket.asks,
-                    bids: futureMarket.bids,
-                    lastPrice: futureMarket.lastPrice,
-                  ),
+                FutureMarketHeader(scaffoldKey: _scaffoldKey),
+                FutureHeaderDetails(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.only(top: 10, bottom: 10, left: 10),
+                      width: width * 0.4,
+                      child: FutureOrderBook(
+                        asks: futureMarket.asks,
+                        bids: futureMarket.bids,
+                        lastPrice: futureMarket.lastPrice,
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.only(right: 10),
+                      width: width * 0.58,
+                      child: FutureTradeForm(
+                        scaffoldKey: _scaffoldKey,
+                        lastPrice: futureMarket.lastPrice,
+                      ),
+                    ),
+                  ],
                 ),
-                Container(
-                  padding: EdgeInsets.only(right: 10),
-                  width: width * 0.58,
-                  child: FutureTradeForm(
-                    scaffoldKey: _scaffoldKey,
-                    lastPrice: futureMarket.lastPrice,
-                  ),
-                ),
+                FutureOpenOrders(),
               ],
             ),
-            FutureOpenOrders(),
-          ],
-        ),
-      ),
+          )),
       bottomNavigationBar: bottomNav(context, auth),
     );
   }

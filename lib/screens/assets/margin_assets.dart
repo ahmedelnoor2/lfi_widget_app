@@ -1012,7 +1012,7 @@ class _MarginAssetsState extends State<MarginAssets> {
                         ),
                       ),
                       Text(
-                        _availableBalanceFrom,
+                        '${(double.parse('${asset.marginBalance['leverMap'][_defaultMarginPair]['rate']}') * 100).toStringAsFixed(2)}%',
                         style: TextStyle(
                           color: secondaryTextColor,
                           fontWeight: FontWeight.w600,

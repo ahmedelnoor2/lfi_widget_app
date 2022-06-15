@@ -53,7 +53,7 @@ class _MarginDetailsState extends State<MarginDetails> {
   Future<void> getDigitalBalance() async {
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
-    await asset.getAccountBalance(auth, "");
+    await asset.getAccountBalance(context, auth, "");
 
     getCoinCosts(_defaultCoin);
   }
@@ -123,11 +123,29 @@ class _MarginDetailsState extends State<MarginDetails> {
         : '${_selectedMarginAssets['values']['quoteTotalBalance']}';
   }
 
+  void updateDefaultMarginCoin(public) {
+    var newDefaultMarginCoin = public.activeMarket['showName'].split('/')[0];
+    for (var marginAsset in _marginAssets) {
+      if (marginAsset['coin'] == newDefaultMarginCoin) {
+        setState(() {
+          _defaultMarginCoin = marginAsset['coin'];
+          _defaultMarginPair = marginAsset['market'];
+          _selectedMarginAssets = marginAsset;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var public = Provider.of<Public>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
     var asset = Provider.of<Asset>(context, listen: true);
+
+    if (_defaultMarginPair.split('/')[0] !=
+        public.activeMarket['showName'].split('/')[0]) {
+      updateDefaultMarginCoin(public);
+    }
 
     String _riskRate = '--';
     if (auth.isAuthenticated) {
@@ -171,11 +189,11 @@ class _MarginDetailsState extends State<MarginDetails> {
                             builder: (BuildContext context) {
                               return StatefulBuilder(
                                 builder: (BuildContext context,
-                                    StateSetter setState) {
+                                    StateSetter updateState) {
                                   return transferAsset(
                                     context,
                                     public,
-                                    setState,
+                                    updateState,
                                   );
                                 },
                               );
@@ -285,7 +303,9 @@ class _MarginDetailsState extends State<MarginDetails> {
     height = MediaQuery.of(context).size.height;
     var asset = Provider.of<Asset>(context, listen: false);
 
-    List _marginCoins = _defaultMarginPair.split('/');
+    List _marginCoins = _defaultMarginPair.isNotEmpty
+        ? _defaultMarginPair.split('/')
+        : ['BTC', 'USDT'];
 
     return Container(
       padding: EdgeInsets.all(10),
@@ -509,9 +529,6 @@ class _MarginDetailsState extends State<MarginDetails> {
                         SizedBox(
                           width: width * 0.69,
                           child: TextField(
-                            onChanged: (value) async {
-                              print(value);
-                            },
                             controller: _amountController,
                             keyboardType: const TextInputType.numberWithOptions(
                               decimal: true,
@@ -802,6 +819,7 @@ class _MarginDetailsState extends State<MarginDetails> {
   Future<void> transferringAsset() async {
     var auth = Provider.of<Auth>(context, listen: false);
     var trading = Provider.of<Trading>(context, listen: false);
+    var asset = Provider.of<Asset>(context, listen: false);
 
     Map formData = {
       "amount": _amountController.text,
@@ -811,7 +829,10 @@ class _MarginDetailsState extends State<MarginDetails> {
       "toAccount": _fromDigitalAccountToOtherAccount ? "2" : "1",
     };
 
-    await trading.transferAsset(context, auth, formData);
+    print(formData);
+
+    Navigator.pop(context);
+    await asset.makeMarginTransfer(context, auth, formData);
     getDigitalBalance();
     getMarginlBalance();
   }
@@ -820,7 +841,9 @@ class _MarginDetailsState extends State<MarginDetails> {
     height = MediaQuery.of(context).size.height;
     var asset = Provider.of<Asset>(context, listen: false);
 
-    List _marginCoins = _selectedMarginAssets['market'].split('/');
+    List _marginCoins = _selectedMarginAssets.isNotEmpty
+        ? _selectedMarginAssets['market'].split('/')
+        : ['BTC', 'USDT'];
 
     return Container(
       padding: EdgeInsets.all(10),
@@ -924,61 +947,59 @@ class _MarginDetailsState extends State<MarginDetails> {
                 color: Color(0xff5E6292),
               ),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                DropdownButton<String>(
-                  isDense: true,
-                  value: _defaultMarginCoin,
-                  icon: Container(
-                    padding: EdgeInsets.only(left: width * 0.44),
-                    child: Icon(
-                      Icons.keyboard_arrow_down,
-                      color: Colors.white,
-                    ),
-                  ),
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  underline: Container(
-                    height: 0,
-                  ),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _defaultMarginCoin = newValue!;
-                    });
-                  },
-                  items: _marginCoins.map<DropdownMenuItem<String>>((value) {
-                    return DropdownMenuItem<String>(
-                        value: value,
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: EdgeInsets.only(right: 10),
-                              child: CircleAvatar(
-                                radius: 12,
-                                child: Image.network(
-                                  '${public.publicInfoMarket['market']['coinList'][value]['icon']}',
-                                ),
-                              ),
-                            ),
-                            Container(
-                              padding: EdgeInsets.only(right: 5),
-                              child: Text(value),
-                            ),
-                            Text(
-                              '${public.publicInfoMarket['market']['coinList'][value]['longName']}',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                          ],
-                        ));
-                  }).toList(),
+            child: SizedBox(
+              width: width * 0.9,
+              child: DropdownButton<String>(
+                isExpanded: true,
+                isDense: true,
+                value: _defaultMarginCoin,
+                icon: Icon(
+                  Icons.keyboard_arrow_down,
+                  color: Colors.white,
                 ),
-              ],
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+                underline: Container(
+                  height: 0,
+                ),
+                onChanged: (String? newValue) {
+                  print('Before: $_defaultMarginCoin');
+                  setState(() {
+                    _defaultMarginCoin = newValue!;
+                  });
+                  print('After: $_defaultMarginCoin');
+                },
+                items: _marginCoins.map<DropdownMenuItem<String>>((value) {
+                  return DropdownMenuItem<String>(
+                      value: value,
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(right: 10),
+                            child: CircleAvatar(
+                              radius: 12,
+                              child: Image.network(
+                                '${public.publicInfoMarket['market']['coinList'][value]['icon']}',
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(right: 5),
+                            child: Text(value),
+                          ),
+                          Text(
+                            '${public.publicInfoMarket['market']['coinList'][value]['longName']}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ));
+                }).toList(),
+              ),
             ),
           ),
           Container(
@@ -1013,13 +1034,12 @@ class _MarginDetailsState extends State<MarginDetails> {
                         SizedBox(
                           width: width * 0.69,
                           child: TextField(
-                            onChanged: (value) async {
-                              print(value);
-                            },
                             controller: _amountController,
                             keyboardType: const TextInputType.numberWithOptions(
+                              signed: true,
                               decimal: true,
                             ),
+                            textInputAction: TextInputAction.done,
                             decoration: InputDecoration(
                               contentPadding: EdgeInsets.zero,
                               isDense: true,
@@ -1038,10 +1058,19 @@ class _MarginDetailsState extends State<MarginDetails> {
                             Container(
                               padding: EdgeInsets.only(right: 10),
                               child: GestureDetector(
-                                onTap: () async {
-                                  _amountController.text =
-                                      asset.accountBalance['allCoinMap']
-                                          [_defaultCoin]['normal_balance'];
+                                onTap: () {
+                                  setState(() {
+                                    _amountController.text =
+                                        _fromDigitalAccountToOtherAccount
+                                            ? '${asset.accountBalance['allCoinMap'][_defaultMarginCoin]['normal_balance']}'
+                                            : _defaultMarginCoin ==
+                                                    asset.marginBalance[
+                                                                'leverMap']
+                                                            [_defaultMarginPair]
+                                                        ['baseCoin']
+                                                ? '${asset.marginBalance['leverMap'][_defaultMarginPair]['baseNormalBalance']}'
+                                                : '${asset.marginBalance['leverMap'][_defaultMarginPair]['quoteNormalBalance']}';
+                                  });
                                 },
                                 child: Text(
                                   'ALL',
@@ -1076,7 +1105,13 @@ class _MarginDetailsState extends State<MarginDetails> {
                         ),
                       ),
                       Text(
-                        _availableBalanceFrom,
+                        _fromDigitalAccountToOtherAccount
+                            ? '${asset.accountBalance['allCoinMap'][_defaultMarginCoin]['normal_balance']}'
+                            : _defaultMarginCoin ==
+                                    asset.marginBalance['leverMap']
+                                        [_defaultMarginPair]['baseCoin']
+                                ? '${asset.marginBalance['leverMap'][_defaultMarginPair]['baseNormalBalance']}'
+                                : '${asset.marginBalance['leverMap'][_defaultMarginPair]['quoteNormalBalance']}',
                         style: TextStyle(
                           color: secondaryTextColor,
                           fontWeight: FontWeight.w600,

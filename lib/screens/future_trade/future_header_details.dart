@@ -47,6 +47,54 @@ class _FutureHeaderDetailsState extends State<FutureHeaderDetails>
     },
   ];
 
+  int _activePositionMode = 1;
+  final List _positionModes = [
+    {
+      'positionMode': 1,
+      'name': 'Netting Mode',
+      'details': 'Only buy or sell side position exists in netting mode',
+    },
+    {
+      'positionMode': 2,
+      'name': 'Hadging Mode',
+      'details': 'Both buy and sell side position can exist in hedging mode',
+    },
+  ];
+
+  int _activeContractUnit = 1;
+  final List _contractUnit = [
+    {
+      'mode': 1,
+      'name': 'Cont.',
+    },
+    {
+      'mode': 2,
+      'name': 'BTC',
+    },
+  ];
+
+  int _activeStopOrderPref = 14;
+  final List _stopOrderPreferences = [
+    {
+      'mode': 4,
+      'name': '4 Hour',
+    },
+    {
+      'mode': 7,
+      'name': '7 Days',
+    },
+    {
+      'mode': 14,
+      'name': '14 Days',
+    },
+    {
+      'mode': 30,
+      'name': '30 Days',
+    },
+  ];
+
+  bool _secondOrderConfirmation = true;
+
   @override
   void initState() {
     _timeRange = DateTime(
@@ -60,6 +108,7 @@ class _FutureHeaderDetailsState extends State<FutureHeaderDetails>
       0,
     );
     startTimer();
+    setUserConfigurations();
     super.initState();
   }
 
@@ -119,6 +168,22 @@ class _FutureHeaderDetailsState extends State<FutureHeaderDetails>
     );
   }
 
+  void setUserConfigurations() {
+    var futureMarket = Provider.of<FutureMarket>(context, listen: false);
+
+    if (futureMarket.userConfiguration.isNotEmpty) {
+      setState(() {
+        _activeContractUnit = futureMarket.userConfiguration['coUnit'];
+        _activeStopOrderPref = futureMarket.userConfiguration['expireTime'];
+        _secondOrderConfirmation =
+            futureMarket.userConfiguration['pcSecondConfirm'] == 0
+                ? false
+                : true;
+        _activePositionMode = futureMarket.userConfiguration['positionModel'];
+      });
+    }
+  }
+
   Future<void> updateMarginMode(marginModelId) async {
     var futureMarket = Provider.of<FutureMarket>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
@@ -139,6 +204,24 @@ class _FutureHeaderDetailsState extends State<FutureHeaderDetails>
     });
     await futureMarket.getUserConfiguration(
         context, auth, futureMarket.activeMarket['id']);
+  }
+
+  Future<void> updateUserConfig() async {
+    var auth = Provider.of<Auth>(context, listen: false);
+    var futureMarket = Provider.of<FutureMarket>(context, listen: false);
+
+    if (auth.isAuthenticated) {
+      Map formData = {
+        'coUnit': _activeContractUnit,
+        'contractId': futureMarket.activeMarket['id'],
+        'expireTime': _activeStopOrderPref,
+        'pcSecondConfirm': _secondOrderConfirmation ? 1 : 0,
+        'positionModel': _activePositionMode,
+      };
+      await futureMarket.updateUserConfigs(context, auth, formData);
+      await futureMarket.getUserConfiguration(
+          context, auth, futureMarket.activeMarket['id']);
+    }
   }
 
   @override
@@ -173,11 +256,7 @@ class _FutureHeaderDetailsState extends State<FutureHeaderDetails>
                               );
                             },
                           )
-                        : snackAlert(
-                            context,
-                            SnackTypes.warning,
-                            'Login to trade',
-                          );
+                        : Navigator.pushNamed(context, '/authentication');
                   },
                   child: Container(
                       padding: EdgeInsets.only(left: 4),
@@ -242,7 +321,7 @@ class _FutureHeaderDetailsState extends State<FutureHeaderDetails>
                       child: Row(
                         children: [
                           Text(
-                            '${futureMarket.userConfiguration['nowLevel'] ?? double.parse(futureMarket.activeMarket['maxLever'])}x',
+                            '${futureMarket.userConfiguration['nowLevel'] ?? double.parse('${futureMarket.activeMarket['maxLever'] ?? 0.0}')}x',
                             style: TextStyle(
                               fontSize: 12,
                             ),
@@ -259,23 +338,22 @@ class _FutureHeaderDetailsState extends State<FutureHeaderDetails>
                 padding: EdgeInsets.only(right: 10),
                 child: InkWell(
                   onTap: () {
-                    // auth.isAuthenticated
-                    //     ? showModalBottomSheet<void>(
-                    //         context: context,
-                    //         builder: (BuildContext context) {
-                    //           return StatefulBuilder(
-                    //             builder: (BuildContext context,
-                    //                 StateSetter setState) {
-                    //               return transferAsset(
-                    //                 context,
-                    //                 public,
-                    //                 setState,
-                    //               );
-                    //             },
-                    //           );
-                    //         },
-                    //       )
-                    //     : Navigator.pushNamed(context, '/authentication');
+                    showModalBottomSheet<void>(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (BuildContext context) {
+                        return StatefulBuilder(
+                          builder:
+                              (BuildContext context, StateSetter setState) {
+                            return preferenceUpdate(
+                              context,
+                              futureMarket,
+                              setState,
+                            );
+                          },
+                        );
+                      },
+                    );
                   },
                   child: Container(
                     padding: EdgeInsets.only(
@@ -599,6 +677,194 @@ class _FutureHeaderDetailsState extends State<FutureHeaderDetails>
             child: ElevatedButton(
               onPressed: () {
                 updateLeverageLevel(_leverageLevelField.text);
+                Navigator.pop(context);
+              },
+              child: Text('Confirm'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget preferenceUpdate(context, futureMarket, setState) {
+    height = MediaQuery.of(context).size.height;
+    width = MediaQuery.of(context).size.width;
+
+    return Container(
+      padding: EdgeInsets.only(
+        top: 10,
+        right: 10,
+        left: 10,
+        bottom: 30,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Preferences',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(
+                  Icons.close,
+                  size: 20,
+                ),
+              )
+            ],
+          ),
+          Divider(),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Position Mode:'),
+              Text(
+                'Note: Can not change when any position or oder exists',
+                style: TextStyle(fontSize: 12, color: secondaryTextColor),
+              )
+            ],
+          ),
+          Divider(),
+          Column(
+            children: _positionModes
+                .map(
+                  (positionMode) => Container(
+                    margin: EdgeInsets.only(bottom: 10),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Color(0xff292C51),
+                      ),
+                      // color: Color(0xff292C51),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(2),
+                      ),
+                    ),
+                    child: ListTile(
+                      title: Text('${positionMode['name']}'),
+                      leading: Radio<int>(
+                        value: positionMode['positionMode'],
+                        groupValue: _activePositionMode,
+                        onChanged: (value) {
+                          setState(() {
+                            _activePositionMode = value!;
+                          });
+                        },
+                      ),
+                      subtitle: Text('${positionMode['details']}'),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+          Divider(),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                child: Text(
+                  'Contract Unit:',
+                  style: TextStyle(
+                    color: secondaryTextColor,
+                  ),
+                ),
+              ),
+              Row(
+                children: _contractUnit
+                    .map(
+                      (contractUnit) => Row(
+                        children: [
+                          Radio<int>(
+                            value: contractUnit['mode'],
+                            groupValue: _activeContractUnit,
+                            onChanged: (value) {
+                              setState(() {
+                                _activeContractUnit = value!;
+                              });
+                            },
+                          ),
+                          Text('${contractUnit['name']}'),
+                        ],
+                      ),
+                    )
+                    .toList(),
+              )
+            ],
+          ),
+          Divider(),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Stop orders preference:',
+                style: TextStyle(
+                  color: secondaryTextColor,
+                ),
+              ),
+              Wrap(
+                children: _stopOrderPreferences
+                    .map(
+                      (stopOrderPreference) => Row(
+                        children: [
+                          Radio<int>(
+                            value: stopOrderPreference['mode'],
+                            groupValue: _activeStopOrderPref,
+                            onChanged: (value) {
+                              setState(() {
+                                _activeStopOrderPref = value!;
+                              });
+                            },
+                          ),
+                          Text('${stopOrderPreference['name']}'),
+                        ],
+                      ),
+                    )
+                    .toList(),
+              ),
+            ],
+          ),
+          Divider(),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Conrifm before place order:',
+                style: TextStyle(
+                  color: secondaryTextColor,
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Second Conrimation of order'),
+                  Switch(
+                    value: _secondOrderConfirmation,
+                    onChanged: (value) {
+                      setState(() {
+                        _secondOrderConfirmation = value;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Divider(),
+          SizedBox(
+            width: width,
+            child: ElevatedButton(
+              onPressed: () {
+                updateUserConfig();
                 Navigator.pop(context);
               },
               child: Text('Confirm'),
