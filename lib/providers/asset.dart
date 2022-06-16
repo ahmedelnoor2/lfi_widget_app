@@ -264,6 +264,44 @@ class Asset with ChangeNotifier {
     }
   }
 
+  // Get Marging Symbol Balance
+  Map _marginSymbolBalance = {};
+
+  Map get marginSymbolBalance {
+    return _marginSymbolBalance;
+  }
+
+  Future<void> getMarginSymbolBalance(auth, symbol) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/lever/finance/symbol/balance',
+    );
+
+    var postData = json.encode({'symbol': symbol});
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _marginSymbolBalance = responseData['data'];
+      } else {
+        _marginSymbolBalance = {};
+      }
+      notifyListeners();
+    } catch (error) {
+      notifyListeners();
+      // throw error;
+    }
+  }
+
   Future<void> getCoinCosts(auth, coin) async {
     headers['exchange-token'] = auth.loginVerificationToken;
 
@@ -419,6 +457,44 @@ class Asset with ChangeNotifier {
       notifyListeners();
     } catch (error) {
       notifyListeners();
+      // throw error;
+    }
+  }
+
+  Future<void> borrowMarginWallet(ctx, auth, formData) async {
+    /*
+    * Params
+      amount: "2"
+      coin: "USDT"
+      symbol: "BTCUSDT"
+    */
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/lever/finance/borrow',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        snackAlert(ctx, SnackTypes.success, 'Borrow successful');
+      } else if (responseData['code'] == 10002) {
+        snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+      } else {
+        snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
+      }
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
       // throw error;
     }
   }

@@ -43,6 +43,7 @@ class _TradeFormState extends State<TradeForm> {
   double _total = 0;
   String _availableBalance = '0.000000';
   bool _isBuy = true;
+  double _currentAmountSelection = 0;
 
   @override
   void initState() {
@@ -83,15 +84,14 @@ class _TradeFormState extends State<TradeForm> {
       setState(() {
         _availableBalance = _isBuy
             ? double.parse(asset.accountBalance['allCoinMap']
-                        [public.activeMarket['showName'].split('/')[1]]
+                        [public.activeMarket['name'].split('/')[1]]
                     ['normal_balance'])
                 .toStringAsPrecision(6)
             : double.parse(asset.accountBalance['allCoinMap']
-                        [public.activeMarket['showName'].split('/')[0]]
+                        [public.activeMarket['name'].split('/')[0]]
                     ['normal_balance'])
                 .toStringAsPrecision(6);
       });
-      getOpenOrders();
     }
   }
 
@@ -103,7 +103,8 @@ class _TradeFormState extends State<TradeForm> {
             _amount = double.parse(_amountField.text);
             _total = double.parse(_amountField.text) * _price;
           });
-          _totalField.text = '${double.parse(_amountField.text) * _price}';
+          _totalField.text =
+              '${(double.parse(_amountField.text) * _price).toStringAsFixed(4)}';
         } catch (e) {
           //
         }
@@ -117,7 +118,8 @@ class _TradeFormState extends State<TradeForm> {
           _price = double.parse(_priceField.text);
           _total = double.parse(_priceField.text) * _amount;
         });
-        _totalField.text = '${double.parse(_priceField.text) * _amount}';
+        _totalField.text =
+            '${(double.parse(_priceField.text) * _amount).toStringAsFixed(4)}';
       } else {
         setState(() {
           _price = 0.00;
@@ -167,6 +169,7 @@ class _TradeFormState extends State<TradeForm> {
       "volume":
           (_orderType == 2 && _isBuy) ? _totalField.text : _amountField.text,
     };
+
     await trading.createOrder(context, auth, formData);
     getOpenOrders();
   }
@@ -191,6 +194,7 @@ class _TradeFormState extends State<TradeForm> {
     height = MediaQuery.of(context).size.height;
 
     var public = Provider.of<Public>(context, listen: true);
+    var asset = Provider.of<Asset>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
 
     if (public.amountFieldUpdate) {
@@ -214,6 +218,9 @@ class _TradeFormState extends State<TradeForm> {
                   ),
                   onPressed: () {
                     setState(() {
+                      _amountField.clear();
+                      _totalField.clear();
+                      _currentAmountSelection = 0;
                       _isBuy = true;
                     });
                     setAvailalbePrice();
@@ -233,6 +240,9 @@ class _TradeFormState extends State<TradeForm> {
                   ),
                   onPressed: () {
                     setState(() {
+                      _amountField.clear();
+                      _totalField.clear();
+                      _currentAmountSelection = 0;
                       _isBuy = false;
                     });
                     setAvailalbePrice();
@@ -447,7 +457,7 @@ class _TradeFormState extends State<TradeForm> {
                     ],
                   ),
                 ),
-          _orderType == 1 ? _selectAmountPecentage() : Container(),
+          _orderType == 1 ? _selectAmountPecentage(public, asset) : Container(),
           ((_orderType == 2 && _isBuy) || _orderType == 1)
               ? Container(
                   margin: EdgeInsets.only(bottom: 8),
@@ -504,7 +514,7 @@ class _TradeFormState extends State<TradeForm> {
                   ),
                 )
               : Container(),
-          _orderType == 2 ? _selectAmountPecentage() : Container(),
+          _orderType == 2 ? _selectAmountPecentage(public, asset) : Container(),
           Container(
             padding: EdgeInsets.only(top: 2),
             child: Row(
@@ -525,11 +535,11 @@ class _TradeFormState extends State<TradeForm> {
                       child: Text(
                           '${_isBuy ? public.activeMarket['showName'].split('/')[1] : public.activeMarket['showName'].split('/')[0]}'),
                     ),
-                    Icon(
-                      Icons.add_circle,
-                      size: 15,
-                      color: linkColor,
-                    ),
+                    // Icon(
+                    //   Icons.add_circle,
+                    //   size: 15,
+                    //   color: linkColor,
+                    // ),
                   ],
                 )
               ],
@@ -579,7 +589,7 @@ class _TradeFormState extends State<TradeForm> {
     );
   }
 
-  Widget _selectAmountPecentage() {
+  Widget _selectAmountPecentage(public, asset) {
     return Container(
       padding: EdgeInsets.only(bottom: 8),
       child: Row(
@@ -587,16 +597,40 @@ class _TradeFormState extends State<TradeForm> {
         children: [
           Column(
             children: [
-              GestureDetector(
+              InkWell(
                 onTap: () {
-                  print('Select preceision');
+                  setState(() {
+                    _currentAmountSelection = 25;
+                    if (_isBuy && (_orderType == 2)) {
+                      _totalField.text = (double.parse(asset
+                                          .accountBalance['allCoinMap'][
+                                      public.activeMarket['name'].split('/')[1]]
+                                  ['normal_balance']) *
+                              0.25)
+                          .toStringAsPrecision(6);
+                    } else {
+                      _amountField.text = (double.parse(asset
+                                          .accountBalance['allCoinMap'][
+                                      public.activeMarket['name'].split('/')[0]]
+                                  ['normal_balance']) *
+                              0.25)
+                          .toStringAsPrecision(6);
+                    }
+                  });
+                  if (_isBuy && (_orderType == 2)) {
+                    calculateTotal('total');
+                  } else {
+                    calculateTotal('amount');
+                  }
                 },
                 child: Container(
                   width: width * 0.13,
                   padding: EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Color(0xff292C51),
+                      color: _currentAmountSelection >= 25
+                          ? linkColor
+                          : Color(0xff292C51),
                     ),
                     color: Color(0xff292C51),
                     borderRadius: BorderRadius.all(
@@ -608,7 +642,9 @@ class _TradeFormState extends State<TradeForm> {
                     child: Text(
                       '25%',
                       style: TextStyle(
-                        color: secondaryTextColor,
+                        color: _currentAmountSelection >= 25
+                            ? linkColor
+                            : secondaryTextColor,
                         fontSize: 12,
                       ),
                     ),
@@ -619,16 +655,40 @@ class _TradeFormState extends State<TradeForm> {
           ),
           Column(
             children: [
-              GestureDetector(
+              InkWell(
                 onTap: () {
-                  print('Select preceision');
+                  setState(() {
+                    _currentAmountSelection = 50;
+                    if (_isBuy && (_orderType == 2)) {
+                      _totalField.text = (double.parse(asset
+                                          .accountBalance['allCoinMap'][
+                                      public.activeMarket['name'].split('/')[1]]
+                                  ['normal_balance']) *
+                              0.50)
+                          .toStringAsPrecision(6);
+                    } else {
+                      _amountField.text = (double.parse(asset
+                                          .accountBalance['allCoinMap'][
+                                      public.activeMarket['name'].split('/')[0]]
+                                  ['normal_balance']) *
+                              0.50)
+                          .toStringAsPrecision(6);
+                    }
+                  });
+                  if (_isBuy && (_orderType == 2)) {
+                    calculateTotal('total');
+                  } else {
+                    calculateTotal('amount');
+                  }
                 },
                 child: Container(
                   width: width * 0.13,
                   padding: EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Color(0xff292C51),
+                      color: _currentAmountSelection >= 50
+                          ? linkColor
+                          : Color(0xff292C51),
                     ),
                     color: Color(0xff292C51),
                     borderRadius: BorderRadius.all(
@@ -640,7 +700,9 @@ class _TradeFormState extends State<TradeForm> {
                     child: Text(
                       '50%',
                       style: TextStyle(
-                        color: secondaryTextColor,
+                        color: _currentAmountSelection >= 50
+                            ? linkColor
+                            : secondaryTextColor,
                         fontSize: 12,
                       ),
                     ),
@@ -651,16 +713,40 @@ class _TradeFormState extends State<TradeForm> {
           ),
           Column(
             children: [
-              GestureDetector(
+              InkWell(
                 onTap: () {
-                  print('Select preceision');
+                  setState(() {
+                    _currentAmountSelection = 75;
+                    if (_isBuy && (_orderType == 2)) {
+                      _totalField.text = (double.parse(asset
+                                          .accountBalance['allCoinMap'][
+                                      public.activeMarket['name'].split('/')[1]]
+                                  ['normal_balance']) *
+                              0.75)
+                          .toStringAsPrecision(6);
+                    } else {
+                      _amountField.text = (double.parse(asset
+                                          .accountBalance['allCoinMap'][
+                                      public.activeMarket['name'].split('/')[0]]
+                                  ['normal_balance']) *
+                              0.75)
+                          .toStringAsPrecision(6);
+                    }
+                  });
+                  if (_isBuy && (_orderType == 2)) {
+                    calculateTotal('total');
+                  } else {
+                    calculateTotal('amount');
+                  }
                 },
                 child: Container(
                   width: width * 0.13,
                   padding: EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Color(0xff292C51),
+                      color: _currentAmountSelection >= 75
+                          ? linkColor
+                          : Color(0xff292C51),
                     ),
                     color: Color(0xff292C51),
                     borderRadius: BorderRadius.all(
@@ -672,7 +758,9 @@ class _TradeFormState extends State<TradeForm> {
                     child: Text(
                       '75%',
                       style: TextStyle(
-                        color: secondaryTextColor,
+                        color: _currentAmountSelection >= 75
+                            ? linkColor
+                            : secondaryTextColor,
                         fontSize: 12,
                       ),
                     ),
@@ -683,16 +771,40 @@ class _TradeFormState extends State<TradeForm> {
           ),
           Column(
             children: [
-              GestureDetector(
+              InkWell(
                 onTap: () {
-                  print('Select preceision');
+                  setState(() {
+                    _currentAmountSelection = 100;
+                    if (_isBuy && (_orderType == 2)) {
+                      _totalField.text = (double.parse(asset
+                                          .accountBalance['allCoinMap'][
+                                      public.activeMarket['name'].split('/')[1]]
+                                  ['normal_balance']) *
+                              1)
+                          .toStringAsPrecision(6);
+                    } else {
+                      _amountField.text = (double.parse(asset
+                                          .accountBalance['allCoinMap'][
+                                      public.activeMarket['name'].split('/')[0]]
+                                  ['normal_balance']) *
+                              1)
+                          .toStringAsPrecision(6);
+                    }
+                  });
+                  if (_isBuy && (_orderType == 2)) {
+                    calculateTotal('total');
+                  } else {
+                    calculateTotal('amount');
+                  }
                 },
                 child: Container(
                   width: width * 0.13,
                   padding: EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Color(0xff292C51),
+                      color: _currentAmountSelection >= 100
+                          ? linkColor
+                          : Color(0xff292C51),
                     ),
                     color: Color(0xff292C51),
                     borderRadius: BorderRadius.all(
@@ -704,7 +816,9 @@ class _TradeFormState extends State<TradeForm> {
                     child: Text(
                       '100%',
                       style: TextStyle(
-                        color: secondaryTextColor,
+                        color: _currentAmountSelection >= 100
+                            ? linkColor
+                            : secondaryTextColor,
                         fontSize: 12,
                       ),
                     ),

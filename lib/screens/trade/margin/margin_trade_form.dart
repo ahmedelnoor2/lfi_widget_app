@@ -91,7 +91,6 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
       //               '${asset.marginBalance['leverMap'][public.activeMarket['showName']]['baseTotalBalance']}')
       //           .toStringAsPrecision(6);
       // });
-      getOpenOrders();
     }
   }
 

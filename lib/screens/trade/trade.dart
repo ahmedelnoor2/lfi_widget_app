@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/screens/common/bottomnav.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/trade/common/header.dart';
@@ -109,12 +111,15 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
     connectWebSocket();
   }
 
-  void onTabChange() {
+  Future<void> onTabChange() async {
+    var trading = Provider.of<Trading>(context, listen: false);
     if (_tabController.index == 1) {
       var public = Provider.of<Public>(context, listen: false);
       public.setActiveMarket(public.activeMarginMarket);
       updateMarket();
     }
+    trading.clearOpenOrders();
+    // await trading.getOpenOrders();
   }
 
   @override

@@ -1,6 +1,7 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/screens/trade/common/percentage_indicator.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
@@ -228,6 +229,7 @@ class _OpenOrdersState extends State<OpenOrders>
   }
 
   Widget openOrderList(context, openOrders, trading, auth) {
+    var public = Provider.of<Public>(context, listen: true);
     return Container(
       padding: EdgeInsets.all(15),
       child: ListView.builder(
@@ -240,202 +242,414 @@ class _OpenOrdersState extends State<OpenOrders>
           double filledVolume = double.parse(openOrder['volume']) -
               double.parse(openOrder['remain_volume']);
           var orderFilled = filledVolume * 100;
-          return Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+          if (_hideOtherPairs) {
+            if (openOrder['symbol'] ==
+                public.activeMarket['symbol'].toUpperCase()) {
+              return Column(
                 children: [
-                  SizedBox(
-                    width: width * 0.65,
-                    child: Row(
-                      children: [
-                        Column(
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(
+                        width: width * 0.65,
+                        child: Row(
                           children: [
-                            Container(
-                              padding: EdgeInsets.only(bottom: 4),
-                              child: Text(
-                                '${getOrderType(openOrder['type'])}/${openOrder['side']}',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: openOrder['side'] == 'BUY'
-                                      ? greenIndicator
-                                      : redIndicator,
-                                ),
-                              ),
-                            ),
-                            Stack(
+                            Column(
                               children: [
                                 Container(
-                                  height: 40,
-                                  width: 40,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: secondaryTextColor400,
-                                      width: 4,
-                                    ),
-                                    borderRadius: BorderRadius.circular(100),
-                                    // shape: BoxShape.circle,
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      '$orderFilled%',
-                                      style: TextStyle(fontSize: 10),
+                                  padding: EdgeInsets.only(bottom: 4),
+                                  child: Text(
+                                    '${getOrderType(openOrder['type'])}/${openOrder['side']}',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: openOrder['side'] == 'BUY'
+                                          ? greenIndicator
+                                          : redIndicator,
                                     ),
                                   ),
                                 ),
-                                Container(
-                                  padding: EdgeInsets.only(left: 20, top: 20),
-                                  child: SemiCircleWidget(
-                                    diameter: 0,
-                                    sweepAngle: (100.0).clamp(0.0, orderFilled),
-                                    color: greenIndicator,
-                                  ),
-                                ),
+                                Stack(
+                                  children: [
+                                    Container(
+                                      height: 40,
+                                      width: 40,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: secondaryTextColor400,
+                                          width: 4,
+                                        ),
+                                        borderRadius:
+                                            BorderRadius.circular(100),
+                                        // shape: BoxShape.circle,
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          '$orderFilled%',
+                                          style: TextStyle(fontSize: 10),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      padding:
+                                          EdgeInsets.only(left: 20, top: 20),
+                                      child: SemiCircleWidget(
+                                        diameter: 0,
+                                        sweepAngle:
+                                            (100.0).clamp(0.0, orderFilled),
+                                        color: greenIndicator,
+                                      ),
+                                    ),
+                                  ],
+                                )
                               ],
-                            )
-                          ],
-                        ),
-                        Container(
-                          padding: EdgeInsets.only(left: 15),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.only(bottom: 5),
-                                child: Text(
-                                  '${openOrder['symbol']}',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                              Row(
+                            ),
+                            Container(
+                              padding: EdgeInsets.only(left: 15),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SizedBox(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          padding: EdgeInsets.only(right: 20),
-                                          child: Text(
-                                            'Amount',
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              color: secondaryTextColor,
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          padding: EdgeInsets.only(right: 20),
-                                          child: Text(
-                                            'Price',
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              color: secondaryTextColor,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                  Container(
+                                    padding: EdgeInsets.only(bottom: 5),
+                                    child: Text(
+                                      '${openOrder['symbol']}',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ),
-                                  SizedBox(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          padding: EdgeInsets.only(right: 20),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                '${double.parse(openOrder['remain_volume']).toStringAsPrecision(6)} / ',
-                                                style: TextStyle(
-                                                  fontSize: 11,
-                                                ),
-                                              ),
-                                              Text(
-                                                '${double.parse(openOrder['volume']).toStringAsPrecision(6)}',
+                                  Row(
+                                    children: [
+                                      SizedBox(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              padding:
+                                                  EdgeInsets.only(right: 20),
+                                              child: Text(
+                                                'Amount',
                                                 style: TextStyle(
                                                   fontSize: 11,
                                                   color: secondaryTextColor,
                                                 ),
                                               ),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          padding: EdgeInsets.only(right: 20),
-                                          child: Text(
-                                            '${double.parse(openOrder['price']).toStringAsPrecision(6)}',
-                                            style: TextStyle(
-                                              fontSize: 11,
                                             ),
-                                          ),
+                                            Container(
+                                              padding:
+                                                  EdgeInsets.only(right: 20),
+                                              child: Text(
+                                                'Price',
+                                                style: TextStyle(
+                                                  fontSize: 11,
+                                                  color: secondaryTextColor,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ],
+                                      ),
+                                      SizedBox(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              padding:
+                                                  EdgeInsets.only(right: 20),
+                                              child: Row(
+                                                children: [
+                                                  Text(
+                                                    '${double.parse(openOrder['remain_volume']).toStringAsFixed(4)} / ',
+                                                    style: TextStyle(
+                                                      fontSize: 11,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    '${double.parse(openOrder['volume']).toStringAsFixed(4)}',
+                                                    style: TextStyle(
+                                                      fontSize: 11,
+                                                      color: secondaryTextColor,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Container(
+                                              padding:
+                                                  EdgeInsets.only(right: 20),
+                                              child: Text(
+                                                '${double.parse(openOrder['price']).toStringAsPrecision(6)}',
+                                                style: TextStyle(
+                                                  fontSize: 11,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.only(bottom: 5),
+                              child: Text(
+                                '${DateFormat('yyy-mm-dd hh:mm:ss').format(DateTime.parse('${openOrder['created_at']}'))}',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: secondaryTextColor,
+                                ),
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () {
+                                cancelOrder({
+                                  "orderId": openOrder['id'],
+                                  "symbol": openOrder['symbol'].toLowerCase(),
+                                });
+                              },
+                              child: Container(
+                                padding: EdgeInsets.only(
+                                    left: 12, right: 12, top: 6, bottom: 6),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Color(0xff292C51),
+                                  ),
+                                  color: Color(0xff292C51),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(2),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                  Divider(),
+                ],
+              );
+            } else {
+              return Container();
+            }
+          } else {
+            return Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(
+                      width: width * 0.65,
+                      child: Row(
+                        children: [
+                          Column(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.only(bottom: 4),
+                                child: Text(
+                                  '${getOrderType(openOrder['type'])}/${openOrder['side']}',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: openOrder['side'] == 'BUY'
+                                        ? greenIndicator
+                                        : redIndicator,
+                                  ),
+                                ),
+                              ),
+                              Stack(
+                                children: [
+                                  Container(
+                                    height: 40,
+                                    width: 40,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: secondaryTextColor400,
+                                        width: 4,
+                                      ),
+                                      borderRadius: BorderRadius.circular(100),
+                                      // shape: BoxShape.circle,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        '$orderFilled%',
+                                        style: TextStyle(fontSize: 10),
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.only(left: 20, top: 20),
+                                    child: SemiCircleWidget(
+                                      diameter: 0,
+                                      sweepAngle:
+                                          (100.0).clamp(0.0, orderFilled),
+                                      color: greenIndicator,
                                     ),
                                   ),
                                 ],
                               )
                             ],
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(bottom: 5),
-                          child: Text(
-                            '${DateFormat('yyy-mm-dd hh:mm:ss').format(DateTime.parse('${openOrder['created_at']}'))}',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: secondaryTextColor,
+                          Container(
+                            padding: EdgeInsets.only(left: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.only(bottom: 5),
+                                  child: Text(
+                                    '${openOrder['symbol']}',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    SizedBox(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.only(right: 20),
+                                            child: Text(
+                                              'Amount',
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                color: secondaryTextColor,
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: EdgeInsets.only(right: 20),
+                                            child: Text(
+                                              'Price',
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                color: secondaryTextColor,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.only(right: 20),
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  '${double.parse(openOrder['remain_volume']).toStringAsFixed(4)} / ',
+                                                  style: TextStyle(
+                                                    fontSize: 11,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  '${double.parse(openOrder['volume']).toStringAsFixed(4)}',
+                                                  style: TextStyle(
+                                                    fontSize: 11,
+                                                    color: secondaryTextColor,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: EdgeInsets.only(right: 20),
+                                            child: Text(
+                                              '${double.parse(openOrder['price']).toStringAsPrecision(6)}',
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
                             ),
                           ),
-                        ),
-                        InkWell(
-                          onTap: () {
-                            // cancelAllOrders();
-                            cancelOrder({
-                              "orderId": openOrder['id'],
-                              "symbol": openOrder['symbol'].toLowerCase(),
-                            });
-                          },
-                          child: Container(
-                            padding: EdgeInsets.only(
-                                left: 12, right: 12, top: 6, bottom: 6),
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Color(0xff292C51),
-                              ),
-                              color: Color(0xff292C51),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(2),
-                              ),
-                            ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(bottom: 5),
                             child: Text(
-                              'Cancel',
+                              '${DateFormat('yyy-mm-dd hh:mm:ss').format(DateTime.parse('${openOrder['created_at']}'))}',
                               style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
+                                fontSize: 11,
+                                color: secondaryTextColor,
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-              Divider(),
-            ],
-          );
+                          InkWell(
+                            onTap: () {
+                              // cancelAllOrders();
+                              cancelOrder({
+                                "orderId": openOrder['id'],
+                                "symbol": openOrder['symbol'].toLowerCase(),
+                              });
+                            },
+                            child: Container(
+                              padding: EdgeInsets.only(
+                                  left: 12, right: 12, top: 6, bottom: 6),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Color(0xff292C51),
+                                ),
+                                color: Color(0xff292C51),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(2),
+                                ),
+                              ),
+                              child: Text(
+                                'Cancel',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+                Divider(),
+              ],
+            );
+          }
         },
       ),
     );

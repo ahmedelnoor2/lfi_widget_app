@@ -32,6 +32,7 @@ class _MarginDetailsState extends State<MarginDetails> {
   List _marginAssets = [];
   Map _selectedMarginAssets = {};
   bool _fromDigitalAccountToOtherAccount = true;
+  double _currentAmountSelection = 0;
 
   String _availableBalanceFrom = '0.000';
   String _availableBalanceTo = '0.000';
@@ -65,7 +66,7 @@ class _MarginDetailsState extends State<MarginDetails> {
     if (auth.isAuthenticated) {
       await asset.getMarginBalance(auth);
       List _margAssets = [];
-      asset.marginBalance['leverMap'].forEach((k, v) {
+      asset.marginBalance['leverMap'].forEach((k, v) async {
         if (k.split('/')[0] == _defaultMarginCoin) {
           setState(() {
             _selectedMarginAssets = {
@@ -74,6 +75,8 @@ class _MarginDetailsState extends State<MarginDetails> {
               'values': v,
             };
           });
+          await asset.getMarginSymbolBalance(
+              auth, _selectedMarginAssets['values']['symbol'].toUpperCase());
         }
         _margAssets.add({
           'coin': k.split('/')[0],
@@ -123,7 +126,10 @@ class _MarginDetailsState extends State<MarginDetails> {
         : '${_selectedMarginAssets['values']['quoteTotalBalance']}';
   }
 
-  void updateDefaultMarginCoin(public) {
+  Future<void> updateDefaultMarginCoin(public) async {
+    var auth = Provider.of<Auth>(context, listen: false);
+    var asset = Provider.of<Asset>(context, listen: false);
+
     var newDefaultMarginCoin = public.activeMarket['showName'].split('/')[0];
     for (var marginAsset in _marginAssets) {
       if (marginAsset['coin'] == newDefaultMarginCoin) {
@@ -132,6 +138,8 @@ class _MarginDetailsState extends State<MarginDetails> {
           _defaultMarginPair = marginAsset['market'];
           _selectedMarginAssets = marginAsset;
         });
+        await asset.getMarginSymbolBalance(
+            auth, _selectedMarginAssets['values']['symbol'].toUpperCase());
       }
     }
   }
@@ -149,9 +157,9 @@ class _MarginDetailsState extends State<MarginDetails> {
 
     String _riskRate = '--';
     if (auth.isAuthenticated) {
-      _riskRate = asset.marginBalance.isEmpty
+      _riskRate = asset.marginSymbolBalance.isEmpty
           ? '--'
-          : '${asset.marginBalance['leverMap'][public.activeMarket['showName']]['riskRate']}';
+          : '${asset.marginSymbolBalance['riskRate']}';
     }
 
     return Container(
@@ -183,6 +191,10 @@ class _MarginDetailsState extends State<MarginDetails> {
                 padding: EdgeInsets.only(right: 10),
                 child: InkWell(
                   onTap: () {
+                    setState(() {
+                      _amountController.clear();
+                      _currentAmountSelection = 0;
+                    });
                     auth.isAuthenticated
                         ? showModalBottomSheet<void>(
                             context: context,
@@ -227,6 +239,10 @@ class _MarginDetailsState extends State<MarginDetails> {
                 padding: EdgeInsets.only(right: 5),
                 child: InkWell(
                   onTap: () {
+                    setState(() {
+                      _amountController.clear();
+                      _currentAmountSelection = 0;
+                    });
                     auth.isAuthenticated
                         ? showModalBottomSheet<void>(
                             context: context,
@@ -299,9 +315,24 @@ class _MarginDetailsState extends State<MarginDetails> {
     );
   }
 
+  Future<void> borrowMarginWallet() async {
+    var asset = Provider.of<Asset>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
+
+    Navigator.pop(context);
+    await asset.borrowMarginWallet(context, auth, {
+      'amount': _amountController.text,
+      'coin': _defaultMarginCoin,
+      'symbol': _selectedMarginAssets['values']['symbol'].toUpperCase(),
+    });
+
+    await asset.getMarginSymbolBalance(
+        auth, _selectedMarginAssets['values']['symbol'].toUpperCase());
+  }
+
   Widget borrowAsset(context, public, setState) {
     height = MediaQuery.of(context).size.height;
-    var asset = Provider.of<Asset>(context, listen: false);
+    var asset = Provider.of<Asset>(context, listen: true);
 
     List _marginCoins = _defaultMarginPair.isNotEmpty
         ? _defaultMarginPair.split('/')
@@ -529,6 +560,22 @@ class _MarginDetailsState extends State<MarginDetails> {
                         SizedBox(
                           width: width * 0.69,
                           child: TextField(
+                            onChanged: (value) {
+                              setState(() {
+                                _currentAmountSelection = value.isEmpty
+                                    ? 0
+                                    : (double.parse(value) /
+                                                    double.parse(
+                                                        '${asset.marginSymbolBalance['baseCanBorrow']}')) *
+                                                100 ==
+                                            double.infinity
+                                        ? 0
+                                        : (double.parse(value) /
+                                                double.parse(
+                                                    '${asset.marginSymbolBalance['baseCanBorrow']}')) *
+                                            100;
+                              });
+                            },
                             controller: _amountController,
                             keyboardType: const TextInputType.numberWithOptions(
                               decimal: true,
@@ -552,9 +599,15 @@ class _MarginDetailsState extends State<MarginDetails> {
                               padding: EdgeInsets.only(right: 10),
                               child: GestureDetector(
                                 onTap: () async {
-                                  _amountController.text =
-                                      asset.accountBalance['allCoinMap']
-                                          [_defaultCoin]['normal_balance'];
+                                  setState(() {
+                                    _currentAmountSelection = 100;
+                                    _amountController
+                                        .text = _defaultMarginCoin ==
+                                            asset
+                                                .marginSymbolBalance['baseCoin']
+                                        ? '${double.parse('${asset.marginSymbolBalance['baseCanBorrow']}')}'
+                                        : '${double.parse('${asset.marginSymbolBalance['quoteCanBorrow']}')}';
+                                  });
                                 },
                                 child: Text(
                                   'ALL',
@@ -584,14 +637,22 @@ class _MarginDetailsState extends State<MarginDetails> {
                         children: [
                           InkWell(
                             onTap: () {
-                              print('Select preceision');
+                              setState(() {
+                                _currentAmountSelection = 25;
+                                _amountController.text = _defaultMarginCoin ==
+                                        asset.marginSymbolBalance['baseCoin']
+                                    ? '${double.parse('${asset.marginSymbolBalance['baseCanBorrow']}') * 0.25}'
+                                    : '${double.parse('${asset.marginSymbolBalance['quoteCanBorrow']}') * 0.25}';
+                              });
                             },
                             child: Container(
                               width: width * 0.22,
                               padding: EdgeInsets.all(4),
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: Color(0xff292C51),
+                                  color: _currentAmountSelection >= 25
+                                      ? linkColor
+                                      : Color(0xff292C51),
                                 ),
                                 color: Color(0xff292C51),
                                 borderRadius: BorderRadius.all(
@@ -603,7 +664,9 @@ class _MarginDetailsState extends State<MarginDetails> {
                                 child: Text(
                                   '25%',
                                   style: TextStyle(
-                                    color: secondaryTextColor,
+                                    color: _currentAmountSelection >= 25
+                                        ? linkColor
+                                        : secondaryTextColor,
                                     fontSize: 12,
                                   ),
                                 ),
@@ -616,14 +679,22 @@ class _MarginDetailsState extends State<MarginDetails> {
                         children: [
                           InkWell(
                             onTap: () {
-                              print('Select preceision');
+                              setState(() {
+                                _currentAmountSelection = 50;
+                                _amountController.text = _defaultMarginCoin ==
+                                        asset.marginSymbolBalance['baseCoin']
+                                    ? '${double.parse('${asset.marginSymbolBalance['baseCanBorrow']}') * 0.50}'
+                                    : '${double.parse('${asset.marginSymbolBalance['quoteCanBorrow']}') * 0.50}';
+                              });
                             },
                             child: Container(
                               width: width * 0.22,
                               padding: EdgeInsets.all(4),
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: Color(0xff292C51),
+                                  color: _currentAmountSelection >= 50
+                                      ? linkColor
+                                      : Color(0xff292C51),
                                 ),
                                 color: Color(0xff292C51),
                                 borderRadius: BorderRadius.all(
@@ -635,7 +706,9 @@ class _MarginDetailsState extends State<MarginDetails> {
                                 child: Text(
                                   '50%',
                                   style: TextStyle(
-                                    color: secondaryTextColor,
+                                    color: _currentAmountSelection >= 50
+                                        ? linkColor
+                                        : secondaryTextColor,
                                     fontSize: 12,
                                   ),
                                 ),
@@ -648,14 +721,22 @@ class _MarginDetailsState extends State<MarginDetails> {
                         children: [
                           InkWell(
                             onTap: () {
-                              print('Select preceision');
+                              setState(() {
+                                _currentAmountSelection = 75;
+                                _amountController.text = _defaultMarginCoin ==
+                                        asset.marginSymbolBalance['baseCoin']
+                                    ? '${double.parse('${asset.marginSymbolBalance['baseCanBorrow']}') * 0.75}'
+                                    : '${double.parse('${asset.marginSymbolBalance['quoteCanBorrow']}') * 0.75}';
+                              });
                             },
                             child: Container(
                               width: width * 0.22,
                               padding: EdgeInsets.all(4),
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: Color(0xff292C51),
+                                  color: _currentAmountSelection >= 75
+                                      ? linkColor
+                                      : Color(0xff292C51),
                                 ),
                                 color: Color(0xff292C51),
                                 borderRadius: BorderRadius.all(
@@ -667,7 +748,9 @@ class _MarginDetailsState extends State<MarginDetails> {
                                 child: Text(
                                   '75%',
                                   style: TextStyle(
-                                    color: secondaryTextColor,
+                                    color: _currentAmountSelection >= 75
+                                        ? linkColor
+                                        : secondaryTextColor,
                                     fontSize: 12,
                                   ),
                                 ),
@@ -680,14 +763,22 @@ class _MarginDetailsState extends State<MarginDetails> {
                         children: [
                           InkWell(
                             onTap: () {
-                              print('Select preceision');
+                              setState(() {
+                                _currentAmountSelection = 100;
+                                _amountController.text = _defaultMarginCoin ==
+                                        asset.marginSymbolBalance['baseCoin']
+                                    ? '${double.parse('${asset.marginSymbolBalance['baseCanBorrow']}') * 1}'
+                                    : '${double.parse('${asset.marginSymbolBalance['quoteCanBorrow']}') * 1}';
+                              });
                             },
                             child: Container(
                               width: width * 0.22,
                               padding: EdgeInsets.all(4),
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: Color(0xff292C51),
+                                  color: _currentAmountSelection >= 100
+                                      ? linkColor
+                                      : Color(0xff292C51),
                                 ),
                                 color: Color(0xff292C51),
                                 borderRadius: BorderRadius.all(
@@ -699,7 +790,9 @@ class _MarginDetailsState extends State<MarginDetails> {
                                 child: Text(
                                   '100%',
                                   style: TextStyle(
-                                    color: secondaryTextColor,
+                                    color: _currentAmountSelection >= 100
+                                        ? linkColor
+                                        : secondaryTextColor,
                                     fontSize: 12,
                                   ),
                                 ),
@@ -728,7 +821,7 @@ class _MarginDetailsState extends State<MarginDetails> {
                         ),
                       ),
                       Text(
-                        _availableBalanceFrom,
+                        '${double.parse('${asset.marginSymbolBalance['rate']}') * 100}%',
                         style: TextStyle(
                           color: secondaryTextColor,
                           fontWeight: FontWeight.w600,
@@ -755,7 +848,10 @@ class _MarginDetailsState extends State<MarginDetails> {
                         ),
                       ),
                       Text(
-                        _availableBalanceFrom,
+                        _defaultMarginCoin ==
+                                asset.marginSymbolBalance['baseCoin']
+                            ? '${double.parse('${asset.marginSymbolBalance['baseTotalBorrow']}')}'
+                            : '${double.parse('${asset.marginSymbolBalance['quoteTotalBorrow']}')}',
                         style: TextStyle(
                           color: secondaryTextColor,
                           fontWeight: FontWeight.w600,
@@ -781,7 +877,10 @@ class _MarginDetailsState extends State<MarginDetails> {
                         ),
                       ),
                       Text(
-                        _availableBalanceFrom,
+                        _defaultMarginCoin ==
+                                asset.marginSymbolBalance['baseCoin']
+                            ? '${double.parse('${asset.marginSymbolBalance['baseCanBorrow']}')}'
+                            : '${double.parse('${asset.marginSymbolBalance['quoteCanBorrow']}')}',
                         style: TextStyle(
                           color: secondaryTextColor,
                           fontWeight: FontWeight.w600,
@@ -795,15 +894,7 @@ class _MarginDetailsState extends State<MarginDetails> {
                   width: width,
                   child: ElevatedButton(
                     onPressed: () {
-                      showAlert(
-                        context,
-                        Container(),
-                        'Alert',
-                        [
-                          Text('Coming soon...'),
-                        ],
-                        'Ok',
-                      );
+                      borrowMarginWallet();
                     },
                     child: Text('Borrow'),
                   ),

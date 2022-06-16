@@ -264,13 +264,13 @@ class _MarginTradeHistoryState extends State<MarginTradeHistory>
                                           child: Row(
                                             children: [
                                               Text(
-                                                '${double.parse(openOrder['remain_volume']).toStringAsPrecision(6)} / ',
+                                                '${double.parse(openOrder['remain_volume']).toStringAsFixed(4)} / ',
                                                 style: TextStyle(
                                                   fontSize: 11,
                                                 ),
                                               ),
                                               Text(
-                                                '${double.parse(openOrder['volume']).toStringAsPrecision(6)}',
+                                                '${double.parse(openOrder['volume']).toStringAsFixed(6)}',
                                                 style: TextStyle(
                                                   fontSize: 11,
                                                   color: secondaryTextColor,

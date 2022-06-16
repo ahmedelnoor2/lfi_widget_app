@@ -71,6 +71,19 @@ class _TradeHistoryState extends State<TradeHistory>
     }
   }
 
+  Future<void> cancelOrder(formData) async {
+    var trading = Provider.of<Trading>(context, listen: false);
+
+    var auth = Provider.of<Auth>(context, listen: false);
+
+    await trading.cancelOrder(
+      context,
+      auth,
+      formData,
+    );
+    getOpenOrders();
+  }
+
   @override
   Widget build(BuildContext context) {
     var trading = Provider.of<Trading>(context, listen: true);
@@ -125,10 +138,10 @@ class _TradeHistoryState extends State<TradeHistory>
                 controller: _tabTradeHistoryController,
                 children: [
                   trading.openOrders.isEmpty
-                      ? noData('No Transactions')
+                      ? noData('No Open Orders')
                       : openOrders(trading.openOrders),
                   trading.orderHistory.isEmpty
-                      ? noData('No Transactions')
+                      ? noData('No Orders')
                       : orderHistory(trading.orderHistory),
                   trading.transactionHistory.isEmpty
                       ? noData('No Transactions')
@@ -264,13 +277,13 @@ class _TradeHistoryState extends State<TradeHistory>
                                           child: Row(
                                             children: [
                                               Text(
-                                                '${double.parse(openOrder['remain_volume']).toStringAsPrecision(6)} / ',
+                                                '${double.parse(openOrder['remain_volume']).toStringAsFixed(4)} / ',
                                                 style: TextStyle(
                                                   fontSize: 11,
                                                 ),
                                               ),
                                               Text(
-                                                '${double.parse(openOrder['volume']).toStringAsPrecision(6)}',
+                                                '${double.parse(openOrder['volume']).toStringAsFixed(4)}',
                                                 style: TextStyle(
                                                   fontSize: 11,
                                                   color: secondaryTextColor,
@@ -315,7 +328,10 @@ class _TradeHistoryState extends State<TradeHistory>
                         ),
                         InkWell(
                           onTap: () {
-                            // cancelAllOrders();
+                            cancelOrder({
+                              "orderId": openOrder['id'],
+                              "symbol": openOrder['symbol'].toLowerCase(),
+                            });
                           },
                           child: Container(
                             padding: EdgeInsets.only(

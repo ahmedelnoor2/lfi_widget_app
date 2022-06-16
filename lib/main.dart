@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/future_market.dart';
+import 'package:lyotrade/providers/loan_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/staking.dart';
 import 'package:lyotrade/providers/trade.dart';
@@ -29,6 +30,7 @@ import 'package:lyotrade/screens/security/phone.dart';
 import 'package:lyotrade/screens/security/security.dart';
 import 'package:lyotrade/screens/staking/common/stake_order.dart';
 import 'package:lyotrade/screens/staking/stake.dart';
+import 'package:lyotrade/screens/take_loan/take_loan.dart';
 import 'package:lyotrade/screens/trade/kline_chart.dart';
 import 'package:lyotrade/screens/trade/margin/margin_trade_history.dart';
 import 'package:lyotrade/screens/trade/trade.dart';
@@ -57,6 +59,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<Trading>(create: (_) => Trading()),
         ChangeNotifierProvider<FutureMarket>(create: (_) => FutureMarket()),
         ChangeNotifierProvider<Staking>(create: (_) => Staking()),
+        ChangeNotifierProvider<LoanProvider>(create: (_) => LoanProvider()),
       ],
       child: Consumer<Auth>(
         builder: (context, auth, _) {
@@ -224,6 +227,7 @@ class MyApp extends StatelessWidget {
               MarginAssets.routeName: (context) => const MarginAssets(),
               OtcAssets.routeName: (context) => const OtcAssets(),
               BuySellCrypto.routeName: (context) => const BuySellCrypto(),
+              TakeLoan.routeName: (context) => const TakeLoan(),
             },
           );
         },

@@ -28,12 +28,17 @@ class Trading with ChangeNotifier {
     return _transactionHistory;
   }
 
+  void clearOpenOrders() {
+    _openOrders = [];
+    notifyListeners();
+  }
+
   Future<void> getOpenOrders(ctx, auth, formData) async {
     /**
      * params:
       "entrust": 1,
       "isShowCanceled": 0,
-      "orderType": 1,
+      "orderType": 1, 1 = Spot and 2 = Margin
       "page": 1,
       "pageSize": 10,
       "symbol": "",
@@ -55,8 +60,6 @@ class Trading with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-
-      print(responseData);
 
       if (responseData['code'] == 0) {
         _openOrders = responseData['data']['orders'];
