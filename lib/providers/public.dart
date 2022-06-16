@@ -455,7 +455,7 @@ class Public with ChangeNotifier {
 
   Future<List<KLineEntity>> fetchKlkines(interval, symbol) async {
     var uri = Uri.parse(
-        'https://$openApiUrl/sapi/v1/klines?symbol=${symbol}&interval=$interval&limit=500');
+        'https://$openApiUrl/sapi/v1/klines?symbol=$symbol&interval=$interval&limit=500');
     final res = await http.get(uri);
     return (jsonDecode(res.body) as List<dynamic>).map(
       (e) {

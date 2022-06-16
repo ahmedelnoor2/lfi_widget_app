@@ -920,8 +920,6 @@ class _MarginDetailsState extends State<MarginDetails> {
       "toAccount": _fromDigitalAccountToOtherAccount ? "2" : "1",
     };
 
-    print(formData);
-
     Navigator.pop(context);
     await asset.makeMarginTransfer(context, auth, formData);
     getDigitalBalance();

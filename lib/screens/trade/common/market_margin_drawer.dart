@@ -155,7 +155,7 @@ class _MarketMarginDrawerState extends State<MarketMarginDrawer> {
               itemCount:
                   public.allMarginSearchMarket[_currentMarketSort].isNotEmpty
                       ? public.allMarginSearchMarket[_currentMarketSort].length
-                      : public.allMarginSearchMarket[_currentMarketSort].length,
+                      : public.allMarginMarkets[_currentMarketSort].length,
               itemBuilder: (context, index) {
                 var _market =
                     public.allMarginSearchMarket[_currentMarketSort][index];

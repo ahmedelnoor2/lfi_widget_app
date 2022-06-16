@@ -43,14 +43,12 @@ class FutureMarket with ChangeNotifier {
   }
 
   Future<void> filterMarketSearchResults(
-    query,
-    _searchAllMarkets,
-    sMarketSort,
-  ) async {
+      query, _searchAllMarkets, sMarketSort) async {
     if (query.isNotEmpty) {
       List dummyListData = [];
-      for (var item in _searchAllMarkets) {
-        if (item['symbol'].contains(query.toLowerCase())) {
+      for (var item in _searchAllMarkets[sMarketSort]) {
+        if ((item['contractOtherName'].toLowerCase())
+            .contains(query.toLowerCase())) {
           dummyListData.add(item);
         }
       }
@@ -60,7 +58,7 @@ class FutureMarket with ChangeNotifier {
       return;
     } else {
       _allSearchMarket[sMarketSort].clear();
-      _allSearchMarket[sMarketSort].addAll(_searchAllMarkets);
+      _allSearchMarket[sMarketSort].addAll(_searchAllMarkets[sMarketSort]);
       notifyListeners();
       return;
     }
@@ -86,13 +84,23 @@ class FutureMarket with ChangeNotifier {
 
   // Market Active Ticke
   Map _activeMarketTick = {};
+  Map _activeMarketAllTicks = {};
 
   Map get activeMarketTick {
     return _activeMarketTick;
   }
 
+  Map get activeMarketAllTicks {
+    return _activeMarketAllTicks;
+  }
+
   Future<void> setActiveMarketTick(tick) async {
     _activeMarketTick = tick;
+    notifyListeners();
+  }
+
+  Future<void> setActiveMarketAllTicks(tick, market) async {
+    _activeMarketAllTicks[market.split('_')[2]] = tick;
     notifyListeners();
   }
 
@@ -124,11 +132,15 @@ class FutureMarket with ChangeNotifier {
       if (responseData['code'] == "0") {
         _publicInfoMarket = responseData['data'];
 
-        for (var k in responseData['data']['contractList']) {
-          _allMarkets[k['base']] = k;
-          _allSearchMarket[k['base']] = k;
-          if (k['base'] == 'BTC') {
-            _activeMarket = k;
+        for (var m in responseData['data']['marginCoinList']) {
+          _allMarkets[m] = [];
+          _allSearchMarket[m] = [];
+          for (var k in responseData['data']['contractList']) {
+            _allMarkets[m].add(k);
+            _allSearchMarket[m].add(k);
+            if (k['base'] == 'BTC') {
+              _activeMarket = k;
+            }
           }
         }
 
@@ -140,10 +152,43 @@ class FutureMarket with ChangeNotifier {
     }
   }
 
-  // Open Positions
-  List _openPositions = [];
+  // Spot market info
+  Map _publicSpotInfoMarket = {};
 
-  List get openPositions {
+  Map get publicSpotInfoMarket {
+    return _publicSpotInfoMarket;
+  }
+
+  Future<void> getPublicSpotInfoMarket() async {
+    var url = Uri.https(
+      futApiUrl,
+      '$exApi/common/public_info_market',
+    );
+
+    var postData = json.encode({});
+
+    try {
+      final response = await http.post(url, body: postData, headers: headers);
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == "0") {
+        _publicSpotInfoMarket = responseData['data'];
+        return notifyListeners();
+      } else {
+        _publicSpotInfoMarket = {};
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      return;
+    }
+  }
+
+  // Open Positions
+  Map _openPositions = {};
+
+  Map get openPositions {
     return _openPositions;
   }
 
@@ -166,11 +211,11 @@ class FutureMarket with ChangeNotifier {
 
       final responseData = json.decode(response.body);
 
-      if (responseData['code'] == 0) {
-        _openPositions = responseData['data']['positionList'];
+      if (responseData['code'] == '0') {
+        _openPositions = responseData['data'];
         return notifyListeners();
       } else {
-        _openPositions = [];
+        _openPositions = {};
         return notifyListeners();
       }
     } catch (error) {
@@ -352,6 +397,80 @@ class FutureMarket with ChangeNotifier {
       print(error);
       // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
       return;
+    }
+  }
+
+  Future<void> makeSpotToFutureTransfer(ctx, auth, formData) async {
+    /*
+    * Params
+      amount: "1"
+      coinSymbol: "USDT"
+    */
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      futApiUrl,
+      '$exApi/web/futures_transfer',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        snackAlert(ctx, SnackTypes.success, 'Transfer successful');
+      } else if (responseData['code'] == 10002) {
+        snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+      } else {
+        snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
+      }
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
+      // throw error;
+    }
+  }
+
+  Future<void> makeFutureToSpotTransfer(ctx, auth, formData) async {
+    /*
+    * Params
+      amount: "1"
+      coinSymbol: "USDT"
+    */
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      futApiUrl,
+      '$futExApi/assets/saas_trans/co_to_ex',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        snackAlert(ctx, SnackTypes.success, 'Transfer successful');
+      } else if (responseData['code'] == 10002) {
+        snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+      } else {
+        snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
+      }
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
+      // throw error;
     }
   }
 }

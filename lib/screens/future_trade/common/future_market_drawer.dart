@@ -22,7 +22,9 @@ class FutureMarketDrawer extends StatefulWidget {
   State<FutureMarketDrawer> createState() => _FutureMarketDrawerState();
 }
 
-class _FutureMarketDrawerState extends State<FutureMarketDrawer> {
+class _FutureMarketDrawerState extends State<FutureMarketDrawer>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
 
   var _channel;
@@ -30,7 +32,7 @@ class _FutureMarketDrawerState extends State<FutureMarketDrawer> {
 
   @override
   void initState() {
-    // connectWebSocket();
+    connectWebSocket();
     super.initState();
   }
 
@@ -45,24 +47,31 @@ class _FutureMarketDrawerState extends State<FutureMarketDrawer> {
   Future<void> connectWebSocket() async {
     var futureMarket = Provider.of<FutureMarket>(context, listen: false);
 
+    _tabController = TabController(
+      length: futureMarket.publicInfoMarket['marginCoinList'].length,
+      vsync: this,
+    );
+
     _channel = WebSocketChannel.connect(
-      Uri.parse('${futureMarket.publicInfoMarket["market"]["wsUrl"]}'),
+      Uri.parse('${futureMarket.publicInfoMarket["wsUrl"]}'),
     );
 
     for (int j = 0;
-        j < futureMarket.publicInfoMarket['market']['marketSort'].length;
+        j < futureMarket.publicInfoMarket['marginCoinList'].length;
         j++) {
-      String cMarketSort =
-          futureMarket.publicInfoMarket['market']['marketSort'][j];
-      for (int i = 0; i < futureMarket.allMarkets[cMarketSort].length; i++) {
-        _channel.sink.add(jsonEncode({
-          "event": "sub",
-          "params": {
-            "channel":
-                "market_${futureMarket.allMarkets[cMarketSort][i]['symbol']}_ticker",
-            "cb_id": futureMarket.allMarkets[cMarketSort][i]['symbol'],
-          }
-        }));
+      String cMarketSort = futureMarket.publicInfoMarket['marginCoinList'][j];
+      if (futureMarket.allMarkets[cMarketSort].isNotEmpty) {
+        for (int i = 0; i < futureMarket.allMarkets[cMarketSort].length; i++) {
+          var market = futureMarket.allMarkets[cMarketSort][i];
+          _channel.sink.add(jsonEncode({
+            "event": "sub",
+            "params": {
+              "channel": ""
+                  "market_e_${market['contractOtherName'].toLowerCase()}_ticker",
+              "cb_id": "e_${market['contractOtherName'].toLowerCase()}",
+            }
+          }));
+        }
       }
     }
 
@@ -77,6 +86,7 @@ class _FutureMarketDrawerState extends State<FutureMarketDrawer> {
       var data = utf8.decode(inflated);
       if (json.decode(data)['channel'] != null) {
         var marketData = json.decode(data);
+        // print(marketData);
         futureMarket.setActiveMarketAllTicks(
           marketData['tick'],
           marketData['channel'],
@@ -133,7 +143,7 @@ class _FutureMarketDrawerState extends State<FutureMarketDrawer> {
                 onChanged: (value) async {
                   await futureMarket.filterMarketSearchResults(
                     value,
-                    futureMarket.allMarkets[_currentMarketSort],
+                    futureMarket.allMarkets,
                     _currentMarketSort,
                   );
                 },
@@ -152,13 +162,30 @@ class _FutureMarketDrawerState extends State<FutureMarketDrawer> {
             ),
           ),
           SizedBox(
+            height: 40,
+            child: TabBar(
+              onTap: (value) {
+                setState(() {
+                  _currentMarketSort =
+                      futureMarket.publicInfoMarket['marginCoinList'][value];
+                });
+              },
+              controller: _tabController,
+              tabs: futureMarket.publicInfoMarket['marginCoinList']
+                  .map<Widget>(
+                    (mname) => Tab(text: '$mname'),
+                  )
+                  .toList(),
+            ),
+          ),
+          SizedBox(
             height: height * 0.794,
             child: ListView.builder(
               shrinkWrap: true,
               itemCount:
                   futureMarket.allSearchMarket[_currentMarketSort].isNotEmpty
                       ? futureMarket.allSearchMarket[_currentMarketSort].length
-                      : futureMarket.allSearchMarket[_currentMarketSort].length,
+                      : futureMarket.allMarkets[_currentMarketSort].length,
               itemBuilder: (context, index) {
                 var _market =
                     futureMarket.allSearchMarket[_currentMarketSort][index];
@@ -172,13 +199,13 @@ class _FutureMarketDrawerState extends State<FutureMarketDrawer> {
                   title: Row(
                     children: [
                       Text(
-                        '${_market['showName'].split('/')[0]}',
+                        '${_market['multiplierCoin']}',
                         style: TextStyle(
                           fontSize: 18,
                         ),
                       ),
                       Text(
-                        ' /${_market['showName'].split('/')[1]}',
+                        ' /${_market['marginCoin']}',
                         style: TextStyle(
                           fontSize: 12,
                           color: secondaryTextColor,
@@ -191,18 +218,21 @@ class _FutureMarketDrawerState extends State<FutureMarketDrawer> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        '${futureMarket.activeMarketTick[_market['symbol']] != null ? futureMarket.activeMarketTick[_market['symbol']]['close'] : '--'}',
+                        '${futureMarket.activeMarketAllTicks[_market['contractOtherName'].toLowerCase()].isNotEmpty ? futureMarket.activeMarketAllTicks[_market['contractOtherName'].toLowerCase()]['close'] : '--'}',
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
-                          color: futureMarket
-                                      .activeMarketTick[_market['symbol']] !=
+                          color: futureMarket.activeMarketAllTicks[
+                                          _market['contractOtherName']
+                                              .toLowerCase()][
+                                      _market['contractOtherName']
+                                          .toLowerCase()] !=
                                   null
-                              ? (((double.parse('${futureMarket.activeMarketTick[_market['symbol']]['open']}') -
+                              ? (((double.parse('${futureMarket.activeMarketAllTicks[_market['contractOtherName'].toLowerCase()][_market['contractOtherName'].toLowerCase()]['open']}') -
                                               double.parse(
-                                                  '${futureMarket.activeMarketTick[_market['symbol']]['close']}')) /
+                                                  '${futureMarket.activeMarketAllTicks[_market['contractOtherName'].toLowerCase()][_market['contractOtherName'].toLowerCase()]['close']}')) /
                                           double.parse(
-                                              '${futureMarket.activeMarketTick[_market['symbol']]['open']}')) >
+                                              '${futureMarket.activeMarketAllTicks[_market['contractOtherName'].toLowerCase()][_market['contractOtherName'].toLowerCase()]['open']}')) >
                                       0)
                                   ? greenlightchartColor
                                   : errorColor
@@ -210,13 +240,15 @@ class _FutureMarketDrawerState extends State<FutureMarketDrawer> {
                         ),
                       ),
                       Text(
-                        '${futureMarket.activeMarketTick[_market['symbol']] != null ? (double.parse(futureMarket.activeMarketTick[_market['symbol']]['rose']) * 100).toStringAsFixed(2) : '--'}%',
+                        '${futureMarket.activeMarketAllTicks[_market['contractOtherName'].toLowerCase()] != null ? (double.parse(futureMarket.activeMarketAllTicks[_market['contractOtherName'].toLowerCase()]['rose']) * 100).toStringAsFixed(2) : '--'}%',
                         style: TextStyle(
-                          color: futureMarket
-                                      .activeMarketTick[_market['symbol']] !=
+                          color: futureMarket.activeMarketAllTicks[
+                                      _market['contractOtherName']
+                                          .toLowerCase()] !=
                                   null
-                              ? double.parse(futureMarket.activeMarketTick[
-                                              _market['symbol']]['rose'] ??
+                              ? double.parse(futureMarket.activeMarketAllTicks[
+                                              _market['contractOtherName']
+                                                  .toLowerCase()]['rose'] ??
                                           '0') >
                                       0
                                   ? greenlightchartColor

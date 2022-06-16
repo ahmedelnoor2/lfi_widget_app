@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/future_market.dart';
 import 'package:lyotrade/providers/public.dart';
@@ -110,14 +111,31 @@ class _FutureTradeState extends State<FutureTrade> {
     var futureMarket = Provider.of<FutureMarket>(context, listen: false);
 
     await futureMarket.getPublicInfoMarket();
-    await futureMarket.setActiveMarket(futureMarket.allMarkets['BTC']);
+    await futureMarket.getPublicSpotInfoMarket();
     await futureMarket.getMarketInfo(
       context,
       futureMarket.activeMarket['id'],
     );
+    setAvailalbePrice();
     futureMarket.getUserConfiguration(
         context, auth, futureMarket.activeMarket['id']);
     connectWebSocket();
+  }
+
+  Future<void> setAvailalbePrice() async {
+    var auth = Provider.of<Auth>(context, listen: false);
+    var futureMarket = Provider.of<FutureMarket>(context, listen: false);
+
+    if (auth.isAuthenticated) {
+      var asset = Provider.of<Asset>(context, listen: false);
+      // getOpenPositions
+      await futureMarket.getOpenPositions(context, auth);
+      await asset.getAccountBalance(
+        context,
+        auth,
+        "${futureMarket.activeMarket['symbol'].split('-')[0]},${futureMarket.activeMarket['symbol'].split('-')[1]}",
+      );
+    }
   }
 
   @override

@@ -180,7 +180,7 @@ class _MarketDrawerState extends State<MarketDrawer>
               shrinkWrap: true,
               itemCount: public.allSearchMarket[_currentMarketSort].isNotEmpty
                   ? public.allSearchMarket[_currentMarketSort].length
-                  : public.allSearchMarket[_currentMarketSort].length,
+                  : [public.allMarkets[_currentMarketSort].length],
               itemBuilder: (context, index) {
                 var _market = public.allSearchMarket[_currentMarketSort][index];
 

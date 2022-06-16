@@ -91,10 +91,12 @@ class _FutureOpenOrdersState extends State<FutureOpenOrders>
                 },
                 tabs: <Tab>[
                   Tab(
-                    text: 'Position(${futureMarket.openPositions.length})',
+                    text:
+                        'Position(${futureMarket.openPositions.isNotEmpty ? futureMarket.openPositions['positionList'].length : 0})',
                   ),
                   Tab(
-                    text: 'Open Orders(${futureMarket.openPositions.length})',
+                    text:
+                        'Open Orders(${futureMarket.openPositions.isNotEmpty ? futureMarket.openPositions['positionList'].length : 0})',
                   ),
                 ],
                 controller: _tabOpenOrderController,

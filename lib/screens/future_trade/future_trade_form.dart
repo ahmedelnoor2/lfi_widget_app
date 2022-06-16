@@ -1,8 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/future_market.dart';
+import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
@@ -24,6 +27,7 @@ class FutureTradeForm extends StatefulWidget {
 
 class _FutureTradeFormState extends State<FutureTradeForm> {
   final _formTradeKey = GlobalKey<FormState>();
+  final TextEditingController _amountController = TextEditingController();
   final TextEditingController _amountField = TextEditingController();
   final TextEditingController _priceField = TextEditingController();
   final TextEditingController _totalField = TextEditingController();
@@ -37,15 +41,21 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
   double _total = 0;
   String _availableBalance = '0.000000';
   bool _isBuy = true;
+  bool _fromDigitalAccountToFutureAccount = true;
+  String _defaultCoin = 'BTC';
+  String _defaultTransferCoin = 'USDT';
+  double _availableBalanceFrom = 0.00;
+  double _availableBalanceTo = 0.00;
 
   @override
   void initState() {
-    // setAvailalbePrice();
+    setAvailalbePrice();
     super.initState();
   }
 
   @override
   void dispose() {
+    _amountController.dispose();
     _amountField.dispose();
     _priceField.dispose();
     _totalField.dispose();
@@ -53,6 +63,34 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
       _timer.cancel();
     }
     super.dispose();
+  }
+
+  Future<void> setAvailalbePrice() async {
+    var auth = Provider.of<Auth>(context, listen: false);
+    var futureMarket = Provider.of<FutureMarket>(context, listen: false);
+
+    if (auth.isAuthenticated) {
+      setState(() {
+        _availableBalance = '${getFutureBalanceCoin(futureMarket)}';
+      });
+    }
+  }
+
+  Future<void> getAvailalbePrice() async {
+    var auth = Provider.of<Auth>(context, listen: false);
+    var futureMarket = Provider.of<FutureMarket>(context, listen: false);
+
+    if (auth.isAuthenticated) {
+      var asset = Provider.of<Asset>(context, listen: false);
+      // getOpenPositions
+      await futureMarket.getOpenPositions(context, auth);
+      await asset.getAccountBalance(
+        context,
+        auth,
+        "${futureMarket.activeMarket['symbol'].split('-')[0]},${futureMarket.activeMarket['symbol'].split('-')[1]}",
+      );
+      setAvailalbePrice();
+    }
   }
 
   void updateLastPrice() {
@@ -192,7 +230,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    _orderType == 1 ? 'Limit' : 'Market',
+                    _orderType == 1 ? 'Limit Order' : 'Market Order',
                     style: TextStyle(fontSize: 16),
                   ),
                   Icon(
@@ -208,8 +246,8 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
               });
             },
             itemBuilder: (ctx) => [
-              _buildPopupMenuItem('Limit', 1),
-              _buildPopupMenuItem('Market', 2),
+              _buildPopupMenuItem('Limit Order', 1),
+              _buildPopupMenuItem('Market Order', 2),
             ],
           ),
           (_orderType == 2)
@@ -451,13 +489,29 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                     ),
                     Container(
                       padding: EdgeInsets.only(right: 5),
-                      child: Text(
-                          '${_isBuy ? futureMarket.activeMarket['quote'] : futureMarket.activeMarket['base']}'),
+                      child: Text('${futureMarket.activeMarket['quote']}'),
                     ),
                     InkWell(
                       onTap: () {
+                        setState(() {
+                          _amountController.clear();
+                        });
                         if (auth.isAuthenticated) {
-                          Navigator.pushNamed(context, '/transfer_assets');
+                          showModalBottomSheet<void>(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return StatefulBuilder(
+                                builder: (BuildContext context,
+                                    StateSetter updateState) {
+                                  return transferAsset(
+                                    context,
+                                    futureMarket,
+                                    updateState,
+                                  );
+                                },
+                              );
+                            },
+                          );
                         } else {
                           Navigator.pushNamed(context, '/authentication');
                         }
@@ -663,6 +717,404 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
               ),
             ],
           ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> transferringAsset() async {
+    var auth = Provider.of<Auth>(context, listen: false);
+    var futureMarket = Provider.of<FutureMarket>(context, listen: false);
+
+    Map formData = {
+      "amount": _amountController.text,
+      "coinSymbol": _defaultTransferCoin,
+    };
+
+    Navigator.pop(context);
+
+    if (_fromDigitalAccountToFutureAccount) {
+      await futureMarket.makeSpotToFutureTransfer(context, auth, formData);
+    } else {
+      await futureMarket.makeFutureToSpotTransfer(context, auth, formData);
+    }
+    getAvailalbePrice();
+  }
+
+  double getFutureBalanceCoin(futureMarket) {
+    return double.parse(
+        '${futureMarket.openPositions['accountList'][0]['canUseAmount']}');
+  }
+
+  Widget transferAsset(context, futureMarket, setState) {
+    height = MediaQuery.of(context).size.height;
+    var asset = Provider.of<Asset>(context, listen: false);
+    var public = Provider.of<Public>(context, listen: false);
+
+    List _marginCoins = futureMarket.openPositions.isNotEmpty
+        ? futureMarket.openPositions['accountList']
+        : [
+            {'symbol': 'USDT'},
+          ];
+
+    return Container(
+      padding: EdgeInsets.all(10),
+      height: height * 0.65,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Balance Transfer',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(
+                  Icons.close,
+                  size: 20,
+                ),
+              )
+            ],
+          ),
+          Container(
+            padding: EdgeInsets.only(bottom: 10),
+            child: Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(
+                  style: BorderStyle.solid,
+                  width: 0.3,
+                  color: Color(0xff5E6292),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    children: [
+                      _fromDigitalAccountToFutureAccount
+                          ? digitalAccounts(context, futureMarket)
+                          : futureAccounts(context, futureMarket),
+                      SizedBox(
+                        width: width * 0.72,
+                        child: Divider(),
+                      ),
+                      !_fromDigitalAccountToFutureAccount
+                          ? digitalAccounts(context, futureMarket)
+                          : futureAccounts(context, futureMarket),
+                    ],
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      HapticFeedback.selectionClick();
+                      setState(() {
+                        _fromDigitalAccountToFutureAccount =
+                            !_fromDigitalAccountToFutureAccount;
+                        // _availableBalanceFrom = _fromDigitalAccountToFutureAccount
+                        //     ? double.parse(
+                        //         '${asset.accountBalance['allCoinMap'][_defaultCoin]['normal_balance']}')
+                        //     : getFutureBalanceCoin(futureMarket);
+                        // _availableBalanceTo = _fromDigitalAccountToFutureAccount
+                        //     ? getFutureBalanceCoin(futureMarket)
+                        //     : double.parse(
+                        //         '${asset.accountBalance['allCoinMap'][_defaultCoin]['normal_balance']}');
+                      });
+                    },
+                    icon: Image.asset(
+                      'assets/img/transfer.png',
+                      width: 20,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.only(bottom: 10),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Coins',
+                style: TextStyle(
+                  color: secondaryTextColor,
+                ),
+              ),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              border: Border.all(
+                width: 0.3,
+                color: Color(0xff5E6292),
+              ),
+            ),
+            child: SizedBox(
+              width: width * 0.9,
+              child: DropdownButton<String>(
+                isExpanded: true,
+                isDense: true,
+                value: _defaultTransferCoin,
+                icon: Icon(
+                  Icons.keyboard_arrow_down,
+                  color: Colors.white,
+                ),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+                underline: Container(
+                  height: 0,
+                ),
+                onChanged: (String? newValue) {
+                  print('Before: $_defaultTransferCoin');
+                  setState(() {
+                    _defaultTransferCoin = newValue!;
+                  });
+                  print('After: $_defaultTransferCoin');
+                },
+                items: _marginCoins.map<DropdownMenuItem<String>>((value) {
+                  return DropdownMenuItem<String>(
+                      value: value['symbol'],
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(right: 10),
+                            child: CircleAvatar(
+                              radius: 12,
+                              child: Image.network(
+                                '${public.publicInfoMarket['market']['coinList'][value['symbol']]['icon']}',
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(right: 5),
+                            child: Text(value['symbol']),
+                          ),
+                          Text(
+                            '${public.publicInfoMarket['market']['coinList'][value['symbol']]['longName']}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ));
+                }).toList(),
+              ),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.only(top: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: EdgeInsets.only(bottom: 5),
+                  child: Text(
+                    'The number of tranfers',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.only(top: 5, bottom: 5),
+                  child: Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(
+                        style: BorderStyle.solid,
+                        width: 0.3,
+                        color: Color(0xff5E6292),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(
+                          width: width * 0.69,
+                          child: TextField(
+                            controller: _amountController,
+                            keyboardType: const TextInputType.numberWithOptions(
+                              signed: true,
+                              decimal: true,
+                            ),
+                            textInputAction: TextInputAction.done,
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.zero,
+                              isDense: true,
+                              border: UnderlineInputBorder(
+                                borderSide: BorderSide.none,
+                              ),
+                              hintStyle: TextStyle(
+                                fontSize: 14,
+                              ),
+                              hintText: "Please enter the number of transfers",
+                            ),
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.only(right: 10),
+                              child: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _amountController.text =
+                                        _fromDigitalAccountToFutureAccount
+                                            ? '${asset.accountBalance['allCoinMap'][_defaultTransferCoin]['normal_balance']}'
+                                            : '${getFutureBalanceCoin(futureMarket)}';
+                                  });
+                                },
+                                child: Text(
+                                  'ALL',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: linkColor,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.only(
+                    top: 5,
+                    right: 5,
+                    left: 5,
+                    bottom: 15,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Can be transferred ($_defaultTransferCoin):',
+                        style: TextStyle(
+                          color: secondaryTextColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        _fromDigitalAccountToFutureAccount
+                            ? '${asset.accountBalance['allCoinMap'][_defaultTransferCoin]['normal_balance']}'
+                            : '${getFutureBalanceCoin(futureMarket)}',
+                        style: TextStyle(
+                          color: secondaryTextColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.only(bottom: 15),
+                  width: width,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      transferringAsset();
+                      // showAlert(
+                      //   context,
+                      //   Container(),
+                      //   'Alert',
+                      //   [
+                      //     Text('Coming soon...'),
+                      //   ],
+                      //   'Ok',
+                      // );
+                    },
+                    child: Text('Transfer'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget digitalAccounts(context, futureMarket) {
+    return SizedBox(
+      width: width * 0.72,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.only(
+                    right: _fromDigitalAccountToFutureAccount ? 20 : 36),
+                child: Text(_fromDigitalAccountToFutureAccount ? 'From' : 'To'),
+              ),
+              Container(
+                padding: EdgeInsets.only(right: 10),
+                child: CircleAvatar(
+                  radius: 12,
+                  child: Image.network(
+                    '${futureMarket.publicSpotInfoMarket['market']['coinList'][_defaultTransferCoin]['icon']}',
+                  ),
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.only(right: 20),
+                child: Text('Digital Account'),
+              ),
+            ],
+          ),
+          // Icon(Icons.keyboard_arrow_down),
+        ],
+      ),
+    );
+  }
+
+  Widget futureAccounts(context, futureMarket) {
+    return SizedBox(
+      width: width * 0.72,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.only(
+                    right: !_fromDigitalAccountToFutureAccount ? 20 : 36),
+                child:
+                    Text(!_fromDigitalAccountToFutureAccount ? 'From' : 'To'),
+              ),
+              Container(
+                padding: EdgeInsets.only(right: 10),
+                child: CircleAvatar(
+                  radius: 12,
+                  child: Image.network(
+                    '${futureMarket.publicSpotInfoMarket['market']['coinList'][_defaultTransferCoin]['icon']}',
+                  ),
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.only(right: 20),
+                child: Text('Contract account'),
+              ),
+            ],
+          ),
+          // Icon(Icons.keyboard_arrow_down),
         ],
       ),
     );
