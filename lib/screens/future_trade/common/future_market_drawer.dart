@@ -218,21 +218,19 @@ class _FutureMarketDrawerState extends State<FutureMarketDrawer>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        '${futureMarket.activeMarketAllTicks[_market['contractOtherName'].toLowerCase()].isNotEmpty ? futureMarket.activeMarketAllTicks[_market['contractOtherName'].toLowerCase()]['close'] : '--'}',
+                        '${futureMarket.activeMarketAllTicks.isNotEmpty ? futureMarket.activeMarketAllTicks[_market['contractOtherName'].toLowerCase()]['close'] : '--'}',
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
                           color: futureMarket.activeMarketAllTicks[
-                                          _market['contractOtherName']
-                                              .toLowerCase()][
                                       _market['contractOtherName']
                                           .toLowerCase()] !=
                                   null
-                              ? (((double.parse('${futureMarket.activeMarketAllTicks[_market['contractOtherName'].toLowerCase()][_market['contractOtherName'].toLowerCase()]['open']}') -
+                              ? (((double.parse('${futureMarket.activeMarketAllTicks[_market['contractOtherName'].toLowerCase()]['open']}') -
                                               double.parse(
-                                                  '${futureMarket.activeMarketAllTicks[_market['contractOtherName'].toLowerCase()][_market['contractOtherName'].toLowerCase()]['close']}')) /
+                                                  '${futureMarket.activeMarketAllTicks[_market['contractOtherName'].toLowerCase()]['close']}')) /
                                           double.parse(
-                                              '${futureMarket.activeMarketAllTicks[_market['contractOtherName'].toLowerCase()][_market['contractOtherName'].toLowerCase()]['open']}')) >
+                                              '${futureMarket.activeMarketAllTicks[_market['contractOtherName'].toLowerCase()]['open']}')) >
                                       0)
                                   ? greenlightchartColor
                                   : errorColor

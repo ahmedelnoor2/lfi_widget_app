@@ -6,6 +6,7 @@ import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:k_chart/entity/k_line_entity.dart';
+import 'package:lyotrade/utils/Translate.utils.dart';
 
 class FutureMarket with ChangeNotifier {
   Map<String, String> headers = {
@@ -467,6 +468,142 @@ class FutureMarket with ChangeNotifier {
         snackAlert(ctx, SnackTypes.warning, 'Please login to access');
       } else {
         snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
+      }
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
+      // throw error;
+    }
+  }
+
+  // Order Create
+  Future<void> createOrder(ctx, auth, formData) async {
+    /*
+    * Params
+    contractId: 1,
+    isConditionOrder: false,
+    isOto: false,
+    leverageLevel: 20,
+    open: "OPEN",
+    positionType: 1,
+    price: 1000,
+    side: "BUY",
+    stopLossPrice: 0,
+    stopLossTrigger: null,
+    stopLossType: 2,
+    takerProfitPrice: 0,
+    takerProfitTrigger: null,
+    takerProfitType: 2,
+    triggerPrice: null,
+    type: 1,
+    volume: "10",
+    */
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      futApiUrl,
+      '$futExApi/order/order_create',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      print(responseData);
+
+      if (responseData['code'] == '0') {
+        snackAlert(ctx, SnackTypes.success, 'Order successfully created');
+      } else if (responseData['code'] == 10002) {
+        snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+      } else {
+        snackAlert(
+            ctx, SnackTypes.errors, '${getTranslate(responseData['msg'])}');
+      }
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
+      // throw error;
+    }
+  }
+
+  // Order Cancel
+  Future<void> cancelLimitOrder(ctx, auth, formData) async {
+    /*
+    * Params
+    contractId: 1,
+    isConditionOrder: false,
+    orderId: "1163227467630649180",
+    */
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      futApiUrl,
+      '$futExApi/order/order_cancel',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        snackAlert(ctx, SnackTypes.success, 'Order successfully cancelled');
+      } else if (responseData['code'] == 10002) {
+        snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+      } else {
+        snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
+      }
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
+      // throw error;
+    }
+  }
+
+  // Current order list
+  List _currentOrders = [];
+
+  List get currentOrders {
+    return _currentOrders;
+  }
+
+  Future<void> getCurrentOrders(ctx, auth, contractId) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      futApiUrl,
+      '$futExApi/order/current_order_list',
+    );
+
+    var postData = json.encode({'contractId': contractId});
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      print(responseData);
+
+      if (responseData['code'] == '0') {
+        _currentOrders = responseData['data']['orderList'];
+        return notifyListeners();
+      } else {
+        _currentOrders = [];
+        return notifyListeners();
       }
     } catch (error) {
       snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');

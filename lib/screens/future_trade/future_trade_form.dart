@@ -32,6 +32,9 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
   final TextEditingController _priceField = TextEditingController();
   final TextEditingController _totalField = TextEditingController();
 
+  final TextEditingController _takeProfitField = TextEditingController();
+  final TextEditingController _stopLossField = TextEditingController();
+
   var _timer;
 
   Color _tabIndicatorColor = greenIndicator;
@@ -47,6 +50,13 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
   double _availableBalanceFrom = 0.00;
   double _availableBalanceTo = 0.00;
 
+  //Avance Options
+  bool _advancedOptions = false;
+  String _advanceOptionValue = 'P/O';
+
+  //TP/SL Options
+  bool _tpSlOptions = false;
+
   @override
   void initState() {
     setAvailalbePrice();
@@ -59,6 +69,8 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
     _amountField.dispose();
     _priceField.dispose();
     _totalField.dispose();
+    _takeProfitField.dispose();
+    _stopLossField.dispose();
     if (_timer != null) {
       _timer.cancel();
     }
@@ -84,6 +96,8 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
       var asset = Provider.of<Asset>(context, listen: false);
       // getOpenPositions
       await futureMarket.getOpenPositions(context, auth);
+      await futureMarket.getCurrentOrders(
+          context, auth, futureMarket.activeMarket['id']);
       await asset.getAccountBalance(
         context,
         auth,
@@ -148,6 +162,50 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
     }
   }
 
+  Future<void> createOrder(type) async {
+    var auth = Provider.of<Auth>(context, listen: false);
+    var futureMarket = Provider.of<FutureMarket>(context, listen: false);
+    var public = Provider.of<Public>(context, listen: false);
+    var formData = {
+      // "price": _orderType == 1
+      //     ? _priceField.text
+      //     : (_orderType == 2)
+      //         ? null
+      //         : public.lastPrice,
+      // "side": _isBuy ? "BUY" : "SELL",
+      // "symbol": public.activeMarket['symbol'],
+      // "type": _orderType,
+      // "volume":
+      //     (_orderType == 2 && _isBuy) ? _totalField.text : _amountField.text,
+
+      "contractId": futureMarket.activeMarket['id'],
+      "isConditionOrder": false,
+      "isOto": false,
+      "leverageLevel": futureMarket.userConfiguration['nowLevel'],
+      "open": _isBuy ? "OPEN" : "CLOSE",
+      "positionType": futureMarket.userConfiguration['positionModel'],
+      "price": _priceField.text,
+      "side": type,
+      "stopLossPrice": 0,
+      "stopLossTrigger": null,
+      "stopLossType": 2,
+      "takerProfitPrice": 0,
+      "takerProfitTrigger": null,
+      "takerProfitType": 2,
+      "triggerPrice": null,
+      "type": 1,
+      "volume": int.parse((double.parse(_amountField.text) /
+              double.parse('${futureMarket.activeMarket['multiplier']}'))
+          .toStringAsFixed(0)),
+    };
+
+    // print(formData);
+
+    await futureMarket.createOrder(context, auth, formData);
+    await futureMarket.getCurrentOrders(
+        context, auth, futureMarket.activeMarket['id']);
+  }
+
   // Future<void> setPriceField() async {
   //   var futureMarket = Provider.of<FutureMarket>(context, listen: false);
   //   _priceField.text = futureMarket.amountField;
@@ -165,10 +223,12 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
     var futureMarket = Provider.of<FutureMarket>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
 
+    // print(futureMarket.lastPrice);
+
     return Form(
       key: _formTradeKey,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -187,7 +247,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                     // setAvailalbePrice();
                   },
                   child: Text(
-                    'Buy',
+                    'Open',
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -206,7 +266,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                     // setAvailalbePrice();
                   },
                   child: Text(
-                    'Sell',
+                    'Close',
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -215,7 +275,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
           ),
           PopupMenuButton(
             child: Container(
-              margin: EdgeInsets.only(bottom: 8),
+              margin: EdgeInsets.only(bottom: 2),
               padding: EdgeInsets.only(top: 6, bottom: 6, left: 10, right: 5),
               decoration: BoxDecoration(
                 border: Border.all(
@@ -230,7 +290,11 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    _orderType == 1 ? 'Limit Order' : 'Market Order',
+                    _orderType == 1
+                        ? 'Limit Order'
+                        : _orderType == 2
+                            ? 'Market Order'
+                            : 'Stop Order',
                     style: TextStyle(fontSize: 16),
                   ),
                   Icon(
@@ -248,12 +312,68 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
             itemBuilder: (ctx) => [
               _buildPopupMenuItem('Limit Order', 1),
               _buildPopupMenuItem('Market Order', 2),
+              _buildPopupMenuItem('Stop Order', 3),
             ],
+          ),
+          Container(
+            padding: EdgeInsets.only(bottom: 2),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Avbl',
+                  style: TextStyle(color: secondaryTextColor),
+                ),
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.only(right: 2),
+                      child: Text(_availableBalance),
+                    ),
+                    Container(
+                      padding: EdgeInsets.only(right: 5),
+                      child: Text('${futureMarket.activeMarket['quote']}'),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          _amountController.clear();
+                        });
+                        if (auth.isAuthenticated) {
+                          showModalBottomSheet<void>(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return StatefulBuilder(
+                                builder: (BuildContext context,
+                                    StateSetter updateState) {
+                                  return transferAsset(
+                                    context,
+                                    futureMarket,
+                                    updateState,
+                                  );
+                                },
+                              );
+                            },
+                          );
+                        } else {
+                          Navigator.pushNamed(context, '/authentication');
+                        }
+                      },
+                      child: Icon(
+                        Icons.swap_horiz,
+                        size: 15,
+                        color: linkColor,
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
           ),
           (_orderType == 2)
               ? Container(
-                  margin: EdgeInsets.only(bottom: 8),
-                  padding: EdgeInsets.all(13),
+                  margin: EdgeInsets.only(bottom: 5),
+                  padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: Color(0xff292C51),
@@ -274,11 +394,66 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                   ),
                 )
               : Container(),
+          (_orderType == 2 && _isBuy)
+              ? Container(
+                  margin: EdgeInsets.only(bottom: 5),
+                  padding: EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Color(0xff292C51),
+                    ),
+                    color: Color(0xff292C51),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(2),
+                    ),
+                  ),
+                  child: TextFormField(
+                    onChanged: (value) {
+                      calculateTotal('total');
+                    },
+                    textAlign: TextAlign.center,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        widget.scaffoldKey!.currentState.hideCurrentSnackBar();
+                        snackAlert(
+                          context,
+                          SnackTypes.errors,
+                          'Error in placing and order, try again',
+                        );
+                        return '';
+                      }
+                      return null;
+                    },
+                    style: TextStyle(fontSize: 16),
+                    keyboardType:
+                        TextInputType.numberWithOptions(decimal: true),
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.zero,
+                      isDense: true,
+                      border: UnderlineInputBorder(
+                        borderSide: BorderSide.none,
+                      ),
+                      hintStyle: TextStyle(
+                        fontSize: 16,
+                      ),
+                      errorStyle: TextStyle(height: 0),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(width: 1, color: redIndicator),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(5),
+                        ),
+                      ),
+                      hintText: 'Total (${futureMarket.activeMarket['quote']})',
+                    ),
+                    controller: _totalField,
+                  ),
+                )
+              : Container(),
           (_orderType == 2)
               ? Container()
               : Container(
-                  margin: EdgeInsets.only(bottom: 8),
-                  padding: EdgeInsets.all(10),
+                  margin: EdgeInsets.only(bottom: 5),
+                  padding: EdgeInsets.all(5),
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: Color(0xff292C51),
@@ -347,8 +522,8 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
           (_orderType == 2 && _isBuy)
               ? Container()
               : Container(
-                  margin: EdgeInsets.only(bottom: 8),
-                  padding: EdgeInsets.all(10),
+                  margin: EdgeInsets.only(bottom: 4),
+                  padding: EdgeInsets.all(5),
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: Color(0xff292C51),
@@ -403,7 +578,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                               ),
                             ),
                             hintText:
-                                'Amount (${futureMarket.activeMarket['base']})',
+                                'Volume (${futureMarket.activeMarket['base']})',
                           ),
                           controller: _amountField,
                         ),
@@ -415,157 +590,462 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                     ],
                   ),
                 ),
-          _orderType == 1 ? _selectAmountPecentage() : Container(),
-          ((_orderType == 2 && _isBuy) || _orderType == 1)
-              ? Container(
-                  margin: EdgeInsets.only(bottom: 8),
-                  padding: EdgeInsets.all(13),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Color(0xff292C51),
-                    ),
-                    color: Color(0xff292C51),
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(2),
-                    ),
-                  ),
-                  child: TextFormField(
-                    onChanged: (value) {
-                      calculateTotal('total');
-                    },
-                    textAlign: TextAlign.center,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        widget.scaffoldKey!.currentState.hideCurrentSnackBar();
-                        snackAlert(
-                          context,
-                          SnackTypes.errors,
-                          'Error in placing and order, try again',
-                        );
-                        return '';
-                      }
-                      return null;
-                    },
-                    style: TextStyle(fontSize: 16),
-                    keyboardType:
-                        TextInputType.numberWithOptions(decimal: true),
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.zero,
-                      isDense: true,
-                      border: UnderlineInputBorder(
-                        borderSide: BorderSide.none,
-                      ),
-                      hintStyle: TextStyle(
-                        fontSize: 16,
-                      ),
-                      errorStyle: TextStyle(height: 0),
-                      focusedErrorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(width: 1, color: redIndicator),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(5),
-                        ),
-                      ),
-                      hintText: 'Total (${futureMarket.activeMarket['quote']})',
-                    ),
-                    controller: _totalField,
-                  ),
-                )
-              : Container(),
-          _orderType == 2 ? _selectAmountPecentage() : Container(),
+          _selectAmountPecentage(),
           Container(
-            padding: EdgeInsets.only(top: 2),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            padding: EdgeInsets.only(top: 4, bottom: 2),
+            child: Column(
               children: [
-                Text(
-                  'Avbl',
-                  style: TextStyle(color: secondaryTextColor),
-                ),
                 Row(
                   children: [
                     Container(
-                      padding: EdgeInsets.only(right: 2),
-                      child: Text(_availableBalance),
+                      padding: EdgeInsets.only(right: 5),
+                      child: InkWell(
+                        onTap: () {
+                          setState(() {
+                            _advancedOptions = !_advancedOptions;
+                          });
+                        },
+                        child: Icon(
+                          Icons.check_circle,
+                          color: _advancedOptions
+                              ? linkColor
+                              : secondaryTextColor400,
+                          size: 15,
+                        ),
+                      ),
                     ),
+                    Text(
+                      'Advance Options',
+                      style: TextStyle(
+                        fontSize: 12,
+                      ),
+                    )
+                  ],
+                )
+              ],
+            ),
+          ),
+          _advancedOptions
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 30,
+                          child: Transform.scale(
+                            scale: 0.9,
+                            child: Radio(
+                              activeColor: linkColor,
+                              value: 'P/O',
+                              groupValue: _advanceOptionValue,
+                              onChanged: <String>(value) {
+                                setState(() {
+                                  _advanceOptionValue = value;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                        Text(
+                          'P/O',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: secondaryTextColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 30,
+                          child: Transform.scale(
+                            scale: 0.9,
+                            child: Radio(
+                              activeColor: linkColor,
+                              value: 'IOC',
+                              groupValue: _advanceOptionValue,
+                              onChanged: <String>(value) {
+                                setState(() {
+                                  _advanceOptionValue = value;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                        Text(
+                          'IOC',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: secondaryTextColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 30,
+                          child: Transform.scale(
+                            scale: 0.9,
+                            child: Radio(
+                              activeColor: linkColor,
+                              value: 'FOK',
+                              groupValue: _advanceOptionValue,
+                              onChanged: <String>(value) {
+                                setState(() {
+                                  _advanceOptionValue = value;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                        Text(
+                          'FOK',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: secondaryTextColor,
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                )
+              : Container(),
+          Container(
+            padding: EdgeInsets.only(top: 2, bottom: 18),
+            child: Column(
+              children: [
+                Row(
+                  children: [
                     Container(
                       padding: EdgeInsets.only(right: 5),
-                      child: Text('${futureMarket.activeMarket['quote']}'),
-                    ),
-                    InkWell(
-                      onTap: () {
-                        setState(() {
-                          _amountController.clear();
-                        });
-                        if (auth.isAuthenticated) {
-                          showModalBottomSheet<void>(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return StatefulBuilder(
-                                builder: (BuildContext context,
-                                    StateSetter updateState) {
-                                  return transferAsset(
-                                    context,
-                                    futureMarket,
-                                    updateState,
-                                  );
-                                },
-                              );
-                            },
-                          );
-                        } else {
-                          Navigator.pushNamed(context, '/authentication');
-                        }
-                      },
-                      child: Icon(
-                        Icons.swap_horiz,
-                        size: 15,
-                        color: linkColor,
+                      child: InkWell(
+                        onTap: () {
+                          setState(() {
+                            _tpSlOptions = !_tpSlOptions;
+                          });
+                        },
+                        child: Icon(
+                          Icons.check_circle,
+                          color:
+                              _tpSlOptions ? linkColor : secondaryTextColor400,
+                          size: 15,
+                        ),
                       ),
+                    ),
+                    Text(
+                      'TP/SL',
+                      style: TextStyle(
+                        fontSize: 12,
+                      ),
+                    )
+                  ],
+                )
+              ],
+            ),
+          ),
+          _tpSlOptions
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                      width: 100,
+                      margin: EdgeInsets.only(bottom: 5),
+                      padding: EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Color(0xff292C51),
+                        ),
+                        color: Color(0xff292C51),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(2),
+                        ),
+                      ),
+                      child: TextFormField(
+                        onChanged: (value) {
+                          calculateTotal('total');
+                        },
+                        textAlign: TextAlign.center,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            widget.scaffoldKey!.currentState
+                                .hideCurrentSnackBar();
+                            snackAlert(
+                              context,
+                              SnackTypes.errors,
+                              'Error in placing and order, try again',
+                            );
+                            return '';
+                          }
+                          return null;
+                        },
+                        style: TextStyle(fontSize: 16),
+                        keyboardType:
+                            TextInputType.numberWithOptions(decimal: true),
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.zero,
+                          isDense: true,
+                          border: UnderlineInputBorder(
+                            borderSide: BorderSide.none,
+                          ),
+                          hintStyle: TextStyle(
+                            fontSize: 12,
+                          ),
+                          errorStyle: TextStyle(height: 0),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(width: 1, color: redIndicator),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(5),
+                            ),
+                          ),
+                          hintText: 'Take Profit',
+                        ),
+                        controller: _takeProfitField,
+                      ),
+                    ),
+                    Container(
+                      width: 100,
+                      margin: EdgeInsets.only(bottom: 5),
+                      padding: EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Color(0xff292C51),
+                        ),
+                        color: Color(0xff292C51),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(2),
+                        ),
+                      ),
+                      child: TextFormField(
+                        onChanged: (value) {
+                          calculateTotal('total');
+                        },
+                        textAlign: TextAlign.center,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            widget.scaffoldKey!.currentState
+                                .hideCurrentSnackBar();
+                            snackAlert(
+                              context,
+                              SnackTypes.errors,
+                              'Error in placing and order, try again',
+                            );
+                            return '';
+                          }
+                          return null;
+                        },
+                        style: TextStyle(fontSize: 16),
+                        keyboardType:
+                            TextInputType.numberWithOptions(decimal: true),
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.zero,
+                          isDense: true,
+                          border: UnderlineInputBorder(
+                            borderSide: BorderSide.none,
+                          ),
+                          hintStyle: TextStyle(
+                            fontSize: 12,
+                          ),
+                          errorStyle: TextStyle(height: 0),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(width: 1, color: redIndicator),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(5),
+                            ),
+                          ),
+                          hintText: 'Stop Loss',
+                        ),
+                        controller: _stopLossField,
+                      ),
+                    )
+                  ],
+                )
+              : Container(),
+          Container(
+            padding: EdgeInsets.only(top: 2, bottom: 2),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.only(right: 5),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(right: 5),
+                            child: Text(
+                              'Max Buy:',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: greenIndicator,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            '0 USDT',
+                            style: TextStyle(
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.only(right: 5),
+                          child: Text(
+                            'Max Sell:',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: redIndicator,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          '0 USDT',
+                          style: TextStyle(
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 )
               ],
             ),
           ),
-          SizedBox(
-            width: width * 0.7,
-            child: ElevatedButton(
-              onPressed: () {
-                if (auth.isAuthenticated) {
-                  if (_formTradeKey.currentState!.validate()) {
-                    // If the form is valid, display a snackbar. In the real world,
-                    // you'd often call a server or save the information in a database.
-                    // widget.scaffoldKey!.currentState.hideCurrentSnackBar();
-                    // snackAlert(
-                    //   context,
-                    //   SnackTypes.warning,
-                    //   'Feature is under process',
-                    // );
-                    // createOrder();
-                    snackAlert(context, SnackTypes.warning, 'Coming Soon...');
-                  } else {
-                    // widget.scaffoldKey!.currentState.hideCurrentSnackBar();
-                    // snackAlert(
-                    //   context,
-                    //   SnackTypes.warning,
-                    //   'Feature is under process',
-                    // );
-                  }
-                } else {
-                  Navigator.pushNamed(context, '/authentication');
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                primary: _isBuy ? Color(0xff26A160) : Color(0xffD84646),
-                textStyle: TextStyle(),
-              ),
-              child: Text(
-                auth.isAuthenticated
-                    ? '${_isBuy ? 'Buy' : 'Sell'} ${futureMarket.activeMarket['base']}'
-                    : 'Login / Sign Up',
-                style: TextStyle(color: Colors.white),
-              ),
+          Container(
+            padding: EdgeInsets.only(top: 2, bottom: 2),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.only(right: 5),
+                          child: Text(
+                            'Cost:',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: secondaryTextColor,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          '0 USDT',
+                          style: TextStyle(
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.only(right: 5),
+                          child: Text(
+                            'Cost:',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: secondaryTextColor,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          '0 USDT',
+                          style: TextStyle(
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                )
+              ],
             ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                width: auth.isAuthenticated ? null : width * 0.55,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (auth.isAuthenticated) {
+                      if (_formTradeKey.currentState!.validate()) {
+                        createOrder('BUY');
+                        // snackAlert(
+                        //     context, SnackTypes.warning, 'Coming Soon...');
+                      } else {
+                        // widget.scaffoldKey!.currentState.hideCurrentSnackBar();
+                        // snackAlert(
+                        //   context,
+                        //   SnackTypes.warning,
+                        //   'Feature is under process',
+                        // );
+                      }
+                    } else {
+                      Navigator.pushNamed(context, '/authentication');
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Color(0xff26A160),
+                    textStyle: TextStyle(),
+                  ),
+                  child: Text(
+                    auth.isAuthenticated
+                        ? '${_isBuy ? 'Open Long' : 'Close Short'}'
+                        : 'Login / Sign Up',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ),
+              auth.isAuthenticated
+                  ? SizedBox(
+                      // width: width * 0.7,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (auth.isAuthenticated) {
+                            if (_formTradeKey.currentState!.validate()) {
+                              createOrder('SELL');
+                            } else {
+                              // widget.scaffoldKey!.currentState.hideCurrentSnackBar();
+                              // snackAlert(
+                              //   context,
+                              //   SnackTypes.warning,
+                              //   'Feature is under process',
+                              // );
+                            }
+                          } else {
+                            Navigator.pushNamed(context, '/authentication');
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          primary: Color(0xffD84646),
+                          textStyle: TextStyle(),
+                        ),
+                        child: Text(
+                          '${_isBuy ? 'Open Short' : 'Close Long'}',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    )
+                  : Container(),
+            ],
           ),
         ],
       ),
@@ -585,7 +1065,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
 
   Widget _selectAmountPecentage() {
     return Container(
-      padding: EdgeInsets.only(bottom: 8),
+      padding: EdgeInsets.only(bottom: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -597,7 +1077,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                 },
                 child: Container(
                   width: width * 0.13,
-                  padding: EdgeInsets.all(4),
+                  padding: EdgeInsets.all(2),
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: Color(0xff292C51),
@@ -629,7 +1109,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                 },
                 child: Container(
                   width: width * 0.13,
-                  padding: EdgeInsets.all(4),
+                  padding: EdgeInsets.all(2),
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: Color(0xff292C51),
@@ -661,7 +1141,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                 },
                 child: Container(
                   width: width * 0.13,
-                  padding: EdgeInsets.all(4),
+                  padding: EdgeInsets.all(2),
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: Color(0xff292C51),
@@ -693,7 +1173,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                 },
                 child: Container(
                   width: width * 0.13,
-                  padding: EdgeInsets.all(4),
+                  padding: EdgeInsets.all(2),
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: Color(0xff292C51),
@@ -742,8 +1222,10 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
   }
 
   double getFutureBalanceCoin(futureMarket) {
-    return double.parse(
-        '${futureMarket.openPositions['accountList'][0]['canUseAmount']}');
+    return futureMarket.openPositions.isNotEmpty
+        ? double.parse(
+            '${futureMarket.openPositions['accountList'][0]['canUseAmount']}')
+        : 0.00;
   }
 
   Widget transferAsset(context, futureMarket, setState) {

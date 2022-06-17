@@ -167,6 +167,7 @@ class _Login extends State<Login> {
                         'loginPword': _loginPword.text,
                       }, _captchaController);
                     } else {
+                      _captchaController.refresh({});
                       _captchaController.reset();
                     }
                   }

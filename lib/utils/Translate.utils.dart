@@ -22,6 +22,12 @@ String getTranslate(String text) {
       return 'Incorrect username or password, you have 2 more chances';
     case '用户名或密码错误,您还有1次机会':
       return 'Incorrect username or password, you have 1 more chances';
+    case '数量精度错误':
+      return 'Quantity precision error';
+    case '下单数量小于最小限制数量':
+      return 'The order quantity is less than the minimum limit quantity';
+    case '价格超出设定偏离范围':
+      return 'The price is outside the set deviation range';
     default:
       return text;
   }

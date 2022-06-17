@@ -187,7 +187,6 @@ class Asset with ChangeNotifier {
       } else if (responseData['code'] == "10002") {
         snackAlert(
             ctx, SnackTypes.warning, 'Session Expired, Please login back');
-        Navigator.pushNamed(ctx, '/authentication');
       } else {
         _accountBalance = {};
       }

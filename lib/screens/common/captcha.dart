@@ -82,6 +82,7 @@ class Captcha extends StatelessWidget {
           // });
           onCaptchaVerification(failCode);
           print('failCode: $failCode');
+          resetCaptcha();
         },
         onError: (String errorCode) {
           // setState(() {
@@ -89,6 +90,7 @@ class Captcha extends StatelessWidget {
           // });
           onCaptchaVerification(errorCode);
           print('errorCode: $errorCode');
+          resetCaptcha();
         },
       ),
     );
