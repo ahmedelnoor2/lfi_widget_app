@@ -4,7 +4,9 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/future_market.dart';
+import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/no_data.dart';
+import 'package:lyotrade/screens/future_trade/common/leverage_level.dart';
 import 'package:lyotrade/screens/trade/common/percentage_indicator.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
@@ -21,6 +23,10 @@ class _FutureOpenOrdersState extends State<FutureOpenOrders>
     with SingleTickerProviderStateMixin {
   late final TabController _tabOpenOrderController =
       TabController(length: 3, vsync: this);
+  final _formStopOrderKey = GlobalKey<FormState>();
+  final TextEditingController _leverageLevelField = TextEditingController();
+  final TextEditingController _amountField = TextEditingController();
+  final TextEditingController _priceField = TextEditingController();
 
   bool _isCancelling = false;
   late Timer _timer;
@@ -28,12 +34,18 @@ class _FutureOpenOrdersState extends State<FutureOpenOrders>
   @override
   void initState() {
     startTimer();
+    getOpenPositions();
     getCurrentOrders();
+    getTriggerOrders();
     super.initState();
   }
 
   @override
   void dispose() {
+    _leverageLevelField.dispose();
+    _amountField.dispose();
+    _priceField.dispose();
+    _timer.cancel();
     super.dispose();
   }
 
@@ -43,6 +55,8 @@ class _FutureOpenOrdersState extends State<FutureOpenOrders>
       oneSec,
       (Timer timer) {
         getOpenPositions();
+        getCurrentOrders();
+        getTriggerOrders();
       },
     );
   }
@@ -66,6 +80,16 @@ class _FutureOpenOrdersState extends State<FutureOpenOrders>
 
     if (auth.isAuthenticated) {
       await futureMarket.getCurrentOrders(
+          context, auth, futureMarket.activeMarket['id']);
+    }
+  }
+
+  Future<void> getTriggerOrders() async {
+    var futureMarket = Provider.of<FutureMarket>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
+
+    if (auth.isAuthenticated) {
+      await futureMarket.getTriggerOrders(
           context, auth, futureMarket.activeMarket['id']);
     }
   }
@@ -100,6 +124,41 @@ class _FutureOpenOrdersState extends State<FutureOpenOrders>
   //   getCurrentOrders();
   // }
 
+  Future<void> updateLeverageLevel(nowLevel) async {
+    var futureMarket = Provider.of<FutureMarket>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
+    await futureMarket.updateLeverageLevel(context, auth, {
+      'contractId': futureMarket.activeMarket['id'],
+      'nowLevel': nowLevel,
+    });
+    await futureMarket.getUserConfiguration(
+        context, auth, futureMarket.activeMarket['id']);
+  }
+
+  Future<void> createOrder(openPosition, type, closePosition) async {
+    var auth = Provider.of<Auth>(context, listen: false);
+    var futureMarket = Provider.of<FutureMarket>(context, listen: false);
+
+    var formData = {
+      "contractId": openPosition['contractId'],
+      "isConditionOrder": false,
+      "leverageLevel": futureMarket.userConfiguration['nowLevel'],
+      "open": 'CLOSE',
+      "positionType": openPosition['positionType'],
+      "price": type == 2 ? null : _priceField.text,
+      "side": openPosition['orderSide'] == 'BUY' ? 'SELL' : 'BUY',
+      "triggerPrice": null,
+      "type": type,
+      "volume":
+          closePosition ? openPosition['positionVolume'] : _amountField.text,
+    };
+
+    await futureMarket.createOrder(context, auth, formData);
+    await futureMarket.getCurrentOrders(
+        context, auth, openPosition['contractId']);
+    await futureMarket.getOpenPositions(context, auth);
+  }
+
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
@@ -108,7 +167,7 @@ class _FutureOpenOrdersState extends State<FutureOpenOrders>
     var auth = Provider.of<Auth>(context, listen: true);
     var futureMarket = Provider.of<FutureMarket>(context, listen: true);
 
-    // print(futureMarket.userConfiguration);
+    // print(futureMarket.triggerOrders);
 
     return Column(
       children: [
@@ -172,7 +231,9 @@ class _FutureOpenOrdersState extends State<FutureOpenOrders>
               futureMarket.currentOrders.isEmpty
                   ? noData('No limit orders')
                   : limitOrders(futureMarket.currentOrders),
-              Text('Stop Order'),
+              futureMarket.triggerOrders.isEmpty
+                  ? noData('No Stop Limit orders')
+                  : triggerOrders(futureMarket.triggerOrders),
             ],
           ),
         ),
@@ -400,9 +461,28 @@ class _FutureOpenOrdersState extends State<FutureOpenOrders>
                 ),
               ),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  ElevatedButton(
-                    onPressed: () {},
+                  OutlinedButton(
+                    onPressed: () {
+                      showModalBottomSheet<void>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return StatefulBuilder(
+                            builder:
+                                (BuildContext context, StateSetter setState) {
+                              return leverageLevel(
+                                context,
+                                _leverageLevelField,
+                                updateLeverageLevel,
+                                futureMarket,
+                                setState,
+                              );
+                            },
+                          );
+                        },
+                      );
+                    },
                     child: Text(
                       'Adjust Leverage',
                       style: TextStyle(
@@ -410,19 +490,49 @@ class _FutureOpenOrdersState extends State<FutureOpenOrders>
                       ),
                     ),
                   ),
-                  ElevatedButton(
-                    onPressed: () {},
+                  OutlinedButton(
+                    onPressed: () {
+                      showModalBottomSheet<void>(
+                        context: context,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(25.0))),
+                        isScrollControlled: true,
+                        builder: (BuildContext context) {
+                          return StatefulBuilder(
+                            builder:
+                                (BuildContext context, StateSetter setState) {
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 30),
+                                child: stopProfitAndLoss(
+                                  context,
+                                  _formStopOrderKey,
+                                  _amountField,
+                                  _priceField,
+                                  futureMarket,
+                                  position,
+                                  setState,
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      );
+                    },
                     child: Text(
-                      'Adjust Leverage',
+                      'Stop Profit & Loss',
                       style: TextStyle(
                         fontSize: 12,
                       ),
                     ),
                   ),
-                  ElevatedButton(
-                    onPressed: () {},
+                  OutlinedButton(
+                    onPressed: () {
+                      createOrder(position, 2, true);
+                    },
                     child: Text(
-                      'Adjust Leverage',
+                      'Close Position',
                       style: TextStyle(
                         fontSize: 12,
                       ),
@@ -434,6 +544,241 @@ class _FutureOpenOrdersState extends State<FutureOpenOrders>
             ],
           );
         },
+      ),
+    );
+  }
+
+  Widget stopProfitAndLoss(
+    context,
+    formStopOrderKey,
+    amountField,
+    priceField,
+    futureMarket,
+    position,
+    setState,
+  ) {
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          titleSpacing: 0,
+          title: GestureDetector(
+            onTap: () {
+              FocusManager.instance.primaryFocus?.unfocus();
+            },
+            child: Text(
+              'Stop Profit & Loss',
+              style: TextStyle(fontSize: 16, fontStyle: FontStyle.normal),
+            ),
+          ),
+          centerTitle: false,
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(Icons.chevron_left),
+          ),
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          // toolbarHeight: 0,
+          bottom: TabBar(
+            onTap: (value) {
+              FocusManager.instance.primaryFocus?.unfocus();
+            },
+            tabs: [
+              Tab(text: 'Limit'),
+              Tab(text: 'Market'),
+            ],
+          ),
+        ),
+        body: GestureDetector(
+          onTap: () {
+            FocusManager.instance.primaryFocus?.unfocus();
+          },
+          child: Form(
+            key: formStopOrderKey,
+            child: TabBarView(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Column(
+                    children: [
+                      Container(
+                        margin: EdgeInsets.only(bottom: 5),
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Color(0xff292C51),
+                          ),
+                          color: Color(0xff292C51),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(2),
+                          ),
+                        ),
+                        child: TextFormField(
+                          textAlign: TextAlign.center,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter price';
+                            }
+                            return null;
+                          },
+                          style: TextStyle(fontSize: 16),
+                          keyboardType:
+                              TextInputType.numberWithOptions(decimal: true),
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.zero,
+                            isDense: true,
+                            border: UnderlineInputBorder(
+                              borderSide: BorderSide.none,
+                            ),
+                            hintStyle: TextStyle(
+                              fontSize: 16,
+                            ),
+                            errorStyle: TextStyle(height: 0),
+                            hintText:
+                                'Price (${futureMarket.activeMarket['quote']})',
+                          ),
+                          controller: priceField,
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(bottom: 5),
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Color(0xff292C51),
+                          ),
+                          color: Color(0xff292C51),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(2),
+                          ),
+                        ),
+                        child: TextFormField(
+                          textAlign: TextAlign.center,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter contract value';
+                            }
+                            return null;
+                          },
+                          style: TextStyle(fontSize: 16),
+                          keyboardType:
+                              TextInputType.numberWithOptions(decimal: true),
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.zero,
+                            isDense: true,
+                            border: UnderlineInputBorder(
+                              borderSide: BorderSide.none,
+                            ),
+                            hintStyle: TextStyle(
+                              fontSize: 16,
+                            ),
+                            errorStyle: TextStyle(height: 0),
+                            hintText: 'Cont.',
+                          ),
+                          controller: amountField,
+                        ),
+                      ),
+                      SizedBox(
+                        width: width,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (formStopOrderKey.currentState!.validate()) {
+                              createOrder(position, 1, false);
+                              Navigator.pop(context);
+                              // createOrder('BUY');
+                              // snackAlert(
+                              //     context, SnackTypes.warning, 'Coming Soon...');
+                            } else {
+                              // widget.scaffoldKey!.currentState.hideCurrentSnackBar();
+                              // snackAlert(
+                              //   context,
+                              //   SnackTypes.warning,
+                              //   'Feature is under process',
+                              // );
+                            }
+                          },
+                          child: const Text(
+                            'Limit Order',
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Column(
+                    children: [
+                      Container(
+                        margin: EdgeInsets.only(bottom: 5),
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Color(0xff292C51),
+                          ),
+                          color: Color(0xff292C51),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(2),
+                          ),
+                        ),
+                        child: TextFormField(
+                          textAlign: TextAlign.center,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter contract value';
+                            }
+                            return null;
+                          },
+                          style: TextStyle(fontSize: 16),
+                          keyboardType:
+                              TextInputType.numberWithOptions(decimal: true),
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.zero,
+                            isDense: true,
+                            border: UnderlineInputBorder(
+                              borderSide: BorderSide.none,
+                            ),
+                            hintStyle: TextStyle(
+                              fontSize: 16,
+                            ),
+                            errorStyle: TextStyle(height: 0),
+                            hintText: 'Cont.',
+                          ),
+                          controller: amountField,
+                        ),
+                      ),
+                      SizedBox(
+                        width: width,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (formStopOrderKey.currentState!.validate()) {
+                              createOrder(position, 2, false);
+                              Navigator.pop(context);
+                              // snackAlert(
+                              //     context, SnackTypes.warning, 'Coming Soon...');
+                            } else {
+                              // widget.scaffoldKey!.currentState.hideCurrentSnackBar();
+                              // snackAlert(
+                              //   context,
+                              //   SnackTypes.warning,
+                              //   'Feature is under process',
+                              // );
+                            }
+                          },
+                          child: const Text(
+                            'Market Order',
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -616,6 +961,242 @@ class _FutureOpenOrdersState extends State<FutureOpenOrders>
                                   cancelOrder({
                                     "orderId": openOrder['id'],
                                     "contractId": openOrder['contractId'],
+                                    "isConditionOrder": false,
+                                  });
+                                },
+                          child: Container(
+                            padding: EdgeInsets.only(
+                                left: 12, right: 12, top: 6, bottom: 6),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Color(0xff292C51),
+                              ),
+                              color: Color(0xff292C51),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(2),
+                              ),
+                            ),
+                            child: _isCancelling
+                                ? CircularProgressIndicator.adaptive()
+                                : Text(
+                                    'Cancel',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              Divider(),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget triggerOrders(triggerOrders) {
+    return Container(
+      padding: EdgeInsets.all(9),
+      child: ListView.builder(
+        itemCount: triggerOrders.length,
+        itemBuilder: (BuildContext context, int index) {
+          var triggerOrder = triggerOrders[index];
+          double filledVolume = double.parse('${triggerOrder['volume']}') /
+              double.parse('${triggerOrder['volume']}');
+          var orderFilled = filledVolume * 100;
+          return Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(
+                    width: width * 0.65,
+                    child: Row(
+                      children: [
+                        Column(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.only(bottom: 4),
+                              child: Text(
+                                'Stop Limit/${triggerOrder['side']}',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: triggerOrder['side'] == 'BUY'
+                                      ? greenIndicator
+                                      : redIndicator,
+                                ),
+                              ),
+                            ),
+                            Stack(
+                              children: [
+                                Container(
+                                  height: 40,
+                                  width: 40,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: secondaryTextColor400,
+                                      width: 4,
+                                    ),
+                                    borderRadius: BorderRadius.circular(100),
+                                    // shape: BoxShape.circle,
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      '$orderFilled%',
+                                      style: TextStyle(fontSize: 10),
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.only(left: 20, top: 20),
+                                  child: SemiCircleWidget(
+                                    diameter: 0,
+                                    sweepAngle: (100.0).clamp(0.0, orderFilled),
+                                    color: triggerOrder['side'] == 'BUY'
+                                        ? greenIndicator
+                                        : redIndicator,
+                                  ),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(left: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.only(bottom: 5),
+                                child: Text(
+                                  '${triggerOrder['symbol']}',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.only(right: 20),
+                                          child: Text(
+                                            'Amount',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: secondaryTextColor,
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: EdgeInsets.only(right: 20),
+                                          child: Text(
+                                            'Price',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: secondaryTextColor,
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: EdgeInsets.only(right: 20),
+                                          child: Text(
+                                            'Trigger Price',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: secondaryTextColor,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.only(right: 20),
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                '${double.parse('${triggerOrder['volume']}').toStringAsFixed(4)} / ',
+                                                style: TextStyle(
+                                                  fontSize: 11,
+                                                ),
+                                              ),
+                                              Text(
+                                                '${double.parse('${triggerOrder['volume']}').toStringAsFixed(4)}',
+                                                style: TextStyle(
+                                                  fontSize: 11,
+                                                  color: secondaryTextColor,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: EdgeInsets.only(right: 20),
+                                          child: Text(
+                                            '${double.parse('${triggerOrder['price']}').toStringAsPrecision(6)}',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: EdgeInsets.only(right: 20),
+                                          child: Text(
+                                            '${double.parse('${triggerOrder['triggerPrice']}').toStringAsPrecision(6)}',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.only(bottom: 5),
+                          child: Text(
+                            '${DateFormat('yyy-mm-dd hh:mm:ss').format(DateTime.fromMillisecondsSinceEpoch(triggerOrder['mtime']))}',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: secondaryTextColor,
+                            ),
+                          ),
+                        ),
+                        InkWell(
+                          onTap: _isCancelling
+                              ? null
+                              : () {
+                                  cancelOrder({
+                                    "orderId": triggerOrder['id'],
+                                    "contractId": triggerOrder['contractId'],
                                     "isConditionOrder": false,
                                   });
                                 },

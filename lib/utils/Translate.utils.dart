@@ -28,6 +28,14 @@ String getTranslate(String text) {
       return 'The order quantity is less than the minimum limit quantity';
     case '价格超出设定偏离范围':
       return 'The price is outside the set deviation range';
+    case '用户可用余额不足':
+      return 'User has insufficient available balance';
+    case '下单金额小于最小限制金额':
+      return 'The order amount is less than the minimum limit amount';
+    case '预计成交价格高于强平价格，无法下单':
+      return 'The expected transaction price is higher than the liquidation price, and the order cannot be placed';
+    case '平仓超出仓位总量':
+      return 'Closing the position exceeds the total amount of the position';
     default:
       return text;
   }

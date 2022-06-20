@@ -220,9 +220,10 @@ class FutureMarket with ChangeNotifier {
         return notifyListeners();
       }
     } catch (error) {
+      _openPositions = {};
       print(error);
       // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
-      return;
+      return notifyListeners();
     }
   }
 
@@ -515,11 +516,9 @@ class FutureMarket with ChangeNotifier {
 
       final responseData = json.decode(response.body);
 
-      print(responseData);
-
       if (responseData['code'] == '0') {
         snackAlert(ctx, SnackTypes.success, 'Order successfully created');
-      } else if (responseData['code'] == 10002) {
+      } else if (responseData['code'] == '10002') {
         snackAlert(ctx, SnackTypes.warning, 'Please login to access');
       } else {
         snackAlert(
@@ -596,13 +595,52 @@ class FutureMarket with ChangeNotifier {
 
       final responseData = json.decode(response.body);
 
-      print(responseData);
-
       if (responseData['code'] == '0') {
         _currentOrders = responseData['data']['orderList'];
         return notifyListeners();
       } else {
         _currentOrders = [];
+        return notifyListeners();
+      }
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
+      // throw error;
+    }
+  }
+
+  // Trigger order list
+  List _triggerOrders = [];
+
+  List get triggerOrders {
+    return _triggerOrders;
+  }
+
+  Future<void> getTriggerOrders(ctx, auth, contractId) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      futApiUrl,
+      '$futExApi/order/trigger_order_list',
+    );
+
+    var postData = json.encode({'contractId': contractId});
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      print(responseData);
+
+      if (responseData['code'] == '0') {
+        _triggerOrders = responseData['data']['trigOrderList'];
+        return notifyListeners();
+      } else {
+        _triggerOrders = [];
         return notifyListeners();
       }
     } catch (error) {

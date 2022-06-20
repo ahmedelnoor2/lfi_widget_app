@@ -32,6 +32,8 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
   final TextEditingController _priceField = TextEditingController();
   final TextEditingController _totalField = TextEditingController();
 
+  final TextEditingController _triggerPriceField = TextEditingController();
+
   final TextEditingController _takeProfitField = TextEditingController();
   final TextEditingController _stopLossField = TextEditingController();
 
@@ -71,6 +73,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
     _totalField.dispose();
     _takeProfitField.dispose();
     _stopLossField.dispose();
+    _triggerPriceField.dispose();
     if (_timer != null) {
       _timer.cancel();
     }
@@ -165,26 +168,30 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
   Future<void> createOrder(type) async {
     var auth = Provider.of<Auth>(context, listen: false);
     var futureMarket = Provider.of<FutureMarket>(context, listen: false);
-    var public = Provider.of<Public>(context, listen: false);
-    var formData = {
-      // "price": _orderType == 1
-      //     ? _priceField.text
-      //     : (_orderType == 2)
-      //         ? null
-      //         : public.lastPrice,
-      // "side": _isBuy ? "BUY" : "SELL",
-      // "symbol": public.activeMarket['symbol'],
-      // "type": _orderType,
-      // "volume":
-      //     (_orderType == 2 && _isBuy) ? _totalField.text : _amountField.text,
 
+    var _submitOrderType = _orderType;
+
+    if (_advancedOptions && _advanceOptionValue == 'P/O') {
+      _submitOrderType = 5;
+    }
+    if (_advancedOptions && _advanceOptionValue == 'IOC') {
+      _submitOrderType = 3;
+    }
+    if (_advancedOptions && _advanceOptionValue == 'FOK') {
+      _submitOrderType = 4;
+    }
+    if (_orderType == 6) {
+      _submitOrderType = 1;
+    }
+
+    var formData = {
       "contractId": futureMarket.activeMarket['id'],
-      "isConditionOrder": false,
+      "isConditionOrder": (_orderType == 6) ? true : false,
       "isOto": false,
       "leverageLevel": futureMarket.userConfiguration['nowLevel'],
       "open": _isBuy ? "OPEN" : "CLOSE",
       "positionType": futureMarket.userConfiguration['positionModel'],
-      "price": _priceField.text,
+      "price": _orderType == 2 ? null : _priceField.text,
       "side": type,
       "stopLossPrice": 0,
       "stopLossTrigger": null,
@@ -192,17 +199,20 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
       "takerProfitPrice": 0,
       "takerProfitTrigger": null,
       "takerProfitType": 2,
-      "triggerPrice": null,
-      "type": 1,
-      "volume": int.parse((double.parse(_amountField.text) /
-              double.parse('${futureMarket.activeMarket['multiplier']}'))
-          .toStringAsFixed(0)),
+      "triggerPrice": _orderType == 6 ? _triggerPriceField.text : null,
+      "type": _submitOrderType,
+      "volume": futureMarket.userConfiguration['coUnit'] == 2
+          ? int.parse((double.parse(_amountField.text) /
+                  double.parse('${futureMarket.activeMarket['multiplier']}'))
+              .toStringAsFixed(0))
+          : int.parse(_amountField.text),
     };
-
-    // print(formData);
 
     await futureMarket.createOrder(context, auth, formData);
     await futureMarket.getCurrentOrders(
+        context, auth, futureMarket.activeMarket['id']);
+    await futureMarket.getOpenPositions(context, auth);
+    await futureMarket.getTriggerOrders(
         context, auth, futureMarket.activeMarket['id']);
   }
 
@@ -312,7 +322,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
             itemBuilder: (ctx) => [
               _buildPopupMenuItem('Limit Order', 1),
               _buildPopupMenuItem('Market Order', 2),
-              _buildPopupMenuItem('Stop Order', 3),
+              _buildPopupMenuItem('Stop Order', 6),
             ],
           ),
           Container(
@@ -328,7 +338,9 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                   children: [
                     Container(
                       padding: EdgeInsets.only(right: 2),
-                      child: Text(_availableBalance),
+                      // child: Text(_availableBalance),
+                      child: Text(
+                          '${getFutureBalanceCoin(futureMarket).toStringAsFixed(4)}'),
                     ),
                     Container(
                       padding: EdgeInsets.only(right: 5),
@@ -394,10 +406,10 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                   ),
                 )
               : Container(),
-          (_orderType == 2 && _isBuy)
+          (_orderType == 6)
               ? Container(
                   margin: EdgeInsets.only(bottom: 5),
-                  padding: EdgeInsets.all(6),
+                  padding: EdgeInsets.all(5),
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: Color(0xff292C51),
@@ -407,45 +419,60 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                       Radius.circular(2),
                     ),
                   ),
-                  child: TextFormField(
-                    onChanged: (value) {
-                      calculateTotal('total');
-                    },
-                    textAlign: TextAlign.center,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        widget.scaffoldKey!.currentState.hideCurrentSnackBar();
-                        snackAlert(
-                          context,
-                          SnackTypes.errors,
-                          'Error in placing and order, try again',
-                        );
-                        return '';
-                      }
-                      return null;
-                    },
-                    style: TextStyle(fontSize: 16),
-                    keyboardType:
-                        TextInputType.numberWithOptions(decimal: true),
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.zero,
-                      isDense: true,
-                      border: UnderlineInputBorder(
-                        borderSide: BorderSide.none,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Icon(
+                        Icons.remove,
+                        color: Color(0xff5E6292),
                       ),
-                      hintStyle: TextStyle(
-                        fontSize: 16,
-                      ),
-                      errorStyle: TextStyle(height: 0),
-                      focusedErrorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(width: 1, color: redIndicator),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(5),
+                      SizedBox(
+                        width: 100,
+                        child: TextFormField(
+                          onChanged: (value) {
+                            calculateTotal('price');
+                          },
+                          onTap: () {
+                            if (_triggerPriceField.text.isEmpty) {
+                              updateLastPrice();
+                            }
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              widget.scaffoldKey!.currentState
+                                  .hideCurrentSnackBar();
+                              snackAlert(context, SnackTypes.errors,
+                                  'Trigger price is required');
+                              return '';
+                            }
+                            return null;
+                          },
+                          controller: _triggerPriceField,
+                          style: TextStyle(fontSize: 16),
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                          ),
+                          textAlign: TextAlign.center,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.zero,
+                            isDense: true,
+                            errorStyle: TextStyle(height: 0),
+                            border: UnderlineInputBorder(
+                              borderSide: BorderSide.none,
+                            ),
+                            hintStyle: TextStyle(
+                              fontSize: 16,
+                            ),
+                            hintText:
+                                "Trigger(${futureMarket.activeMarket['quote']})",
+                          ),
                         ),
                       ),
-                      hintText: 'Total (${futureMarket.activeMarket['quote']})',
-                    ),
-                    controller: _totalField,
+                      Icon(
+                        Icons.add,
+                        color: Color(0xff5E6292),
+                      ),
+                    ],
                   ),
                 )
               : Container(),
@@ -508,7 +535,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                               fontSize: 16,
                             ),
                             hintText:
-                                "Price (${futureMarket.activeMarket['quote']})",
+                                "Price(${futureMarket.activeMarket['quote']})",
                           ),
                         ),
                       ),
@@ -519,77 +546,74 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                     ],
                   ),
                 ),
-          (_orderType == 2 && _isBuy)
-              ? Container()
-              : Container(
-                  margin: EdgeInsets.only(bottom: 4),
-                  padding: EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Color(0xff292C51),
-                    ),
-                    color: Color(0xff292C51),
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(2),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Icon(
-                        Icons.remove,
-                        color: Color(0xff5E6292),
+          Container(
+            margin: EdgeInsets.only(bottom: 4),
+            padding: EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Color(0xff292C51),
+              ),
+              color: Color(0xff292C51),
+              borderRadius: BorderRadius.all(
+                Radius.circular(2),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Icon(
+                  Icons.remove,
+                  color: Color(0xff5E6292),
+                ),
+                SizedBox(
+                  width: 100,
+                  child: TextFormField(
+                    onChanged: (value) {
+                      calculateTotal('amount');
+                    },
+                    textAlign: TextAlign.center,
+                    validator: (value) {
+                      print(futureMarket.userConfiguration['coUnit']);
+                      if (value == null || value.isEmpty) {
+                        widget.scaffoldKey!.currentState.hideCurrentSnackBar();
+                        snackAlert(
+                            context, SnackTypes.errors, 'Amount is required');
+                        return '';
+                      }
+                      return null;
+                    },
+                    style: TextStyle(fontSize: 16),
+                    keyboardType:
+                        TextInputType.numberWithOptions(decimal: true),
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.zero,
+                      isDense: true,
+                      border: UnderlineInputBorder(
+                        borderSide: BorderSide.none,
                       ),
-                      SizedBox(
-                        width: 100,
-                        child: TextFormField(
-                          onChanged: (value) {
-                            calculateTotal('amount');
-                          },
-                          textAlign: TextAlign.center,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              widget.scaffoldKey!.currentState
-                                  .hideCurrentSnackBar();
-                              snackAlert(context, SnackTypes.errors,
-                                  'Amount is required');
-                              return '';
-                            }
-                            return null;
-                          },
-                          style: TextStyle(fontSize: 16),
-                          keyboardType:
-                              TextInputType.numberWithOptions(decimal: true),
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.zero,
-                            isDense: true,
-                            border: UnderlineInputBorder(
-                              borderSide: BorderSide.none,
-                            ),
-                            hintStyle: TextStyle(
-                              fontSize: 16,
-                            ),
-                            errorStyle: TextStyle(height: 0),
-                            focusedErrorBorder: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(width: 1, color: redIndicator),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(5),
-                              ),
-                            ),
-                            hintText:
-                                'Volume (${futureMarket.activeMarket['base']})',
-                          ),
-                          controller: _amountField,
+                      hintStyle: TextStyle(
+                        fontSize: 16,
+                      ),
+                      errorStyle: TextStyle(height: 0),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(width: 1, color: redIndicator),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(5),
                         ),
                       ),
-                      Icon(
-                        Icons.add,
-                        color: Color(0xff5E6292),
-                      ),
-                    ],
+                      hintText:
+                          'Volume(${(_orderType == 2 && _isBuy) ? futureMarket.activeMarket['quote'] : (_orderType == 2 && !_isBuy) ? futureMarket.activeMarket['base'] : futureMarket.userConfiguration['coUnit'] == 1 ? 'Cont.' : futureMarket.activeMarket['base']})',
+                    ),
+                    controller: _amountField,
                   ),
                 ),
+                Icon(
+                  Icons.add,
+                  color: Color(0xff5E6292),
+                ),
+              ],
+            ),
+          ),
           _selectAmountPecentage(),
           Container(
             padding: EdgeInsets.only(top: 4, bottom: 2),

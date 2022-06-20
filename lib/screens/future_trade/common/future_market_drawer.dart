@@ -218,7 +218,7 @@ class _FutureMarketDrawerState extends State<FutureMarketDrawer>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        '${futureMarket.activeMarketAllTicks.isNotEmpty ? futureMarket.activeMarketAllTicks[_market['contractOtherName'].toLowerCase()]['close'] : '--'}',
+                        '${futureMarket.activeMarketAllTicks[_market['contractOtherName'].toLowerCase()] != null ? futureMarket.activeMarketAllTicks[_market['contractOtherName'].toLowerCase()]['close'] : '--'}',
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
