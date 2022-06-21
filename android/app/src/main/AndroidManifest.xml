@@ -6,7 +6,9 @@
    <application
         android:label="LYOTRADE"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true"
+        android:resource="@xml/network_security_config">
         <activity
             android:name=".MainActivity"
             android:exported="true"

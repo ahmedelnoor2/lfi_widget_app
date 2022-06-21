@@ -36,6 +36,8 @@ String getTranslate(String text) {
       return 'The expected transaction price is higher than the liquidation price, and the order cannot be placed';
     case '平仓超出仓位总量':
       return 'Closing the position exceeds the total amount of the position';
+    case '用户未登陆':
+      return 'User is not logged in';
     default:
       return text;
   }

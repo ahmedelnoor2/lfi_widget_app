@@ -23,7 +23,7 @@ class _StakeState extends State<Stake> with SingleTickerProviderStateMixin {
 
     return Scaffold(
       appBar: hiddenAppBar(),
-      body: Container(
+      body: SingleChildScrollView(
         padding: EdgeInsets.all(10),
         child: Column(
           children: [
@@ -76,7 +76,7 @@ class _StakeState extends State<Stake> with SingleTickerProviderStateMixin {
             ),
             Divider(),
             SizedBox(
-              height: height * 0.8,
+              height: height * 0.85,
               child: TabBarView(
                 controller: _tabStakeController,
                 children: [

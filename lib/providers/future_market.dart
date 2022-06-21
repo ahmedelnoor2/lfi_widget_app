@@ -390,10 +390,12 @@ class FutureMarket with ChangeNotifier {
 
       final responseData = json.decode(response.body);
 
+      print(responseData);
+
       if (responseData['code'] == '0') {
         snackAlert(ctx, SnackTypes.success, "Configuration updated");
       } else {
-        snackAlert(ctx, SnackTypes.errors, "${responseData['msg']}");
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
     } catch (error) {
       print(error);
@@ -633,8 +635,6 @@ class FutureMarket with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-
-      print(responseData);
 
       if (responseData['code'] == '0') {
         _triggerOrders = responseData['data']['trigOrderList'];

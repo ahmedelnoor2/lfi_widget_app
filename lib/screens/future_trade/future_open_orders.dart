@@ -196,7 +196,7 @@ class _FutureOpenOrdersState extends State<FutureOpenOrders>
                   ),
                   Tab(
                     text:
-                        'Stop Orders(${futureMarket.openPositions.isNotEmpty ? futureMarket.openPositions['positionList'].length : 0})',
+                        'Stop Orders(${futureMarket.triggerOrders.isNotEmpty ? futureMarket.triggerOrders.length : 0})',
                   ),
                 ],
                 controller: _tabOpenOrderController,
@@ -1007,8 +1007,7 @@ class _FutureOpenOrdersState extends State<FutureOpenOrders>
         itemCount: triggerOrders.length,
         itemBuilder: (BuildContext context, int index) {
           var triggerOrder = triggerOrders[index];
-          double filledVolume = double.parse('${triggerOrder['volume']}') /
-              double.parse('${triggerOrder['volume']}');
+          double filledVolume = 0 / double.parse('${triggerOrder['volume']}');
           var orderFilled = filledVolume * 100;
           return Column(
             children: [
@@ -1016,7 +1015,7 @@ class _FutureOpenOrdersState extends State<FutureOpenOrders>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox(
-                    width: width * 0.65,
+                    width: width * 0.7,
                     child: Row(
                       children: [
                         Column(
@@ -1077,7 +1076,7 @@ class _FutureOpenOrdersState extends State<FutureOpenOrders>
                                 child: Text(
                                   '${triggerOrder['symbol']}',
                                   style: TextStyle(
-                                    fontSize: 15,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -1197,7 +1196,7 @@ class _FutureOpenOrdersState extends State<FutureOpenOrders>
                                   cancelOrder({
                                     "orderId": triggerOrder['id'],
                                     "contractId": triggerOrder['contractId'],
-                                    "isConditionOrder": false,
+                                    "isConditionOrder": true,
                                   });
                                 },
                           child: Container(

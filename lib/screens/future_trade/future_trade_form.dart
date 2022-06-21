@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lyotrade/providers/asset.dart';
@@ -51,6 +51,9 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
   String _defaultTransferCoin = 'USDT';
   double _availableBalanceFrom = 0.00;
   double _availableBalanceTo = 0.00;
+  double _selectedPercentage = 0;
+  double _totalContracts = 0;
+  double _maxBuySell = 0;
 
   //Avance Options
   bool _advancedOptions = false;
@@ -119,18 +122,27 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
   }
 
   void calculateTotal(field) {
+    var futureMarket = Provider.of<FutureMarket>(context, listen: false);
+
     if (field == 'amount') {
       if (_amountField.text.isNotEmpty) {
         try {
           setState(() {
             _amount = double.parse(_amountField.text);
             _total = double.parse(_amountField.text) * _price;
+            _totalContracts = calculateContractToPrice(futureMarket, '$_total');
+            _maxBuySell = calculateMaxBuySell(
+                futureMarket, '${getFutureBalanceCoin(futureMarket) / _price}');
           });
           _totalField.text = '${double.parse(_amountField.text) * _price}';
         } catch (e) {
           //
         }
       } else {
+        setState(() {
+          _maxBuySell = 0.00;
+          _totalContracts = 0.00;
+        });
         _totalField.clear();
       }
     }
@@ -139,11 +151,16 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
         setState(() {
           _price = double.parse(_priceField.text);
           _total = double.parse(_priceField.text) * _amount;
+          _totalContracts = calculateContractToPrice(futureMarket, '$_total');
+          _maxBuySell = calculateMaxBuySell(
+              futureMarket, '${getFutureBalanceCoin(futureMarket) / _price}');
         });
         _totalField.text = '${double.parse(_priceField.text) * _amount}';
       } else {
         setState(() {
+          _maxBuySell = 0.00;
           _price = 0.00;
+          _totalContracts = 0.00;
         });
         _totalField.clear();
       }
@@ -154,15 +171,51 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
           setState(() {
             _total = double.parse(_totalField.text);
             _amount = double.parse(_totalField.text) / _price;
+            _totalContracts = calculateContractToPrice(futureMarket, '$_total');
+            _maxBuySell = calculateMaxBuySell(
+                futureMarket, '${getFutureBalanceCoin(futureMarket) / _price}');
           });
           _amountField.text = '${double.parse(_totalField.text) / _price}';
         } catch (e) {
           //
         }
       } else {
+        setState(() {
+          _maxBuySell = 0.00;
+          _totalContracts = 0.00;
+        });
         _amountField.clear();
       }
     }
+  }
+
+  int calculateContracts(futureMarket, amountInPrice) {
+    return (amountInPrice.isEmpty)
+        ? 0
+        : double.tryParse(amountInPrice) == null
+            ? 0
+            : futureMarket.userConfiguration['coUnit'] == 2
+                ? int.parse((double.parse(amountInPrice) /
+                        double.parse(
+                            '${futureMarket.activeMarket['multiplier']}'))
+                    .toStringAsFixed(0))
+                : int.parse(double.parse(amountInPrice).toStringAsFixed(0));
+  }
+
+  double calculateContractToPrice(futureMarket, amountInPrice) {
+    var leverageMultiplier = double.parse(
+        '${futureMarket.userConfiguration.isEmpty ? 125 : futureMarket.userConfiguration['nowLevel']}');
+    return (amountInPrice.isEmpty)
+        ? 0
+        : double.parse(
+            '${double.parse('$amountInPrice') / leverageMultiplier}');
+  }
+
+  double calculateMaxBuySell(futureMarket, priceMultiplyer) {
+    var leverageMultiplier = double.parse(
+        '${futureMarket.userConfiguration.isEmpty ? 125 : futureMarket.userConfiguration['nowLevel']}');
+    return double.parse(
+        '${double.parse('$priceMultiplyer') / leverageMultiplier}');
   }
 
   Future<void> createOrder(type) async {
@@ -201,11 +254,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
       "takerProfitType": 2,
       "triggerPrice": _orderType == 6 ? _triggerPriceField.text : null,
       "type": _submitOrderType,
-      "volume": futureMarket.userConfiguration['coUnit'] == 2
-          ? int.parse((double.parse(_amountField.text) /
-                  double.parse('${futureMarket.activeMarket['multiplier']}'))
-              .toStringAsFixed(0))
-          : int.parse(_amountField.text),
+      "volume": calculateContracts(futureMarket, _amountField.text),
     };
 
     await futureMarket.createOrder(context, auth, formData);
@@ -232,8 +281,6 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
 
     var futureMarket = Provider.of<FutureMarket>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
-
-    // print(futureMarket.lastPrice);
 
     return Form(
       key: _formTradeKey,
@@ -336,15 +383,46 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                 ),
                 Row(
                   children: [
-                    Container(
-                      padding: EdgeInsets.only(right: 2),
-                      // child: Text(_availableBalance),
-                      child: Text(
-                          '${getFutureBalanceCoin(futureMarket).toStringAsFixed(4)}'),
-                    ),
-                    Container(
-                      padding: EdgeInsets.only(right: 5),
-                      child: Text('${futureMarket.activeMarket['quote']}'),
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          _amountController.clear();
+                        });
+                        if (auth.isAuthenticated) {
+                          showModalBottomSheet<void>(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return StatefulBuilder(
+                                builder: (BuildContext context,
+                                    StateSetter updateState) {
+                                  return transferAsset(
+                                    context,
+                                    futureMarket,
+                                    updateState,
+                                  );
+                                },
+                              );
+                            },
+                          );
+                        } else {
+                          Navigator.pushNamed(context, '/authentication');
+                        }
+                      },
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(right: 2),
+                            // child: Text(_availableBalance),
+                            child: Text(getFutureBalanceCoin(futureMarket)
+                                .toStringAsFixed(4)),
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(right: 5),
+                            child:
+                                Text('${futureMarket.activeMarket['quote']}'),
+                          ),
+                        ],
+                      ),
                     ),
                     InkWell(
                       onTap: () {
@@ -432,11 +510,6 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                           onChanged: (value) {
                             calculateTotal('price');
                           },
-                          onTap: () {
-                            if (_triggerPriceField.text.isEmpty) {
-                              updateLastPrice();
-                            }
-                          },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               widget.scaffoldKey!.currentState
@@ -461,7 +534,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                               borderSide: BorderSide.none,
                             ),
                             hintStyle: TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                             ),
                             hintText:
                                 "Trigger(${futureMarket.activeMarket['quote']})",
@@ -532,7 +605,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                               borderSide: BorderSide.none,
                             ),
                             hintStyle: TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                             ),
                             hintText:
                                 "Price(${futureMarket.activeMarket['quote']})",
@@ -570,10 +643,18 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                   child: TextFormField(
                     onChanged: (value) {
                       calculateTotal('amount');
+                      setState(() {
+                        _selectedPercentage = value.isNotEmpty
+                            ? double.tryParse(value) == null
+                                ? 0
+                                : (double.parse(value) /
+                                        getFutureBalanceCoin(futureMarket)) *
+                                    100
+                            : 0;
+                      });
                     },
                     textAlign: TextAlign.center,
                     validator: (value) {
-                      print(futureMarket.userConfiguration['coUnit']);
                       if (value == null || value.isEmpty) {
                         widget.scaffoldKey!.currentState.hideCurrentSnackBar();
                         snackAlert(
@@ -583,6 +664,14 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                       return null;
                     },
                     style: TextStyle(fontSize: 16),
+                    inputFormatters: [
+                      DecimalTextInputFormatter(
+                        decimalRange: 4,
+                        coUnit: futureMarket.userConfiguration['coUnit'] != null
+                            ? futureMarket.userConfiguration['coUnit']
+                            : 2,
+                      ),
+                    ],
                     keyboardType:
                         TextInputType.numberWithOptions(decimal: true),
                     decoration: InputDecoration(
@@ -592,7 +681,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                         borderSide: BorderSide.none,
                       ),
                       hintStyle: TextStyle(
-                        fontSize: 16,
+                        fontSize: 14,
                       ),
                       errorStyle: TextStyle(height: 0),
                       focusedErrorBorder: OutlineInputBorder(
@@ -614,41 +703,50 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
               ],
             ),
           ),
-          _selectAmountPecentage(),
-          Container(
-            padding: EdgeInsets.only(top: 4, bottom: 2),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.only(right: 5),
-                      child: InkWell(
-                        onTap: () {
-                          setState(() {
-                            _advancedOptions = !_advancedOptions;
-                          });
-                        },
-                        child: Icon(
-                          Icons.check_circle,
-                          color: _advancedOptions
-                              ? linkColor
-                              : secondaryTextColor400,
-                          size: 15,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      'Advance Options',
-                      style: TextStyle(
-                        fontSize: 12,
-                      ),
-                    )
-                  ],
+          _selectAmountPecentage(futureMarket),
+          (_orderType == 1 || _orderType == 6)
+              ? Container(
+                  padding: EdgeInsets.only(top: 4, bottom: 2),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(right: 5),
+                            child: InkWell(
+                              onTap: () {
+                                setState(() {
+                                  _advancedOptions = !_advancedOptions;
+                                });
+                              },
+                              child: Icon(
+                                Icons.check_circle,
+                                color: _advancedOptions
+                                    ? linkColor
+                                    : secondaryTextColor400,
+                                size: 15,
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                _advancedOptions = !_advancedOptions;
+                              });
+                            },
+                            child: Text(
+                              'Advance Options',
+                              style: TextStyle(
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
                 )
-              ],
-            ),
-          ),
+              : Container(),
           _advancedOptions
               ? Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -738,7 +836,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                 )
               : Container(),
           Container(
-            padding: EdgeInsets.only(top: 2, bottom: 18),
+            padding: EdgeInsets.only(top: 2, bottom: 8),
             child: Column(
               children: [
                 Row(
@@ -759,12 +857,19 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                         ),
                       ),
                     ),
-                    Text(
-                      'TP/SL',
-                      style: TextStyle(
-                        fontSize: 12,
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          _tpSlOptions = !_tpSlOptions;
+                        });
+                      },
+                      child: Text(
+                        'TP/SL',
+                        style: TextStyle(
+                          fontSize: 12,
+                        ),
                       ),
-                    )
+                    ),
                   ],
                 )
               ],
@@ -898,46 +1003,50 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                   children: [
                     Container(
                       padding: EdgeInsets.only(right: 5),
-                      child: Row(
+                      child: Column(
                         children: [
-                          Container(
-                            padding: EdgeInsets.only(right: 5),
-                            child: Text(
-                              'Max Buy:',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: greenIndicator,
+                          Row(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.only(right: 5),
+                                child: Text(
+                                  'Max Buy:',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: greenIndicator,
+                                  ),
+                                ),
                               ),
-                            ),
+                              Text(
+                                '$_maxBuySell ${futureMarket.activeMarket['quote']}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
                           ),
-                          Text(
-                            '0 USDT',
-                            style: TextStyle(
-                              fontSize: 12,
-                            ),
+                          Row(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.only(right: 5),
+                                child: Text(
+                                  'Max Sell:',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: redIndicator,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                '$_maxBuySell ${futureMarket.activeMarket['quote']}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ),
-                    Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(right: 5),
-                          child: Text(
-                            'Max Sell:',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: redIndicator,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          '0 USDT',
-                          style: TextStyle(
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
                     ),
                   ],
                 )
@@ -964,7 +1073,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                           ),
                         ),
                         Text(
-                          '0 USDT',
+                          '${double.parse('$_totalContracts').toStringAsFixed(4)} ${futureMarket.userConfiguration['coUnit'] == 2 ? 'Cont' : futureMarket.activeMarket['quote']}',
                           style: TextStyle(
                             fontSize: 12,
                           ),
@@ -984,7 +1093,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                           ),
                         ),
                         Text(
-                          '0 USDT',
+                          '${double.parse('$_totalContracts').toStringAsFixed(4)} ${futureMarket.userConfiguration['coUnit'] == 2 ? 'Cont' : futureMarket.activeMarket['quote']}',
                           style: TextStyle(
                             fontSize: 12,
                           ),
@@ -1087,7 +1196,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
     );
   }
 
-  Widget _selectAmountPecentage() {
+  Widget _selectAmountPecentage(futureMarket) {
     return Container(
       padding: EdgeInsets.only(bottom: 4),
       child: Row(
@@ -1097,14 +1206,21 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
             children: [
               GestureDetector(
                 onTap: () {
-                  print('Select preceision');
+                  setState(() {
+                    _selectedPercentage = 25;
+                    _amountField.text =
+                        (getFutureBalanceCoin(futureMarket) * 0.25)
+                            .toStringAsFixed(4);
+                  });
                 },
                 child: Container(
                   width: width * 0.13,
                   padding: EdgeInsets.all(2),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Color(0xff292C51),
+                      color: _selectedPercentage >= 25
+                          ? linkColor
+                          : Color(0xff292C51),
                     ),
                     color: Color(0xff292C51),
                     borderRadius: BorderRadius.all(
@@ -1116,7 +1232,9 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                     child: Text(
                       '25%',
                       style: TextStyle(
-                        color: secondaryTextColor,
+                        color: _selectedPercentage >= 25
+                            ? linkColor
+                            : secondaryTextColor,
                         fontSize: 12,
                       ),
                     ),
@@ -1129,14 +1247,21 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
             children: [
               GestureDetector(
                 onTap: () {
-                  print('Select preceision');
+                  setState(() {
+                    _selectedPercentage = 50;
+                    _amountField.text =
+                        (getFutureBalanceCoin(futureMarket) * 0.50)
+                            .toStringAsFixed(4);
+                  });
                 },
                 child: Container(
                   width: width * 0.13,
                   padding: EdgeInsets.all(2),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Color(0xff292C51),
+                      color: _selectedPercentage >= 50
+                          ? linkColor
+                          : Color(0xff292C51),
                     ),
                     color: Color(0xff292C51),
                     borderRadius: BorderRadius.all(
@@ -1148,7 +1273,9 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                     child: Text(
                       '50%',
                       style: TextStyle(
-                        color: secondaryTextColor,
+                        color: _selectedPercentage >= 50
+                            ? linkColor
+                            : secondaryTextColor,
                         fontSize: 12,
                       ),
                     ),
@@ -1161,14 +1288,21 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
             children: [
               GestureDetector(
                 onTap: () {
-                  print('Select preceision');
+                  setState(() {
+                    _selectedPercentage = 75;
+                    _amountField.text =
+                        (getFutureBalanceCoin(futureMarket) * 0.75)
+                            .toStringAsFixed(4);
+                  });
                 },
                 child: Container(
                   width: width * 0.13,
                   padding: EdgeInsets.all(2),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Color(0xff292C51),
+                      color: _selectedPercentage >= 75
+                          ? linkColor
+                          : Color(0xff292C51),
                     ),
                     color: Color(0xff292C51),
                     borderRadius: BorderRadius.all(
@@ -1180,7 +1314,9 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                     child: Text(
                       '75%',
                       style: TextStyle(
-                        color: secondaryTextColor,
+                        color: _selectedPercentage >= 75
+                            ? linkColor
+                            : secondaryTextColor,
                         fontSize: 12,
                       ),
                     ),
@@ -1193,14 +1329,20 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
             children: [
               GestureDetector(
                 onTap: () {
-                  print('Select preceision');
+                  setState(() {
+                    _selectedPercentage = 100;
+                    _amountField.text = (getFutureBalanceCoin(futureMarket) * 1)
+                        .toStringAsFixed(4);
+                  });
                 },
                 child: Container(
                   width: width * 0.13,
                   padding: EdgeInsets.all(2),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Color(0xff292C51),
+                      color: _selectedPercentage >= 100
+                          ? linkColor
+                          : Color(0xff292C51),
                     ),
                     color: Color(0xff292C51),
                     borderRadius: BorderRadius.all(
@@ -1212,7 +1354,9 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                     child: Text(
                       '100%',
                       style: TextStyle(
-                        color: secondaryTextColor,
+                        color: _selectedPercentage >= 100
+                            ? linkColor
+                            : secondaryTextColor,
                         fontSize: 12,
                       ),
                     ),
@@ -1624,5 +1768,49 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
         ],
       ),
     );
+  }
+}
+
+class DecimalTextInputFormatter extends TextInputFormatter {
+  DecimalTextInputFormatter({this.decimalRange, required this.coUnit})
+      : assert(decimalRange == null || decimalRange >= 0);
+
+  int? decimalRange;
+  final int coUnit;
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue, // unused.
+    TextEditingValue newValue,
+  ) {
+    TextSelection newSelection = newValue.selection;
+    String truncated = newValue.text;
+
+    if (decimalRange != null) {
+      String value = newValue.text;
+
+      if ((value.contains(".") || value.contains(",")) &&
+          value.substring(value.indexOf(".") + 1).length > decimalRange!) {
+        truncated = oldValue.text;
+        newSelection = oldValue.selection;
+      } else if ((value.contains(".") || value.contains(",")) && coUnit != 2) {
+        truncated = oldValue.text;
+        newSelection = oldValue.selection;
+      } else if (value == ".") {
+        truncated = "0.";
+
+        newSelection = newValue.selection.copyWith(
+          baseOffset: math.min(truncated.length, truncated.length + 1),
+          extentOffset: math.min(truncated.length, truncated.length + 1),
+        );
+      }
+
+      return TextEditingValue(
+        text: truncated,
+        selection: newSelection,
+        composing: TextRange.empty,
+      );
+    }
+    return newValue;
   }
 }
