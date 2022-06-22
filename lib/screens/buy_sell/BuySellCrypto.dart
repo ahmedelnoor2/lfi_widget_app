@@ -63,37 +63,28 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
               ),
             ],
           ),
-          SizedBox(
-            height: height * 0.87,
-            child: WebView(
-              //window.document.addEventListener("message", (event) => { Toaster.postMessage("Test message" + event.data ) });
-              initialUrl: Uri.dataFromString(
-                '<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="X-UA-Compatible" content="ie=edge"></head><body style="background-color:1A1D3F;"><iframe allowfullscreen id="myframe1" frameBorder="0" height="${height * 0.7}" width="${width * 0.965}" src="$_uri"></iframe><script defer type="text/javascript" src="https://changenow.io/embeds/exchange-widget/v2/stepper-connector.js"></script><script>document.addEventListener("DOMContentLoaded", function() {var elmnt = document.getElementsByName("recipient_wallet")[0]; var btTn = document.getElementsByClassName("exchange-form-btn_vertical"); });</script></body></html>',
-                mimeType: 'text/html',
-              ).toString(),
-              // initialUrl: _uri,
-              gestureNavigationEnabled: true,
-              debuggingEnabled: true,
-              backgroundColor: Color.fromARGB(255, 26, 29, 63),
-              javascriptMode: JavascriptMode.unrestricted,
-              javascriptChannels: <JavascriptChannel>{
-                _toasterJavascriptChannel(context),
-              },
-              onWebViewCreated: (WebViewController controller) {
-                setState(() {
-                  _webViewController = controller;
-                });
-              },
-            ),
-          ),
-          // ElevatedButton(
-          //   onPressed: () async {
-          //     await _webViewController.runJavascript(
-          //         'var elmnt = document.getElementById("myframe1"); elmnt.contentWindow.postMessage("My message", "https://buy-sell.lyotrade.com");');
-          //     // await _webViewController.runJavascript(
-          //     //     'var elmnt = document.getElementById("myframe1").contentWindow.document.getElementsByClassName("exchange-header");elmnt.innerHTML = "theNewPrice";');
-          //   },
-          //   child: Text('Run JS'),
+          // SizedBox(
+          //   height: height * 0.87,
+          //   child: WebView(
+          //     //window.document.addEventListener("message", (event) => { Toaster.postMessage("Test message" + event.data ) });
+          //     initialUrl: Uri.dataFromString(
+          //       '<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="X-UA-Compatible" content="ie=edge"></head><body style="background-color:1A1D3F;"><iframe allowfullscreen id="myframe1" frameBorder="0" height="${height * 0.7}" width="${width * 0.965}" src="$_uri"></iframe><script defer type="text/javascript" src="https://changenow.io/embeds/exchange-widget/v2/stepper-connector.js"></script><script>document.addEventListener("DOMContentLoaded", function() {var elmnt = document.getElementsByName("recipient_wallet")[0]; var btTn = document.getElementsByClassName("exchange-form-btn_vertical"); });</script></body></html>',
+          //       mimeType: 'text/html',
+          //     ).toString(),
+          //     // initialUrl: _uri,
+          //     gestureNavigationEnabled: true,
+          //     debuggingEnabled: true,
+          //     backgroundColor: Color.fromARGB(255, 26, 29, 63),
+          //     javascriptMode: JavascriptMode.unrestricted,
+          //     javascriptChannels: <JavascriptChannel>{
+          //       _toasterJavascriptChannel(context),
+          //     },
+          //     onWebViewCreated: (WebViewController controller) {
+          //       setState(() {
+          //         _webViewController = controller;
+          //       });
+          //     },
+          //   ),
           // ),
         ],
       ),

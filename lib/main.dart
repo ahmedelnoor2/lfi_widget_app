@@ -3,6 +3,7 @@ import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/future_market.dart';
 import 'package:lyotrade/providers/loan_provider.dart';
+import 'package:lyotrade/providers/payments.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/staking.dart';
 import 'package:lyotrade/providers/trade.dart';
@@ -60,6 +61,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<FutureMarket>(create: (_) => FutureMarket()),
         ChangeNotifierProvider<Staking>(create: (_) => Staking()),
         ChangeNotifierProvider<LoanProvider>(create: (_) => LoanProvider()),
+        ChangeNotifierProvider<Payments>(create: (_) => Payments()),
       ],
       child: Consumer<Auth>(
         builder: (context, auth, _) {
