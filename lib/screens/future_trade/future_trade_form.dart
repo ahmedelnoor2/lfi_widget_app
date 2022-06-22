@@ -205,15 +205,19 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
   double calculateContractToPrice(futureMarket, amountInPrice) {
     var leverageMultiplier = double.parse(
         '${futureMarket.userConfiguration.isEmpty ? 125 : futureMarket.userConfiguration['nowLevel']}');
+
     return (amountInPrice.isEmpty)
         ? 0
         : double.parse(
-            '${double.parse('$amountInPrice') / leverageMultiplier}');
+            '${futureMarket.userConfiguration['coUnit'] == 1 ? (double.parse('$amountInPrice') * double.parse('${futureMarket.activeMarket['multiplier']}')) / leverageMultiplier : double.parse('$amountInPrice') / leverageMultiplier}');
   }
 
   double calculateMaxBuySell(futureMarket, priceMultiplyer) {
     var leverageMultiplier = double.parse(
         '${futureMarket.userConfiguration.isEmpty ? 125 : futureMarket.userConfiguration['nowLevel']}');
+
+    print(priceMultiplyer);
+
     return double.parse(
         '${double.parse('$priceMultiplyer') / leverageMultiplier}');
   }
@@ -1004,6 +1008,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                     Container(
                       padding: EdgeInsets.only(right: 5),
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Row(
                             children: [
@@ -1018,7 +1023,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                                 ),
                               ),
                               Text(
-                                '$_maxBuySell ${futureMarket.activeMarket['quote']}',
+                                '${double.parse('$_maxBuySell').toStringAsFixed(6)} ${futureMarket.activeMarket['quote']}',
                                 style: TextStyle(
                                   fontSize: 12,
                                 ),
@@ -1038,7 +1043,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                                 ),
                               ),
                               Text(
-                                '$_maxBuySell ${futureMarket.activeMarket['quote']}',
+                                '${double.parse('$_maxBuySell').toStringAsFixed(6)} ${futureMarket.activeMarket['quote']}',
                                 style: TextStyle(
                                   fontSize: 12,
                                 ),
@@ -1073,27 +1078,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                           ),
                         ),
                         Text(
-                          '${double.parse('$_totalContracts').toStringAsFixed(4)} ${futureMarket.userConfiguration['coUnit'] == 2 ? 'Cont' : futureMarket.activeMarket['quote']}',
-                          style: TextStyle(
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(right: 5),
-                          child: Text(
-                            'Cost:',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: secondaryTextColor,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          '${double.parse('$_totalContracts').toStringAsFixed(4)} ${futureMarket.userConfiguration['coUnit'] == 2 ? 'Cont' : futureMarket.activeMarket['quote']}',
+                          '${double.parse('$_totalContracts').toStringAsFixed(4)} ${futureMarket.activeMarket['quote']}',
                           style: TextStyle(
                             fontSize: 12,
                           ),
