@@ -1,5 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/asset.dart';
+import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
@@ -20,24 +25,29 @@ class TradeForm extends StatefulWidget {
   State<TradeForm> createState() => _TradeFormState();
 }
 
-class _TradeFormState extends State<TradeForm>
-    with SingleTickerProviderStateMixin {
+class _TradeFormState extends State<TradeForm> {
   final _formTradeKey = GlobalKey<FormState>();
   final TextEditingController _amountField = TextEditingController();
   final TextEditingController _priceField = TextEditingController();
   final TextEditingController _totalField = TextEditingController();
 
-  late final TabController _tabTradeController =
-      TabController(length: 2, vsync: this);
+  var _timer;
 
-  Color _tabIndicatorColor = Colors.green;
+  // late final TabController _tabTradeController =
+  //     TabController(length: 2, vsync: this);
+
+  Color _tabIndicatorColor = greenIndicator;
   int _orderType = 1;
   double _amount = 0;
   double _price = 0;
   double _total = 0;
+  String _availableBalance = '0.000000';
+  bool _isBuy = true;
+  double _currentAmountSelection = 0;
 
   @override
   void initState() {
+    setAvailalbePrice();
     super.initState();
   }
 
@@ -46,6 +56,9 @@ class _TradeFormState extends State<TradeForm>
     _amountField.dispose();
     _priceField.dispose();
     _totalField.dispose();
+    if (_timer != null) {
+      _timer.cancel();
+    }
     super.dispose();
   }
 
@@ -54,16 +67,47 @@ class _TradeFormState extends State<TradeForm>
     setState(() {
       _price = double.parse(widget.lastPrice);
     });
+    calculateTotal('price');
+  }
+
+  Future<void> setAvailalbePrice() async {
+    var auth = Provider.of<Auth>(context, listen: false);
+    var public = Provider.of<Public>(context, listen: false);
+
+    if (auth.isAuthenticated) {
+      var asset = Provider.of<Asset>(context, listen: false);
+      await asset.getAccountBalance(
+        context,
+        auth,
+        "${public.activeMarket['showName'].split('/')[0]},${public.activeMarket['showName'].split('/')[1]}",
+      );
+      setState(() {
+        _availableBalance = _isBuy
+            ? double.parse(asset.accountBalance['allCoinMap']
+                        [public.activeMarket['name'].split('/')[1]]
+                    ['normal_balance'])
+                .toStringAsPrecision(6)
+            : double.parse(asset.accountBalance['allCoinMap']
+                        [public.activeMarket['name'].split('/')[0]]
+                    ['normal_balance'])
+                .toStringAsPrecision(6);
+      });
+    }
   }
 
   void calculateTotal(field) {
     if (field == 'amount') {
       if (_amountField.text.isNotEmpty) {
-        setState(() {
-          _amount = double.parse(_amountField.text);
-          _total = double.parse(_amountField.text) * _price;
-        });
-        _totalField.text = '${double.parse(_amountField.text) * _price}';
+        try {
+          setState(() {
+            _amount = double.parse(_amountField.text);
+            _total = double.parse(_amountField.text) * _price;
+          });
+          _totalField.text =
+              '${(double.parse(_amountField.text) * _price).toStringAsFixed(4)}';
+        } catch (e) {
+          //
+        }
       } else {
         _totalField.clear();
       }
@@ -74,28 +118,74 @@ class _TradeFormState extends State<TradeForm>
           _price = double.parse(_priceField.text);
           _total = double.parse(_priceField.text) * _amount;
         });
-        _totalField.text = '${double.parse(_priceField.text) * _amount}';
+        _totalField.text =
+            '${(double.parse(_priceField.text) * _amount).toStringAsFixed(4)}';
       } else {
+        setState(() {
+          _price = 0.00;
+        });
         _totalField.clear();
       }
     }
     if (field == 'total') {
       if (_totalField.text.isNotEmpty) {
-        setState(() {
-          _total = double.parse(_totalField.text);
-          _amount = double.parse(_totalField.text) / _price;
-        });
-        _amountField.text = '${double.parse(_totalField.text) / _price}';
+        try {
+          setState(() {
+            _total = double.parse(_totalField.text);
+            _amount = double.parse(_totalField.text) / _price;
+          });
+          _amountField.text = '${double.parse(_totalField.text) / _price}';
+        } catch (e) {
+          //
+        }
       } else {
         _amountField.clear();
       }
     }
   }
 
-  Future<void> setAmountField() async {
+  Future<void> setPriceField() async {
     var public = Provider.of<Public>(context, listen: false);
     _priceField.text = public.amountField;
-    await public.amountFieldDisable();
+    _timer = Timer(Duration(milliseconds: 400), () async {
+      await public.amountFieldDisable();
+    });
+    calculateTotal('price');
+  }
+
+  Future<void> createOrder() async {
+    var auth = Provider.of<Auth>(context, listen: false);
+    var trading = Provider.of<Trading>(context, listen: false);
+    var public = Provider.of<Public>(context, listen: false);
+    var formData = {
+      "price": _orderType == 1
+          ? _priceField.text
+          : (_orderType == 2)
+              ? null
+              : public.lastPrice,
+      "side": _isBuy ? "BUY" : "SELL",
+      "symbol": public.activeMarket['symbol'],
+      "type": _orderType,
+      "volume":
+          (_orderType == 2 && _isBuy) ? _totalField.text : _amountField.text,
+    };
+
+    await trading.createOrder(context, auth, formData);
+    getOpenOrders();
+  }
+
+  Future<void> getOpenOrders() async {
+    var trading = Provider.of<Trading>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
+
+    await trading.getOpenOrders(context, auth, {
+      "entrust": 1,
+      "isShowCanceled": 0,
+      "orderType": _orderType,
+      "page": 1,
+      "pageSize": 10,
+      "symbol": "",
+    });
   }
 
   @override
@@ -104,9 +194,11 @@ class _TradeFormState extends State<TradeForm>
     height = MediaQuery.of(context).size.height;
 
     var public = Provider.of<Public>(context, listen: true);
+    var asset = Provider.of<Asset>(context, listen: true);
+    var auth = Provider.of<Auth>(context, listen: true);
 
     if (public.amountFieldUpdate) {
-      setAmountField();
+      setPriceField();
     }
 
     return Form(
@@ -114,62 +206,86 @@ class _TradeFormState extends State<TradeForm>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          TabBar(
-            onTap: (value) => setState(() {
-              _tabIndicatorColor = value == 0 ? Colors.green : Colors.red;
-            }),
-            indicatorColor: _tabIndicatorColor,
-            tabs: const <Tab>[
-              Tab(text: 'Buy'),
-              Tab(text: 'Sell'),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                width: width * 0.27,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    primary: _isBuy ? Color(0xff26A160) : Color(0xff292C51),
+                    textStyle: TextStyle(),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _amountField.clear();
+                      _totalField.clear();
+                      _currentAmountSelection = 0;
+                      _isBuy = true;
+                    });
+                    setAvailalbePrice();
+                  },
+                  child: Text(
+                    'Buy',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: width * 0.27,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    primary: _isBuy ? Color(0xff292C51) : Color(0xffD84646),
+                    textStyle: TextStyle(),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _amountField.clear();
+                      _totalField.clear();
+                      _currentAmountSelection = 0;
+                      _isBuy = false;
+                    });
+                    setAvailalbePrice();
+                  },
+                  child: Text(
+                    'Sell',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
             ],
-            controller: _tabTradeController,
           ),
           PopupMenuButton(
             child: Container(
-              width: width * 0.5,
-              margin: EdgeInsets.only(top: 10, bottom: 10),
-              padding: EdgeInsets.all(5),
+              margin: EdgeInsets.only(bottom: 8),
+              padding: EdgeInsets.only(top: 6, bottom: 6, left: 10, right: 5),
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: Color.fromARGB(67, 118, 118, 118),
+                  color: Color(0xff292C51),
                 ),
-                color: Color.fromARGB(67, 118, 118, 118),
+                color: Color(0xff292C51),
                 borderRadius: BorderRadius.all(
-                  Radius.circular(5),
+                  Radius.circular(2),
                 ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      print('info');
-                    },
-                    child: Icon(
-                      Icons.info,
-                      size: 15,
-                      color: secondaryTextColor,
-                    ),
-                  ),
                   Text(
                     _orderType == 1 ? 'Limit' : 'Market',
-                    style: TextStyle(fontSize: 15),
+                    style: TextStyle(fontSize: 16),
                   ),
                   Icon(
                     Icons.expand_more,
-                    size: 15,
                     color: secondaryTextColor,
                   ),
                 ],
               ),
             ),
             onSelected: (value) {
-              print(value);
               setState(() {
                 _orderType = value as int;
               });
-              // _onMenuItemSelected(value as int);
             },
             itemBuilder: (ctx) => [
               _buildPopupMenuItem('Limit', 1),
@@ -178,16 +294,15 @@ class _TradeFormState extends State<TradeForm>
           ),
           (_orderType == 2)
               ? Container(
-                  width: width * 0.5,
-                  margin: EdgeInsets.only(bottom: 10),
-                  padding: EdgeInsets.all(15),
+                  margin: EdgeInsets.only(bottom: 8),
+                  padding: EdgeInsets.all(13),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Color.fromARGB(67, 118, 118, 118),
+                      color: Color(0xff292C51),
                     ),
-                    color: Color.fromARGB(67, 118, 118, 118),
+                    color: Color(0xff292C51),
                     borderRadius: BorderRadius.all(
-                      Radius.circular(5),
+                      Radius.circular(2),
                     ),
                   ),
                   child: Align(
@@ -201,193 +316,207 @@ class _TradeFormState extends State<TradeForm>
                   ),
                 )
               : Container(),
-          (_tabTradeController.index == 1 && _orderType == 2)
+          (_orderType == 2)
               ? Container()
               : Container(
-                  padding: EdgeInsets.only(bottom: 10),
-                  child: TextFormField(
-                    onTap: () {
-                      if (_priceField.text.isEmpty) {
-                        updateLastPrice();
-                      }
-                    },
-                    onChanged: (value) {
-                      calculateTotal('price');
-                    },
-                    textAlign: TextAlign.center,
-                    validator: (value) {
-                      if ((value == null || value.isEmpty) && _orderType == 1) {
-                        widget.scaffoldKey!.currentState.hideCurrentSnackBar();
-                        snackAlert(
-                            context, SnackTypes.errors, 'Price is required');
-                        return '';
-                      }
-                      return null;
-                    },
-                    style: TextStyle(fontSize: 14),
-                    keyboardType:
-                        TextInputType.numberWithOptions(decimal: true),
-                    decoration: InputDecoration(
-                      errorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          width: 2,
-                          color: redPercentageIndicator,
-                        ),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(5),
-                        ),
-                      ),
-                      errorStyle: TextStyle(height: 0),
-                      labelText:
-                          'Price (${public.activeMarket['showName'].split('/')[1]})',
-                      labelStyle: TextStyle(fontSize: 12),
-                      isDense: true,
-                      filled: true,
-                      fillColor: Color.fromARGB(67, 118, 118, 118),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(width: 0),
-                        borderRadius: BorderRadius.all(Radius.circular(5)),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(width: 0),
-                        borderRadius: BorderRadius.all(Radius.circular(5)),
-                      ),
-                      focusedErrorBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(width: 0),
-                      ),
-                      floatingLabelAlignment: FloatingLabelAlignment.center,
-                      floatingLabelBehavior: FloatingLabelBehavior.never,
-                      // border: OutlineInputBorder(),
-                      suffixIcon: Icon(Icons.add),
-                      prefixIcon: Icon(Icons.remove),
-                      // labelText: '30534.21',
+                  margin: EdgeInsets.only(bottom: 8),
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Color(0xff292C51),
                     ),
-                    controller: _priceField,
+                    color: Color(0xff292C51),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(2),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Icon(
+                        Icons.remove,
+                        color: Color(0xff5E6292),
+                      ),
+                      SizedBox(
+                        width: 100,
+                        child: TextFormField(
+                          onChanged: (value) {
+                            calculateTotal('price');
+                          },
+                          onTap: () {
+                            if (_priceField.text.isEmpty) {
+                              updateLastPrice();
+                            }
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              widget.scaffoldKey!.currentState
+                                  .hideCurrentSnackBar();
+                              snackAlert(context, SnackTypes.errors,
+                                  'Price is required');
+                              return '';
+                            }
+                            return null;
+                          },
+                          controller: _priceField,
+                          style: TextStyle(fontSize: 16),
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                          ),
+                          textAlign: TextAlign.center,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.zero,
+                            isDense: true,
+                            errorStyle: TextStyle(height: 0),
+                            border: UnderlineInputBorder(
+                              borderSide: BorderSide.none,
+                            ),
+                            hintStyle: TextStyle(
+                              fontSize: 16,
+                            ),
+                            hintText:
+                                "Price (${public.activeMarket['showName'].split('/')[1]})",
+                          ),
+                        ),
+                      ),
+                      Icon(
+                        Icons.add,
+                        color: Color(0xff5E6292),
+                      ),
+                    ],
                   ),
                 ),
-          (_tabTradeController.index == 0 && _orderType == 2)
+          (_orderType == 2 && _isBuy)
               ? Container()
               : Container(
-                  padding: EdgeInsets.only(bottom: 10),
+                  margin: EdgeInsets.only(bottom: 8),
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Color(0xff292C51),
+                    ),
+                    color: Color(0xff292C51),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(2),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Icon(
+                        Icons.remove,
+                        color: Color(0xff5E6292),
+                      ),
+                      SizedBox(
+                        width: 100,
+                        child: TextFormField(
+                          onChanged: (value) {
+                            calculateTotal('amount');
+                          },
+                          textAlign: TextAlign.center,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              widget.scaffoldKey!.currentState
+                                  .hideCurrentSnackBar();
+                              snackAlert(context, SnackTypes.errors,
+                                  'Amount is required');
+                              return '';
+                            }
+                            return null;
+                          },
+                          style: TextStyle(fontSize: 16),
+                          keyboardType:
+                              TextInputType.numberWithOptions(decimal: true),
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.zero,
+                            isDense: true,
+                            border: UnderlineInputBorder(
+                              borderSide: BorderSide.none,
+                            ),
+                            hintStyle: TextStyle(
+                              fontSize: 16,
+                            ),
+                            errorStyle: TextStyle(height: 0),
+                            focusedErrorBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(width: 1, color: redIndicator),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(5),
+                              ),
+                            ),
+                            hintText:
+                                'Amount (${public.activeMarket['showName'].split('/')[0]})',
+                          ),
+                          controller: _amountField,
+                        ),
+                      ),
+                      Icon(
+                        Icons.add,
+                        color: Color(0xff5E6292),
+                      ),
+                    ],
+                  ),
+                ),
+          _orderType == 1 ? _selectAmountPecentage(public, asset) : Container(),
+          ((_orderType == 2 && _isBuy) || _orderType == 1)
+              ? Container(
+                  margin: EdgeInsets.only(bottom: 8),
+                  padding: EdgeInsets.all(13),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Color(0xff292C51),
+                    ),
+                    color: Color(0xff292C51),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(2),
+                    ),
+                  ),
                   child: TextFormField(
                     onChanged: (value) {
-                      calculateTotal('amount');
+                      calculateTotal('total');
                     },
                     textAlign: TextAlign.center,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         widget.scaffoldKey!.currentState.hideCurrentSnackBar();
                         snackAlert(
-                            context, SnackTypes.errors, 'Amount is required');
+                          context,
+                          SnackTypes.errors,
+                          'Error in placing and order, try again',
+                        );
                         return '';
                       }
                       return null;
                     },
-                    style: TextStyle(fontSize: 14),
+                    style: TextStyle(fontSize: 16),
                     keyboardType:
                         TextInputType.numberWithOptions(decimal: true),
                     decoration: InputDecoration(
-                      errorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          width: 2,
-                          color: redPercentageIndicator,
-                        ),
+                      contentPadding: EdgeInsets.zero,
+                      isDense: true,
+                      border: UnderlineInputBorder(
+                        borderSide: BorderSide.none,
+                      ),
+                      hintStyle: TextStyle(
+                        fontSize: 16,
+                      ),
+                      errorStyle: TextStyle(height: 0),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(width: 1, color: redIndicator),
                         borderRadius: BorderRadius.all(
                           Radius.circular(5),
                         ),
                       ),
-                      errorStyle: TextStyle(height: 0),
-                      labelText:
-                          'Amount (${public.activeMarket['showName'].split('/')[0]})',
-                      labelStyle: TextStyle(fontSize: 12),
-                      isDense: true,
-                      filled: true,
-                      fillColor: Color.fromARGB(67, 118, 118, 118),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(width: 0),
-                        borderRadius: BorderRadius.all(Radius.circular(5)),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(width: 0),
-                        borderRadius: BorderRadius.all(Radius.circular(5)),
-                      ),
-                      focusedErrorBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(width: 0),
-                      ),
-                      floatingLabelBehavior: FloatingLabelBehavior.never,
-                      // floatingLabelAlignment: FloatingLabelAlignment.center,
-                      // border: OutlineInputBorder(),
-                      suffixIcon: Icon(Icons.add),
-                      prefixIcon: Icon(Icons.remove),
-                      // labelText: '30534.21',
+                      hintText:
+                          'Total (${public.activeMarket['showName'].split('/')[1]})',
                     ),
-                    controller: _amountField,
+                    controller: _totalField,
                   ),
-                ),
-          _selectAmountPecentage(),
+                )
+              : Container(),
+          _orderType == 2 ? _selectAmountPecentage(public, asset) : Container(),
           Container(
-            padding: EdgeInsets.only(bottom: 10),
-            child: TextFormField(
-              onChanged: (value) {
-                calculateTotal('total');
-              },
-              textAlign: TextAlign.center,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  widget.scaffoldKey!.currentState.hideCurrentSnackBar();
-                  snackAlert(
-                    context,
-                    SnackTypes.errors,
-                    'Error in placing and order, try again',
-                  );
-                  return '';
-                }
-                return null;
-              },
-              style: TextStyle(fontSize: 14),
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              decoration: InputDecoration(
-                errorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    width: 2,
-                    color: redPercentageIndicator,
-                  ),
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(5),
-                  ),
-                ),
-                focusedErrorBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(width: 0),
-                ),
-                errorStyle: TextStyle(height: 0),
-                isDense: true,
-                filled: true,
-                fillColor: Color.fromARGB(67, 118, 118, 118),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(width: 0),
-                  borderRadius: BorderRadius.all(Radius.circular(5)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(width: 0),
-                  borderRadius: BorderRadius.all(Radius.circular(5)),
-                ),
-                floatingLabelBehavior: FloatingLabelBehavior.never,
-                // labelText: 'Total (USDT)',
-                label: Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                      'Total (${public.activeMarket['showName'].split('/')[1]})'),
-                ),
-                labelStyle: TextStyle(
-                  color: secondaryTextColor,
-                  fontSize: 15,
-                ),
-              ),
-              controller: _totalField,
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.only(bottom: 10),
+            padding: EdgeInsets.only(top: 2),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -399,52 +528,60 @@ class _TradeFormState extends State<TradeForm>
                   children: [
                     Container(
                       padding: EdgeInsets.only(right: 2),
-                      child: Text('0.0000'),
+                      child: Text(_availableBalance),
                     ),
                     Container(
                       padding: EdgeInsets.only(right: 5),
                       child: Text(
-                          '${public.activeMarket['showName'].split('/')[1]}'),
+                          '${_isBuy ? public.activeMarket['showName'].split('/')[1] : public.activeMarket['showName'].split('/')[0]}'),
                     ),
-                    Icon(
-                      Icons.add_circle,
-                      size: 15,
-                      color: linkColor,
-                    ),
+                    // Icon(
+                    //   Icons.add_circle,
+                    //   size: 15,
+                    //   color: linkColor,
+                    // ),
                   ],
                 )
               ],
             ),
           ),
-          Container(
-            padding: EdgeInsets.only(bottom: 10),
-            width: width * 0.5,
+          SizedBox(
+            width: width * 0.7,
             child: ElevatedButton(
               onPressed: () {
-                if (_formTradeKey.currentState!.validate()) {
-                  // If the form is valid, display a snackbar. In the real world,
-                  // you'd often call a server or save the information in a database.
-                  widget.scaffoldKey!.currentState.hideCurrentSnackBar();
-                  snackAlert(
-                    context,
-                    SnackTypes.warning,
-                    'Feature is under process',
-                  );
+                if (auth.isAuthenticated) {
+                  if (_formTradeKey.currentState!.validate()) {
+                    // If the form is valid, display a snackbar. In the real world,
+                    // you'd often call a server or save the information in a database.
+                    // widget.scaffoldKey!.currentState.hideCurrentSnackBar();
+                    // snackAlert(
+                    //   context,
+                    //   SnackTypes.warning,
+                    //   'Feature is under process',
+                    // );
+                    createOrder();
+                  } else {
+                    // widget.scaffoldKey!.currentState.hideCurrentSnackBar();
+                    // snackAlert(
+                    //   context,
+                    //   SnackTypes.warning,
+                    //   'Feature is under process',
+                    // );
+                  }
                 } else {
-                  widget.scaffoldKey!.currentState.hideCurrentSnackBar();
-                  snackAlert(
-                    context,
-                    SnackTypes.warning,
-                    'Feature is under process',
-                  );
+                  Navigator.pushNamed(context, '/authentication');
                 }
               },
               style: ElevatedButton.styleFrom(
-                  primary: _tabTradeController.index == 0
-                      ? greenBTNBGColor
-                      : pinkBTNBGColor),
+                primary: _isBuy ? Color(0xff26A160) : Color(0xffD84646),
+                textStyle: TextStyle(),
+              ),
               child: Text(
-                  '${_tabTradeController.index == 0 ? 'Buy' : 'Sell'} ${public.activeMarket['showName'].split('/')[0]}'),
+                auth.isAuthenticated
+                    ? '${_isBuy ? 'Buy' : 'Sell'} ${public.activeMarket['showName'].split('/')[0]}'
+                    : 'Login / Sign Up',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ),
         ],
@@ -452,122 +589,242 @@ class _TradeFormState extends State<TradeForm>
     );
   }
 
-  Widget _selectAmountPecentage() {
+  Widget _selectAmountPecentage(public, asset) {
     return Container(
-      padding: EdgeInsets.only(bottom: 10),
+      padding: EdgeInsets.only(bottom: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Column(
             children: [
-              GestureDetector(
+              InkWell(
                 onTap: () {
-                  print('Select preceision');
+                  setState(() {
+                    _currentAmountSelection = 25;
+                    if (_isBuy && (_orderType == 2)) {
+                      _totalField.text = (double.parse(asset
+                                          .accountBalance['allCoinMap'][
+                                      public.activeMarket['name'].split('/')[1]]
+                                  ['normal_balance']) *
+                              0.25)
+                          .toStringAsPrecision(6);
+                    } else {
+                      _amountField.text = (double.parse(asset
+                                          .accountBalance['allCoinMap'][
+                                      public.activeMarket['name'].split('/')[0]]
+                                  ['normal_balance']) *
+                              0.25)
+                          .toStringAsPrecision(6);
+                    }
+                  });
+                  if (_isBuy && (_orderType == 2)) {
+                    calculateTotal('total');
+                  } else {
+                    calculateTotal('amount');
+                  }
                 },
                 child: Container(
-                  width: width * 0.1,
-                  margin: EdgeInsets.only(bottom: 2),
-                  padding: EdgeInsets.all(5),
+                  width: width * 0.13,
+                  padding: EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Color.fromARGB(67, 118, 118, 118),
+                      color: _currentAmountSelection >= 25
+                          ? linkColor
+                          : Color(0xff292C51),
                     ),
-                    color: Color.fromARGB(67, 118, 118, 118),
+                    color: Color(0xff292C51),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(2),
+                    ),
                   ),
-                  child: Container(),
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      '25%',
+                      style: TextStyle(
+                        color: _currentAmountSelection >= 25
+                            ? linkColor
+                            : secondaryTextColor,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-              Text(
-                '25%',
-                style: TextStyle(
-                  color: secondaryTextColor,
-                  fontSize: 12,
-                ),
-              )
             ],
           ),
           Column(
             children: [
-              GestureDetector(
+              InkWell(
                 onTap: () {
-                  print('Select preceision');
+                  setState(() {
+                    _currentAmountSelection = 50;
+                    if (_isBuy && (_orderType == 2)) {
+                      _totalField.text = (double.parse(asset
+                                          .accountBalance['allCoinMap'][
+                                      public.activeMarket['name'].split('/')[1]]
+                                  ['normal_balance']) *
+                              0.50)
+                          .toStringAsPrecision(6);
+                    } else {
+                      _amountField.text = (double.parse(asset
+                                          .accountBalance['allCoinMap'][
+                                      public.activeMarket['name'].split('/')[0]]
+                                  ['normal_balance']) *
+                              0.50)
+                          .toStringAsPrecision(6);
+                    }
+                  });
+                  if (_isBuy && (_orderType == 2)) {
+                    calculateTotal('total');
+                  } else {
+                    calculateTotal('amount');
+                  }
                 },
                 child: Container(
-                  width: width * 0.1,
-                  margin: EdgeInsets.only(bottom: 2),
-                  padding: EdgeInsets.all(5),
+                  width: width * 0.13,
+                  padding: EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Color.fromARGB(67, 118, 118, 118),
+                      color: _currentAmountSelection >= 50
+                          ? linkColor
+                          : Color(0xff292C51),
                     ),
-                    color: Color.fromARGB(67, 118, 118, 118),
+                    color: Color(0xff292C51),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(2),
+                    ),
                   ),
-                  child: Container(),
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      '50%',
+                      style: TextStyle(
+                        color: _currentAmountSelection >= 50
+                            ? linkColor
+                            : secondaryTextColor,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-              Text(
-                '50%',
-                style: TextStyle(
-                  color: secondaryTextColor,
-                  fontSize: 12,
-                ),
-              )
             ],
           ),
           Column(
             children: [
-              GestureDetector(
+              InkWell(
                 onTap: () {
-                  print('Select preceision');
+                  setState(() {
+                    _currentAmountSelection = 75;
+                    if (_isBuy && (_orderType == 2)) {
+                      _totalField.text = (double.parse(asset
+                                          .accountBalance['allCoinMap'][
+                                      public.activeMarket['name'].split('/')[1]]
+                                  ['normal_balance']) *
+                              0.75)
+                          .toStringAsPrecision(6);
+                    } else {
+                      _amountField.text = (double.parse(asset
+                                          .accountBalance['allCoinMap'][
+                                      public.activeMarket['name'].split('/')[0]]
+                                  ['normal_balance']) *
+                              0.75)
+                          .toStringAsPrecision(6);
+                    }
+                  });
+                  if (_isBuy && (_orderType == 2)) {
+                    calculateTotal('total');
+                  } else {
+                    calculateTotal('amount');
+                  }
                 },
                 child: Container(
-                  width: width * 0.1,
-                  margin: EdgeInsets.only(bottom: 2),
-                  padding: EdgeInsets.all(5),
+                  width: width * 0.13,
+                  padding: EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Color.fromARGB(67, 118, 118, 118),
+                      color: _currentAmountSelection >= 75
+                          ? linkColor
+                          : Color(0xff292C51),
                     ),
-                    color: Color.fromARGB(67, 118, 118, 118),
+                    color: Color(0xff292C51),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(2),
+                    ),
                   ),
-                  child: Container(),
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      '75%',
+                      style: TextStyle(
+                        color: _currentAmountSelection >= 75
+                            ? linkColor
+                            : secondaryTextColor,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-              Text(
-                '75%',
-                style: TextStyle(
-                  color: secondaryTextColor,
-                  fontSize: 12,
-                ),
-              )
             ],
           ),
           Column(
             children: [
-              GestureDetector(
+              InkWell(
                 onTap: () {
-                  print('Select preceision');
+                  setState(() {
+                    _currentAmountSelection = 100;
+                    if (_isBuy && (_orderType == 2)) {
+                      _totalField.text = (double.parse(asset
+                                          .accountBalance['allCoinMap'][
+                                      public.activeMarket['name'].split('/')[1]]
+                                  ['normal_balance']) *
+                              1)
+                          .toStringAsPrecision(6);
+                    } else {
+                      _amountField.text = (double.parse(asset
+                                          .accountBalance['allCoinMap'][
+                                      public.activeMarket['name'].split('/')[0]]
+                                  ['normal_balance']) *
+                              1)
+                          .toStringAsPrecision(6);
+                    }
+                  });
+                  if (_isBuy && (_orderType == 2)) {
+                    calculateTotal('total');
+                  } else {
+                    calculateTotal('amount');
+                  }
                 },
                 child: Container(
-                  width: width * 0.1,
-                  margin: EdgeInsets.only(bottom: 2),
-                  padding: EdgeInsets.all(5),
+                  width: width * 0.13,
+                  padding: EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Color.fromARGB(67, 118, 118, 118),
+                      color: _currentAmountSelection >= 100
+                          ? linkColor
+                          : Color(0xff292C51),
                     ),
-                    color: Color.fromARGB(67, 118, 118, 118),
+                    color: Color(0xff292C51),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(2),
+                    ),
                   ),
-                  child: Container(),
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      '100%',
+                      style: TextStyle(
+                        color: _currentAmountSelection >= 100
+                            ? linkColor
+                            : secondaryTextColor,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-              Text(
-                '100%',
-                style: TextStyle(
-                  color: secondaryTextColor,
-                  fontSize: 12,
-                ),
-              )
             ],
           ),
         ],

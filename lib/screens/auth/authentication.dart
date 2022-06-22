@@ -153,13 +153,15 @@ class _AuthenticationState extends State<Authentication> {
                         isMobile: _isMobile,
                       )
                     : _authLogin
-                        ? Login(onLogin: (value) async {
+                        ? Login(onLogin: (value, captchaController) async {
                             String result = await processLogin(value);
                             if (result.isNotEmpty) {
                               setState(() {
                                 _token = result;
                                 _verifyEmail = true;
                               });
+                            } else {
+                              captchaController.reset();
                             }
                           }, onCaptchaVerification: (value) {
                             setState(() {
@@ -167,13 +169,15 @@ class _AuthenticationState extends State<Authentication> {
                             });
                           })
                         : Signup(
-                            onRegister: (value) async {
+                            onRegister: (value, captchaController) async {
                               String result = await processSignup(value);
                               if (result.isNotEmpty) {
                                 setState(() {
                                   _token = result;
                                   _verifyEmail = true;
                                 });
+                              } else {
+                                captchaController.reset();
                               }
                             },
                             onCaptchaVerification: (value) {
@@ -202,6 +206,7 @@ class _AuthenticationState extends State<Authentication> {
                                 _authLogin
                                     ? 'Don\'t have an account?'
                                     : 'Already have an account?',
+                                style: TextStyle(fontSize: 16),
                               ),
                               Container(
                                 padding: const EdgeInsets.only(left: 5),
@@ -210,6 +215,7 @@ class _AuthenticationState extends State<Authentication> {
                                   style: TextStyle(
                                     color: linkColor,
                                     fontWeight: FontWeight.bold,
+                                    fontSize: 16,
                                   ),
                                 ),
                               ),

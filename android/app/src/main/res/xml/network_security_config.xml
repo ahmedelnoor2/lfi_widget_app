@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">www.lyotrade.com</domain>
+        <domain includeSubdomains="true">futures.lyotrade.com</domain>
+        <domain includeSubdomains="true">service.lyotrade.com</domain>
+        <domain includeSubdomains="true">api.coinrabbit.io</domain>
+        <domain includeSubdomains="true">openapi.lyotrade.com</domain>
+    </domain-config>
+</network-security-config>

@@ -1,10 +1,11 @@
-// finance/v5/account_balance
-
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 
 import 'package:lyotrade/utils/AppConstant.utils.dart';
+import 'package:lyotrade/utils/Translate.utils.dart';
 
 class Asset with ChangeNotifier {
   Map _accountBalance = {};
@@ -15,6 +16,13 @@ class Asset with ChangeNotifier {
   Map _changeAddress = {};
   List _digitialAss = [];
   List _allDigAsset = [];
+  List _depositLists = [];
+  List _withdrawLists = [];
+  List _p2pLists = [];
+  List _marginLoanLists = [];
+  List _marginHistoryLists = [];
+  List _marginTransferLists = [];
+  List _financialRecords = [];
   bool _hideBalances = false;
   final String _hideBalanceString = '******';
 
@@ -62,6 +70,34 @@ class Asset with ChangeNotifier {
 
   String get hideBalanceString {
     return _hideBalanceString;
+  }
+
+  List get depositLists {
+    return _depositLists;
+  }
+
+  List get withdrawLists {
+    return _withdrawLists;
+  }
+
+  List get p2pLists {
+    return _p2pLists;
+  }
+
+  List get marginLoanLists {
+    return _marginLoanLists;
+  }
+
+  List get marginHistoryLists {
+    return _marginHistoryLists;
+  }
+
+  List get marginTransferLists {
+    return _marginTransferLists;
+  }
+
+  List get financialRecords {
+    return _financialRecords;
   }
 
   void toggleHideBalances(value) {
@@ -127,7 +163,7 @@ class Asset with ChangeNotifier {
     }
   }
 
-  Future<void> getAccountBalance(auth, coinSymbols) async {
+  Future<void> getAccountBalance(ctx, auth, coinSymbols) async {
     headers['exchange-token'] = auth.loginVerificationToken;
 
     var url = Uri.https(
@@ -148,6 +184,9 @@ class Asset with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         _accountBalance = responseData['data'];
+      } else if (responseData['code'] == "10002") {
+        snackAlert(
+            ctx, SnackTypes.warning, 'Session Expired, Please login back');
       } else {
         _accountBalance = {};
       }
@@ -158,7 +197,7 @@ class Asset with ChangeNotifier {
     }
   }
 
-  Future<void> getP2pBalance(auth) async {
+  Future<void> getP2pBalance(ctx, auth) async {
     headers['exchange-token'] = auth.loginVerificationToken;
 
     var url = Uri.https(
@@ -179,6 +218,10 @@ class Asset with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         _p2pBalance = responseData['data'];
+      } else if (responseData['code'] == "10002") {
+        snackAlert(
+            ctx, SnackTypes.warning, 'Session Expired, Please login back');
+        Navigator.pushNamed(ctx, '/authentication');
       } else {
         _p2pBalance = {};
       }
@@ -220,6 +263,44 @@ class Asset with ChangeNotifier {
     }
   }
 
+  // Get Marging Symbol Balance
+  Map _marginSymbolBalance = {};
+
+  Map get marginSymbolBalance {
+    return _marginSymbolBalance;
+  }
+
+  Future<void> getMarginSymbolBalance(auth, symbol) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/lever/finance/symbol/balance',
+    );
+
+    var postData = json.encode({'symbol': symbol});
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _marginSymbolBalance = responseData['data'];
+      } else {
+        _marginSymbolBalance = {};
+      }
+      notifyListeners();
+    } catch (error) {
+      notifyListeners();
+      // throw error;
+    }
+  }
+
   Future<void> getCoinCosts(auth, coin) async {
     headers['exchange-token'] = auth.loginVerificationToken;
 
@@ -253,7 +334,7 @@ class Asset with ChangeNotifier {
     }
   }
 
-  Future<void> getChangeAddress(auth, coin) async {
+  Future<void> getChangeAddress(ctx, auth, coin) async {
     headers['exchange-token'] = auth.loginVerificationToken;
 
     var url = Uri.https(
@@ -276,10 +357,352 @@ class Asset with ChangeNotifier {
         _changeAddress = responseData['data'];
       } else {
         _changeAddress = {};
+        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+        auth.checkResponseCode(ctx, responseData['code']);
       }
       notifyListeners();
     } catch (error) {
       notifyListeners();
+      // throw error;
+    }
+  }
+
+  Future<void> getDepositTransactions(auth, formData) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/record/deposit_list',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _depositLists = responseData['data']['financeList'];
+      } else {
+        _depositLists = [];
+      }
+      notifyListeners();
+    } catch (error) {
+      notifyListeners();
+      // throw error;
+    }
+  }
+
+  Future<void> getWithdrawTransactions(auth, formData) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/record/withdraw_list',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _withdrawLists = responseData['data']['financeList'];
+      } else {
+        _withdrawLists = [];
+      }
+      notifyListeners();
+    } catch (error) {
+      notifyListeners();
+      // throw error;
+    }
+  }
+
+  Future<void> getP2pTransactions(auth, formData) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/record/otc_transfer_list',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _p2pLists = responseData['data']['financeList'];
+      } else {
+        _p2pLists = [];
+      }
+      notifyListeners();
+    } catch (error) {
+      notifyListeners();
+      // throw error;
+    }
+  }
+
+  Future<void> borrowMarginWallet(ctx, auth, formData) async {
+    /*
+    * Params
+      amount: "2"
+      coin: "USDT"
+      symbol: "BTCUSDT"
+    */
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/lever/finance/borrow',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        snackAlert(ctx, SnackTypes.success, 'Borrow successful');
+      } else if (responseData['code'] == 10002) {
+        snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+      } else {
+        snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
+      }
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
+      // throw error;
+    }
+  }
+
+  Future<void> getMarginLoanTransactions(auth, formData) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/lever/borrow/new',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _marginLoanLists = responseData['data']['financeList'];
+      } else {
+        _marginLoanLists = [];
+      }
+      notifyListeners();
+    } catch (error) {
+      notifyListeners();
+      // throw error;
+    }
+  }
+
+  Future<void> getMarginHistoryTransactions(auth, formData) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/lever/borrow/history',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _marginHistoryLists = responseData['data']['financeList'];
+      } else {
+        _marginHistoryLists = [];
+      }
+      notifyListeners();
+    } catch (error) {
+      notifyListeners();
+      // throw error;
+    }
+  }
+
+  Future<void> getMarginTransferTransactions(auth, formData) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/lever/finance/transfer/list',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _marginTransferLists = responseData['data']['financeList'];
+      } else {
+        _marginTransferLists = [];
+      }
+      notifyListeners();
+    } catch (error) {
+      notifyListeners();
+      // throw error;
+    }
+  }
+
+  Future<void> getFinancialRecords(auth, formData) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$incrementApi/increment/financial_management',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _financialRecords = responseData['data']['financeList'];
+      } else {
+        _financialRecords = [];
+      }
+      notifyListeners();
+    } catch (error) {
+      notifyListeners();
+      // throw error;
+    }
+  }
+
+  Future<void> makeOtcTransfer(ctx, auth, formData) async {
+    /*
+    * Params
+      amount: "1"
+      coinSymbol: "LYO1"
+      fromAccount: "1" 1 = Digital Account
+      toAccount: "2" 2 = P2P Account 
+    */
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/finance/otc_transfer',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        snackAlert(ctx, SnackTypes.success, 'Transfer successful');
+      } else if (responseData['code'] == 10002) {
+        snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+      } else {
+        snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
+      }
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
+      // throw error;
+    }
+  }
+
+  Future<void> makeMarginTransfer(ctx, auth, formData) async {
+    /*
+    * Params
+      amount: "1"
+      coinSymbol: "USDT"
+      fromAccount: "1" 1 = Digital Account
+      symbol: "btcusdt"
+      toAccount: "2" 2 = Margin Account
+    */
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/lever/finance/transfer',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        if (responseData['msg'] == 'Failure to transfer leveraged funds！') {
+          snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
+        } else if (responseData['msg'] == 'Insufficient Balance') {
+          snackAlert(ctx, SnackTypes.errors, 'Insufficient Balance');
+        } else {
+          snackAlert(ctx, SnackTypes.success, 'Transfer Successful');
+        }
+      } else if (responseData['code'] == 10002) {
+        snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+      } else {
+        snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
+      }
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
       // throw error;
     }
   }

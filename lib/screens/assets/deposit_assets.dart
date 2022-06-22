@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
-import 'package:lyotrade/screens/assets/common/networks.dart';
 import 'package:lyotrade/screens/assets/skeleton/deposit_skull.dart';
 import 'package:lyotrade/screens/common/drawer.dart';
 import 'package:lyotrade/screens/common/header.dart';
@@ -39,7 +38,6 @@ class _DepositAssetsState extends State<DepositAssets> {
   String _defaultNetwork = 'ERC20';
   String _defaultCoin = 'USDT';
   List _allNetworks = [];
-  // List _digAssets = [];
 
   @override
   void initState() {
@@ -56,7 +54,7 @@ class _DepositAssetsState extends State<DepositAssets> {
   Future<void> getDigitalBalance() async {
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
-    await asset.getAccountBalance(auth, "");
+    await asset.getAccountBalance(context, auth, "");
     getCoinCosts(_defaultCoin);
   }
 
@@ -95,7 +93,7 @@ class _DepositAssetsState extends State<DepositAssets> {
     }
 
     await asset.getCoinCosts(auth, _defaultNetwork);
-    await asset.getChangeAddress(auth, _defaultNetwork);
+    await asset.getChangeAddress(context, auth, _defaultNetwork);
 
     List _digitialAss = [];
     asset.accountBalance['allCoinMap'].forEach((k, v) {
@@ -146,7 +144,7 @@ class _DepositAssetsState extends State<DepositAssets> {
       _defaultNetwork = netwrk['mainChainName'];
     });
     await asset.getCoinCosts(auth, netwrk['showName']);
-    await asset.getChangeAddress(auth, netwrk['showName']);
+    await asset.getChangeAddress(context, auth, netwrk['showName']);
     setState(() {
       _loadingAddress = false;
     });

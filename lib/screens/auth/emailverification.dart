@@ -58,9 +58,7 @@ class _EmailVerificationState extends State<EmailVerification> {
       (Timer timer) {
         if (_start == 0) {
           setState(() {
-            setState(() {
-              _startTimer = false;
-            });
+            _startTimer = false;
             _timer.cancel();
           });
         } else {

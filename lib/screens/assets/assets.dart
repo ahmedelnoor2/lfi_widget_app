@@ -35,8 +35,10 @@ class _AssetsState extends State<Assets> {
     });
     var auth = Provider.of<Auth>(context, listen: false);
     await auth.checkLogin(context);
-    if (auth.userInfo.isNotEmpty) {
+    if (auth.isAuthenticated) {
       getAccountBalance();
+    } else {
+      Navigator.pushNamed(context, '/authentication');
     }
     setState(() {
       _checkAuthStatus = false;
@@ -68,13 +70,13 @@ class _AssetsState extends State<Assets> {
         'icon': 'digital.png',
         'name': 'Digital Account',
         'path': '/digital_assets',
-        'balance': asset.totalAccountBalance['balance'] ?? '0'
+        'balance': asset.totalAccountBalance['balance'] ?? '0',
       },
       {
         'icon': 'p2p.png',
         'name': 'P2P Account',
         'path': '/p2p_assets',
-        'balance': asset.totalAccountBalance['c2cBalance'] ?? '0'
+        'balance': asset.totalAccountBalance['c2cBalance'] ?? '0',
       },
       {
         'icon': 'margin.png',
@@ -144,7 +146,7 @@ class _AssetsState extends State<Assets> {
                     toolbarHeight: 0,
                   ),
                   body: Container(
-                    padding: EdgeInsets.all(width * 0.03),
+                    padding: EdgeInsets.all(width * 0.025),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -164,7 +166,7 @@ class _AssetsState extends State<Assets> {
                                       fontSize: 16,
                                     ),
                                   ),
-                                  GestureDetector(
+                                  InkWell(
                                     onTap: () {
                                       toggleHideBalances();
                                     },
@@ -237,8 +239,14 @@ class _AssetsState extends State<Assets> {
                                                                     [
                                                                     _totalBalanceSymbol] !=
                                                                 null
-                                                            ? '${double.parse(asset.totalAccountBalance['totalbalance'] ?? '0') * public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()][_totalBalanceSymbol]}'
-                                                            : '0',
+                                                            ? double.parse(
+                                                                    asset.totalAccountBalance['totalbalance'] ??
+                                                                        '0') *
+                                                                public.rate[public
+                                                                    .activeCurrency[
+                                                                        'fiat_symbol']
+                                                                    .toUpperCase()][_totalBalanceSymbol]
+                                                            : 0,
                                                       )}',
                                                     style: TextStyle(
                                                       color: secondaryTextColor,
@@ -261,25 +269,58 @@ class _AssetsState extends State<Assets> {
                                               Row(
                                                 children: [
                                                   Text(
-                                                    '\$4.20',
+                                                    getNumberFormat(
+                                                        context,
+                                                        ((double.parse(
+                                                                '${(asset.accountBalance['yesterdayProfit'] == '--' || asset.accountBalance['yesterdayProfit'] == null) ? 0.00 : asset.accountBalance['yesterdayProfit']}')) *
+                                                            public.rate[public
+                                                                    .activeCurrency[
+                                                                        'fiat_symbol']
+                                                                    .toUpperCase()]
+                                                                [
+                                                                _totalBalanceSymbol])),
                                                     style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold,
-                                                      color:
-                                                          greenlightchartColor,
+                                                      color: asset
+                                                              .accountBalance
+                                                              .isNotEmpty
+                                                          ? asset.accountBalance[
+                                                                      'yesterdayProfitRate'] ==
+                                                                  '--'
+                                                              ? secondaryTextColor
+                                                              : double.parse(asset
+                                                                              .accountBalance[
+                                                                          'yesterdayProfitRate']) >
+                                                                      0
+                                                                  ? greenIndicator
+                                                                  : redIndicator
+                                                          : secondaryTextColor,
                                                     ),
                                                   ),
                                                   Text(
-                                                    '/0.15%',
+                                                    '/${asset.accountBalance.isNotEmpty ? getNumberString(context, double.parse(asset.accountBalance['yesterdayProfitRate'] == '--' ? '0' : asset.accountBalance['yesterdayProfitRate'])) : '0'}%',
                                                     style: TextStyle(
-                                                      color:
-                                                          greenlightchartColor,
+                                                      color: asset
+                                                              .accountBalance
+                                                              .isNotEmpty
+                                                          ? asset.accountBalance[
+                                                                      'yesterdayProfitRate'] ==
+                                                                  '--'
+                                                              ? secondaryTextColor
+                                                              : double.parse(asset
+                                                                              .accountBalance[
+                                                                          'yesterdayProfitRate']) >
+                                                                      0
+                                                                  ? greenIndicator
+                                                                  : redIndicator
+                                                          : secondaryTextColor,
                                                     ),
                                                   ),
                                                 ],
                                               )
                                             ],
-                                          )
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -310,16 +351,10 @@ class _AssetsState extends State<Assets> {
                               padding: EdgeInsets.zero,
                               itemCount: _accounts.length,
                               itemBuilder: (BuildContext context, int index) {
-                                return GestureDetector(
+                                return InkWell(
                                   onTap: () {
-                                    if (_accounts[index]['path'] ==
-                                        '/staking') {
-                                      snackAlert(context, SnackTypes.warning,
-                                          'Coming Soon...');
-                                    } else {
-                                      Navigator.pushNamed(context,
-                                          '${_accounts[index]['path']}');
-                                    }
+                                    Navigator.pushNamed(
+                                        context, '${_accounts[index]['path']}');
                                   },
                                   child: Card(
                                     child: ListTile(
@@ -345,36 +380,44 @@ class _AssetsState extends State<Assets> {
                                               ),
                                             ],
                                           ),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            children: [
-                                              Text(
-                                                '${_hideBalances ? _hideBalanceString : double.parse('${_accounts[index]['balance']}').toStringAsFixed(6)} $_totalBalanceSymbol',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              Text(
-                                                '=${_hideBalances ? _hideBalanceString : getNumberFormat(
-                                                    context,
-                                                    public.rate[public
-                                                                    .activeCurrency[
-                                                                        'fiat_symbol']
-                                                                    .toUpperCase()]
-                                                                [
-                                                                _totalBalanceSymbol] !=
-                                                            null
-                                                        ? '${double.parse(_accounts[index]['balance'] ?? '0') * public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()][_totalBalanceSymbol]}'
-                                                        : '0',
-                                                  )}',
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: secondaryTextColor,
-                                                ),
-                                              ),
-                                            ],
-                                          )
+                                          _accounts[index]['path'] == '/staking'
+                                              ? Container()
+                                              : Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.end,
+                                                  children: [
+                                                    Text(
+                                                      '${_hideBalances ? _hideBalanceString : double.parse('${_accounts[index]['balance']}').toStringAsFixed(6)} $_totalBalanceSymbol',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '=${_hideBalances ? _hideBalanceString : getNumberFormat(
+                                                          context,
+                                                          public.rate[public.activeCurrency['fiat_symbol']
+                                                                          .toUpperCase()][
+                                                                      _totalBalanceSymbol] !=
+                                                                  null
+                                                              ? double.parse(
+                                                                      _accounts[index][
+                                                                              'balance'] ??
+                                                                          '0') *
+                                                                  public.rate[public
+                                                                      .activeCurrency[
+                                                                          'fiat_symbol']
+                                                                      .toUpperCase()][_totalBalanceSymbol]
+                                                              : 0,
+                                                        )}',
+                                                      style: TextStyle(
+                                                        fontSize: 12,
+                                                        color:
+                                                            secondaryTextColor,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )
                                         ],
                                       ),
                                       trailing: Icon(Icons.chevron_right),
@@ -394,10 +437,15 @@ class _AssetsState extends State<Assets> {
                                 width: width * 0.28,
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/deposit_assets',
-                                    );
+                                    if (auth.userInfo['realAuthType'] == 0) {
+                                      snackAlert(context, SnackTypes.warning,
+                                          'Deposit limited(Please check KYC status)');
+                                    } else {
+                                      Navigator.pushNamed(
+                                        context,
+                                        '/deposit_assets',
+                                      );
+                                    }
                                   },
                                   child: Text('Deposit'),
                                 ),
@@ -433,7 +481,7 @@ class _AssetsState extends State<Assets> {
                     ),
                   ),
                 ),
-      bottomNavigationBar: bottomNav(context),
+      bottomNavigationBar: bottomNav(context, auth),
     );
   }
 }

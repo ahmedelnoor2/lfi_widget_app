@@ -1,28 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:lyotrade/screens/assets/assets.dart';
+import 'package:lyotrade/screens/auth/authentication.dart';
+import 'package:lyotrade/screens/dashboard.dart';
+import 'package:lyotrade/screens/future_trade/future_trade.dart';
+import 'package:lyotrade/screens/market/market.dart';
+import 'package:lyotrade/screens/trade/trade.dart';
 
-bottomNav(context) {
+bottomNav(context, auth) {
   var _currentRoute = ModalRoute.of(context)!.settings.name;
 
   return BottomNavigationBar(
-    items: const <BottomNavigationBarItem>[
+    items: <BottomNavigationBarItem>[
       BottomNavigationBarItem(
-        icon: Icon(Icons.home),
+        icon: Image.asset(
+          'assets/img/bottom_bar/${(_currentRoute == '/' || _currentRoute == '/dashboard') ? 'home_active' : 'home'}.png',
+          width: 24,
+        ),
         label: 'Home',
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.bar_chart),
+        icon: Image.asset(
+          'assets/img/bottom_bar/${(_currentRoute == '/market') ? 'market_active' : 'market'}.png',
+          width: 24,
+        ),
         label: 'Markets',
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.currency_exchange),
+        icon: Image.asset(
+          'assets/img/bottom_bar/${(_currentRoute == '/trade') ? 'trade_active' : 'trade'}.png',
+          width: 24,
+        ),
         label: 'Trade',
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.currency_exchange),
+        icon: Image.asset(
+          'assets/img/bottom_bar/${(_currentRoute == '/future_trade') ? 'future_active' : 'future'}.png',
+          width: 24,
+        ),
         label: 'Futures',
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.account_balance_wallet),
+        icon: Image.asset(
+          'assets/img/bottom_bar/${(_currentRoute == '/assets') ? 'asset_active' : 'asset'}.png',
+          width: 24,
+        ),
         label: 'Assets',
       ),
     ],
@@ -43,24 +64,33 @@ bottomNav(context) {
     onTap: (value) {
       switch (value) {
         case 0:
-          Navigator.pushNamedAndRemoveUntil(
+          Navigator.pushReplacement(
             context,
-            '/dashboard',
-            (route) => false,
+            PageRouteBuilder(
+              settings: RouteSettings(name: Dashboard.routeName),
+              pageBuilder: (context, animation1, animation2) => Dashboard(),
+              transitionDuration: Duration(seconds: 0),
+            ),
           );
           break;
         case 1:
-          Navigator.pushNamedAndRemoveUntil(
+          Navigator.pushReplacement(
             context,
-            '/market',
-            (route) => false,
+            PageRouteBuilder(
+              settings: RouteSettings(name: Market.routeName),
+              pageBuilder: (context, animation1, animation2) => Market(),
+              transitionDuration: Duration(seconds: 0),
+            ),
           );
           break;
         case 2:
-          Navigator.pushNamedAndRemoveUntil(
+          Navigator.pushReplacement(
             context,
-            '/trade',
-            (route) => false,
+            PageRouteBuilder(
+              settings: RouteSettings(name: Trade.routeName),
+              pageBuilder: (context, animation1, animation2) => Trade(),
+              transitionDuration: Duration(seconds: 0),
+            ),
           );
           break;
         case 3:
@@ -69,13 +99,34 @@ bottomNav(context) {
             '/future_trade',
             (route) => false,
           );
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              settings: RouteSettings(name: FutureTrade.routeName),
+              pageBuilder: (context, animation1, animation2) => FutureTrade(),
+              transitionDuration: Duration(seconds: 0),
+            ),
+          );
           break;
         case 4:
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            '/assets',
-            (route) => false,
-          );
+          auth.isAuthenticated
+              ? Navigator.pushReplacement(
+                  context,
+                  PageRouteBuilder(
+                    settings: RouteSettings(name: Assets.routeName),
+                    pageBuilder: (context, animation1, animation2) => Assets(),
+                    transitionDuration: Duration(seconds: 0),
+                  ),
+                )
+              : Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    settings: RouteSettings(name: Authentication.routeName),
+                    pageBuilder: (context, animation1, animation2) =>
+                        Authentication(),
+                    transitionDuration: Duration(seconds: 0),
+                  ),
+                );
           break;
         default:
           Navigator.pushNamedAndRemoveUntil(

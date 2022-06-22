@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/screens/assets/skeleton/assets_skull.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 
@@ -35,7 +37,7 @@ class _OtcAssetsState extends State<OtcAssets> {
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
 
-    await asset.getP2pBalance(auth);
+    await asset.getP2pBalance(context, auth);
     setState(() {
       _totalBalanceSymbol = asset.p2pBalance['totalBalanceSymbol'] ?? 'BTC';
       _p2pAssets = asset.p2pBalance['allCoinMap'];
@@ -106,13 +108,26 @@ class _OtcAssetsState extends State<OtcAssets> {
                       ),
                     ],
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      toggleHideBalances();
-                    },
-                    child: _hideBalances
-                        ? Icon(Icons.visibility)
-                        : Icon(Icons.visibility_off),
+                  Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(right: 15),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/p2p_transactions');
+                          },
+                          child: Icon(Icons.history),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          toggleHideBalances();
+                        },
+                        child: _hideBalances
+                            ? Icon(Icons.visibility)
+                            : Icon(Icons.visibility_off),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -166,15 +181,19 @@ class _OtcAssetsState extends State<OtcAssets> {
                                   Text(
                                     '≈${_hideBalances ? _hideBalanceString : getNumberFormat(
                                         context,
-                                        public.rate[public.activeCurrency[
-                                                        'fiat_symbol']
-                                                    .toUpperCase()][asset
-                                                            .p2pBalance[
-                                                        _totalBalanceSymbol] ??
-                                                    'BTC'] !=
+                                        public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()]
+                                                    [
+                                                    asset.p2pBalance[_totalBalanceSymbol] ??
+                                                        'BTC'] !=
                                                 null
-                                            ? '${double.parse(asset.totalAccountBalance['totalbalance'] ?? '0') * public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()][_totalBalanceSymbol]}'
-                                            : '0',
+                                            ? double.parse(
+                                                    asset.totalAccountBalance[
+                                                            'totalbalance'] ??
+                                                        '0') *
+                                                public.rate[public
+                                                    .activeCurrency['fiat_symbol']
+                                                    .toUpperCase()][_totalBalanceSymbol]
+                                            : 0,
                                       )}',
                                     style: TextStyle(
                                       color: secondaryTextColor,
@@ -184,34 +203,34 @@ class _OtcAssetsState extends State<OtcAssets> {
                               ),
                             ],
                           ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Yesterday\'s PNL',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    '\$4.20',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: greenlightchartColor,
-                                    ),
-                                  ),
-                                  Text(
-                                    '/0.15%',
-                                    style: TextStyle(
-                                      color: greenlightchartColor,
-                                    ),
-                                  ),
-                                ],
-                              )
-                            ],
-                          )
+                          // Column(
+                          //   crossAxisAlignment: CrossAxisAlignment.start,
+                          //   children: [
+                          //     Text(
+                          //       'Yesterday\'s PNL',
+                          //       style: TextStyle(
+                          //         fontSize: 10,
+                          //       ),
+                          //     ),
+                          //     Row(
+                          //       children: [
+                          //         Text(
+                          //           '\$4.20',
+                          //           style: TextStyle(
+                          //             fontWeight: FontWeight.bold,
+                          //             color: greenlightchartColor,
+                          //           ),
+                          //         ),
+                          //         Text(
+                          //           '/0.15%',
+                          //           style: TextStyle(
+                          //             color: greenlightchartColor,
+                          //           ),
+                          //         ),
+                          //       ],
+                          //     )
+                          //   ],
+                          // )
                         ],
                       ),
                     ),
@@ -365,7 +384,7 @@ class _OtcAssetsState extends State<OtcAssets> {
                                     Container(
                                       padding: EdgeInsets.only(right: 8),
                                       child: CircleAvatar(
-                                        radius: 12,
+                                        radius: 15,
                                         child: Image.network(
                                           '${public.publicInfoMarket['market']['coinList'][asset['coinSymbol']]['icon']}',
                                         ),
@@ -379,12 +398,13 @@ class _OtcAssetsState extends State<OtcAssets> {
                                           '${asset['coinSymbol']}',
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
+                                            fontSize: 16,
                                           ),
                                         ),
                                         Text(
                                           'LYO Credit',
                                           style: TextStyle(
-                                            fontSize: 11,
+                                            fontSize: 12,
                                             color: secondaryTextColor,
                                           ),
                                         ),
@@ -403,12 +423,13 @@ class _OtcAssetsState extends State<OtcAssets> {
                                         : '${double.parse('${asset['normal']}').toStringAsFixed(4)}',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
+                                      fontSize: 16,
                                     ),
                                   ),
                                 ),
                               ),
                               SizedBox(
-                                width: width * 0.12,
+                                width: width * 0.13,
                                 child: Align(
                                   alignment: Alignment.centerLeft,
                                   child: Text(
@@ -418,6 +439,7 @@ class _OtcAssetsState extends State<OtcAssets> {
                                             .toStringAsFixed(4),
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
+                                      fontSize: 16,
                                     ),
                                   ),
                                 ),
@@ -430,11 +452,15 @@ class _OtcAssetsState extends State<OtcAssets> {
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       GestureDetector(
-                                        onTap: () {},
+                                        onTap: () {
+                                          Navigator.pushNamed(
+                                              context, '/transfer_assets');
+                                        },
                                         child: Text(
                                           'Transfer',
                                           style: TextStyle(
                                             color: linkColor,
+                                            fontSize: 16,
                                           ),
                                         ),
                                       ),
@@ -456,21 +482,29 @@ class _OtcAssetsState extends State<OtcAssets> {
                   SizedBox(
                     width: width * 0.28,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        snackAlert(
+                            context, SnackTypes.warning, 'Coming Soon...');
+                      },
                       child: Text('Buy'),
                     ),
                   ),
                   SizedBox(
                     width: width * 0.28,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        snackAlert(
+                            context, SnackTypes.warning, 'Coming Soon...');
+                      },
                       child: Text('Sell'),
                     ),
                   ),
                   SizedBox(
                     width: width * 0.30,
                     child: ElevatedButton(
-                      onPressed: null,
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/transfer_assets');
+                      },
                       child: Text('Transfer'),
                     ),
                   ),

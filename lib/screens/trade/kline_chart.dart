@@ -1,18 +1,20 @@
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'dart:io';
-import 'dart:ui';
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
-import 'package:lyotrade/screens/common/header.dart';
+import 'package:lyotrade/screens/common/bottomnav.dart';
 import 'package:lyotrade/screens/trade/common/header.dart';
+import 'package:lyotrade/screens/trade/common/market_drawer.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/Number.utils.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'package:candlesticks/candlesticks.dart';
+
+import 'package:k_chart/chart_translations.dart';
+import 'package:k_chart/flutter_k_chart.dart';
 
 class KlineChart extends StatefulWidget {
   static const routeName = '/kline_chart';
@@ -24,42 +26,35 @@ class KlineChart extends StatefulWidget {
 
 class _KlineChartState extends State<KlineChart>
     with SingleTickerProviderStateMixin {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late final TabController _tabController = TabController(
     length: 2,
     vsync: this,
   );
 
-  List<Candle> candles = [];
+  //Kline
+  List<KLineEntity> datas = [];
+  bool showLoading = true;
+  MainState _mainState = MainState.MA;
+  bool _volHidden = false;
+  SecondaryState _secondaryState = SecondaryState.MACD;
+  bool isLine = false;
+  bool isChinese = false;
+  bool _hideGrid = true;
+  bool _showNowPrice = true;
+  List<DepthEntity>? _bids, _asks;
+  bool isChangeUI = true;
+  bool _isTrendLine = false;
+  bool _priceLeft = false;
+  VerticalTextAlignment _verticalTextAlignment = VerticalTextAlignment.left;
+
+  ChartStyle chartStyle = ChartStyle();
+  ChartColors chartColors = ChartColors();
   List<String> symbols = [];
   List latestTrades = [];
   String currentSymbol = '';
   String _currentInterval = '30min';
   List intervals = ['30min'];
-  List<Indicator>? indicators = [
-    // BollingerBandsIndicator(
-    //   length: 20,
-    //   stdDev: 2,
-    //   upperColor: const Color(0xFF2962FF),
-    //   basisColor: const Color(0xFFFF6D00),
-    //   lowerColor: const Color(0xFF2962FF),
-    // ),
-    // WeightedMovingAverageIndicator(
-    //   length: 100,
-    //   color: Colors.green.shade600,
-    // ),
-    MovingAverageIndicator(
-      length: 7,
-      color: Color.fromARGB(255, 255, 255, 255),
-    ),
-    MovingAverageIndicator(
-      length: 25,
-      color: Colors.green.shade600,
-    ),
-    MovingAverageIndicator(
-      length: 99,
-      color: Colors.pink.shade600,
-    ),
-  ];
   bool themeIsDark = true;
   var _mchannel;
   bool _loadingChart = false;
@@ -138,31 +133,35 @@ class _KlineChartState extends State<KlineChart>
         if (marketData['channel'] ==
             "market_${marketCoin}_kline_$_currentInterval") {
           var e = marketData['tick'];
-          if (candles.isNotEmpty) {
-            if (DateTime.parse(e['ds']) == candles[0].date) {
+
+          if (datas.isNotEmpty) {
+            if (DateTime.parse(e['ds']) ==
+                DateTime.fromMillisecondsSinceEpoch(datas.last.time!)) {
               setState(() {
-                candles[0] = Candle(
-                  date: DateTime.parse(e['ds']),
+                datas.last = KLineEntity.fromCustom(
+                  time: DateTime.parse('${e['ds']}').millisecondsSinceEpoch,
                   high: double.parse('${e['high']}'),
                   low: double.parse('${e['low']}'),
                   open: double.parse('${e['open']}'),
                   close: double.parse('${e['close']}'),
-                  volume: double.parse('${e['vol']}'),
+                  vol: double.parse('${e['vol']}'),
                 );
               });
+              DataUtil.calculate(datas);
             } else {
               setState(() {
-                candles.insert(
-                    0,
-                    Candle(
-                      date: DateTime.parse(e['ds']),
-                      high: double.parse('${e['high']}'),
-                      low: double.parse('${e['low']}'),
-                      open: double.parse('${e['open']}'),
-                      close: double.parse('${e['close']}'),
-                      volume: double.parse('${e['vol']}'),
-                    ));
+                datas.add(
+                  KLineEntity.fromCustom(
+                    time: DateTime.parse('${e['ds']}').millisecondsSinceEpoch,
+                    high: double.parse('${e['high']}'),
+                    low: double.parse('${e['low']}'),
+                    open: double.parse('${e['open']}'),
+                    close: double.parse('${e['close']}'),
+                    vol: double.parse('${e['vol']}'),
+                  ),
+                );
               });
+              DataUtil.calculate(datas);
             }
           }
         }
@@ -198,8 +197,8 @@ class _KlineChartState extends State<KlineChart>
         if (marketData['channel'] == 'market_${marketCoin}_trade_ticker') {
           var _latestTradesAll = latestTrades;
           _latestTradesAll.insertAll(0, marketData['tick']['data']);
-          if (_latestTradesAll.length > 22) {
-            var _subLastTradesAll = _latestTradesAll.sublist(0, 22);
+          if (_latestTradesAll.length > 21) {
+            var _subLastTradesAll = _latestTradesAll.sublist(0, 21);
             setState(() {
               latestTrades = _subLastTradesAll;
             });
@@ -216,16 +215,22 @@ class _KlineChartState extends State<KlineChart>
   Future<void> getKlineData() async {
     setState(() {
       _loadingChart = true;
+      chartColors.bgColor = [
+        Color.fromARGB(255, 41, 44, 81),
+        Color.fromARGB(255, 41, 44, 81),
+      ];
     });
     var public = Provider.of<Public>(context, listen: false);
+
     public
-        .fetchCandles(_currentInterval, public.activeMarket['symbol'])
+        .fetchKlkines(_currentInterval, public.activeMarket['symbol'])
         .then((value) {
       setState(() {
-        candles = value;
+        datas = List.from(value.reversed);
         intervals = public.publicInfoMarket['market']['klineScale'];
       });
     });
+
     await public.getKlineData();
     setState(() {
       _loadingChart = false;
@@ -233,12 +238,27 @@ class _KlineChartState extends State<KlineChart>
     return;
   }
 
+  void updateMarket() {
+    if (_mchannel != null) {
+      _mchannel.sink.close();
+    }
+    setState(() {
+      datas = [];
+      _currentInterval = '30min';
+    });
+    connectWebSocket();
+    getKlineData();
+  }
+
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
 
+    var _currentRoute = ModalRoute.of(context)!.settings.name;
+
     var public = Provider.of<Public>(context, listen: true);
+    var auth = Provider.of<Auth>(context, listen: true);
 
     List? asks = public.asks;
     List? bids = public.bids;
@@ -257,7 +277,13 @@ class _KlineChartState extends State<KlineChart>
         : 0;
 
     return Scaffold(
-      appBar: klineHeader(context),
+      key: _scaffoldKey,
+      drawer: MarketDrawer(
+        scaffoldKey: _scaffoldKey,
+        updateMarket: updateMarket,
+      ),
+      appBar:
+          klineHeader(context, _scaffoldKey, public.activeMarket['showName']),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -284,7 +310,9 @@ class _KlineChartState extends State<KlineChart>
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               Text(
-                                '${getNumberString(context, double.parse('${public.activeMarketTick['close']}'))}',
+                                public.activeMarketTick.isNotEmpty
+                                    ? '${getNumberString(context, double.parse('${public.activeMarketTick['close']}'))}'
+                                    : '0.00',
                                 style: TextStyle(
                                   fontSize: 25,
                                   color: _upDirection == false
@@ -301,16 +329,21 @@ class _KlineChartState extends State<KlineChart>
                                     style: TextStyle(fontSize: 12),
                                   ),
                                   Text(
-                                    ' ${(double.parse(public.activeMarketTick['rose']) * 100).toStringAsFixed(2)}%',
+                                    public.activeMarketTick.isNotEmpty
+                                        ? ' ${(double.parse(public.activeMarketTick['rose']) * 100).toStringAsFixed(2)}%'
+                                        : '--%',
                                     style: TextStyle(
                                         fontSize: 12,
-                                        color: double.parse(
-                                                    public.activeMarketTick[
-                                                            'rose'] ??
-                                                        '0') >
-                                                0
-                                            ? greenIndicator
-                                            : redIndicator),
+                                        color: public
+                                                .activeMarketTick.isNotEmpty
+                                            ? double.parse(
+                                                        public.activeMarketTick[
+                                                                'rose'] ??
+                                                            '0') >
+                                                    0
+                                                ? greenIndicator
+                                                : redIndicator
+                                            : secondaryTextColor),
                                   ),
                                 ],
                               )
@@ -342,7 +375,9 @@ class _KlineChartState extends State<KlineChart>
                                           ),
                                         ),
                                         Text(
-                                          '${getNumberString(context, double.parse('${public.activeMarketTick['high']}'))}',
+                                          public.activeMarketTick.isNotEmpty
+                                              ? '${getNumberString(context, double.parse('${public.activeMarketTick['high']}'))}'
+                                              : '0.00',
                                           style: TextStyle(
                                             fontSize: 10,
                                           ),
@@ -366,7 +401,9 @@ class _KlineChartState extends State<KlineChart>
                                             ),
                                           ),
                                           Text(
-                                            '${getNumberString(context, double.parse('${public.activeMarketTick['vol']}'))}',
+                                            public.activeMarketTick.isNotEmpty
+                                                ? '${getNumberString(context, double.parse('${public.activeMarketTick['vol']}'))}'
+                                                : '0.00',
                                             style: TextStyle(
                                               fontSize: 10,
                                             ),
@@ -396,7 +433,9 @@ class _KlineChartState extends State<KlineChart>
                                           ),
                                         ),
                                         Text(
-                                          '${getNumberString(context, double.parse('${public.activeMarketTick['low']}'))}',
+                                          public.activeMarketTick.isNotEmpty
+                                              ? '${getNumberString(context, double.parse('${public.activeMarketTick['low']}'))}'
+                                              : '0.00',
                                           style: TextStyle(
                                             fontSize: 10,
                                           ),
@@ -420,7 +459,9 @@ class _KlineChartState extends State<KlineChart>
                                             ),
                                           ),
                                           Text(
-                                            '${getNumberString(context, double.parse('${public.activeMarketTick['amount']}'))}',
+                                            public.activeMarketTick.isNotEmpty
+                                                ? '${getNumberString(context, double.parse('${public.activeMarketTick['amount']}'))}'
+                                                : '0.00',
                                             style: TextStyle(
                                               fontSize: 10,
                                             ),
@@ -436,128 +477,133 @@ class _KlineChartState extends State<KlineChart>
                         ],
                       ),
                     ),
-                    Container(
-                      padding: EdgeInsets.only(
-                        bottom: 15,
-                      ),
-                      height: width * 0.9,
-                      child: _loadingChart
-                          ? CircularProgressIndicator.adaptive()
-                          : Candlesticks(
-                              style: CandleSticksStyle(
-                                borderColor: Color(0xFF848E9C),
-                                background: Color.fromARGB(255, 41, 44, 81),
-                                primaryBull: Color(0xFF26A69A),
-                                secondaryBull: Color(0xFF005940),
-                                primaryBear: Color(0xFFEF5350),
-                                secondaryBear: Color(0xFF82122B),
-                                hoverIndicatorBackgroundColor:
-                                    Color(0xFF4C525E),
-                                primaryTextColor: Color(0xFF848E9C),
-                                secondaryTextColor: Color(0XFFFFFFFF),
-                                mobileCandleHoverColor:
-                                    Color(0xFFF0B90A).withOpacity(0.2),
-                                loadingColor: Color(0xFFF0B90A),
-                                toolBarColor: Color.fromARGB(255, 26, 29, 63),
-                              ),
-                              candles: candles,
-                              indicators: indicators,
-                              actions: [
-                                ToolBarAction(
-                                  width: 50,
-                                  onPressed: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return Center(
-                                          child: Container(
-                                            width: 200,
-                                            color: Theme.of(context)
-                                                .backgroundColor,
-                                            child: Wrap(
-                                              children: intervals
-                                                  .map((e) => Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(8.0),
-                                                        child: SizedBox(
-                                                          width: 50,
-                                                          height: 30,
-                                                          child:
-                                                              RawMaterialButton(
-                                                            elevation: 0,
-                                                            fillColor:
-                                                                const Color(
-                                                                    0xFF494537),
-                                                            onPressed:
-                                                                () async {
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .pop();
+                    Column(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                              color: Color.fromARGB(255, 26, 29, 63)),
+                          // padding: EdgeInsets.all(5),
+                          height: 30,
+                          child: Row(
+                            children: [
+                              TextButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return Center(
+                                        child: Container(
+                                          width: 200,
+                                          color:
+                                              Theme.of(context).backgroundColor,
+                                          child: Wrap(
+                                            children: intervals
+                                                .map((e) => Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: SizedBox(
+                                                        width: 50,
+                                                        height: 30,
+                                                        child:
+                                                            RawMaterialButton(
+                                                          elevation: 0,
+                                                          fillColor:
+                                                              const Color(
+                                                                  0xFF494537),
+                                                          onPressed: () async {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
 
-                                                              setState(() {
-                                                                candles = [];
-                                                                _currentInterval =
-                                                                    e;
-                                                              });
-                                                              if (_mchannel !=
-                                                                  null) {
-                                                                _mchannel.sink
-                                                                    .close();
-                                                              }
-                                                              setState(() {
-                                                                candles = [];
-                                                                _currentInterval =
-                                                                    e;
-                                                              });
-                                                              await getKlineData();
-                                                              connectWebSocket();
-                                                            },
-                                                            child: Text(
-                                                              e,
-                                                              style:
-                                                                  const TextStyle(
-                                                                color: Color(
-                                                                    0xFFF0B90A),
-                                                              ),
+                                                            setState(() {
+                                                              datas = [];
+                                                              _currentInterval =
+                                                                  e;
+                                                            });
+                                                            if (_mchannel !=
+                                                                null) {
+                                                              _mchannel.sink
+                                                                  .close();
+                                                            }
+                                                            setState(() {
+                                                              datas = [];
+                                                              _currentInterval =
+                                                                  e;
+                                                            });
+                                                            await getKlineData();
+                                                            connectWebSocket();
+                                                          },
+                                                          child: Text(
+                                                            e,
+                                                            style:
+                                                                const TextStyle(
+                                                              color: Color(
+                                                                  0xFFF0B90A),
                                                             ),
                                                           ),
                                                         ),
-                                                      ))
-                                                  .toList(),
-                                            ),
+                                                      ),
+                                                    ))
+                                                .toList(),
                                           ),
-                                        );
-                                      },
-                                    );
-                                  },
-                                  child: Text(
-                                    '$_currentInterval',
-                                    style: TextStyle(color: secondaryTextColor),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                                child: Text(
+                                  _currentInterval,
+                                  style: TextStyle(
+                                    color: linkColor,
                                   ),
                                 ),
-                                // ToolBarAction(
-                                //   width: 100,
-                                //   onPressed: () {
-                                //     showDialog(
-                                //       context: context,
-                                //       builder: (context) {
-                                //         return SymbolsSearchModal(
-                                //           symbols: symbols,
-                                //           onSelect: (value) {
-                                //             // fetchCandles(value, currentInterval);
-                                //             getKlineData();
-                                //           },
-                                //         );
-                                //       },
-                                //     );
-                                //   },
-                                //   child: Text(
-                                //     currentSymbol,
-                                //   ),
-                                // )
-                              ],
-                            ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: width * 0.87,
+                          child: _loadingChart
+                              ? Center(
+                                  child: CircularProgressIndicator.adaptive(),
+                                )
+                              : KChartWidget(
+                                  datas, // Required，Data must be an ordered list，(history=>now)
+                                  chartStyle, // Required for styling purposes
+                                  chartColors, // Required for styling purposes
+                                  isLine:
+                                      isLine, // Decide whether it is k-line or time-sharing
+                                  mainState:
+                                      _mainState, // Decide what the main view shows
+                                  secondaryState:
+                                      _secondaryState, // Decide what the sub view shows
+                                  fixedLength: 2, // Displayed decimal precision
+                                  timeFormat:
+                                      TimeFormat.YEAR_MONTH_DAY_WITH_HOUR,
+                                  isTapShowInfoDialog: true,
+                                  materialInfoDialog: false,
+                                  onLoadMore: (bool
+                                      a) {}, // Called when the data scrolls to the end. When a is true, it means the user is pulled to the end of the right side of the data. When a
+                                  // is false, it means the user is pulled to the end of the left side of the data.
+                                  maDayList: [
+                                    7,
+                                    25,
+                                    99,
+                                  ], // Display of MA,This parameter must be equal to DataUtil.calculate‘s maDayList
+                                  translations:
+                                      kChartTranslations, // Graphic language
+                                  volHidden: false, // hide volume
+                                  showNowPrice: true, // show now price
+                                  isOnDrag:
+                                      (isDrag) {}, // true is on Drag.Don't load data while Draging.
+                                  onSecondaryTap:
+                                      () {}, // on secondary rect taped.
+                                  isTrendLine:
+                                      false, // You can use Trendline by long-pressing and moving your finger after setting true to isTrendLine property.
+                                ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -578,7 +624,7 @@ class _KlineChartState extends State<KlineChart>
                     ],
                   ),
                   SizedBox(
-                    height: height * 0.77,
+                    height: height * 0.79,
                     child: TabBarView(
                       controller: _tabController,
                       children: [
@@ -797,7 +843,7 @@ class _KlineChartState extends State<KlineChart>
                                   children: [
                                     Container(
                                       padding:
-                                          EdgeInsets.only(left: 10, top: 10),
+                                          EdgeInsets.only(left: 10, top: 5),
                                       width: width * 0.33,
                                       child: Text(
                                         '${DateFormat('hh:mm:ss').format(DateTime.fromMillisecondsSinceEpoch(latestTrades[index]['ts']))}',
@@ -806,7 +852,7 @@ class _KlineChartState extends State<KlineChart>
                                       ),
                                     ),
                                     Container(
-                                      padding: EdgeInsets.only(top: 10),
+                                      padding: EdgeInsets.only(top: 5),
                                       width: width * 0.33,
                                       child: Align(
                                         alignment: Alignment.center,
@@ -823,7 +869,7 @@ class _KlineChartState extends State<KlineChart>
                                     ),
                                     Container(
                                       padding:
-                                          EdgeInsets.only(top: 10, right: 10),
+                                          EdgeInsets.only(top: 5, right: 10),
                                       width: width * 0.33,
                                       child: Align(
                                         alignment: Alignment.centerRight,
@@ -852,6 +898,8 @@ class _KlineChartState extends State<KlineChart>
           ],
         ),
       ),
+      bottomNavigationBar:
+          _currentRoute == '/market' ? bottomNav(context, auth) : null,
     );
   }
 }

@@ -10,6 +10,7 @@ Widget drawer(
   searchController,
   getCoinCosts,
 ) {
+  print(asset.allDigAsset);
   return Container(
     decoration: BoxDecoration(
       color: Colors.grey[850],

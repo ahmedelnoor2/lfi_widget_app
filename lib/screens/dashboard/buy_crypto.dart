@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:provider/provider.dart';
 
 class BuyCrypto extends StatefulWidget {
   const BuyCrypto({Key? key}) : super(key: key);
@@ -15,14 +19,22 @@ class _BuyCryptoState extends State<BuyCrypto> {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
 
+    var auth = Provider.of<Auth>(context, listen: true);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        GestureDetector(
-          onTap: () {},
+        InkWell(
+          onTap: () {
+            if (auth.isAuthenticated) {
+              Navigator.pushNamed(context, '/buy_sell_crypto');
+            } else {
+              Navigator.pushNamed(context, '/authentication');
+            }
+          },
           child: SizedBox(
             width: width * 0.325,
-            height: height * 0.12,
+            height: 100,
             child: Card(
               child: Container(
                 padding: EdgeInsets.all(10),
@@ -58,10 +70,21 @@ class _BuyCryptoState extends State<BuyCrypto> {
           ),
         ),
         GestureDetector(
-          onTap: () {},
+          onTap: () {
+            if (auth.isAuthenticated) {
+              if (auth.userInfo['realAuthType'] == 0) {
+                snackAlert(context, SnackTypes.warning,
+                    'Deposit limited(Please check KYC status)');
+              } else {
+                Navigator.pushNamed(context, '/deposit_assets');
+              }
+            } else {
+              Navigator.pushNamed(context, '/authentication');
+            }
+          },
           child: SizedBox(
             width: width * 0.325,
-            height: height * 0.12,
+            height: 100,
             child: Card(
               child: Container(
                 padding: EdgeInsets.all(10),
@@ -96,13 +119,13 @@ class _BuyCryptoState extends State<BuyCrypto> {
             ),
           ),
         ),
-        GestureDetector(
+        InkWell(
           onTap: () {
-            print('hit');
+            Navigator.pushNamed(context, '/staking');
           },
           child: SizedBox(
             width: width * 0.32,
-            height: height * 0.12,
+            height: 100,
             child: Card(
               child: Container(
                 padding: EdgeInsets.all(10),

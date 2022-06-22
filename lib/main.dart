@@ -1,27 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/future_market.dart';
+import 'package:lyotrade/providers/loan_provider.dart';
 import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/providers/staking.dart';
 import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/providers/user.dart';
 import 'package:lyotrade/screens/assets/assets.dart';
 import 'package:lyotrade/screens/assets/deposit_assets.dart';
 import 'package:lyotrade/screens/assets/digital_assets.dart';
 import 'package:lyotrade/screens/assets/margin_assets.dart';
+import 'package:lyotrade/screens/assets/margin_transactions.dart';
 import 'package:lyotrade/screens/assets/otc_assets.dart';
+import 'package:lyotrade/screens/assets/p2p_transactions.dart';
+import 'package:lyotrade/screens/assets/transaction_details.dart';
 import 'package:lyotrade/screens/assets/transactions.dart';
 import 'package:lyotrade/screens/assets/transfer_assets.dart';
 import 'package:lyotrade/screens/assets/withdraw_assets.dart';
 import 'package:lyotrade/screens/auth/authentication.dart';
+import 'package:lyotrade/screens/buy_sell/BuySellCrypto.dart';
 import 'package:lyotrade/screens/dashboard.dart';
 import 'package:lyotrade/screens/future_trade/future_trade.dart';
 import 'package:lyotrade/screens/market/market.dart';
 import 'package:lyotrade/screens/security/email_change.dart';
 import 'package:lyotrade/screens/security/google_auth.dart';
 import 'package:lyotrade/screens/security/password.dart';
+import 'package:lyotrade/screens/security/phone.dart';
 import 'package:lyotrade/screens/security/security.dart';
+import 'package:lyotrade/screens/staking/common/stake_order.dart';
+import 'package:lyotrade/screens/staking/stake.dart';
+import 'package:lyotrade/screens/take_loan/take_loan.dart';
 import 'package:lyotrade/screens/trade/kline_chart.dart';
+import 'package:lyotrade/screens/trade/margin/margin_trade_history.dart';
 import 'package:lyotrade/screens/trade/trade.dart';
+import 'package:lyotrade/screens/trade/trade_history.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 
@@ -44,6 +57,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<Asset>(create: (_) => Asset()),
         ChangeNotifierProvider<User>(create: (_) => User()),
         ChangeNotifierProvider<Trading>(create: (_) => Trading()),
+        ChangeNotifierProvider<FutureMarket>(create: (_) => FutureMarket()),
+        ChangeNotifierProvider<Staking>(create: (_) => Staking()),
+        ChangeNotifierProvider<LoanProvider>(create: (_) => LoanProvider()),
       ],
       child: Consumer<Auth>(
         builder: (context, auth, _) {
@@ -59,6 +75,12 @@ class MyApp extends StatelessWidget {
               // or simply save your changes to "hot reload" in a Flutter IDE).
               // Notice that the counter didn't reset back to zero; the application
               // is not restarted.
+              // pageTransitionsTheme: PageTransitionsTheme(
+              //   builders: {
+              //     TargetPlatform.android: NoTransitionsBuilder(),
+              //     TargetPlatform.iOS: NoTransitionsBuilder(),
+              //   },
+              // ),
               brightness: Brightness.dark,
               appBarTheme: AppBarTheme(
                 backgroundColor: Color.fromARGB(255, 26, 29, 63),
@@ -74,6 +96,9 @@ class MyApp extends StatelessWidget {
                 unselectedItemColor: secondaryTextColor,
                 showUnselectedLabels: true,
                 type: BottomNavigationBarType.fixed,
+              ),
+              bottomSheetTheme: BottomSheetThemeData(
+                backgroundColor: Color.fromARGB(255, 26, 29, 63),
               ),
               primarySwatch:
                   createMaterialColor(Color.fromARGB(255, 1, 254, 246)),
@@ -176,12 +201,23 @@ class MyApp extends StatelessWidget {
               Authentication.routeName: (context) => const Authentication(),
               Market.routeName: (context) => const Market(),
               Trade.routeName: (context) => const Trade(),
+              Stake.routeName: (context) => const Stake(),
+              StakeOrder.routeName: (context) => const StakeOrder(),
+              TradeHistory.routeName: (context) => const TradeHistory(),
+              MarginTradeHistory.routeName: (context) =>
+                  const MarginTradeHistory(),
+              TransactionDetails.routeName: (context) =>
+                  const TransactionDetails(),
+              P2pTransactions.routeName: (context) => const P2pTransactions(),
+              MarginTransactions.routeName: (context) =>
+                  const MarginTransactions(),
               FutureTrade.routeName: (context) => const FutureTrade(),
               Assets.routeName: (context) => const Assets(),
               DepositAssets.routeName: (context) => const DepositAssets(),
               WithdrawAssets.routeName: (context) => const WithdrawAssets(),
               TransferAssets.routeName: (context) => const TransferAssets(),
               Security.routeName: (context) => const Security(),
+              Phone.routeName: (context) => const Phone(),
               Password.routeName: (context) => const Password(),
               GoogleAuth.routeName: (context) => const GoogleAuth(),
               EmailChange.routeName: (context) => const EmailChange(),
@@ -190,10 +226,28 @@ class MyApp extends StatelessWidget {
               DigitalAssets.routeName: (context) => const DigitalAssets(),
               MarginAssets.routeName: (context) => const MarginAssets(),
               OtcAssets.routeName: (context) => const OtcAssets(),
+              BuySellCrypto.routeName: (context) => const BuySellCrypto(),
+              TakeLoan.routeName: (context) => const TakeLoan(),
             },
           );
         },
       ),
     );
+  }
+}
+
+class NoTransitionsBuilder extends PageTransitionsBuilder {
+  const NoTransitionsBuilder();
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T>? route,
+    BuildContext? context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget? child,
+  ) {
+    // only return the child without warping it with animations
+    return child!;
   }
 }

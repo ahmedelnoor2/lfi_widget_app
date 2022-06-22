@@ -27,6 +27,8 @@ class _OrderBookState extends State<OrderBook> {
 
   @override
   Widget build(BuildContext context) {
+    width = MediaQuery.of(context).size.width;
+
     var public = Provider.of<Public>(context, listen: true);
 
     List? rasks = widget.asks!.isNotEmpty ? widget.asks!.sublist(0, 6) : [];
@@ -64,7 +66,7 @@ class _OrderBookState extends State<OrderBook> {
                   '(${public.activeMarket['showName'].split('/')[1]})',
                   style: TextStyle(
                     color: secondaryTextColor,
-                    fontSize: 12,
+                    fontSize: 10,
                   ),
                 ),
               ],
@@ -82,7 +84,7 @@ class _OrderBookState extends State<OrderBook> {
                   '(${public.activeMarket['showName'].split('/')[0]})',
                   style: TextStyle(
                     color: secondaryTextColor,
-                    fontSize: 12,
+                    fontSize: 10,
                   ),
                 ),
               ],
@@ -95,7 +97,7 @@ class _OrderBookState extends State<OrderBook> {
           padding: EdgeInsets.zero,
           itemCount: asks.length,
           itemBuilder: (BuildContext context, int index) {
-            return GestureDetector(
+            return InkWell(
               onTap: () {
                 setPriceField(public, asks[index][0]);
               },
@@ -103,8 +105,8 @@ class _OrderBookState extends State<OrderBook> {
                 children: <Widget>[
                   Container(
                     padding: const EdgeInsets.only(
-                      top: 2,
-                      bottom: 2,
+                      top: 1,
+                      bottom: 1,
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -112,7 +114,10 @@ class _OrderBookState extends State<OrderBook> {
                         Text(
                           double.parse('${asks[index][0]}')
                               .toStringAsPrecision(7),
-                          style: TextStyle(color: errorColor),
+                          style: TextStyle(
+                            color: redIndicator,
+                            fontSize: 15,
+                          ),
                         ),
                         Text(
                           double.parse('${asks[index][1]}') > 10
@@ -120,6 +125,7 @@ class _OrderBookState extends State<OrderBook> {
                                   .toStringAsFixed(2)
                               : double.parse('${asks[index][1]}')
                                   .toStringAsPrecision(4),
+                          style: TextStyle(fontSize: 15),
                         ),
                       ],
                     ),
@@ -132,7 +138,7 @@ class _OrderBookState extends State<OrderBook> {
                                   double.parse('$askMax')) *
                               2) *
                           100,
-                      height: 23,
+                      height: 21,
                     ),
                   ),
                 ],
@@ -146,12 +152,12 @@ class _OrderBookState extends State<OrderBook> {
             Text(
               double.parse('${widget.lastPrice}').toStringAsPrecision(7),
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 16,
               ),
             ),
             Text(
               '≈ ${getNumberFormat(context, double.parse(widget.lastPrice ?? '0'))}',
-              style: TextStyle(fontSize: 14, color: secondaryTextColor),
+              style: TextStyle(fontSize: 12, color: secondaryTextColor),
             ),
           ],
         ),
@@ -161,7 +167,7 @@ class _OrderBookState extends State<OrderBook> {
           padding: EdgeInsets.zero,
           itemCount: bids.length,
           itemBuilder: (BuildContext context, int index) {
-            return GestureDetector(
+            return InkWell(
               onTap: () {
                 setPriceField(public, bids[index][0]);
               },
@@ -169,8 +175,8 @@ class _OrderBookState extends State<OrderBook> {
                 children: <Widget>[
                   Container(
                     padding: const EdgeInsets.only(
-                      top: 2,
-                      bottom: 2,
+                      top: 1,
+                      bottom: 1,
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -178,7 +184,10 @@ class _OrderBookState extends State<OrderBook> {
                         Text(
                           double.parse('${bids[index][0]}')
                               .toStringAsPrecision(7),
-                          style: TextStyle(color: greenlightchartColor),
+                          style: TextStyle(
+                            color: greenIndicator,
+                            fontSize: 15,
+                          ),
                         ),
                         Text(
                           double.parse('${bids[index][1]}') > 10
@@ -186,6 +195,7 @@ class _OrderBookState extends State<OrderBook> {
                                   .toStringAsFixed(2)
                               : double.parse('${bids[index][1]}')
                                   .toStringAsPrecision(4),
+                          style: TextStyle(fontSize: 15),
                         ),
                       ],
                     ),
@@ -198,7 +208,7 @@ class _OrderBookState extends State<OrderBook> {
                                   double.parse('$bidMax')) *
                               2) *
                           100,
-                      height: 23,
+                      height: 21,
                     ),
                   ),
                 ],
@@ -216,23 +226,25 @@ class _OrderBookState extends State<OrderBook> {
                   print('Select preceision');
                 },
                 child: Container(
-                  width: width * 0.34,
-                  padding: EdgeInsets.all(3),
+                  width: width * 0.31,
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: Color.fromARGB(67, 118, 118, 118),
                     ),
                     color: Color.fromARGB(67, 118, 118, 118),
                     borderRadius: BorderRadius.all(
-                      Radius.circular(5),
+                      Radius.circular(2),
                     ),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        '0.1',
-                        style: TextStyle(fontSize: 15),
+                      Container(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Text(
+                          '0.1',
+                          style: TextStyle(fontSize: 15),
+                        ),
                       ),
                       Icon(
                         Icons.expand_more,
@@ -253,12 +265,13 @@ class _OrderBookState extends State<OrderBook> {
                     ),
                     color: Color.fromARGB(67, 118, 118, 118),
                     borderRadius: BorderRadius.all(
-                      Radius.circular(5),
+                      Radius.circular(2),
                     ),
                   ),
                   child: Icon(
                     Icons.dashboard,
                     color: secondaryTextColor,
+                    size: 19,
                   ),
                 ),
               ),

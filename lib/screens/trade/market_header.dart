@@ -39,11 +39,11 @@ class _MarketHeaderState extends State<MarketHeader> {
               Container(
                 padding: EdgeInsets.only(right: 5),
                 child: Icon(
-                  Icons.sync_alt_rounded,
-                  size: 25,
+                  Icons.sync,
+                  size: 20,
                 ),
               ),
-              GestureDetector(
+              InkWell(
                 onTap: () {
                   widget.scaffoldKey!.currentState.openDrawer();
                 },
@@ -84,11 +84,7 @@ class _MarketHeaderState extends State<MarketHeader> {
                 padding: EdgeInsets.only(left: 10),
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      '/kline_chart',
-                      (route) => false,
-                    );
+                    Navigator.pushNamed(context, '/kline_chart');
                   },
                   child: Icon(
                     Icons.candlestick_chart,

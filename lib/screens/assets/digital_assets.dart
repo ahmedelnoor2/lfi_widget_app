@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/screens/assets/skeleton/assets_skull.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 
@@ -43,7 +45,7 @@ class _DigitalAssetsState extends State<DigitalAssets> {
   Future<void> getDigitalBalance() async {
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
-    await asset.getAccountBalance(auth, "");
+    await asset.getAccountBalance(context, auth, "");
     List _digAssets = [];
     asset.accountBalance['allCoinMap'].forEach((k, v) {
       _digAssets.add({
@@ -86,6 +88,7 @@ class _DigitalAssetsState extends State<DigitalAssets> {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
 
+    var auth = Provider.of<Auth>(context, listen: true);
     var public = Provider.of<Public>(context, listen: true);
     var asset = Provider.of<Asset>(context, listen: true);
 
@@ -125,13 +128,26 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                       ),
                     ],
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      toggleHideBalances();
-                    },
-                    child: _hideBalances
-                        ? Icon(Icons.visibility)
-                        : Icon(Icons.visibility_off),
+                  Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(right: 15),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/transactions');
+                          },
+                          child: Icon(Icons.history),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          toggleHideBalances();
+                        },
+                        child: _hideBalances
+                            ? Icon(Icons.visibility)
+                            : Icon(Icons.visibility_off),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -185,15 +201,17 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                                   Text(
                                     '≈${_hideBalances ? _hideBalanceString : getNumberFormat(
                                         context,
-                                        public.rate[public.activeCurrency[
-                                                        'fiat_symbol']
+                                        public.rate[public.activeCurrency['fiat_symbol']
                                                     .toUpperCase()][asset
                                                             .accountBalance[
                                                         _totalBalanceSymbol] ??
                                                     'BTC'] !=
                                                 null
-                                            ? '${double.parse(asset.totalAccountBalance['totalbalance'] ?? '0') * public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()][_totalBalanceSymbol]}'
-                                            : '0',
+                                            ? double.parse(asset.totalAccountBalance['totalbalance'] ?? '0') *
+                                                public.rate[public
+                                                    .activeCurrency['fiat_symbol']
+                                                    .toUpperCase()][_totalBalanceSymbol]
+                                            : 0,
                                       )}',
                                     style: TextStyle(
                                       color: secondaryTextColor,
@@ -215,22 +233,51 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                               Row(
                                 children: [
                                   Text(
-                                    '\$4.20',
+                                    getNumberFormat(
+                                        context,
+                                        ((double.parse(
+                                                '${(asset.accountBalance['yesterdayProfit'] == '--' || asset.accountBalance['yesterdayProfit'] == null) ? 0.00 : asset.accountBalance['yesterdayProfit']}')) *
+                                            public.rate[public.activeCurrency[
+                                                        'fiat_symbol']
+                                                    .toUpperCase()]
+                                                [_totalBalanceSymbol])),
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      color: greenlightchartColor,
+                                      color: asset.accountBalance.isNotEmpty
+                                          ? asset.accountBalance[
+                                                      'yesterdayProfitRate'] ==
+                                                  '--'
+                                              ? secondaryTextColor
+                                              : double.parse(asset
+                                                              .accountBalance[
+                                                          'yesterdayProfitRate']) >
+                                                      0
+                                                  ? greenIndicator
+                                                  : redIndicator
+                                          : secondaryTextColor,
                                     ),
                                   ),
                                   Text(
-                                    '/0.15%',
+                                    '/${asset.accountBalance.isNotEmpty ? getNumberString(context, double.parse(asset.accountBalance['yesterdayProfitRate'] == '--' ? '0' : asset.accountBalance['yesterdayProfitRate'])) : '0'}%',
                                     style: TextStyle(
-                                      color: greenlightchartColor,
+                                      color: asset.accountBalance.isNotEmpty
+                                          ? asset.accountBalance[
+                                                      'yesterdayProfitRate'] ==
+                                                  '--'
+                                              ? secondaryTextColor
+                                              : double.parse(asset
+                                                              .accountBalance[
+                                                          'yesterdayProfitRate']) >
+                                                      0
+                                                  ? greenIndicator
+                                                  : redIndicator
+                                          : secondaryTextColor,
                                     ),
                                   ),
                                 ],
                               )
                             ],
-                          )
+                          ),
                         ],
                       ),
                     ),
@@ -383,7 +430,7 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                                     Container(
                                       padding: EdgeInsets.only(right: 8),
                                       child: CircleAvatar(
-                                        radius: 12,
+                                        radius: 15,
                                         child: Image.network(
                                           '${public.publicInfoMarket['market']['coinList'][asset['coin']]['icon']}',
                                         ),
@@ -396,13 +443,13 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                                         Text(
                                           '${asset['coin']}',
                                           style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16),
                                         ),
                                         Text(
                                           'LYO Credit',
                                           style: TextStyle(
-                                            fontSize: 11,
+                                            fontSize: 12,
                                             color: secondaryTextColor,
                                           ),
                                         ),
@@ -419,12 +466,13 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                                     '${_hideBalances ? _hideBalanceString : double.parse(asset['values']['normal_balance']).toStringAsFixed(4)}',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
+                                      fontSize: 16,
                                     ),
                                   ),
                                 ),
                               ),
                               SizedBox(
-                                width: width * 0.12,
+                                width: width * 0.13,
                                 child: Align(
                                   alignment: Alignment.centerLeft,
                                   child: Text(
@@ -435,6 +483,7 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                                             .toStringAsFixed(4),
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
+                                      fontSize: 16,
                                     ),
                                   ),
                                 ),
@@ -469,8 +518,13 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                                                                 [asset[
                                                                     'coin']] !=
                                                             null
-                                                        ? '${(double.parse(asset['values']['total_balance'])) * public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()][asset['coin']]}'
-                                                        : '0',
+                                                        ? (double.parse(asset['values']['total_balance'])) *
+                                                            public.rate[public
+                                                                    .activeCurrency[
+                                                                        'fiat_symbol']
+                                                                    .toUpperCase()]
+                                                                [asset['coin']]
+                                                        : 0,
                                                   ),
                                             style: TextStyle(
                                               fontSize: 12,
@@ -494,10 +548,12 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                     width: width * 0.28,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushNamed(
-                          context,
-                          '/deposit_assets',
-                        );
+                        if (auth.userInfo['realAuthType'] == 0) {
+                          snackAlert(context, SnackTypes.warning,
+                              'Deposit limited(Please check KYC status)');
+                        } else {
+                          Navigator.pushNamed(context, '/deposit_assets');
+                        }
                       },
                       child: Text('Deposit'),
                     ),
@@ -517,7 +573,9 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                   SizedBox(
                     width: width * 0.30,
                     child: ElevatedButton(
-                      onPressed: null,
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/transfer_assets');
+                      },
                       child: Text('Transfer'),
                     ),
                   ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-Future<void> showAlert(context, title, message, action) async {
+Future<void> showAlert(context, icon, title, message, action) async {
   return showDialog<void>(
     context: context,
     barrierDismissible: false,
@@ -13,9 +13,7 @@ Future<void> showAlert(context, title, message, action) async {
               children: [
                 Container(
                   padding: const EdgeInsets.only(right: 5),
-                  child: const Icon(
-                    Icons.featured_play_list,
-                  ),
+                  child: icon,
                 ),
                 Text(
                   '$title',

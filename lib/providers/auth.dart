@@ -20,6 +20,7 @@ class Auth with ChangeNotifier {
   bool _googleAuth = false;
 
   Map _userInfo = {};
+  bool _isAuthenticated = false;
 
   String get emailVerificationToken {
     return _emailVerificationToken;
@@ -33,6 +34,10 @@ class Auth with ChangeNotifier {
     return _userInfo;
   }
 
+  bool get isAuthenticated {
+    return _isAuthenticated;
+  }
+
   bool get googleAuth {
     return _googleAuth;
   }
@@ -41,6 +46,7 @@ class Auth with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final String? catchedAuthToken = prefs.getString('authToken');
     authToken = catchedAuthToken ?? '';
+    _isAuthenticated = catchedAuthToken!.isNotEmpty ? true : false;
     _loginVerificationToken = authToken;
     headers['exchange-token'] = authToken;
     await getUserInfo();
@@ -61,17 +67,33 @@ class Auth with ChangeNotifier {
       final responseData = json.decode(response.body);
       if (responseData['code'] == '0') {
         _userInfo = responseData['data'];
+        _isAuthenticated = true;
         notifyListeners();
       } else {
         _userInfo = {};
+        _isAuthenticated = false;
         notifyListeners();
       }
       return '';
     } catch (error) {
       _userInfo = {};
+      _isAuthenticated = false;
       notifyListeners();
       return '';
       // throw error;
+    }
+  }
+
+  Future<void> checkResponseCode(ctx, code) async {
+    print(code);
+    if ('$code' == '10002') {
+      _loginVerificationToken = '';
+      _userInfo = {};
+      _isAuthenticated = false;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('authToken', _loginVerificationToken);
+      notifyListeners();
+      Navigator.pushNamedAndRemoveUntil(ctx, '/', (route) => false);
     }
   }
 
@@ -90,6 +112,7 @@ class Auth with ChangeNotifier {
       if (responseData['code'] == "0") {
         _loginVerificationToken = '';
         _userInfo = {};
+        _isAuthenticated = false;
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('authToken', _loginVerificationToken);
         notifyListeners();
@@ -120,6 +143,7 @@ class Auth with ChangeNotifier {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
+      print(responseData);
       if (responseData['code'] == 0) {
         if (responseData['data']['googleAuth'] == '1') {
           _googleAuth = true;
@@ -130,7 +154,7 @@ class Auth with ChangeNotifier {
         notifyListeners();
         return _loginVerificationToken;
       } else {
-        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
 
       return '';
@@ -165,12 +189,11 @@ class Auth with ChangeNotifier {
         await prefs.setString('authToken', _loginVerificationToken);
         snackAlert(ctx, SnackTypes.success, 'Email is successfully verified.');
       } else {
-        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
 
       return '${responseData['code']}';
     } catch (error) {
-      print(error);
       snackAlert(ctx, SnackTypes.errors, 'Server Error!');
       return '0';
       // throw error;
@@ -246,7 +269,7 @@ class Auth with ChangeNotifier {
         _loginVerificationToken = _emailVerificationToken;
         return _emailVerificationToken;
       } else {
-        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
 
       return '';
@@ -278,7 +301,7 @@ class Auth with ChangeNotifier {
         snackAlert(
             ctx, SnackTypes.success, 'Verification code sent to your email.');
       } else {
-        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
 
       return '';
@@ -407,7 +430,7 @@ class Auth with ChangeNotifier {
         await prefs.setString('authToken', _loginVerificationToken);
         snackAlert(ctx, SnackTypes.success, 'Email is successfully verified.');
       } else {
-        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
 
       return responseData['code'];

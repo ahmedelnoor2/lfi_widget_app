@@ -4,6 +4,7 @@ import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:flutter_aliyun_captcha/flutter_aliyun_captcha.dart';
 
 class Login extends StatefulWidget {
   const Login({
@@ -20,6 +21,8 @@ class Login extends StatefulWidget {
 }
 
 class _Login extends State<Login> {
+  static final AliyunCaptchaController _captchaController =
+      AliyunCaptchaController();
   bool _enableLogin = false;
   final _formLoginKey = GlobalKey<FormState>();
 
@@ -68,7 +71,7 @@ class _Login extends State<Login> {
                 child: const Text(
                   'Sign In',
                   style: TextStyle(
-                    fontSize: 25,
+                    fontSize: 32,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -77,7 +80,10 @@ class _Login extends State<Login> {
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Text(
                   'Sign In to access your account',
-                  style: TextStyle(color: secondaryTextColor),
+                  style: TextStyle(
+                    color: secondaryTextColor,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ],
@@ -142,13 +148,13 @@ class _Login extends State<Login> {
             }
             widget.onCaptchaVerification(value);
           },
+          captchaController: _captchaController,
         ),
         SizedBox(
           width: width * 1,
           child: ElevatedButton(
             onPressed: _enableLogin
                 ? () {
-                    print('Login');
                     if (_formLoginKey.currentState!.validate()) {
                       // If the form is valid, display a snackbar. In the real world,
                       // you'd often call a server or save the information in a database.
@@ -159,7 +165,10 @@ class _Login extends State<Login> {
                       widget.onLogin({
                         'mobileNumber': _mobileNumber.text,
                         'loginPword': _loginPword.text,
-                      });
+                      }, _captchaController);
+                    } else {
+                      _captchaController.refresh({});
+                      _captchaController.reset();
                     }
                   }
                 : null,
@@ -179,6 +188,7 @@ class _Login extends State<Login> {
                 style: TextStyle(
                   color: linkColor,
                   fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
               ),
             ),
