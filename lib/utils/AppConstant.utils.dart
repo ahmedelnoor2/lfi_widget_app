@@ -7,6 +7,7 @@ var futApiUrl = 'futures.lyotrade.com';
 var serviceApi = 'service.lyotrade.com';
 var loanApiUrl = 'api.coinrabbit.io';
 var paymentsApi = 'payments.lyotrade.com';
+var changeNowApi = 'https://content-api.changenow.io';
 
 var exApi = '/fe-ex-api';
 var futExApi = '/fe-co-api';

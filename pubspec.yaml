@@ -53,6 +53,7 @@ dependencies:
   syncfusion_flutter_sliders: ^20.1.59
   webviewx: ^0.2.1
   webview_flutter: ^2.8.0
+  flutter_svg: ^1.0.3
 
 dev_dependencies:
   flutter_test:

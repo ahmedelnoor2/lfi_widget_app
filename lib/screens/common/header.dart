@@ -21,6 +21,14 @@ hiddenAppBar() {
   );
 }
 
+hiddenAppBarWithDefaultHeight() {
+  return AppBar(
+    leading: Container(),
+    backgroundColor: Colors.transparent,
+    shadowColor: Colors.transparent,
+  );
+}
+
 appBar(context, _handleDrawer) {
   var _currentRoute = ModalRoute.of(context)!.settings.name;
 
