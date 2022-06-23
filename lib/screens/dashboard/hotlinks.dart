@@ -100,11 +100,11 @@ class _HotlinksState extends State<Hotlinks> {
           ),
           GestureDetector(
             onTap: () {
-              if (auth.isAuthenticated) {
+              //if (auth.isAuthenticated) {
                 Navigator.pushNamed(context, '/crypto_loan');
-              } else {
-                Navigator.pushNamed(context, '/authentication');
-              }
+             // } else {
+             //   Navigator.pushNamed(context, '/authentication');
+            //  }
             },
             child: Column(
               children: [

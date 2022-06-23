@@ -87,3 +87,11 @@ var darkgreyColor = Color(0xFF6d6d6d); //
 
 // Icon Colors
 var orangeBGColor = Color(0xFFFF9000);
+
+
+//button colour
+
+var buttoncolour=Color(0xFF5E6292);
+var selectboxcolour=Color(0xFF292C51);
+var seconadarytextcolour=Color(0xFF5E6292);
+var selecteditembordercolour=Color(0XFF01FEF5);
