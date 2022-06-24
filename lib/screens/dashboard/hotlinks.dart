@@ -22,7 +22,9 @@ class _HotlinksState extends State<Hotlinks> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              snackAlert(context, SnackTypes.warning, 'Coming Soon...');
+            },
             child: Column(
               children: [
                 Container(
@@ -44,7 +46,9 @@ class _HotlinksState extends State<Hotlinks> {
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              snackAlert(context, SnackTypes.warning, 'Coming Soon...');
+            },
             child: Column(
               children: [
                 Container(

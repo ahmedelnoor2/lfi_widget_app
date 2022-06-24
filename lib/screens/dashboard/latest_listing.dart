@@ -35,67 +35,101 @@ class _LatestListingState extends State<LatestListing> {
               ((double.parse(public.listingSymbol['price']) + 1.22) / 2));
     }
 
-    return Container(
-      padding: EdgeInsets.all(5),
+    return InkWell(
+      onTap: () {
+        public.setActiveMarket(
+            public.publicInfoMarket['market']['market']['USDT']['LYO1/USDT']);
+        Navigator.pushNamed(context, '/kline_chart');
+      },
       child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5),
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment(0.8, 1),
-            colors: <Color>[
-              Color(0xff3F4374),
-              Color(0xff292C51),
-            ],
-            tileMode: TileMode.mirror,
-          ),
-        ),
-        padding: EdgeInsets.all(12),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.only(right: 15),
-                  child: CircleAvatar(
-                    radius: 15,
-                    child: Image.asset('assets/img/lyo.png'),
-                  ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'LYO Credit',
-                      style: TextStyle(
-                        fontSize: 8,
-                        fontWeight: FontWeight.bold,
-                        color: secondaryTextColor,
-                      ),
-                    ),
-                    Text(
-                      'LYO',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    )
-                  ],
-                ),
+        padding: EdgeInsets.all(5),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment(0.8, 1),
+              colors: <Color>[
+                Color(0xff3F4374),
+                Color(0xff292C51),
               ],
+              tileMode: TileMode.mirror,
             ),
-            Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.only(right: 18),
-                  child: Column(
+          ),
+          padding: EdgeInsets.all(12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(right: 15),
+                    child: CircleAvatar(
+                      radius: 15,
+                      child: Image.asset('assets/img/lyo.png'),
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'LYO Credit',
+                        style: TextStyle(
+                          fontSize: 8,
+                          fontWeight: FontWeight.bold,
+                          color: secondaryTextColor,
+                        ),
+                      ),
+                      Text(
+                        'LYO',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(right: 18),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.only(bottom: 2),
+                          child: Text(
+                            'Price (USDT)',
+                            style: TextStyle(
+                              fontSize: 8,
+                              color: secondaryTextColor,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          getNumberString(
+                            context,
+                            public.listingSymbol.isNotEmpty
+                                ? double.parse(public.listingSymbol['price'])
+                                : 0,
+                          ),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Container(
                         padding: EdgeInsets.only(bottom: 2),
                         child: Text(
-                          'Price (USDT)',
+                          'Since Listing (USDT)',
                           style: TextStyle(
                             fontSize: 8,
                             color: secondaryTextColor,
@@ -103,50 +137,23 @@ class _LatestListingState extends State<LatestListing> {
                         ),
                       ),
                       Text(
-                        getNumberString(
-                          context,
-                          public.listingSymbol.isNotEmpty
-                              ? double.parse(public.listingSymbol['price'])
-                              : 0,
-                        ),
+                        public.listingSymbol.isNotEmpty
+                            ? '+${_percentageChange.toStringAsFixed(6)}'
+                            : '0.000000',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
+                          color: public.listingSymbol.isNotEmpty
+                              ? greenIndicator
+                              : Colors.white,
                         ),
                       ),
                     ],
                   ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.only(bottom: 2),
-                      child: Text(
-                        'Since Listing (USDT)',
-                        style: TextStyle(
-                          fontSize: 8,
-                          color: secondaryTextColor,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      public.listingSymbol.isNotEmpty
-                          ? '+${_percentageChange.toStringAsFixed(6)}'
-                          : '0.000000',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: public.listingSymbol.isNotEmpty
-                            ? greenIndicator
-                            : Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            )
-          ],
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
