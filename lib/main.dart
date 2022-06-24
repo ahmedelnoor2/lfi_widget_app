@@ -59,7 +59,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<Trading>(create: (_) => Trading()),
         ChangeNotifierProvider<FutureMarket>(create: (_) => FutureMarket()),
         ChangeNotifierProvider<Staking>(create: (_) => Staking()),
-        ChangeNotifierProvider<LoanProvider>(create: (_) => LoanProvider()),
+        ChangeNotifierProvider<LoanProvider>(create: (_) => LoanProvider(),lazy: true,)
       ],
       child: Consumer<Auth>(
         builder: (context, auth, _) {

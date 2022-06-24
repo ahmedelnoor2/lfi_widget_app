@@ -13,17 +13,26 @@ class LoanProvider with ChangeNotifier {
     'Accept': 'application/json',
   };
 
-  // Currencies
-  List _currencies = [];
+  var issenderenable = false;
+  var isreciverenable = false;
 
-  List get currencies {
-    return _currencies;
+  // Currencies
+  List _sendercurrences = [];
+
+  List get sendercurrences {
+    return _sendercurrences;
+  }
+
+  List _recivercurrencies = [];
+
+  List get recivercurrencies {
+    return _recivercurrencies;
   }
 
   Future<void> getCurrencies() async {
     var url = Uri.https(
       loanApiUrl,
-      '$loanApiVersion/currencies',
+      '$loanApiVersion/assets',
     );
 
     try {
@@ -35,10 +44,68 @@ class LoanProvider with ChangeNotifier {
       final responseData = json.decode(response.body);
 
       if (responseData['result']) {
-        _currencies = responseData['response'];
+        _sendercurrences = responseData['response'];
+        _recivercurrencies = responseData['response'];
+
+        isreciverenable = responseData['response']['is_loan_deposit_enabled'];
+        issenderenable = responseData['response']['is_loan_deposit_enabled'];
+
+        print(responseData['response']['is_loan_receive_enabled']);
+
         return notifyListeners();
       } else {
-        _currencies = [];
+        _sendercurrences = [];
+        _recivercurrencies = [];
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return;
+    }
+  }
+
+////Loan estimates api//
+  ///
+  var _loanestimate;
+
+  get loanestimate {
+    return _loanestimate;
+  }
+
+  var from_code = 'BTC';
+  var from_network = 'BTC';
+  var to_code = 'USDT';
+  var to_network = 'ETH';
+  var amount = 1;
+  var exchange = 'direct';
+  var ltv_percent =0.8;
+
+  Future<void> getloanestimate() async {
+    var url = Uri.https(loanApiUrl, loansApiestimate, {
+      'from_code': 'BTC',
+      'from_network': 'BTC',
+      'to_code': 'USDT',
+      'to_network': 'ETH',
+      'amount': '1',
+      'exchange': 'direct',
+      'ltv_percent':'$ltv_percent'
+    });
+
+    try {
+      final response = await http.get(
+        url,
+        headers: headers,
+      );
+      final responseData = json.decode(response.body);
+
+      if (responseData['result']) {
+        _loanestimate = responseData['response'];
+
+        print(_loanestimate);
+        return notifyListeners();
+      } else {
+        _loanestimate = [];
         return notifyListeners();
       }
     } catch (error) {
