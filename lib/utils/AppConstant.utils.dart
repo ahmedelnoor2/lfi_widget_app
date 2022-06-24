@@ -16,3 +16,7 @@ var loanApiVersion = '/v2';
 
 var incrementApi = '/fe-increment-api';
 var openApiUrl = 'openapi.lyotrade.com';
+
+var dexSwapApi = 'api.changenow.io';
+var dexApiKey =
+    'a4643d07a4ae7c79183e95e53da2fa17c3f2307e901c1b440083b1f0c9a32cc5';

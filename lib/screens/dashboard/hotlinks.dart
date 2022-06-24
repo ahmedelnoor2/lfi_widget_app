@@ -140,7 +140,7 @@ class _HotlinksState extends State<Hotlinks> {
           ),
           GestureDetector(
             onTap: () {
-              snackAlert(context, SnackTypes.warning, 'Coming Soon...');
+              Navigator.pushNamed(context, '/dex_swap');
             },
             child: Column(
               children: [
