@@ -5,7 +5,12 @@ import 'package:lyotrade/screens/common/types.dart';
 import 'package:provider/provider.dart';
 
 class Hotlinks extends StatefulWidget {
-  const Hotlinks({Key? key}) : super(key: key);
+  const Hotlinks({
+    Key? key,
+    required this.channel,
+  }) : super(key: key);
+
+  final channel;
 
   @override
   State<Hotlinks> createState() => _HotlinksState();
@@ -76,6 +81,9 @@ class _HotlinksState extends State<Hotlinks> {
                   snackAlert(context, SnackTypes.warning,
                       'Deposit limited(Please check KYC status)');
                 } else {
+                  if (widget.channel != null) {
+                    widget.channel.sink.close();
+                  }
                   Navigator.pushNamed(context, '/deposit_assets');
                 }
               } else {
@@ -118,7 +126,7 @@ class _HotlinksState extends State<Hotlinks> {
                   ),
                   child: Image.asset(
                     'assets/img/bot.png',
-                    width: 28,
+                    width: 27,
                   ),
                 ),
                 Text(
@@ -131,7 +139,9 @@ class _HotlinksState extends State<Hotlinks> {
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              snackAlert(context, SnackTypes.warning, 'Coming Soon...');
+            },
             child: Column(
               children: [
                 Container(
@@ -139,12 +149,12 @@ class _HotlinksState extends State<Hotlinks> {
                     bottom: 2,
                   ),
                   child: Image.asset(
-                    'assets/img/applications.png',
-                    width: 28,
+                    'assets/img/swap.png',
+                    width: 27,
                   ),
                 ),
                 Text(
-                  'More',
+                  'Swap',
                   style: TextStyle(
                     fontSize: 12,
                   ),

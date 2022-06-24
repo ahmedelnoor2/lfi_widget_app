@@ -187,9 +187,9 @@ class _DashboardState extends State<Dashboard> {
               LiveFeed(
                 headerSymbols: public.headerSymbols,
               ),
-              BuyCrypto(),
+              BuyCrypto(channel: _channel),
               LatestListing(),
-              Hotlinks(),
+              Hotlinks(channel: _channel),
               AssetsInfo(
                 headerSymbols: public.headerSymbols,
               ),
