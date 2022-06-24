@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lyotrade/providers/dex_provider.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
@@ -210,6 +212,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                 ? null
                 : () {
                     // processBuy();
+                    snackAlert(context, SnackTypes.warning, 'Coming Soon...');
                   },
             child: Container(
               width: width,

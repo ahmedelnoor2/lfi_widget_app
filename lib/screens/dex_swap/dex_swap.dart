@@ -30,7 +30,6 @@ class _DexSwapState extends State<DexSwap> {
     var dexProvider = Provider.of<DexProvider>(context, listen: false);
 
     await dexProvider.getAllCurrencies(context, auth);
-    print('call');
     await dexProvider.estimateExchangeValue(
         context,
         auth,
