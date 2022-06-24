@@ -45,7 +45,7 @@ class _TakeLoanState extends State<TakeLoan> {
                 Row(
                   children: [
                     Container(
-                      padding: EdgeInsets.only(right: 20),
+                      padding: EdgeInsets.only(right: 10),
                       child: IconButton(
                         onPressed: () {
                           Navigator.pop(context);

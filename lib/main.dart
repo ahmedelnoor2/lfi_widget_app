@@ -21,6 +21,7 @@ import 'package:lyotrade/screens/assets/transfer_assets.dart';
 import 'package:lyotrade/screens/assets/withdraw_assets.dart';
 import 'package:lyotrade/screens/auth/authentication.dart';
 import 'package:lyotrade/screens/buy_sell/buy_sell_crypto.dart';
+import 'package:lyotrade/screens/buy_sell/buy_sell_transactions.dart';
 import 'package:lyotrade/screens/buy_sell/common/process_payment.dart';
 import 'package:lyotrade/screens/dashboard.dart';
 import 'package:lyotrade/screens/future_trade/future_trade.dart';
@@ -232,6 +233,8 @@ class MyApp extends StatelessWidget {
               BuySellCrypto.routeName: (context) => const BuySellCrypto(),
               TakeLoan.routeName: (context) => const TakeLoan(),
               ProcessPayment.routeName: (context) => const ProcessPayment(),
+              BuySellTransactions.routeName: (context) =>
+                  const BuySellTransactions(),
             },
           );
         },

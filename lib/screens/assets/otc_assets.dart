@@ -5,6 +5,7 @@ import 'package:lyotrade/screens/assets/skeleton/assets_skull.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
+import 'package:lyotrade/utils/Coins.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 
 import 'package:lyotrade/providers/public.dart';
@@ -395,7 +396,7 @@ class _OtcAssetsState extends State<OtcAssets> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          '${asset['coinSymbol']}',
+                                          '${getCoinName(asset['coinSymbol'])}',
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16,

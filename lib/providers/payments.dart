@@ -213,6 +213,7 @@ class Payments with ChangeNotifier {
   }
 
   Future<void> createTransaction(ctx, auth, formData) async {
+    _changenowTransaction = {};
     notifyListeners();
     headers['exchange-token'] = auth.loginVerificationToken;
 
@@ -243,6 +244,45 @@ class Payments with ChangeNotifier {
     } catch (error) {
       print(error);
       _estimateLoader = false;
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return notifyListeners();
+    }
+  }
+
+  // Get all transactions
+  List _allTransactions = [];
+
+  List get allTransactions {
+    return _allTransactions;
+  }
+
+  Future<void> getAllTransactions(ctx, auth) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      paymentsApi,
+      '/user_transactions',
+    );
+
+    try {
+      final response = await http.get(url, headers: headers);
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _allTransactions = responseData['data'];
+        return notifyListeners();
+      } else if (responseData['code'] == '4000') {
+        snackAlert(ctx, SnackTypes.errors, responseData['msg']['message']);
+      } else if (responseData['code'] == '10002') {
+        snackAlert(
+            ctx, SnackTypes.warning, 'Session Expired, Please login back');
+      } else {
+        _allTransactions = [];
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
       // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
       return notifyListeners();
     }

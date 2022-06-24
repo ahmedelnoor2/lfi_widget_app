@@ -4,6 +4,7 @@ import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/screens/assets/skeleton/assets_skull.dart';
 import 'package:lyotrade/screens/common/alert.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
+import 'package:lyotrade/utils/Coins.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 
 import 'package:lyotrade/providers/public.dart';
@@ -420,7 +421,7 @@ class _MarginAssetsState extends State<MarginAssets> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          '${asset['values']['name']}',
+                                          '${getCoinName(asset['values']['name'])}',
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16,

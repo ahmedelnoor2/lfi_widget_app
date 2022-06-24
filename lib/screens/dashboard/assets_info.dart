@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/dashboard/skeleton/dashboard_skull.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
+import 'package:lyotrade/utils/Coins.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 
@@ -134,7 +135,7 @@ class _AssetsInfoState extends State<AssetsInfo>
                                         ),
                                       ),
                                       Text(
-                                        '${item['coin']}',
+                                        '${getCoinName(item['coin'])}',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16,

@@ -12,6 +12,7 @@ import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
+import 'package:lyotrade/utils/Coins.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 
@@ -250,7 +251,7 @@ class _DepositAssetsState extends State<DepositAssets> {
                               Container(
                                 padding: EdgeInsets.only(right: 5),
                                 child: Text(
-                                  '$_defaultCoin',
+                                  '${getCoinName(_defaultCoin)}',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -302,7 +303,7 @@ class _DepositAssetsState extends State<DepositAssets> {
                         ),
                         Container(
                           padding: EdgeInsets.only(right: 5),
-                          child: Text(_defaultCoin),
+                          child: Text(getCoinName(_defaultCoin)),
                         ),
                       ],
                     ),

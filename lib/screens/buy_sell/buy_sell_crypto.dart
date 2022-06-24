@@ -8,8 +8,6 @@ import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/buy_sell/common/crypto_coin_drawer.dart';
 import 'package:lyotrade/screens/buy_sell/common/fiat_coin_drawer.dart';
 import 'package:lyotrade/screens/common/header.dart';
-import 'package:lyotrade/screens/common/snackalert.dart';
-import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
@@ -47,25 +45,93 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
   }
 
   Future<void> getDigitalBalance() async {
+    setState(() {
+      _loadingCoins = true;
+    });
+
     var payments = Provider.of<Payments>(context, listen: false);
     var public = Provider.of<Public>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
-    await asset.getAccountBalance(context, auth, "");
+
     if (public.publicInfoMarket['market']['followCoinList']
             [payments.selectedCryptoCurrency['current_ticker'].toUpperCase()] !=
         null) {
       public.publicInfoMarket['market']['followCoinList']
               [payments.selectedCryptoCurrency['current_ticker'].toUpperCase()]
-          .forEach((k, v) {
-        if (payments.selectedCryptoCurrency['network'].toUpperCase() ==
-            v['tokenBase']) {
-          setState(() {
-            _defaultNetwork = '${v['name']}';
-          });
+          .forEach((key, _network) {
+        if (_network['tokenBase'] ==
+            payments.selectedCryptoCurrency['network'].toUpperCase()) {
+          _defaultNetwork = _network['showName'];
         }
       });
+    } else {
+      if (public.publicInfoMarket['market']['coinList'][payments
+              .selectedCryptoCurrency['current_ticker']
+              .toUpperCase()]['tokenBase'] ==
+          payments.selectedCryptoCurrency['network'].toUpperCase()) {
+        _defaultNetwork = public.publicInfoMarket['market']['coinList'][
+                payments.selectedCryptoCurrency['current_ticker'].toUpperCase()]
+            ['showName'];
+      }
+
+      if (payments.selectedCryptoCurrency['current_ticker'] == 'sol') {
+        if ('${public.publicInfoMarket['market']['coinList']['${payments.selectedCryptoCurrency['current_ticker'].toUpperCase()}1']['tokenBase']}' ==
+            '${payments.selectedCryptoCurrency['network'].toUpperCase()}1') {
+          _defaultNetwork =
+              '${public.publicInfoMarket['market']['coinList']['${payments.selectedCryptoCurrency['current_ticker'].toUpperCase()}1']['showName']}';
+        }
+      }
     }
+
+    print(_defaultNetwork);
+
+    // Map _availableCoinLists = {};
+    // if (asset.accountBalance.isNotEmpty) {
+    //   asset.accountBalance['allCoinMap'].forEach((key, value) {
+    //     if (value['depositOpen'] == 1) {
+    //       if (public.publicInfoMarket['market']['followCoinList'][
+    //               public.publicInfoMarket['market']['coinList'][key]['name']] !=
+    //           null) {
+    //         public.publicInfoMarket['market']['followCoinList']
+    //                 [public.publicInfoMarket['market']['coinList'][key]['name']]
+    //             .forEach((networkKey, network) {
+    //           _availableCoinLists[networkKey] = {
+    //             "coin": key,
+    //             "mainChainName": network['mainChainName'],
+    //             "network": network['name']
+    //           };
+    //         });
+    //       } else {
+    //         _availableCoinLists[public.publicInfoMarket['market']['coinList']
+    //             [key]['name']] = {
+    //           "coin": key,
+    //           "mainChainName": public.publicInfoMarket['market']['coinList']
+    //               [key]['mainChainName'],
+    //           "network": public.publicInfoMarket['market']['coinList'][key]
+    //               ['name']
+    //         };
+    //       }
+    //     }
+    //   });
+    // }
+
+    // print(_availableCoinLists.length);
+
+    // if (public.publicInfoMarket['market']['followCoinList']
+    //         [payments.selectedCryptoCurrency['current_ticker'].toUpperCase()] !=
+    //     null) {
+    //   public.publicInfoMarket['market']['followCoinList']
+    //           [payments.selectedCryptoCurrency['current_ticker'].toUpperCase()]
+    //       .forEach((k, v) {
+    //     if (payments.selectedCryptoCurrency['network'].toUpperCase() ==
+    //         v['tokenBase']) {
+    //       setState(() {
+    //         _defaultNetwork = '${v['name']}';
+    //       });
+    //     }
+    //   });
+    // }
 
     if (_defaultNetwork.isNotEmpty) {
       await asset.getChangeAddress(context, auth, _defaultNetwork);
@@ -75,6 +141,10 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
         });
       }
     }
+
+    setState(() {
+      _loadingCoins = false;
+    });
   }
 
   Future<void> estimateCrypto(payments) async {
@@ -114,6 +184,9 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
   }
 
   Future<void> processBuy() async {
+    setState(() {
+      _loadingCoins = true;
+    });
     var auth = Provider.of<Auth>(context, listen: false);
     var payments = Provider.of<Payments>(context, listen: false);
 
@@ -128,6 +201,9 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
       'payout_type': 'CRYPTO_THROUGH_CN',
     });
 
+    setState(() {
+      _loadingCoins = false;
+    });
     if (payments.changenowTransaction.isNotEmpty) {
       if (payments.changenowTransaction['redirect_url'] != null) {
         Navigator.pushNamed(context, '/process_payment');
@@ -177,7 +253,9 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                       ],
                     ),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/buy_sell_transactions');
+                      },
                       icon: Icon(Icons.history),
                     )
                   ],
@@ -254,6 +332,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                         builder: (BuildContext context,
                                             StateSetter setState) {
                                           return Scaffold(
+                                            resizeToAvoidBottomInset: false,
                                             appBar:
                                                 hiddenAppBarWithDefaultHeight(),
                                             body: selectFiatCoin(
@@ -312,9 +391,15 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                   ),
                                 ),
                                 payments.estimateLoader
-                                    ? const CircularProgressIndicator.adaptive()
+                                    ? SizedBox(
+                                        child:
+                                            CircularProgressIndicator.adaptive(
+                                                strokeWidth: 2),
+                                        height: 25,
+                                        width: 25,
+                                      )
                                     : Text(
-                                        '${payments.estimateRate.isNotEmpty ? payments.estimateRate['value'] : 0.00}',
+                                        '${payments.estimateRate.isNotEmpty ? double.parse(payments.estimateRate['value']).toStringAsFixed(4) : 0.00}',
                                         style: TextStyle(fontSize: 22),
                                       ),
                               ],
@@ -331,6 +416,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                         builder: (BuildContext context,
                                             StateSetter setState) {
                                           return Scaffold(
+                                            resizeToAvoidBottomInset: false,
                                             appBar:
                                                 hiddenAppBarWithDefaultHeight(),
                                             body: selectCryptoCoin(
@@ -399,9 +485,11 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
               ],
             ),
             InkWell(
-              onTap: () {
-                processBuy();
-              },
+              onTap: _loadingCoins
+                  ? null
+                  : () {
+                      processBuy();
+                    },
               child: Container(
                 width: width,
                 padding: EdgeInsets.only(
@@ -414,7 +502,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                   padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     // color: Color(0xff5E6292),
-                    color: payments.estimateLoader
+                    color: (_loadingCoins || payments.estimateLoader)
                         ? Color(0xff292C51)
                         : Color(0xff5E6292),
                     borderRadius: BorderRadius.circular(5),
@@ -422,22 +510,29 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                       // style: BorderStyle.solid,
                       width: 0,
                       // color: Color(0xff5E6292),
-                      color: payments.estimateLoader
+                      color: _loadingCoins
                           ? Colors.transparent
                           : Color(0xff5E6292),
                     ),
                   ),
                   child: Align(
                     alignment: Alignment.center,
-                    child: Text(
-                      'Buy',
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: payments.estimateLoader
-                            ? secondaryTextColor
-                            : Colors.white,
-                      ),
-                    ),
+                    child: (_loadingCoins || payments.estimateLoader)
+                        ? SizedBox(
+                            child: CircularProgressIndicator.adaptive(
+                                strokeWidth: 2),
+                            height: 25,
+                            width: 25,
+                          )
+                        : Text(
+                            'Buy',
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: (_loadingCoins || payments.estimateLoader)
+                                  ? secondaryTextColor
+                                  : Colors.white,
+                            ),
+                          ),
                   ),
                 ),
               ),

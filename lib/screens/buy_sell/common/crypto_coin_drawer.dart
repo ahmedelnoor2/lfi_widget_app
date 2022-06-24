@@ -131,7 +131,7 @@ class _CryptoCoinDrawerState extends State<CryptoCoinDrawer> {
           ),
           Divider(),
           SizedBox(
-            height: height * 0.72,
+            height: height * 0.7,
             child: ListView.builder(
               // shrinkWrap: true,
               itemCount: payments.cryptoSearchCurrencies.isNotEmpty
@@ -139,7 +139,6 @@ class _CryptoCoinDrawerState extends State<CryptoCoinDrawer> {
                   : payments.cryptoCurrencies.length,
               itemBuilder: (context, index) {
                 var _cryptoCurrency = payments.cryptoSearchCurrencies[index];
-
                 return Column(
                   children: [
                     ListTile(

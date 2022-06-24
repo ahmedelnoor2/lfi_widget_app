@@ -125,7 +125,7 @@ class _FiatCoinDrawerState extends State<FiatCoinDrawer> {
           ),
           Divider(),
           SizedBox(
-            height: height * 0.72,
+            height: height * 0.716,
             child: ListView.builder(
               // shrinkWrap: true,
               itemCount: payments.fiatSearchCurrencies.isNotEmpty
