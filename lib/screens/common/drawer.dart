@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lyotrade/utils/Coins.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 
 Widget drawer(
@@ -10,7 +11,6 @@ Widget drawer(
   searchController,
   getCoinCosts,
 ) {
-  print(asset.allDigAsset);
   return Container(
     decoration: BoxDecoration(
       color: Colors.grey[850],
@@ -92,7 +92,7 @@ Widget drawer(
                     '${public.publicInfoMarket['market']['coinList'][_asset['coin']]['icon']}',
                   ),
                 ),
-                title: Text('${_asset['coin']}'),
+                title: Text(getCoinName(_asset['coin'])),
                 trailing: Text('${_asset['values']['total_balance']}'),
               );
             },

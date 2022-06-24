@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/dashboard/skeleton/dashboard_skull.dart';
+import 'package:lyotrade/screens/market/market.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
+import 'package:lyotrade/utils/Coins.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 
@@ -109,90 +111,107 @@ class _AssetsInfoState extends State<AssetsInfo>
                     ),
                   ),
                   Column(
-                    children: widget.headerSymbols
-                        .map(
-                          (item) => Container(
-                            padding: EdgeInsets.only(
-                              bottom: width * 0.005,
-                              top: width * 0.01,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                SizedBox(
-                                  width: width * 0.25,
+                    children: widget.headerSymbols.map(
+                      (item) {
+                        return item['coin'] == 'LYO1'
+                            ? Container()
+                            : InkWell(
+                                onTap: () {
+                                  public.setActiveMarket(public
+                                              .publicInfoMarket['market']
+                                          ['market']['USDT']
+                                      ['${getCoinName(item['coin'])}/USDT']);
+                                  Navigator.pushNamed(context, '/kline_chart');
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.only(
+                                    bottom: width * 0.005,
+                                    top: width * 0.01,
+                                  ),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Container(
-                                        padding: EdgeInsets.only(right: 10),
-                                        child: CircleAvatar(
-                                          radius: 14,
-                                          child: Image.network(
-                                            '${public.publicInfoMarket['market']['coinList'][item['coin']]['icon']}',
+                                      SizedBox(
+                                        width: width * 0.25,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              padding:
+                                                  EdgeInsets.only(right: 10),
+                                              child: CircleAvatar(
+                                                radius: 14,
+                                                child: Image.network(
+                                                  '${public.publicInfoMarket['market']['coinList'][item['coin']]['icon']}',
+                                                ),
+                                              ),
+                                            ),
+                                            Text(
+                                              getCoinName(item['coin']),
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: height * 0.04,
+                                        width: width * 0.22,
+                                        child: Align(
+                                          alignment: Alignment.centerRight,
+                                          child: Text(
+                                            double.parse(item['price'])
+                                                .toStringAsPrecision(6),
+                                            style: TextStyle(fontSize: 15),
                                           ),
                                         ),
                                       ),
-                                      Text(
-                                        '${item['coin']}',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: height * 0.04,
-                                  width: width * 0.22,
-                                  child: Align(
-                                    alignment: Alignment.centerRight,
-                                    child: Text(
-                                      double.parse(item['price'])
-                                          .toStringAsPrecision(6),
-                                      style: TextStyle(fontSize: 15),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  // height: height * 0.04,
-                                  width: width * 0.2,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
                                       SizedBox(
-                                        height: height * 0.045,
+                                        // height: height * 0.04,
                                         width: width * 0.2,
-                                        child: Card(
-                                          shadowColor: Colors.transparent,
-                                          color:
-                                              double.parse(item['change']) > 0
-                                                  ? greenPercentageIndicator
-                                                  : redPercentageIndicator,
-                                          child: Center(
-                                            child: Text(
-                                              '${double.parse(item['change']) > 0 ? '+' : ''}${double.parse(item['change']).toStringAsFixed(2)}%',
-                                              style: TextStyle(
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          children: [
+                                            SizedBox(
+                                              height: height * 0.045,
+                                              width: width * 0.2,
+                                              child: Card(
+                                                shadowColor: Colors.transparent,
                                                 color: double.parse(
                                                             item['change']) >
                                                         0
-                                                    ? greenlightchartColor
-                                                    : errorColor,
+                                                    ? greenPercentageIndicator
+                                                    : redPercentageIndicator,
+                                                child: Center(
+                                                  child: Text(
+                                                    '${double.parse(item['change']) > 0 ? '+' : ''}${double.parse(item['change']).toStringAsFixed(2)}%',
+                                                    style: TextStyle(
+                                                      color: double.parse(item[
+                                                                  'change']) >
+                                                              0
+                                                          ? greenlightchartColor
+                                                          : errorColor,
+                                                    ),
+                                                  ),
+                                                ),
                                               ),
                                             ),
-                                          ),
+                                          ],
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                        )
-                        .toList(),
+                              );
+                      },
+                    ).toList(),
                   ),
                 ],
               ),

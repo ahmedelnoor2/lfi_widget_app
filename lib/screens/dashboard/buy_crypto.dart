@@ -7,7 +7,12 @@ import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 
 class BuyCrypto extends StatefulWidget {
-  const BuyCrypto({Key? key}) : super(key: key);
+  const BuyCrypto({
+    Key? key,
+    required this.channel,
+  }) : super(key: key);
+
+  final channel;
 
   @override
   State<BuyCrypto> createState() => _BuyCryptoState();
@@ -27,7 +32,12 @@ class _BuyCryptoState extends State<BuyCrypto> {
         InkWell(
           onTap: () {
             if (auth.isAuthenticated) {
-              Navigator.pushNamed(context, '/buy_sell_crypto');
+              if (auth.userInfo['realAuthType'] == 0) {
+                snackAlert(context, SnackTypes.warning,
+                    'Deposit limited(Please check KYC status)');
+              } else {
+                Navigator.pushNamed(context, '/buy_sell_crypto');
+              }
             } else {
               Navigator.pushNamed(context, '/authentication');
             }
@@ -76,6 +86,9 @@ class _BuyCryptoState extends State<BuyCrypto> {
                 snackAlert(context, SnackTypes.warning,
                     'Deposit limited(Please check KYC status)');
               } else {
+                if (widget.channel != null) {
+                  widget.channel.sink.close();
+                }
                 Navigator.pushNamed(context, '/deposit_assets');
               }
             } else {

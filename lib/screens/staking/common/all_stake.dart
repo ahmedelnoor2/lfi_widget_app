@@ -20,7 +20,7 @@ class _AllStakeState extends State<AllStake> {
   final _formStakeKey = GlobalKey<FormState>();
   final TextEditingController _amountController = TextEditingController();
 
-  String _filterType = 'All';
+  String _filterType = 'Processing';
   bool _isAgree = false;
   String _activeStakeId = '';
 
