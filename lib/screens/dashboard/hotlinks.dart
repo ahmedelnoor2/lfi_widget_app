@@ -140,7 +140,19 @@ class _HotlinksState extends State<Hotlinks> {
           ),
           GestureDetector(
             onTap: () {
-              snackAlert(context, SnackTypes.warning, 'Coming Soon...');
+              if (auth.isAuthenticated) {
+                if (auth.userInfo['realAuthType'] == 0) {
+                  snackAlert(context, SnackTypes.warning,
+                      'Deposit limited(Please check KYC status)');
+                } else {
+                  if (widget.channel != null) {
+                    widget.channel.sink.close();
+                  }
+                  Navigator.pushNamed(context, '/dex_swap');
+                }
+              } else {
+                Navigator.pushNamed(context, '/authentication');
+              }
             },
             child: Column(
               children: [

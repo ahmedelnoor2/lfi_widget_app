@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/dex_provider.dart';
 import 'package:lyotrade/providers/future_market.dart';
 import 'package:lyotrade/providers/loan_provider.dart';
 import 'package:lyotrade/providers/payments.dart';
@@ -24,6 +25,7 @@ import 'package:lyotrade/screens/buy_sell/buy_sell_crypto.dart';
 import 'package:lyotrade/screens/buy_sell/buy_sell_transactions.dart';
 import 'package:lyotrade/screens/buy_sell/common/process_payment.dart';
 import 'package:lyotrade/screens/dashboard.dart';
+import 'package:lyotrade/screens/dex_swap/dex_swap.dart';
 import 'package:lyotrade/screens/future_trade/future_trade.dart';
 import 'package:lyotrade/screens/market/market.dart';
 import 'package:lyotrade/screens/security/email_change.dart';
@@ -64,6 +66,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<Staking>(create: (_) => Staking()),
         ChangeNotifierProvider<LoanProvider>(create: (_) => LoanProvider()),
         ChangeNotifierProvider<Payments>(create: (_) => Payments()),
+        ChangeNotifierProvider<DexProvider>(create: (_) => DexProvider()),
       ],
       child: Consumer<Auth>(
         builder: (context, auth, _) {
@@ -235,6 +238,7 @@ class MyApp extends StatelessWidget {
               ProcessPayment.routeName: (context) => const ProcessPayment(),
               BuySellTransactions.routeName: (context) =>
                   const BuySellTransactions(),
+              DexSwap.routeName: (context) => const DexSwap(),
             },
           );
         },

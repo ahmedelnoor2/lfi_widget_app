@@ -457,7 +457,7 @@ class _TransferAssetsState extends State<TransferAssets> {
                       ),
                     ),
                   ),
-                  GestureDetector(
+                  InkWell(
                     onTap: () {
                       _selectedToAccount == 'Margin Account'
                           ? showModalBottomSheet<void>(
