@@ -13,6 +13,10 @@ class LoanProvider with ChangeNotifier {
     'Accept': 'application/json',
   };
 
+  Map<String, String> headers1 = {
+    'Content-Type': 'application/x-www-form-urlencoded'
+  };
+
   var issenderenable = false;
   var isreciverenable = false;
 
@@ -79,7 +83,7 @@ class LoanProvider with ChangeNotifier {
   var to_network = 'ETH';
   var amount = 1;
   var exchange = 'direct';
-  var ltv_percent =0.8;
+  var ltv_percent = 0.8;
 
   Future<void> getloanestimate() async {
     var url = Uri.https(loanApiUrl, loansApiestimate, {
@@ -89,7 +93,7 @@ class LoanProvider with ChangeNotifier {
       'to_network': 'ETH',
       'amount': '1',
       'exchange': 'direct',
-      'ltv_percent':'$ltv_percent'
+      'ltv_percent': '$ltv_percent'
     });
 
     try {
@@ -103,6 +107,44 @@ class LoanProvider with ChangeNotifier {
         _loanestimate = responseData['response'];
 
         print(_loanestimate);
+        return notifyListeners();
+      } else {
+        _loanestimate = [];
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return;
+    }
+  }
+
+  ///create loan api
+  var _createloan;
+
+  get createloan {
+    return _createloan;
+  }
+
+  bool result = false;
+
+  Future<void> getCreateLoan() async {
+    var url = Uri.https(
+      loanApiUrl,
+      '$loanApiVersion/create_loan',
+    );
+    String myJSON =
+        '{"deposit":{"currency_code":"BTC","currency_network":"BTC","expected_amount":"1"},"loan":{"currency_code":"USDT","currency_network":"ETH"},"ltv_percent":"0.8", "referral":"" }';
+    var data = jsonEncode(myJSON);
+    try {
+      final response =
+          await http.post(url, body: {'parameters': data}, headers: headers1);
+      final responseData = json.decode(response.body);
+      if (responseData['result']) {
+        result = responseData['result'];
+        print(result);
+        _createloan = responseData['response'];
+
         return notifyListeners();
       } else {
         _loanestimate = [];

@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lyotrade/providers/loan_provider.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
@@ -20,36 +21,49 @@ class TakeLoan extends StatefulWidget {
 class _TakeLoanState extends State<TakeLoan> {
   var _selected;
   var _currselected;
-  final List<Map> _myJson = [
-    {"id": '1', "image": "assets/img/currency.png", "name": "Lyo"},
-    {"id": '2', "image": "assets/img/currency.png", "name": "USD"},
-  ];
 
-  final List<Map> _myJsonlist = [
-    {"id": '1', "detail": "Unlimited", "name": "Long Term"},
-    {"id": '2', "detail": "140.01 USDT", "name": "Monthly Interest"},
-    {"id": '3', "detail": "11627.56 BTC/USDT", "name": "Liquidation Price"},
-  ];
+  var collatralintailvalue = 1;
+  // final List<Map> _myJson = [
+  //   {"id": '1', "image": "assets/img/currency.png", "name": "Lyo"},
+  //   {"id": '2', "image": "assets/img/currency.png", "name": "USD"},
+  // ];
+
+  // final List<Map> _myJsonlist = [
+  //   {"id": '1', "detail": "Unlimited", "name": "Long Term"},
+  //   {"id": '2', "detail": "140.01 USDT", "name": "Monthly Interest"},
+  //   {"id": '3', "detail": "11627.56 BTC/USDT", "name": "Liquidation Price"},
+  // ];
   List<dynamic> percentageList = [0.5, 0.7, 0.8];
 
   int _itemPosition = 0;
   @override
   void initState() {
     getCurrencies();
-
+    getloanestimate();
     super.initState();
   }
 
   Future<void> getCurrencies() async {
     var loanProvider = Provider.of<LoanProvider>(context, listen: false);
     await loanProvider.getCurrencies();
+  }
+
+  Future<void> getloanestimate() async {
+    var loanProvider = Provider.of<LoanProvider>(context, listen: false);
     await loanProvider.getloanestimate();
+  }
+
+  Future<void> getCreateLoan() async {
+    var loanProvider = Provider.of<LoanProvider>(context, listen: false);
+    await loanProvider.getCreateLoan();
   }
 
   @override
   Widget build(BuildContext context) {
     var loanProvider = Provider.of<LoanProvider>(context, listen: false);
     print(loanProvider.getloanestimate());
+
+   
     return Scaffold(
       appBar: hiddenAppBar(),
       body: Container(
@@ -130,69 +144,83 @@ class _TakeLoanState extends State<TakeLoan> {
                   SizedBox(
                     height: 10,
                   ),
-                  Center(
-                      child: Container(
-                    padding: EdgeInsets.all(15),
+                  Container(
                     decoration: BoxDecoration(
-                        border: Border.all(width: 1, color: Colors.grey),
-                        borderRadius: BorderRadius.circular(5)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Expanded(
-                          child: FutureBuilder(
-                              future: getCurrencies(),
-                              builder: (context, snapshot) {
-                                return DropdownButtonHideUnderline(
-                                    child: ButtonTheme(
-                                  alignedDropdown: true,
-                                  child: DropdownButton<String>(
-                                    dropdownColor: buttoncolour,
-                                    alignment: Alignment.centerRight,
-                                    isDense: true,
-                                    hint: new Text("Select ",
-                                        style:
-                                            TextStyle(color: textFieldBGColor)),
-                                    value: _currselected,
-                                    onChanged: loanProvider.issenderenable
-                                        ? (String? newValue) {
-                                            setState(() {
-                                              _currselected = newValue!;
-                                            });
-                                          }
-                                        : null,
-                                    items:
-                                        loanProvider.sendercurrences.map((map) {
-                                      return new DropdownMenuItem<String>(
-                                        value: map["network"],
-                                        child: Container(
-                                          // margin: EdgeInsets.only(left: 200),
-                                          child: Row(
-                                            children: <Widget>[
-                                              Image.asset(
-                                                'assets/img/currency.png',
-                                                width: 25,
-                                              ),
-                                              SizedBox(
-                                                width: 10,
-                                              ),
-                                              Container(
-                                                child: Text(map["network"],
-                                                    style: TextStyle(
-                                                        color: whiteTextColor)),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    }).toList(),
-                                  ),
-                                ));
-                              }),
-                        ),
-                      ],
+                      border: Border.all(
+                        color: Colors.grey,
+                      ),
+                      borderRadius: BorderRadius.circular(5),
                     ),
-                  )),
+                    child: ListTile(
+                      title: Row(
+                        children: <Widget>[
+                          Expanded(
+                              child: TextFormField(
+                                
+                            initialValue: collatralintailvalue.toString(),
+                            decoration: new InputDecoration(
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              errorBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.only(
+                                  left: 15, bottom: 11, top: 11, right: 15),
+                            ),
+                          )),
+                          Expanded(
+                            child: FutureBuilder(
+                                future: getCurrencies(),
+                                builder: (context, snapshot) {
+                                  return DropdownButtonHideUnderline(
+                                    child: DropdownButton<String>(
+                                      dropdownColor: buttoncolour,
+                                      alignment: Alignment.centerRight,
+                                      hint: new Text("Select ",
+                                          style: TextStyle(
+                                              color: textFieldBGColor)),
+                                      value: _currselected,
+                                      onChanged: loanProvider.issenderenable
+                                          ? (String? newValue) {
+                                              setState(() {
+                                                _currselected = newValue!;
+                                              });
+                                            }
+                                          : null,
+                                      items: loanProvider.sendercurrences
+                                          .map((map) {
+                                        return new DropdownMenuItem<String>(
+                                          value: map["network"],
+                                          child: Container(
+                                            // margin: EdgeInsets.only(left: 200),
+                                            child: Row(
+                                              children: <Widget>[
+                                                Image.asset(
+                                                  'assets/img/currency.png',
+                                                  width: 25,
+                                                ),
+                                                SizedBox(
+                                                  width: 10,
+                                                ),
+                                                Container(
+                                                  child: Text(map["network"],
+                                                      style: TextStyle(
+                                                          color:
+                                                              whiteTextColor)),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  );
+                                }),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
                   SizedBox(
                     height: 10,
                   ),
@@ -217,71 +245,83 @@ class _TakeLoanState extends State<TakeLoan> {
                   SizedBox(
                     height: 10,
                   ),
-                  Center(
-                      child: Container(
-                    padding: EdgeInsets.all(15),
+                  Container(
                     decoration: BoxDecoration(
-                        border: Border.all(width: 1, color: Colors.grey),
-                        borderRadius: BorderRadius.circular(5)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Expanded(
-                          child: FutureBuilder(
-                              future: getCurrencies(),
-                              builder: (context, snapshot) {
-                                return DropdownButtonHideUnderline(
-                                    child: ButtonTheme(
-                                  alignedDropdown: true,
-                                  child: DropdownButton<String>(
-                                    dropdownColor: buttoncolour,
-                                    alignment: Alignment.centerRight,
-                                    isDense: true,
-                                    hint: new Text("Select ",
-                                        style:
-                                            TextStyle(color: textFieldBGColor)),
-                                    value: _selected,
-                                    onChanged: loanProvider.isreciverenable
-                                        ? (String? newValue) {
-                                            setState(() {
-                                              _selected = newValue!;
-                                            });
-
-                                            // print(_selected);
-                                          }
-                                        : null,
-                                    items: loanProvider.recivercurrencies
-                                        .map((map) {
-                                      return new DropdownMenuItem<String>(
-                                        value: map["network"],
-                                        child: Container(
-                                          // margin: EdgeInsets.only(left: 200),
-                                          child: Row(
-                                            children: <Widget>[
-                                              Image.asset(
-                                                'assets/img/currency.png',
-                                                width: 25,
-                                              ),
-                                              SizedBox(
-                                                width: 10,
-                                              ),
-                                              Container(
-                                                child: Text(map["network"],
-                                                    style: TextStyle(
-                                                        color: whiteTextColor)),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    }).toList(),
-                                  ),
-                                ));
-                              }),
-                        ),
-                      ],
+                      border: Border.all(
+                        color: Colors.grey,
+                      ),
+                      borderRadius: BorderRadius.circular(5),
                     ),
-                  )),
+                    child: ListTile(
+                      title: Row(
+                        children: <Widget>[
+                          Expanded(
+                              child: TextFormField(
+                              
+                            initialValue: '1223.3',
+                            decoration: new InputDecoration(
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              errorBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.only(
+                                  left: 15, bottom: 11, top: 11, right: 15),
+                            ),
+                          )),
+                          Expanded(
+                            child: FutureBuilder(
+                                future: getCurrencies(),
+                                builder: (context, snapshot) {
+                                  return DropdownButtonHideUnderline(
+                                    child: DropdownButton<String>(
+                                      dropdownColor: buttoncolour,
+                                      alignment: Alignment.centerRight,
+                                      hint: new Text("Select ",
+                                          style: TextStyle(
+                                              color: textFieldBGColor)),
+                                      value: _currselected,
+                                      onChanged: loanProvider.isreciverenable
+                                          ? (String? newValue) {
+                                              setState(() {
+                                                _currselected = newValue!;
+                                              });
+                                            }
+                                          : null,
+                                      items: loanProvider.recivercurrencies
+                                          .map((map) {
+                                        return new DropdownMenuItem<String>(
+                                          value: map["network"],
+                                          child: Container(
+                                            // margin: EdgeInsets.only(left: 200),
+                                            child: Row(
+                                              children: <Widget>[
+                                                Image.asset(
+                                                  'assets/img/currency.png',
+                                                  width: 25,
+                                                ),
+                                                SizedBox(
+                                                  width: 10,
+                                                ),
+                                                Container(
+                                                  child: Text(map["network"],
+                                                      style: TextStyle(
+                                                          color:
+                                                              whiteTextColor)),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  );
+                                }),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
                   SizedBox(
                     height: 10,
                   ),
@@ -315,7 +355,7 @@ class _TakeLoanState extends State<TakeLoan> {
                                       // when tapped.
                                       _itemPosition = i;
                                       loanProvider.ltv_percent =
-                                        percentageList[i];
+                                          percentageList[i];
                                     });
                                   },
                                   child: Container(
@@ -354,95 +394,119 @@ class _TakeLoanState extends State<TakeLoan> {
               thickness: 0.1,
             ),
             Padding(
-              padding:
-                  const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
-              child: FutureBuilder(
-                  future: loanProvider.getloanestimate(),
-                  builder: (context, snapshot) {
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Loan Term',
-                              style: TextStyle(
-                                fontSize: 14.0,
-                                fontWeight: FontWeight.w400,
-                                fontFamily: 'Yantramanav',
-                                color: seconadarytextcolour,
+                padding: const EdgeInsets.only(
+                    left: 16, right: 16, top: 8, bottom: 8),
+                child: FutureBuilder(
+                    future: getloanestimate(),
+                    builder: (context, dataSnapshot) {
+                      if (dataSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      } else {
+                        if (dataSnapshot.error != null) {
+                          return Center(
+                            child: Text('An error occured'),
+                          );
+                        } else {
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Loan Term',
+                                    style: TextStyle(
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.w400,
+                                      fontFamily: 'Yantramanav',
+                                      color: seconadarytextcolour,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Unlimited',
+                                    style: TextStyle(
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.w400,
+                                      fontFamily: 'Yantramanav',
+                                      color: whiteTextColor,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                            Text(
-                             'Unlimited',
-                              style: TextStyle(
-                                fontSize: 14.0,
-                                fontWeight: FontWeight.w400,
-                                fontFamily: 'Yantramanav',
-                                color: whiteTextColor,
+                              SizedBox(
+                                height: 10,
                               ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Monthly Interest',
-                              style: TextStyle(
-                                fontSize: 14.0,
-                                fontWeight: FontWeight.w400,
-                                fontFamily: 'Yantramanav',
-                                color: seconadarytextcolour,
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Monthly Interest',
+                                    style: TextStyle(
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.w400,
+                                      fontFamily: 'Yantramanav',
+                                      color: seconadarytextcolour,
+                                    ),
+                                  ),
+                                  Text(
+                                    loanProvider.loanestimate[
+                                                'interest_amounts']['month'] ==
+                                            null
+                                        ? ''
+                                        : loanProvider
+                                            .loanestimate['interest_amounts']
+                                                ['month']
+                                            .toString(),
+                                    style: TextStyle(
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.w400,
+                                      fontFamily: 'Yantramanav',
+                                      color: whiteTextColor,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                            Text(
-                              loanProvider.loanestimate['interest_amounts']
-                                          ['month'] ?? '',
-                                     
-                              style: TextStyle(
-                                fontSize: 14.0,
-                                fontWeight: FontWeight.w400,
-                                fontFamily: 'Yantramanav',
-                                color: whiteTextColor,
+                              SizedBox(
+                                height: 10,
                               ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Liquidation Price',
-                              style: TextStyle(
-                                fontSize: 14.0,
-                                fontWeight: FontWeight.w400,
-                                fontFamily: 'Yantramanav',
-                                color: seconadarytextcolour,
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Liquidation Price',
+                                    style: TextStyle(
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.w400,
+                                      fontFamily: 'Yantramanav',
+                                      color: seconadarytextcolour,
+                                    ),
+                                  ),
+                                  Text(
+                                    loanProvider.loanestimate['down_limit'] ==
+                                            null
+                                        ? ''
+                                        : loanProvider
+                                            .loanestimate['down_limit'],
+                                    style: TextStyle(
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.w400,
+                                      fontFamily: 'Yantramanav',
+                                      color: whiteTextColor,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                            Text(
-                              loanProvider.loanestimate['down_limit'] ?? '',
-                              style: TextStyle(
-                                fontSize: 14.0,
-                                fontWeight: FontWeight.w400,
-                                fontFamily: 'Yantramanav',
-                                color: whiteTextColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    );
-                  }),
-            ),
+                            ],
+                          );
+                        }
+                      }
+                    })),
             Spacer(),
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -459,7 +523,52 @@ class _TakeLoanState extends State<TakeLoan> {
                     ),
                   ),
                   color: buttoncolour,
-                  onPressed: () {},
+                  onPressed: () async {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return Center(
+                            child: Container(
+                              height: 100,
+                              color: Colors.white,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  CircularProgressIndicator(),
+                                  Container(
+                                      child: Text(
+                                    'Loading...',
+                                    style: TextStyle(
+                                        decoration: TextDecoration.none,
+                                        fontSize: 14,
+                                        color: Colors.black),
+                                    textAlign: TextAlign.center,
+                                  )),
+                                ],
+                              ),
+                            ),
+                          );
+                        });
+
+                    await getCreateLoan().whenComplete(() => loanProvider.result
+                        ? Fluttertoast.showToast(
+                            msg: "SucessFully Created Loan",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.CENTER,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: buttoncolour,
+                            textColor: Colors.white,
+                            fontSize: 16.0)
+                        : Fluttertoast.showToast(
+                            msg: "Somethig went wrong!!",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.CENTER,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                            fontSize: 16.0));
+                    Navigator.pop(context);
+                  },
                 ),
               ),
             ),
