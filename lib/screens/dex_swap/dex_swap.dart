@@ -31,10 +31,18 @@ class _DexSwapState extends State<DexSwap> {
 
     await dexProvider.getAllCurrencies(context, auth);
     await dexProvider.estimateExchangeValue(
-        context,
-        auth,
-        dexProvider.fromActiveCurrency['ticker'],
-        dexProvider.toActiveCurrency['ticker']);
+      context,
+      auth,
+      '1',
+      dexProvider.fromActiveCurrency['ticker'],
+      dexProvider.toActiveCurrency['ticker'],
+    );
+  }
+
+  Future<void> clearPaymentProcess() async {
+    var dexProvider = Provider.of<DexProvider>(context, listen: false);
+    await dexProvider.clearPaymentProcess();
+    Navigator.pop(context);
   }
 
   @override
@@ -45,7 +53,7 @@ class _DexSwapState extends State<DexSwap> {
         appBar: AppBar(
           leading: IconButton(
             onPressed: () {
-              Navigator.pop(context);
+              clearPaymentProcess();
             },
             icon: Icon(Icons.chevron_left),
           ),
@@ -82,7 +90,9 @@ class _DexSwapState extends State<DexSwap> {
         body: TabBarView(
           children: [
             ExchangeNow(),
-            Icon(Icons.directions_transit),
+            Center(
+              child: Text('Coming Soon...'),
+            ),
           ],
         ),
       ),
