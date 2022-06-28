@@ -12,7 +12,7 @@ var futExApi = '/fe-co-api';
 var plfApi = '/fe-platform-api';
 var loanApiVersion = '/loans';
 var loansApiestimate='/loans/estimate';
-
+ var loanhistory='/mstloan';
 
 
 

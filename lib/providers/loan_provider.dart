@@ -73,7 +73,7 @@ class LoanProvider with ChangeNotifier {
 ////Loan estimates api//
   ///
   var _loanestimate;
-  
+
   get loanestimate {
     return _loanestimate;
   }
@@ -164,8 +164,7 @@ class LoanProvider with ChangeNotifier {
   ////  GET Loan startus api /////////////
   ///
 
-
- var _loanstatus;
+  var _loanstatus;
 
   get loanstatus {
     return _loanstatus;
@@ -174,24 +173,21 @@ class LoanProvider with ChangeNotifier {
   Future<void> getLoanStatus(loanid) async {
     var url = Uri.https(
       loanApiUrl,
-     '$loanApiVersion/get_loan_status',
+      '$loanApiVersion/get_loan_status',
     );
 
-   var data = {'loan_id': loanid};
+    var data = {'loan_id': loanid};
 
     var body = jsonEncode(data);
 
     try {
       final response = await http.post(url, headers: headers, body: body);
 
-
       print(response.statusCode);
-
-
 
       final responseData = json.decode(response.body);
       if (responseData['result']) {
-          _loanstatus= responseData['response'];
+        _loanstatus = responseData['response'];
 
         //  print(_loanestimate);
         return notifyListeners();
@@ -206,33 +202,24 @@ class LoanProvider with ChangeNotifier {
     }
   }
 
-
   /////// loan Confirm api ///
-  
-  Future<void> getConfirm(reciveraddress,email) async {
 
-    print(reciveraddress);
-    print(email);
-    print(loanid);
+  Future<void> getConfirm(reciveraddress, email) async {
     var url = Uri.https(
       loanApiUrl,
-     '$loanApiVersion/confirm_loan',
+      '$loanApiVersion/confirm_loan',
     );
 
-   var data = {'loan_id': '4689901146',"receive_address": '$reciveraddress',
-        "email": '$email'};
+    var data = {
+      'loan_id': '4689901146',
+      "receive_address": '$reciveraddress',
+      "email": '$email'
+    };
 
-
-print(data);
     var body = jsonEncode(data);
 
     try {
       final response = await http.post(url, headers: headers, body: body);
-
-      print('mjujahid checck..');
-      print(response.statusCode);
-
-
 
       final responseData = json.decode(response.body);
       if (responseData['result']) {
@@ -241,7 +228,7 @@ print(data);
         //  print(_loanestimate);
         return notifyListeners();
       } else {
-       // _loanstatus = [];
+        // _loanstatus = [];
         return notifyListeners();
       }
     } catch (error) {
@@ -250,5 +237,51 @@ print(data);
       return;
     }
   }
+
+  ////// loan history api //
+  ///
+
+  var _myloanhistory;
+
+  get myloanhistory {
+    return _myloanhistory;
+  }
+
+
+  Future<void> getLoanHistory(email) async {
+    var url = Uri.https(
+      loanApiUrl,
+      '$loanhistory/Loan_History_Email',
+    );
+
+    var data = {"email": '$email'};
+    var loanstatus;
+    var body = jsonEncode(data);
+
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+
+      final responseData = json.decode(response.body);
+
+      
+      if (response.statusCode==200) {
+        
+     loanstatus=responseData['status'];
   
+      
+        _myloanhistory = responseData;
+
+        print(loanstatus);
+
+        return notifyListeners();
+      } else {
+        _myloanhistory = [];
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return;
+    }
+  }
 }
