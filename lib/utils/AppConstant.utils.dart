@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 var height;
 var width;
 var currentindex = 0;
 
-var apiUrl = 'www.lyotrade.com';
+var apiUrl = kIsWeb ? 'api.m.lyotrade.com' : 'www.lyotrade.com';
 var futApiUrl = 'futures.lyotrade.com';
 var serviceApi = 'service.lyotrade.com';
 var loanApiUrl = 'api.coinrabbit.io';

@@ -1,6 +1,9 @@
+import 'dart:js' as js;
 import 'package:flutter/material.dart';
+import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:webviewx/webviewx.dart';
 
 class Carousal extends StatefulWidget {
   const Carousal({Key? key}) : super(key: key);
@@ -10,33 +13,92 @@ class Carousal extends StatefulWidget {
 }
 
 class _CarousalState extends State<Carousal> {
+  late WebViewXController webviewController;
+  List _sliderFrames = [
+    {
+      "link": "frame_1.jpg",
+      "path": "/crypto_loan",
+    },
+    {
+      "link": "frame_2.jpg",
+      "path": "/staking",
+    },
+    {
+      "link": "frame_3.jpg",
+      "path": "/lyowallet",
+    },
+    {
+      "link": "frame_4.jpg",
+      "path": "/dex_swap",
+    },
+    {
+      "link": "frame_5.jpg",
+      "path": "/faq",
+    },
+  ];
+
   @override
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
 
-    return Container(
-      padding: EdgeInsets.only(
-        bottom: 10,
+    return CarouselSlider(
+      options: CarouselOptions(
+        height: height * 0.12,
+        viewportFraction: 1,
+        // aspectRatio: 0,
+        enableInfiniteScroll: true,
+        enlargeCenterPage: true,
+        autoPlay: true,
       ),
-      child: CarouselSlider(
-        options: CarouselOptions(
-          height: height * 0.12,
-          viewportFraction: 1,
-          enlargeCenterPage: false,
-          autoPlay: true,
-        ),
-        items: [1, 2, 3].map((i) {
-          return Builder(
-            builder: (BuildContext context) {
-              return SizedBox(
+      items: _sliderFrames.map((slider) {
+        // var slider = _sliderFrames[i];
+
+        return Builder(
+          builder: (BuildContext context) {
+            return InkWell(
+              onTap: () {
+                if (slider['path'] == '/faq') {
+                  js.context.callMethod('open', [
+                    'https://docs.lyotrade.com/introduction/what-is-lyotrade'
+                  ]);
+                  // showModalBottomSheet<void>(
+                  //   isScrollControlled: true,
+                  //   context: context,
+                  //   builder: (BuildContext context) {
+                  //     return StatefulBuilder(
+                  //       builder:
+                  //           (BuildContext context, StateSetter setState) {
+                  //         return Scaffold(
+                  //           appBar: hiddenAppBarWithDefaultHeight(),
+                  //           body: WebViewX(
+                  //             width: width,
+                  //             height: height * 0.8,
+                  //             initialContent:
+                  //                 'https://docs.lyotrade.com/introduction/what-is-lyotrade',
+                  //             initialSourceType: SourceType.url,
+                  //             onWebViewCreated: (controller) =>
+                  //                 webviewController = controller,
+                  //           ),
+                  //         );
+                  //       },
+                  //     );
+                  //   },
+                  // );
+                } else if (slider['path'] == '/lyowallet') {
+                  js.context.callMethod('open', ['https://wallet.lyofi.com']);
+                } else {
+                  Navigator.pushNamed(context, '${slider['path']}');
+                }
+              },
+              child: SizedBox(
                 width: width,
-                child: Image.asset('assets/img/timeline.png'),
-              );
-            },
-          );
-        }).toList(),
-      ),
+                child: Image.asset('assets/img/${slider['link']}'),
+              ),
+            );
+          },
+        );
+      }).toList(),
     );
   }
 }

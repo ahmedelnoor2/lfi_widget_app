@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:lyotrade/screens/auth/emailverification.dart';
 import 'package:lyotrade/screens/auth/login.dart';
 import 'package:lyotrade/screens/auth/signup.dart';
@@ -27,12 +28,14 @@ class _AuthenticationState extends State<Authentication> {
   bool _isMobile = true;
 
   Future<String> processSignup(value) async {
-    print(_captchaVerification);
+    // print(_captchaVerification);
     var auth = Provider.of<Auth>(context, listen: false);
 
     if (value['emailSignup']) {
       String emailToken = await auth.checkEmailRegistration(context, {
-        'csessionid': _captchaVerification['sessionId'],
+        'csessionid': kIsWeb
+            ? _captchaVerification['csessionid']
+            : _captchaVerification['sessionId'],
         'email': value['email'],
         'invitedCode': value['invitedCode'],
         'loginPword': value['loginPword'],
@@ -49,7 +52,9 @@ class _AuthenticationState extends State<Authentication> {
         _emailVerification = false;
       });
       String emailToken = await auth.checkMobileRegistration(context, {
-        'csessionid': _captchaVerification['sessionId'],
+        'csessionid': kIsWeb
+            ? _captchaVerification['csessionid']
+            : _captchaVerification['sessionId'],
         'countryCode': value['countryCode'],
         'mobileNumber': value['mobileNumber'],
         'invitedCode': value['invitedCode'],
@@ -77,13 +82,18 @@ class _AuthenticationState extends State<Authentication> {
 
     var auth = Provider.of<Auth>(context, listen: false);
     String loginToken = await auth.login(context, {
-      'csessionid': _captchaVerification['sessionId'],
+      "geetest_challenge": "sys_conf_validate",
+      "geetest_seccode": "sys_conf_validate",
+      "geetest_validate": "sys_conf_validate",
+      // 'csessionid': kIsWeb
+      //     ? _captchaVerification['csessionid']
+      //     : _captchaVerification['sessionId'],
       'mobileNumber': value['mobileNumber'],
       'loginPword': value['loginPword'],
-      'scene': 'other',
-      'sig': _captchaVerification['sig'],
-      'token': _captchaVerification['token'],
-      'verificationType': '1',
+      // 'scene': 'other',
+      // 'sig': _captchaVerification['sig'],
+      'token': true,
+      'verificationType': '0',
     });
 
     return loginToken;
@@ -154,6 +164,9 @@ class _AuthenticationState extends State<Authentication> {
                       )
                     : _authLogin
                         ? Login(onLogin: (value, captchaController) async {
+                            print('--------------------');
+                            print(captchaController);
+
                             String result = await processLogin(value);
                             if (result.isNotEmpty) {
                               setState(() {

@@ -42,6 +42,49 @@ class Auth with ChangeNotifier {
     return _googleAuth;
   }
 
+  // Get Captcha
+  Map _captchaData = {};
+
+  Map get captchaData {
+    return _captchaData;
+  }
+
+  Future<void> getCaptcha() async {
+    var url = Uri.https(
+      apiUrl,
+      '/aliyun/get_aliyun',
+    );
+
+    // var postData = json.encode({});
+
+    try {
+      final response = await http.get(url, headers: headers);
+
+      final responseData = json.decode(response.body);
+      if (responseData['msg'] == 'success') {
+        _captchaData = responseData['data']['data'];
+        notifyListeners();
+      } else {
+        _captchaData = {};
+        notifyListeners();
+      }
+      // if (responseData['code'] == '0') {
+      //   _userInfo = responseData['data'];
+      //   _isAuthenticated = true;
+      //   notifyListeners();
+      // } else {
+      //   _userInfo = {};
+      //   _isAuthenticated = false;
+      //   notifyListeners();
+      // }
+      return;
+    } catch (error) {
+      notifyListeners();
+      return;
+      // throw error;
+    }
+  }
+
   Future<void> checkLogin(ctx) async {
     final prefs = await SharedPreferences.getInstance();
     final String? catchedAuthToken = prefs.getString('authToken');
@@ -139,6 +182,8 @@ class Auth with ChangeNotifier {
       'verificationType': formData['verificationType'],
     });
 
+    print(postData);
+
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
@@ -217,6 +262,8 @@ class Auth with ChangeNotifier {
       'token': formData['token'],
       'verificationType': formData['verificationType'],
     });
+
+    print(postData);
 
     try {
       final response = await http.post(url, body: postData, headers: headers);

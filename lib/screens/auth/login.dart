@@ -1,3 +1,8 @@
+import 'dart:async';
+import 'package:lyotrade/providers/auth.dart';
+import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:lyotrade/screens/common/captcha.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
@@ -5,6 +10,10 @@ import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:flutter_aliyun_captcha/flutter_aliyun_captcha.dart';
+// import 'package:g_recaptcha_v3/g_recaptcha_v3.dart';
+// import 'package:webview_flutter/webview_flutter.dart';
+// import 'package:slider_captcha/slider_capchar.dart';
+import 'package:webviewx/webviewx.dart';
 
 class Login extends StatefulWidget {
   const Login({
@@ -21,6 +30,12 @@ class Login extends StatefulWidget {
 }
 
 class _Login extends State<Login> {
+  var uuid = const Uuid();
+  // final SliderController controller = SliderController();
+  // late WebViewXController webviewController;
+  WebViewXController? _controller;
+  // final Completer<WebViewController> _controller =
+  // Completer<WebViewController>();
   static final AliyunCaptchaController _captchaController =
       AliyunCaptchaController();
   bool _enableLogin = false;
@@ -51,6 +66,16 @@ class _Login extends State<Login> {
     setState(() {
       _enableLogin = value;
     });
+  }
+
+  Future<void> getCaptchaData() async {
+    var auth = Provider.of<Auth>(context, listen: false);
+    await auth.getCaptcha();
+    // print(auth.captchaData);
+    widget.onLogin({
+      'mobileNumber': _mobileNumber.text,
+      'loginPword': _loginPword.text,
+    }, auth.captchaData);
   }
 
   @override
@@ -139,21 +164,31 @@ class _Login extends State<Login> {
             ],
           ),
         ),
-        Captcha(
-          onCaptchaVerification: (value) {
-            toggleLoginButton(true);
-            if (value.containsKey('sig')) {
-            } else {
-              toggleLoginButton(false);
-            }
-            widget.onCaptchaVerification(value);
-          },
-          captchaController: _captchaController,
-        ),
-        SizedBox(
+        // kIsWeb
+        //     ? Align(
+        //         alignment: Alignment.center,
+        //         child: Container(
+        //           width: width,
+        //           padding: EdgeInsets.only(left: 10, top: 10, right: 10),
+        //           child: _buildWebViewX(),
+        //         ),
+        //       )
+        //     : Captcha(
+        //         onCaptchaVerification: (value) {
+        //           toggleLoginButton(true);
+        //           if (value.containsKey('sig')) {
+        //           } else {
+        //             toggleLoginButton(false);
+        //           }
+        //           widget.onCaptchaVerification(value);
+        //         },
+        //         captchaController: _captchaController,
+        //       ),
+        Container(
+          padding: EdgeInsets.only(top: 20),
           width: width * 1,
           child: ElevatedButton(
-            onPressed: _enableLogin
+            onPressed: _enableLogin || kIsWeb
                 ? () {
                     if (_formLoginKey.currentState!.validate()) {
                       // If the form is valid, display a snackbar. In the real world,
@@ -162,13 +197,10 @@ class _Login extends State<Login> {
                       setState(() {
                         _enableLogin = false;
                       });
-                      widget.onLogin({
-                        'mobileNumber': _mobileNumber.text,
-                        'loginPword': _loginPword.text,
-                      }, _captchaController);
+                      getCaptchaData();
                     } else {
-                      _captchaController.refresh({});
-                      _captchaController.reset();
+                      // _captchaController.refresh({});
+                      // _captchaController.reset();
                     }
                   }
                 : null,
@@ -197,4 +229,56 @@ class _Login extends State<Login> {
       ],
     );
   }
+
+  Widget _buildWebViewX() {
+    return WebViewX(
+      key: const ValueKey('webviewx'),
+      height: height * 0.09,
+      width: width,
+      initialContent: 'https://captcha.m.lyotrade.com/',
+      initialSourceType: SourceType.url,
+      onWebViewCreated: (controller) => _controller = controller,
+      onPageStarted: (src) =>
+          debugPrint('A new page has started loading: $src\n'),
+      onPageFinished: (src) =>
+          debugPrint('The page has finished loading: $src\n'),
+      jsContent: const {
+        EmbeddedJsContent(
+          js: "function testPlatformIndependentMethod() { console.log('Hi from JS');}",
+        ),
+        EmbeddedJsContent(
+          webJs:
+              "function testPlatformSpecificMethod(msg) { TestDartCallback('Web callback says: ' + msg) }",
+          mobileJs:
+              "function testPlatformSpecificMethod(msg) { TestDartCallback.postMessage('Mobile callback says: ' + msg) }",
+        ),
+      },
+      dartCallBacks: {
+        DartCallback(
+          name: 'TestDartCallback',
+          callBack: (msg) => print(msg.toString()),
+        )
+      },
+      webSpecificParams: const WebSpecificParams(
+        printDebugInfo: true,
+      ),
+      mobileSpecificParams: const MobileSpecificParams(
+        androidEnableHybridComposition: true,
+      ),
+      navigationDelegate: (navigation) {
+        debugPrint(navigation.content.sourceType.toString());
+        return NavigationDecision.navigate;
+      },
+    );
+  }
+
+  // JavascriptChannel _toasterJavascriptChannel(BuildContext context) {
+  //   return JavascriptChannel(
+  //       name: 'Toaster',
+  //       onMessageReceived: (JavascriptMessage message) {
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           SnackBar(content: Text(message.message)),
+  //         );
+  //       });
+  // }
 }

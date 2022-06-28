@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'dart:io';
+import 'package:archive/archive.dart';
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
@@ -124,7 +125,9 @@ class _KlineChartState extends State<KlineChart>
 
   void extractStreamData(streamData, public) async {
     if (streamData != null) {
-      var inflated = zlib.decode(streamData as List<int>);
+      // var inflated = zlib.decode(streamData as List<int>);
+      var inflated =
+          GZipDecoder().decodeBytes(streamData as List<int>, verify: false);
       var data = utf8.decode(inflated);
       if (json.decode(data)['channel'] != null) {
         var marketData = json.decode(data);

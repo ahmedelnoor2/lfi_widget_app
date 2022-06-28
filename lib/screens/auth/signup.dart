@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
@@ -7,6 +8,8 @@ import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:lyotrade/utils/Country.utils.dart';
 import 'package:flutter_aliyun_captcha/flutter_aliyun_captcha.dart';
+
+import 'package:webviewx/webviewx.dart';
 
 class Signup extends StatefulWidget {
   const Signup({
@@ -23,6 +26,7 @@ class Signup extends StatefulWidget {
 }
 
 class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
+  WebViewXController? _controller;
   static final AliyunCaptchaController _captchaController =
       AliyunCaptchaController();
   late final TabController _tabController =
@@ -58,6 +62,21 @@ class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
     _newPassword.dispose();
     _invitedCode.dispose();
     super.dispose();
+  }
+
+  Future<void> _callPlatformIndependentJsMethod() async {
+    try {
+      await _controller!.callJsMethod('testPlatformIndependentMethod', []);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> setController(controller) async {
+    _controller = controller;
+    await controller.callJsMethod('testPlatformIndependentMethod', []);
+    // setState(() {
+    // });
   }
 
   void toggleLoginButton(value) {
@@ -367,16 +386,63 @@ class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
             ),
           ),
         ),
-        Captcha(
-          onCaptchaVerification: (value) {
-            toggleLoginButton(true);
-            if (value.containsKey('sig')) {
-            } else {
-              toggleLoginButton(false);
-            }
-            widget.onCaptchaVerification(value);
-          },
-        ),
+        kIsWeb
+            ? Align(
+                alignment: Alignment.center,
+                child: Container(
+                  width: width,
+                  padding: EdgeInsets.only(left: 10, top: 10, right: 10),
+                  child: WebViewX(
+                    height: height * 0.05,
+                    width: width,
+                    initialContent: 'http://localhost:3001/',
+                    initialSourceType: SourceType.url,
+                    onWebViewCreated: (WebViewXController controller) {
+                      // _controller = controller;
+                      setController(controller);
+                      // setState(() {
+                      // });
+                    },
+                    onPageFinished: (src) {
+                      // _callPlatformIndependentJsMethod();
+                    },
+                    jsContent: const {
+                      EmbeddedJsContent(
+                        js: "function testPlatformIndependentMethod() { console.log('Hi from JS') }",
+                      ),
+                      EmbeddedJsContent(
+                        webJs:
+                            "function testPlatformSpecificMethod(msg) { TestDartCallback('Web callback says: ' + msg) }",
+                        mobileJs:
+                            "function testPlatformSpecificMethod(msg) { TestDartCallback.postMessage('Mobile callback says: ' + msg) }",
+                      ),
+                    },
+                    dartCallBacks: {
+                      DartCallback(
+                        name: 'TestDartCallback',
+                        callBack: (msg) {
+                          print(msg);
+                        },
+                      )
+                    },
+                    webSpecificParams: const WebSpecificParams(
+                      printDebugInfo: true,
+                    ),
+                    // ...
+                    // ... other options
+                  ),
+                ),
+              )
+            : Captcha(
+                onCaptchaVerification: (value) {
+                  toggleLoginButton(true);
+                  if (value.containsKey('sig')) {
+                  } else {
+                    toggleLoginButton(false);
+                  }
+                  widget.onCaptchaVerification(value);
+                },
+              ),
         SizedBox(
           width: width * 1,
           child: ElevatedButton(

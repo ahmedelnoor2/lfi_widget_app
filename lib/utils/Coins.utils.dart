@@ -21,3 +21,12 @@ String getCoinName(String coinName) {
       return coinName;
   }
 }
+
+String getMarketName(String coinName) {
+  switch (coinName) {
+    case 'LYO1/USDT':
+      return 'LYO/USDT';
+    default:
+      return coinName;
+  }
+}
