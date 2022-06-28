@@ -19,8 +19,8 @@ class TakeLoan extends StatefulWidget {
 }
 
 class _TakeLoanState extends State<TakeLoan> {
-  var _selected;
-  var _currselected;
+  var _reciver;
+  var _sender;
 
   var collatralintailvalue = 1;
   // final List<Map> _myJson = [
@@ -34,18 +34,23 @@ class _TakeLoanState extends State<TakeLoan> {
   //   {"id": '3', "detail": "11627.56 BTC/USDT", "name": "Liquidation Price"},
   // ];
   List<dynamic> percentageList = [0.5, 0.7, 0.8];
-
+  
   int _itemPosition = 0;
   @override
   void initState() {
     getCurrencies();
     getloanestimate();
     super.initState();
+
+  
   }
 
   Future<void> getCurrencies() async {
     var loanProvider = Provider.of<LoanProvider>(context, listen: false);
+    
     await loanProvider.getCurrencies();
+
+    
   }
 
   Future<void> getloanestimate() async {
@@ -58,14 +63,15 @@ class _TakeLoanState extends State<TakeLoan> {
     await loanProvider.getCreateLoan();
   }
 
+  final TextEditingController _textEditingControllereciver =
+      TextEditingController();
   @override
   Widget build(BuildContext context) {
     var loanProvider = Provider.of<LoanProvider>(context, listen: false);
     print(loanProvider.getloanestimate());
 
-  
 
-   
+
     return Scaffold(
       appBar: hiddenAppBar(),
       body: Container(
@@ -158,7 +164,6 @@ class _TakeLoanState extends State<TakeLoan> {
                         children: <Widget>[
                           Expanded(
                               child: TextFormField(
-                                
                             initialValue: collatralintailvalue.toString(),
                             decoration: new InputDecoration(
                               border: InputBorder.none,
@@ -178,20 +183,18 @@ class _TakeLoanState extends State<TakeLoan> {
                                     child: DropdownButton<String>(
                                       dropdownColor: buttoncolour,
                                       alignment: Alignment.centerRight,
-                                      hint: new Text("Select ",
-                                          style: TextStyle(
-                                              color: textFieldBGColor)),
-                                      value: _currselected,
+                                      value: _sender,
                                       onChanged: loanProvider.issenderenable
                                           ? (String? newValue) {
                                               setState(() {
-                                                _currselected = newValue!;
+                                                _sender = newValue!;
                                               });
                                             }
                                           : null,
                                       items: loanProvider.sendercurrences
                                           .map((map) {
                                         return new DropdownMenuItem<String>(
+
                                           value: map["network"],
                                           child: Container(
                                             // margin: EdgeInsets.only(left: 200),
@@ -259,8 +262,8 @@ class _TakeLoanState extends State<TakeLoan> {
                         children: <Widget>[
                           Expanded(
                               child: TextFormField(
-                              
-                            initialValue: '1223.3',
+                            controller: _textEditingControllereciver,
+                            //  initialValue: '1223.3',
                             decoration: new InputDecoration(
                               border: InputBorder.none,
                               focusedBorder: InputBorder.none,
@@ -279,14 +282,11 @@ class _TakeLoanState extends State<TakeLoan> {
                                     child: DropdownButton<String>(
                                       dropdownColor: buttoncolour,
                                       alignment: Alignment.centerRight,
-                                      hint: new Text("Select ",
-                                          style: TextStyle(
-                                              color: textFieldBGColor)),
-                                      value: _currselected,
+                                      value: _reciver,
                                       onChanged: loanProvider.isreciverenable
                                           ? (String? newValue) {
                                               setState(() {
-                                                _currselected = newValue!;
+                                                _reciver = newValue!;
                                               });
                                             }
                                           : null,
@@ -526,35 +526,49 @@ class _TakeLoanState extends State<TakeLoan> {
                   ),
                   color: buttoncolour,
                   onPressed: () async {
-                    showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return Center(
-                            child: Container(
-                              height: 100,
-                              color: Colors.white,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  CircularProgressIndicator(),
-                                  Container(
-                                      child: Text(
-                                    'Loading...',
-                                    style: TextStyle(
-                                        decoration: TextDecoration.none,
-                                        fontSize: 14,
-                                        color: Colors.black),
-                                    textAlign: TextAlign.center,
-                                  )),
-                                ],
+                    if (_textEditingControllereciver.text.isEmpty) {
+                      Fluttertoast.showToast(
+                          msg: "Field is Empty",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.CENTER,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.red,
+                          textColor: Colors.white,
+                          fontSize: 16.0);
+                    } else {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return Center(
+                              child: Container(
+                                height: 100,
+                                color: Colors.white,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    CircularProgressIndicator(),
+                                    Container(
+                                        child: Text(
+                                      'Loading...',
+                                      style: TextStyle(
+                                          decoration: TextDecoration.none,
+                                          fontSize: 14,
+                                          color: Colors.black),
+                                      textAlign: TextAlign.center,
+                                    )),
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        });
+                            );
+                          });
 
-                    await getCreateLoan().whenComplete(() => loanProvider.getLoanStatus(loanProvider.loanid).whenComplete(() => Navigator.pushNamed(context, '/confirm_loan')));
-                        
-                    Navigator.pop(context);
+                      await getCreateLoan().whenComplete(() => loanProvider
+                          .getLoanStatus(loanProvider.loanid)
+                          .whenComplete(() =>
+                              Navigator.pushNamed(context, '/confirm_loan')));
+
+                      Navigator.pop(context);
+                    }
                   },
                 ),
               ),

@@ -50,6 +50,7 @@ class LoanProvider with ChangeNotifier {
 
       if (responseData['result']) {
         _sendercurrences = responseData['response'];
+
         _recivercurrencies = responseData['response'];
 
         isreciverenable = responseData['response']['is_loan_deposit_enabled'];
@@ -247,7 +248,6 @@ class LoanProvider with ChangeNotifier {
     return _myloanhistory;
   }
 
-
   Future<void> getLoanHistory(email) async {
     var url = Uri.https(
       loanApiUrl,
@@ -263,12 +263,9 @@ class LoanProvider with ChangeNotifier {
 
       final responseData = json.decode(response.body);
 
-      
-      if (response.statusCode==200) {
-        
-     loanstatus=responseData['status'];
-  
-      
+      if (response.statusCode == 200) {
+        loanstatus = responseData['status'];
+
         _myloanhistory = responseData;
 
         print(loanstatus);

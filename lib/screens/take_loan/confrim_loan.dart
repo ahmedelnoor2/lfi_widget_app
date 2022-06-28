@@ -397,22 +397,36 @@ class _ConfirmloanState extends State<Confirmloan> {
                         border: Border.all(color: Colors.blueAccent)),
                   ),
                   ElevatedButton(
+                  
                       onPressed: () async {
-                        await agree
-                            ? loanProvider
-                                .getConfirm(
-                                    _textEditingControllerAddress.text
-                                        .toString(),
-                                    _textEditingControllerEmail.text.toString())
-                                .whenComplete(() => Fluttertoast.showToast(
-                                    msg: "Confirm Your Loan Thanks",
-                                    toastLength: Toast.LENGTH_SHORT,
-                                    gravity: ToastGravity.CENTER,
-                                    timeInSecForIosWeb: 1,
-                                    backgroundColor: Colors.red,
-                                    textColor: Colors.white,
-                                    fontSize: 16.0))
-                            : null;
+                        if (_textEditingControllerAddress.text.isEmpty ||
+                            _textEditingControllerEmail.text.isEmpty) {
+                          Fluttertoast.showToast(
+                              msg: "Field is empty",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.CENTER,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                              fontSize: 16.0);
+                        } else {
+                          await agree
+                              ? loanProvider
+                                  .getConfirm(
+                                      _textEditingControllerAddress.text
+                                          .toString(),
+                                      _textEditingControllerEmail.text
+                                          .toString())
+                                  .whenComplete(() => Fluttertoast.showToast(
+                                      msg: "Confirm Your Loan Thanks",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.CENTER,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Colors.red,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0))
+                              : null;
+                        }
                       },
                       child: const Text('Confirm'))
                 ],
