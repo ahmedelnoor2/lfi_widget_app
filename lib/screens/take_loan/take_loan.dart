@@ -63,6 +63,8 @@ class _TakeLoanState extends State<TakeLoan> {
     var loanProvider = Provider.of<LoanProvider>(context, listen: false);
     print(loanProvider.getloanestimate());
 
+  
+
    
     return Scaffold(
       appBar: hiddenAppBar(),
@@ -550,23 +552,8 @@ class _TakeLoanState extends State<TakeLoan> {
                           );
                         });
 
-                    await getCreateLoan().whenComplete(() => loanProvider.result
-                        ? Fluttertoast.showToast(
-                            msg: "SucessFully Created Loan",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.CENTER,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: buttoncolour,
-                            textColor: Colors.white,
-                            fontSize: 16.0)
-                        : Fluttertoast.showToast(
-                            msg: "Somethig went wrong!!",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.CENTER,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: Colors.red,
-                            textColor: Colors.white,
-                            fontSize: 16.0));
+                    await getCreateLoan().whenComplete(() => loanProvider.getLoanStatus(loanProvider.loanid).whenComplete(() => Navigator.pushNamed(context, '/confirm_loan')));
+                        
                     Navigator.pop(context);
                   },
                 ),

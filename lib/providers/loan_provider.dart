@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:k_chart/entity/index.dart';
@@ -72,7 +73,7 @@ class LoanProvider with ChangeNotifier {
 ////Loan estimates api//
   ///
   var _loanestimate;
-
+  
   get loanestimate {
     return _loanestimate;
   }
@@ -126,6 +127,7 @@ class LoanProvider with ChangeNotifier {
     return _createloan;
   }
 
+  var loanid;
   bool result = false;
 
   Future<void> getCreateLoan() async {
@@ -142,7 +144,9 @@ class LoanProvider with ChangeNotifier {
       final responseData = json.decode(response.body);
       if (responseData['result']) {
         result = responseData['result'];
-        print(result);
+
+        loanid = responseData['response']['loan_id'];
+        print(loanid);
         _createloan = responseData['response'];
 
         return notifyListeners();
@@ -156,4 +160,95 @@ class LoanProvider with ChangeNotifier {
       return;
     }
   }
+
+  ////  GET Loan startus api /////////////
+  ///
+
+
+ var _loanstatus;
+
+  get loanstatus {
+    return _loanstatus;
+  }
+
+  Future<void> getLoanStatus(loanid) async {
+    var url = Uri.https(
+      loanApiUrl,
+     '$loanApiVersion/get_loan_status',
+    );
+
+   var data = {'loan_id': loanid};
+
+    var body = jsonEncode(data);
+
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+
+
+      print(response.statusCode);
+
+
+
+      final responseData = json.decode(response.body);
+      if (responseData['result']) {
+          _loanstatus= responseData['response'];
+
+        //  print(_loanestimate);
+        return notifyListeners();
+      } else {
+        _loanstatus = [];
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return;
+    }
+  }
+
+
+  /////// loan Confirm api ///
+  
+  Future<void> getConfirm(reciveraddress,email) async {
+
+    print(reciveraddress);
+    print(email);
+    print(loanid);
+    var url = Uri.https(
+      loanApiUrl,
+     '$loanApiVersion/confirm_loan',
+    );
+
+   var data = {'loan_id': '4689901146',"receive_address": '$reciveraddress',
+        "email": '$email'};
+
+
+print(data);
+    var body = jsonEncode(data);
+
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+
+      print('mjujahid checck..');
+      print(response.statusCode);
+
+
+
+      final responseData = json.decode(response.body);
+      if (responseData['result']) {
+        //  _loanstatus= responseData['response'];
+
+        //  print(_loanestimate);
+        return notifyListeners();
+      } else {
+       // _loanstatus = [];
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return;
+    }
+  }
+  
 }
