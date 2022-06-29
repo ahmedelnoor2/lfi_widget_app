@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:k_chart/entity/index.dart';
@@ -24,16 +25,27 @@ class LoanProvider with ChangeNotifier {
   // Currencies
   List _sendercurrences = [];
 
-  List get sendercurrences {
+  Future<void> setsendercurrences(value) async {
+    _sendercurrences = value;
+    notifyListeners();
+  }
+
+  Iterable get sendercurrences {
     return _sendercurrences;
   }
 
   List _recivercurrencies = [];
+  Future<void> setrecivercurrences(value) async {
+    _recivercurrencies = value;
+    notifyListeners();
+  }
 
-  List get recivercurrencies {
+  Iterable get recivercurrencies {
     return _recivercurrencies;
   }
 
+  var senderintialvalue;
+  var reciverintialvalue;
   Future<void> getCurrencies() async {
     var url = Uri.https(
       loanApiUrl,
@@ -49,15 +61,18 @@ class LoanProvider with ChangeNotifier {
       final responseData = json.decode(response.body);
 
       if (responseData['result']) {
-        _sendercurrences = responseData['response'];
-
-        _recivercurrencies = responseData['response'];
-
-        isreciverenable = responseData['response']['is_loan_deposit_enabled'];
-        issenderenable = responseData['response']['is_loan_deposit_enabled'];
-
-        print(responseData['response']['is_loan_receive_enabled']);
-
+        var myresponsedata=responseData['response'];
+      var filteredCollateral =  myresponsedata.where((currency) =>
+            (currency['is_loan_deposit_enabled'] == true &&
+                currency['is_stable'] == false)).toList();
+        var filteredLoans = responseData['response'].where((currency) =>
+            (currency['is_stable'] == true &&
+                currency['is_loan_receive_enabled'] == true)).toList();
+        setsendercurrences(filteredCollateral);
+        setrecivercurrences(filteredLoans);
+        senderintialvalue =  filteredCollateral[0];
+        reciverintialvalue = filteredLoans[0];
+    
         return notifyListeners();
       } else {
         _sendercurrences = [];
@@ -66,7 +81,7 @@ class LoanProvider with ChangeNotifier {
       }
     } catch (error) {
       print(error);
-      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+    
       return;
     }
   }
@@ -85,15 +100,15 @@ class LoanProvider with ChangeNotifier {
   var to_network = 'ETH';
   var amount = 1;
   var exchange = 'direct';
-  var ltv_percent = 0.8;
+  var ltv_percent = 0.5;
 
-  Future<void> getloanestimate() async {
+  Future<void> getloanestimate(amount) async {
     var url = Uri.https(loanApiUrl, loansApiestimate, {
       'from_code': 'BTC',
       'from_network': 'BTC',
       'to_code': 'USDT',
       'to_network': 'ETH',
-      'amount': '1',
+      'amount': '$amount',
       'exchange': 'direct',
       'ltv_percent': '$ltv_percent'
     });

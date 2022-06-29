@@ -1,8 +1,9 @@
-import 'dart:ffi';
+
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lyotrade/providers/loan_provider.dart';
 import 'package:lyotrade/screens/common/header.dart';
@@ -19,10 +20,13 @@ class TakeLoan extends StatefulWidget {
 }
 
 class _TakeLoanState extends State<TakeLoan> {
-  var _reciver;
-  var _sender;
+  var _mysender;
+  var _myreciver;
+    final TextEditingController _textEditingControllesender =
+      TextEditingController(text: '1');
+  final TextEditingController _textEditingControllereciver =
+      TextEditingController(text: '');
 
-  var collatralintailvalue = 1;
   // final List<Map> _myJson = [
   //   {"id": '1', "image": "assets/img/currency.png", "name": "Lyo"},
   //   {"id": '2', "image": "assets/img/currency.png", "name": "USD"},
@@ -34,44 +38,36 @@ class _TakeLoanState extends State<TakeLoan> {
   //   {"id": '3', "detail": "11627.56 BTC/USDT", "name": "Liquidation Price"},
   // ];
   List<dynamic> percentageList = [0.5, 0.7, 0.8];
-  
+
   int _itemPosition = 0;
   @override
   void initState() {
+ 
     getCurrencies();
-    getloanestimate();
+   
     super.initState();
-
-  
   }
 
   Future<void> getCurrencies() async {
     var loanProvider = Provider.of<LoanProvider>(context, listen: false);
-    
     await loanProvider.getCurrencies();
-
-    
   }
 
-  Future<void> getloanestimate() async {
+  Future<void> getloanestimate(amount) async {
     var loanProvider = Provider.of<LoanProvider>(context, listen: false);
-    await loanProvider.getloanestimate();
+    await loanProvider.getloanestimate(amount);
   }
 
-  Future<void> getCreateLoan() async {
-    var loanProvider = Provider.of<LoanProvider>(context, listen: false);
-    await loanProvider.getCreateLoan();
-  }
+  // Future<void> getCreateLoan() async {
+  //   var loanProvider = Provider.of<LoanProvider>(context, listen: false);
+  //   await loanProvider.getCreateLoan();
+  // }
 
-  final TextEditingController _textEditingControllereciver =
-      TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     var loanProvider = Provider.of<LoanProvider>(context, listen: false);
-    print(loanProvider.getloanestimate());
-
-
-
+   
     return Scaffold(
       appBar: hiddenAppBar(),
       body: Container(
@@ -164,7 +160,7 @@ class _TakeLoanState extends State<TakeLoan> {
                         children: <Widget>[
                           Expanded(
                               child: TextFormField(
-                            initialValue: collatralintailvalue.toString(),
+                            controller: _textEditingControllesender,
                             decoration: new InputDecoration(
                               border: InputBorder.none,
                               focusedBorder: InputBorder.none,
@@ -183,27 +179,24 @@ class _TakeLoanState extends State<TakeLoan> {
                                     child: DropdownButton<String>(
                                       dropdownColor: buttoncolour,
                                       alignment: Alignment.centerRight,
-                                      value: _sender,
-                                      onChanged: loanProvider.issenderenable
-                                          ? (String? newValue) {
-                                              setState(() {
-                                                _sender = newValue!;
-                                              });
-                                            }
-                                          : null,
+                                      value: loanProvider.senderintialvalue
+                                          .toString(),
+                                      onChanged: (String? newValue) {
+                                        setState(() {
+                                          loanProvider.senderintialvalue =
+                                              newValue!;
+                                        });
+                                      },
                                       items: loanProvider.sendercurrences
                                           .map((map) {
                                         return new DropdownMenuItem<String>(
-
-                                          value: map["network"],
+                                          value: map.toString(),
                                           child: Container(
                                             // margin: EdgeInsets.only(left: 200),
                                             child: Row(
                                               children: <Widget>[
-                                                Image.asset(
-                                                  'assets/img/currency.png',
-                                                  width: 25,
-                                                ),
+                                                SvgPicture.network(
+                                                    map["logo_url"]),
                                                 SizedBox(
                                                   width: 10,
                                                 ),
@@ -263,7 +256,6 @@ class _TakeLoanState extends State<TakeLoan> {
                           Expanded(
                               child: TextFormField(
                             controller: _textEditingControllereciver,
-                            //  initialValue: '1223.3',
                             decoration: new InputDecoration(
                               border: InputBorder.none,
                               focusedBorder: InputBorder.none,
@@ -282,26 +274,24 @@ class _TakeLoanState extends State<TakeLoan> {
                                     child: DropdownButton<String>(
                                       dropdownColor: buttoncolour,
                                       alignment: Alignment.centerRight,
-                                      value: _reciver,
-                                      onChanged: loanProvider.isreciverenable
-                                          ? (String? newValue) {
-                                              setState(() {
-                                                _reciver = newValue!;
-                                              });
-                                            }
-                                          : null,
+                                      value: loanProvider.reciverintialvalue
+                                          .toString(),
+                                      onChanged: (String? newValue) {
+                                        setState(() {
+                                          loanProvider.reciverintialvalue =
+                                              newValue!;
+                                        });
+                                      },
                                       items: loanProvider.recivercurrencies
                                           .map((map) {
                                         return new DropdownMenuItem<String>(
-                                          value: map["network"],
+                                          value: map.toString(),
                                           child: Container(
                                             // margin: EdgeInsets.only(left: 200),
                                             child: Row(
                                               children: <Widget>[
-                                                Image.asset(
-                                                  'assets/img/currency.png',
-                                                  width: 25,
-                                                ),
+                                                SvgPicture.network(
+                                                    map["logo_url"]),
                                                 SizedBox(
                                                   width: 10,
                                                 ),
@@ -399,7 +389,8 @@ class _TakeLoanState extends State<TakeLoan> {
                 padding: const EdgeInsets.only(
                     left: 16, right: 16, top: 8, bottom: 8),
                 child: FutureBuilder(
-                    future: getloanestimate(),
+                     
+                    future:loanProvider.getloanestimate(_textEditingControllesender.text.trim()),
                     builder: (context, dataSnapshot) {
                       if (dataSnapshot.connectionState ==
                           ConnectionState.waiting) {
@@ -562,10 +553,11 @@ class _TakeLoanState extends State<TakeLoan> {
                             );
                           });
 
-                      await getCreateLoan().whenComplete(() => loanProvider
-                          .getLoanStatus(loanProvider.loanid)
-                          .whenComplete(() =>
-                              Navigator.pushNamed(context, '/confirm_loan')));
+                      await loanProvider.getCreateLoan().whenComplete(() =>
+                          loanProvider
+                              .getLoanStatus(loanProvider.loanid)
+                              .whenComplete(() => Navigator.pushNamed(
+                                  context, '/confirm_loan')));
 
                       Navigator.pop(context);
                     }
