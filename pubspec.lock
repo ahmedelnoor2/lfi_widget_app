@@ -135,13 +135,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  g_recaptcha_v3:
-    dependency: "direct main"
-    description:
-      name: g_recaptcha_v3
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.0.4"
   gallery_saver:
     dependency: "direct main"
     description:

@@ -33,11 +33,16 @@ class Trade extends StatefulWidget {
 }
 
 class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
+  var refreshKey = GlobalKey<RefreshIndicatorState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   var _channel;
 
+  final List<String> _tabs = [
+    "Spot",
+    "Cross Margin",
+  ];
   late final TabController _tabController =
-      TabController(length: 2, vsync: this);
+      TabController(length: _tabs.length, vsync: this);
 
   @override
   void initState() {
@@ -51,6 +56,13 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
       _channel.sink.close();
     }
     super.dispose();
+  }
+
+  Future<Null> refreshList() async {
+    refreshKey.currentState?.show(atTop: false);
+    connectWebSocket();
+    await Future.delayed(Duration(seconds: 2));
+    return null;
   }
 
   Future<void> connectWebSocket() async {
@@ -135,7 +147,7 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
 
     return Scaffold(
       key: _scaffoldKey,
-      appBar: appHeader(context, _tabController, onTabChange),
+      appBar: appHeader(context, _tabs, _tabController, onTabChange),
       drawer: _tabController.index == 0
           ? MarketDrawer(
               scaffoldKey: _scaffoldKey,
@@ -148,76 +160,161 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
       body: TabBarView(
         controller: _tabController,
         children: [
-          SingleChildScrollView(
-            child: Column(
-              children: [
-                MarketHeader(scaffoldKey: _scaffoldKey),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          Tab(
+            child: RefreshIndicator(
+              onRefresh: refreshList,
+              key: refreshKey,
+              child: SingleChildScrollView(
+                child: Column(
                   children: [
-                    Container(
-                      padding: EdgeInsets.only(top: 10, bottom: 10, left: 10),
-                      width: width * 0.4,
-                      child: OrderBook(
-                        asks: public.asks,
-                        bids: public.bids,
-                        lastPrice: public.lastPrice,
-                      ),
+                    MarketHeader(scaffoldKey: _scaffoldKey),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding:
+                              EdgeInsets.only(top: 10, bottom: 10, left: 10),
+                          width: width * 0.4,
+                          child: OrderBook(
+                            asks: public.asks,
+                            bids: public.bids,
+                            lastPrice: public.lastPrice,
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(right: 10),
+                          width: width * 0.58,
+                          child: TradeForm(
+                            scaffoldKey: _scaffoldKey,
+                            lastPrice: public.lastPrice,
+                          ),
+                        ),
+                      ],
                     ),
-                    Container(
-                      padding: EdgeInsets.only(right: 10),
-                      width: width * 0.58,
-                      child: TradeForm(
-                        scaffoldKey: _scaffoldKey,
-                        lastPrice: public.lastPrice,
-                      ),
+                    SizedBox(
+                      height: height,
+                      child: OpenOrders(),
                     ),
                   ],
                 ),
-                SizedBox(
-                  height: height,
-                  child: OpenOrders(),
-                ),
-              ],
+              ),
             ),
           ),
-          SingleChildScrollView(
-            child: Column(
-              children: [
-                MarketMarginHeader(scaffoldKey: _scaffoldKey),
-                MarginDetails(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          Tab(
+            child: RefreshIndicator(
+              onRefresh: refreshList,
+              key: refreshKey,
+              child: SingleChildScrollView(
+                child: Column(
                   children: [
-                    Container(
-                      padding: EdgeInsets.only(top: 10, bottom: 10, left: 10),
-                      width: width * 0.4,
-                      child: OrderBook(
-                        asks: public.asks,
-                        bids: public.bids,
-                        lastPrice: public.lastPrice,
-                      ),
+                    MarketMarginHeader(scaffoldKey: _scaffoldKey),
+                    MarginDetails(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding:
+                              EdgeInsets.only(top: 10, bottom: 10, left: 10),
+                          width: width * 0.4,
+                          child: OrderBook(
+                            asks: public.asks,
+                            bids: public.bids,
+                            lastPrice: public.lastPrice,
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(right: 10),
+                          width: width * 0.58,
+                          child: MarginTradeForm(
+                            scaffoldKey: _scaffoldKey,
+                            lastPrice: public.lastPrice,
+                          ),
+                        ),
+                      ],
                     ),
-                    Container(
-                      padding: EdgeInsets.only(right: 10),
-                      width: width * 0.58,
-                      child: MarginTradeForm(
-                        scaffoldKey: _scaffoldKey,
-                        lastPrice: public.lastPrice,
-                      ),
+                    SizedBox(
+                      height: height,
+                      child: MarginOpenOrders(),
                     ),
                   ],
                 ),
-                SizedBox(
-                  height: height,
-                  child: MarginOpenOrders(),
-                ),
-              ],
+              ),
             ),
           ),
         ],
+        // children: [
+        // SingleChildScrollView(
+        //   child: Column(
+        //     children: [
+        //       MarketHeader(scaffoldKey: _scaffoldKey),
+        //       Row(
+        //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //         crossAxisAlignment: CrossAxisAlignment.start,
+        //         children: [
+        //           Container(
+        //             padding: EdgeInsets.only(top: 10, bottom: 10, left: 10),
+        //             width: width * 0.4,
+        //             child: OrderBook(
+        //               asks: public.asks,
+        //               bids: public.bids,
+        //               lastPrice: public.lastPrice,
+        //             ),
+        //           ),
+        //           Container(
+        //             padding: EdgeInsets.only(right: 10),
+        //             width: width * 0.58,
+        //             child: TradeForm(
+        //               scaffoldKey: _scaffoldKey,
+        //               lastPrice: public.lastPrice,
+        //             ),
+        //           ),
+        //         ],
+        //       ),
+        //       SizedBox(
+        //         height: height,
+        //         child: OpenOrders(),
+        //       ),
+        //     ],
+        //   ),
+        // ),
+        // SingleChildScrollView(
+        //   child: Column(
+        //     children: [
+        //       MarketMarginHeader(scaffoldKey: _scaffoldKey),
+        //       MarginDetails(),
+        //       Row(
+        //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //         crossAxisAlignment: CrossAxisAlignment.start,
+        //         children: [
+        //           Container(
+        //             padding: EdgeInsets.only(top: 10, bottom: 10, left: 10),
+        //             width: width * 0.4,
+        //             child: OrderBook(
+        //               asks: public.asks,
+        //               bids: public.bids,
+        //               lastPrice: public.lastPrice,
+        //             ),
+        //           ),
+        //           Container(
+        //             padding: EdgeInsets.only(right: 10),
+        //             width: width * 0.58,
+        //             child: MarginTradeForm(
+        //               scaffoldKey: _scaffoldKey,
+        //               lastPrice: public.lastPrice,
+        //             ),
+        //           ),
+        //         ],
+        //       ),
+        //       SizedBox(
+        //         height: height,
+        //         child: MarginOpenOrders(),
+        //       ),
+        //     ],
+        //   ),
+        // ),
+        // ],
       ),
       bottomNavigationBar: bottomNav(context, auth),
     );

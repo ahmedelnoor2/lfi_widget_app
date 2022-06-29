@@ -126,8 +126,8 @@ class _AssetsInfoState extends State<AssetsInfo>
                                 },
                                 child: Container(
                                   padding: EdgeInsets.only(
-                                    bottom: width * 0.005,
-                                    top: width * 0.01,
+                                    bottom: 5,
+                                    top: 5,
                                   ),
                                   child: Row(
                                     mainAxisAlignment:

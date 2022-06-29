@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
@@ -49,7 +50,7 @@ class _SideBarState extends State<SideBar> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             SizedBox(
-              height: width * 0.46,
+              height: kIsWeb ? 120 : width * 0.46,
               child: DrawerHeader(
                 padding: EdgeInsets.zero,
                 child: Column(

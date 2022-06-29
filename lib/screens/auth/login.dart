@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -38,7 +39,7 @@ class _Login extends State<Login> {
   // Completer<WebViewController>();
   static final AliyunCaptchaController _captchaController =
       AliyunCaptchaController();
-  bool _enableLogin = false;
+  bool _enableLogin = true;
   final _formLoginKey = GlobalKey<FormState>();
 
   final String mobileNumber = '';
@@ -70,7 +71,7 @@ class _Login extends State<Login> {
 
   Future<void> getCaptchaData() async {
     var auth = Provider.of<Auth>(context, listen: false);
-    await auth.getCaptcha();
+    // await auth.getCaptcha();
     // print(auth.captchaData);
     widget.onLogin({
       'mobileNumber': _mobileNumber.text,
@@ -186,25 +187,26 @@ class _Login extends State<Login> {
         //       ),
         Container(
           padding: EdgeInsets.only(top: 20),
-          width: width * 1,
-          child: ElevatedButton(
-            onPressed: _enableLogin || kIsWeb
-                ? () {
-                    if (_formLoginKey.currentState!.validate()) {
-                      // If the form is valid, display a snackbar. In the real world,
-                      // you'd often call a server or save the information in a database.
-                      snackAlert(context, SnackTypes.warning, 'Processing...');
-                      setState(() {
-                        _enableLogin = false;
-                      });
-                      getCaptchaData();
-                    } else {
-                      // _captchaController.refresh({});
-                      // _captchaController.reset();
-                    }
-                  }
-                : null,
-            child: const Text('Login'),
+          child: LyoButton(
+            text: 'Login',
+            active: (_enableLogin || kIsWeb),
+            isLoading: false,
+            activeColor: linkColor,
+            activeTextColor: Colors.black,
+            onPressed: () {
+              if (_formLoginKey.currentState!.validate()) {
+                // If the form is valid, display a snackbar. In the real world,
+                // you'd often call a server or save the information in a database.
+                snackAlert(context, SnackTypes.warning, 'Processing...');
+                setState(() {
+                  _enableLogin = false;
+                });
+                getCaptchaData();
+              } else {
+                // _captchaController.refresh({});
+                // _captchaController.reset();
+              }
+            },
           ),
         ),
         Container(

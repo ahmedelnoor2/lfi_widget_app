@@ -313,13 +313,13 @@ class _MarginAssetsState extends State<MarginAssets> {
                       Text('Hide Small Balance'),
                     ],
                   ),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Icon(
-                      Icons.search,
-                      size: 18,
-                    ),
-                  )
+                  // GestureDetector(
+                  //   onTap: () {},
+                  //   child: Icon(
+                  //     Icons.search,
+                  //     size: 18,
+                  //   ),
+                  // )
                 ],
               ),
             ),
@@ -428,7 +428,7 @@ class _MarginAssetsState extends State<MarginAssets> {
                                           ),
                                         ),
                                         Text(
-                                          'LYO Credit',
+                                          '${public.publicInfoMarket['market']['coinList'][asset['values']['baseCoin']]['longName']}',
                                           style: TextStyle(
                                             fontSize: 12,
                                             color: secondaryTextColor,

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
@@ -31,7 +32,7 @@ class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
       AliyunCaptchaController();
   late final TabController _tabController =
       TabController(length: 2, vsync: this);
-  bool _enableSignup = false;
+  bool _enableSignup = true;
   final _formKey = GlobalKey<FormState>();
 
   bool termsAndCondition = false;
@@ -386,66 +387,71 @@ class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
             ),
           ),
         ),
-        kIsWeb
-            ? Align(
-                alignment: Alignment.center,
-                child: Container(
-                  width: width,
-                  padding: EdgeInsets.only(left: 10, top: 10, right: 10),
-                  child: WebViewX(
-                    height: height * 0.05,
-                    width: width,
-                    initialContent: 'http://localhost:3001/',
-                    initialSourceType: SourceType.url,
-                    onWebViewCreated: (WebViewXController controller) {
-                      // _controller = controller;
-                      setController(controller);
-                      // setState(() {
-                      // });
-                    },
-                    onPageFinished: (src) {
-                      // _callPlatformIndependentJsMethod();
-                    },
-                    jsContent: const {
-                      EmbeddedJsContent(
-                        js: "function testPlatformIndependentMethod() { console.log('Hi from JS') }",
-                      ),
-                      EmbeddedJsContent(
-                        webJs:
-                            "function testPlatformSpecificMethod(msg) { TestDartCallback('Web callback says: ' + msg) }",
-                        mobileJs:
-                            "function testPlatformSpecificMethod(msg) { TestDartCallback.postMessage('Mobile callback says: ' + msg) }",
-                      ),
-                    },
-                    dartCallBacks: {
-                      DartCallback(
-                        name: 'TestDartCallback',
-                        callBack: (msg) {
-                          print(msg);
-                        },
-                      )
-                    },
-                    webSpecificParams: const WebSpecificParams(
-                      printDebugInfo: true,
-                    ),
-                    // ...
-                    // ... other options
-                  ),
-                ),
-              )
-            : Captcha(
-                onCaptchaVerification: (value) {
-                  toggleLoginButton(true);
-                  if (value.containsKey('sig')) {
-                  } else {
-                    toggleLoginButton(false);
-                  }
-                  widget.onCaptchaVerification(value);
-                },
-              ),
-        SizedBox(
-          width: width * 1,
-          child: ElevatedButton(
+        // kIsWeb
+        //     ? Align(
+        //         alignment: Alignment.center,
+        //         child: Container(
+        //           width: width,
+        //           padding: EdgeInsets.only(left: 10, top: 10, right: 10),
+        //           child: WebViewX(
+        //             height: height * 0.05,
+        //             width: width,
+        //             initialContent: 'http://localhost:3001/',
+        //             initialSourceType: SourceType.url,
+        //             onWebViewCreated: (WebViewXController controller) {
+        //               // _controller = controller;
+        //               setController(controller);
+        //               // setState(() {
+        //               // });
+        //             },
+        //             onPageFinished: (src) {
+        //               // _callPlatformIndependentJsMethod();
+        //             },
+        //             jsContent: const {
+        //               EmbeddedJsContent(
+        //                 js: "function testPlatformIndependentMethod() { console.log('Hi from JS') }",
+        //               ),
+        //               EmbeddedJsContent(
+        //                 webJs:
+        //                     "function testPlatformSpecificMethod(msg) { TestDartCallback('Web callback says: ' + msg) }",
+        //                 mobileJs:
+        //                     "function testPlatformSpecificMethod(msg) { TestDartCallback.postMessage('Mobile callback says: ' + msg) }",
+        //               ),
+        //             },
+        //             dartCallBacks: {
+        //               DartCallback(
+        //                 name: 'TestDartCallback',
+        //                 callBack: (msg) {
+        //                   print(msg);
+        //                 },
+        //               )
+        //             },
+        //             webSpecificParams: const WebSpecificParams(
+        //               printDebugInfo: true,
+        //             ),
+        //             // ...
+        //             // ... other options
+        //           ),
+        //         ),
+        //       )
+        //     : Captcha(
+        //         onCaptchaVerification: (value) {
+        //           toggleLoginButton(true);
+        //           if (value.containsKey('sig')) {
+        //           } else {
+        //             toggleLoginButton(false);
+        //           }
+        //           widget.onCaptchaVerification(value);
+        //         },
+        //       ),
+        Container(
+          padding: EdgeInsets.only(top: 20),
+          child: LyoButton(
+            text: 'Sign Up',
+            active: (_enableSignup && termsAndCondition),
+            isLoading: false,
+            activeColor: linkColor,
+            activeTextColor: Colors.black,
             onPressed: (_enableSignup && termsAndCondition)
                 ? () {
                     if (_formKey.currentState!.validate()) {
@@ -477,7 +483,6 @@ class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
                     }
                   }
                 : null,
-            child: const Text('Sign Up'),
           ),
         ),
       ],

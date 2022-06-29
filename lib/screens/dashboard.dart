@@ -201,27 +201,34 @@ class _DashboardState extends State<Dashboard> {
       key: _key,
       appBar: hiddenAppBar(),
       drawer: const SideBar(),
-      body: SingleChildScrollView(
-        child: Container(
-          width: width,
-          padding: EdgeInsets.all(width * 0.015),
-          child: Column(
-            // mainAxisAlignment: MainAxisAlignment.center,
-            // crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SearchBar(handleDrawer: _handleDrawer),
-              Carousal(),
-              Announcement(),
-              LiveFeed(
-                headerSymbols: public.headerSymbols,
-              ),
-              BuyCrypto(channel: _channel),
-              LatestListing(),
-              Hotlinks(channel: _channel),
-              AssetsInfo(
-                headerSymbols: public.headerSymbols,
-              ),
-            ],
+      body: RefreshIndicator(
+        onRefresh: () async {
+          getAssetsRate();
+          checkLoginStatus();
+          await Future.delayed(const Duration(seconds: 2));
+        },
+        child: SingleChildScrollView(
+          child: Container(
+            width: width,
+            padding: EdgeInsets.all(width * 0.015),
+            child: Column(
+              // mainAxisAlignment: MainAxisAlignment.center,
+              // crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SearchBar(handleDrawer: _handleDrawer),
+                Carousal(),
+                Announcement(),
+                LiveFeed(
+                  headerSymbols: public.headerSymbols,
+                ),
+                BuyCrypto(channel: _channel),
+                LatestListing(),
+                Hotlinks(channel: _channel),
+                AssetsInfo(
+                  headerSymbols: public.headerSymbols,
+                ),
+              ],
+            ),
           ),
         ),
       ),

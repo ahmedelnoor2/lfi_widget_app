@@ -1,9 +1,9 @@
-import 'dart:js' as js;
 import 'package:flutter/material.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:webviewx/webviewx.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Carousal extends StatefulWidget {
   const Carousal({Key? key}) : super(key: key);
@@ -37,6 +37,11 @@ class _CarousalState extends State<Carousal> {
     },
   ];
 
+  void _launchUrl(_url) async {
+    final Uri url = Uri.parse(_url);
+    if (!await launchUrl(url)) throw 'Could not launch $url';
+  }
+
   @override
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
@@ -59,9 +64,11 @@ class _CarousalState extends State<Carousal> {
             return InkWell(
               onTap: () {
                 if (slider['path'] == '/faq') {
-                  js.context.callMethod('open', [
-                    'https://docs.lyotrade.com/introduction/what-is-lyotrade'
-                  ]);
+                  _launchUrl(
+                      'https://docs.lyotrade.com/introduction/what-is-lyotrade');
+                  // js.context.callMethod('open', [
+                  //   'https://docs.lyotrade.com/introduction/what-is-lyotrade'
+                  // ]);
                   // showModalBottomSheet<void>(
                   //   isScrollControlled: true,
                   //   context: context,
@@ -86,7 +93,7 @@ class _CarousalState extends State<Carousal> {
                   //   },
                   // );
                 } else if (slider['path'] == '/lyowallet') {
-                  js.context.callMethod('open', ['https://wallet.lyofi.com']);
+                  _launchUrl('https://wallet.lyofi.com');
                 } else {
                   Navigator.pushNamed(context, '${slider['path']}');
                 }

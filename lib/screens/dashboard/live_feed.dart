@@ -34,7 +34,7 @@ class _LiveFeedState extends State<LiveFeed> {
           : Column(
               children: [
                 Container(
-                  height: height * 0.115,
+                  height: 100,
                   padding: EdgeInsets.only(
                     top: width * 0.04,
                     bottom: width * 0.04,

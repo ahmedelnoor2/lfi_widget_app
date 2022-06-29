@@ -38,6 +38,10 @@ String getTranslate(String text) {
       return 'Closing the position exceeds the total amount of the position';
     case '用户未登陆':
       return 'User is not logged in';
+    case '滑动验证类型错误':
+      return 'Swipe validation type error';
+    case '参数非法':
+      return 'Illegal parameter';
     default:
       return text;
   }

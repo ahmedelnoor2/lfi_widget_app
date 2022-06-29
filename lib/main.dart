@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/dex_provider.dart';
@@ -43,15 +42,8 @@ import 'package:lyotrade/screens/trade/trade.dart';
 import 'package:lyotrade/screens/trade/trade_history.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
-// import 'package:g_recaptcha_v3/g_recaptcha_v3.dart';
 
 void main() async {
-  // WidgetsFlutterBinding.ensureInitialized();
-  // if (kIsWeb) {
-  //   var ready = await GRecaptchaV3.ready(
-  //       "6LcbLqggAAAAAB2SsL0izB_chHwgcm55-EquHn0F"); //--2
-  //   // print("Is Recaptcha ready? $ready");
-  // }
   runApp(const MyApp());
 }
 

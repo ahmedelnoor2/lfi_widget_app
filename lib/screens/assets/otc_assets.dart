@@ -287,13 +287,13 @@ class _OtcAssetsState extends State<OtcAssets> {
                       Text('Hide Small Balance'),
                     ],
                   ),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Icon(
-                      Icons.search,
-                      size: 18,
-                    ),
-                  )
+                  // GestureDetector(
+                  //   onTap: () {},
+                  //   child: Icon(
+                  //     Icons.search,
+                  //     size: 18,
+                  //   ),
+                  // )
                 ],
               ),
             ),
@@ -403,7 +403,7 @@ class _OtcAssetsState extends State<OtcAssets> {
                                           ),
                                         ),
                                         Text(
-                                          'LYO Credit',
+                                          '${public.publicInfoMarket['market']['coinList'][asset['coin']] != null ? public.publicInfoMarket['market']['coinList'][asset['coin']]['longName'] : getCoinName(asset['coinSymbol'])}',
                                           style: TextStyle(
                                             fontSize: 12,
                                             color: secondaryTextColor,

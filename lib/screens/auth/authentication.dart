@@ -90,8 +90,9 @@ class _AuthenticationState extends State<Authentication> {
       //     : _captchaVerification['sessionId'],
       'mobileNumber': value['mobileNumber'],
       'loginPword': value['loginPword'],
-      // 'scene': 'other',
+      'scene': 'other',
       // 'sig': _captchaVerification['sig'],
+      // 'token': _captchaVerification['token'],
       'token': true,
       'verificationType': '0',
     });
@@ -164,8 +165,8 @@ class _AuthenticationState extends State<Authentication> {
                       )
                     : _authLogin
                         ? Login(onLogin: (value, captchaController) async {
-                            print('--------------------');
-                            print(captchaController);
+                            // print('--------------------');
+                            // print(captchaController);
 
                             String result = await processLogin(value);
                             if (result.isNotEmpty) {

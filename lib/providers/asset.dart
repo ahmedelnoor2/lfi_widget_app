@@ -706,4 +706,99 @@ class Asset with ChangeNotifier {
       // throw error;
     }
   }
+
+  Future<void> withdrawAddressValidate(ctx, auth, formData) async {
+    /*
+    * Params
+      "address": "0x215c92caf0e55c8f9e8fafb1a2d8efcd5298da40",
+      "coinSymbol": "LYO1",
+    */
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/addr/add_withdraw_addr_validate_v4',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        // if (responseData['msg'] == 'Failure to transfer leveraged funds！') {
+        //   snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
+        // } else if (responseData['msg'] == 'Insufficient Balance') {
+        //   snackAlert(ctx, SnackTypes.errors, 'Insufficient Balance');
+        // } else {
+        // }
+        snackAlert(ctx, SnackTypes.success, 'Address validated');
+      } else if (responseData['code'] == 10002) {
+        snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+      } else {
+        snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
+      }
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
+      // throw error;
+    }
+  }
+
+  // operationType: "17"
+
+  Future<void> processWithdrawal(ctx, auth, formData) async {
+    /*
+    * Params
+      "address": "0x215c92caf0e55c8f9e8fafb1a2d8efcd5298da40",
+      "addressId": "",
+      "amount": "50.80000000",
+      "emailValidCode": "057401",
+      "fee": "20.2",
+      "googleCode": "816218",
+      "symbol": "LYO1",
+      "trustType": 0,
+    */
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/finance/do_withdraw_v4',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        // if (responseData['msg'] == 'Failure to transfer leveraged funds！') {
+        //   snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
+        // } else if (responseData['msg'] == 'Insufficient Balance') {
+        //   snackAlert(ctx, SnackTypes.errors, 'Insufficient Balance');
+        // } else {
+        // }
+        snackAlert(
+            ctx, SnackTypes.success, 'Successfully created withdraw request');
+      } else if (responseData['code'] == 10002) {
+        snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+      } else {
+        snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
+      }
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
+      // throw error;
+    }
+  }
 }

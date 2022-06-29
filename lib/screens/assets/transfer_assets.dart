@@ -220,7 +220,7 @@ class _TransferAssetsState extends State<TransferAssets> {
             left: 15,
             bottom: 15,
           ),
-          height: height * 0.95,
+          height: height,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -770,7 +770,12 @@ class _TransferAssetsState extends State<TransferAssets> {
                 items: _toAccounts.map<DropdownMenuItem<String>>((value) {
                   return DropdownMenuItem<String>(
                     value: value,
-                    child: Text(value),
+                    child: Text(
+                      value,
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
                   );
                 }).toList(),
               ),

@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
@@ -212,48 +212,51 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SizedBox(
-                width: width * 0.27,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: _isBuy ? Color(0xff26A160) : Color(0xff292C51),
-                    textStyle: TextStyle(),
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _isBuy = true;
-                    });
-                    setAvailalbePrice();
-                  },
-                  child: Text(
-                    'Buy',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: width * 0.27,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: _isBuy ? Color(0xff292C51) : Color(0xffD84646),
-                    textStyle: TextStyle(),
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _isBuy = false;
-                    });
-                    setAvailalbePrice();
-                  },
-                  child: Text(
-                    'Sell',
-                    style: TextStyle(color: Colors.white),
+          Container(
+            margin: kIsWeb ? EdgeInsets.only(bottom: 8) : EdgeInsets.zero,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SizedBox(
+                  width: width * 0.27,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: _isBuy ? Color(0xff26A160) : Color(0xff292C51),
+                      textStyle: TextStyle(),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isBuy = true;
+                      });
+                      setAvailalbePrice();
+                    },
+                    child: Text(
+                      'Buy',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
-              ),
-            ],
+                SizedBox(
+                  width: width * 0.27,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: _isBuy ? Color(0xff292C51) : Color(0xffD84646),
+                      textStyle: TextStyle(),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isBuy = false;
+                      });
+                      setAvailalbePrice();
+                    },
+                    child: Text(
+                      'Sell',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           PopupMenuButton(
             child: Container(
@@ -570,6 +573,7 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
               style: ElevatedButton.styleFrom(
                 primary: _isBuy ? Color(0xff26A160) : Color(0xffD84646),
                 textStyle: TextStyle(),
+                padding: kIsWeb ? EdgeInsets.all(18) : EdgeInsets.zero,
               ),
               child: Text(
                 auth.isAuthenticated

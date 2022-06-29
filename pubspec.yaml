@@ -55,7 +55,6 @@ dependencies:
   webview_flutter: ^2.8.0
   flutter_svg: ^1.0.3
   archive: ^3.3.0
-  g_recaptcha_v3: ^0.0.4
   slider_captcha: ^0.0.8
   uuid: ^3.0.6
 
