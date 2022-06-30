@@ -39,6 +39,7 @@ class _DepositAssetsState extends State<DepositAssets> {
   String _defaultNetwork = 'ERC20';
   String _defaultCoin = 'USDT';
   List _allNetworks = [];
+  Image? _qrCode;
 
   @override
   void initState() {
@@ -50,6 +51,20 @@ class _DepositAssetsState extends State<DepositAssets> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  Future<void> loadQrCode() async {
+    var asset = Provider.of<Asset>(context, listen: false);
+
+    setState(() {
+      _qrCode = Image.memory(
+        base64Decode(
+          asset.changeAddress['addressQRCode']
+              .split(',')[1]
+              .replaceAll("\n", ""),
+        ),
+      );
+    });
   }
 
   Future<void> getDigitalBalance() async {
@@ -105,6 +120,7 @@ class _DepositAssetsState extends State<DepositAssets> {
         });
       }
     });
+    loadQrCode();
 
     setState(() {
       _loadingAddress = false;
@@ -377,14 +393,10 @@ class _DepositAssetsState extends State<DepositAssets> {
                             height: width * 0.45,
                             child: _loadingAddress
                                 ? depositQrSkull(context)
-                                : asset.changeAddress['addressQRCode'] != null
-                                    ? Image.memory(
-                                        base64Decode(
-                                          asset.changeAddress['addressQRCode']
-                                              .split(',')[1]
-                                              .replaceAll("\n", ""),
-                                        ),
-                                      )
+                                : (asset.changeAddress['addressQRCode'] !=
+                                            null &&
+                                        _qrCode != null)
+                                    ? _qrCode
                                     : const CircularProgressIndicator
                                         .adaptive(),
                           ),

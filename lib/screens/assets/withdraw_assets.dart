@@ -39,6 +39,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
   final TextEditingController _searchController = TextEditingController();
 
   final TextEditingController _emailVeirficationCode = TextEditingController();
+  final TextEditingController _smsVeirficationCode = TextEditingController();
   final TextEditingController _googleVeirficationCode = TextEditingController();
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -59,6 +60,10 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
   int _start = 90;
   bool _startTimer = false;
 
+  late Timer _timerSms;
+  int _startSms = 90;
+  bool _startTimerSms = false;
+
   @override
   void initState() {
     getDigitalBalance();
@@ -73,6 +78,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
     _addressController.dispose();
     _amountController.dispose();
     _emailVeirficationCode.dispose();
+    _smsVeirficationCode.dispose();
     _googleVeirficationCode.dispose();
     super.dispose();
   }
@@ -100,25 +106,47 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
     );
   }
 
+  void startMobileTimer() {
+    setState(() {
+      _startTimerSms = true;
+    });
+    sendSmsVerificationCode();
+    const oneSec = Duration(seconds: 1);
+    _timerSms = Timer.periodic(
+      oneSec,
+      (Timer timer) {
+        if (_start == 0) {
+          setState(() {
+            _startTimerSms = false;
+            _timerSms.cancel();
+          });
+        } else {
+          setState(() {
+            _startSms--;
+          });
+        }
+      },
+    );
+  }
+
+  Future<void> sendSmsVerificationCode() async {
+    var auth = Provider.of<Auth>(context, listen: false);
+
+    await auth.sendMobileValidCode(context, {
+      'token': '',
+      'operationType': '10',
+      'smsType': '0',
+    });
+  }
+
   Future<void> sendVerificationCode() async {
     var auth = Provider.of<Auth>(context, listen: false);
 
-    if (auth.userInfo['mobileNumber'].isEmpty) {
-      await auth.sendEmailValidCode(context, {
-        'token': '',
-        'email': '',
-        'operationType': '17',
-      });
-    } else if (auth.userInfo['mobileNumber'].isNotEmpty) {
-      await auth.sendMobileValidCode(context, {
-        'token': '',
-        'operationType': '17',
-        'smsType': '0',
-      });
-    } else {
-      snackAlert(
-          context, SnackTypes.errors, 'Auth error, contact administrator');
-    }
+    await auth.sendEmailValidCode(context, {
+      'token': '',
+      'email': '',
+      'operationType': '17',
+    });
   }
 
   @override
@@ -290,7 +318,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
 
-    asset.processWithdrawal(context, auth, {
+    var _postData = {
       "address": _addressController.text,
       "addressId": "",
       "amount": _amountController.text,
@@ -299,7 +327,12 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
       "googleCode": _googleVeirficationCode.text,
       "symbol": _coinShowName,
       "trustType": 0,
-    });
+    };
+    if (auth.userInfo['mobileNumber'].isNotEmpty) {
+      _postData['smsValidCode'] = _smsVeirficationCode.text;
+    }
+
+    asset.processWithdrawal(context, auth, _postData);
     getDigitalBalance();
     setState(() {
       _addressController.clear();
@@ -995,7 +1028,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                     child: TextFormField(
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter ${(auth.userInfo['mobileNumber'].isEmpty) ? 'Email' : 'SMS'} verification code';
+                          return 'Please enter Email verification code';
                         }
                         return null;
                       },
@@ -1009,8 +1042,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                         hintStyle: TextStyle(
                           fontSize: 14,
                         ),
-                        hintText:
-                            '${(auth.userInfo['mobileNumber'].isEmpty) ? 'Email' : 'SMS'} verification code',
+                        hintText: 'Email verification code',
                       ),
                     ),
                   ),
@@ -1033,6 +1065,64 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                 ],
               ),
             ),
+            auth.userInfo['mobileNumber'].isEmpty
+                ? Container()
+                : Container(
+                    margin: EdgeInsets.only(top: 20),
+                    padding: EdgeInsets.only(top: 15, bottom: 15, left: 15),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(
+                        style: BorderStyle.solid,
+                        width: 0.3,
+                        color: Color(0xff5E6292),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(
+                          width: width * 0.49,
+                          child: TextFormField(
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter SMS verification code';
+                              }
+                              return null;
+                            },
+                            controller: _smsVeirficationCode,
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.zero,
+                              isDense: true,
+                              border: UnderlineInputBorder(
+                                borderSide: BorderSide.none,
+                              ),
+                              hintStyle: TextStyle(
+                                fontSize: 14,
+                              ),
+                              hintText: 'SMS verification code',
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(right: 10),
+                          child: TextButton(
+                            onPressed: _startTimerSms
+                                ? null
+                                : () {
+                                    setState(() {
+                                      _startSms = 90;
+                                    });
+                                    startMobileTimer();
+                                  },
+                            child: Text(_startTimerSms
+                                ? '${_startSms}s Get it again'
+                                : 'Click to send'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
             Container(
               margin: EdgeInsets.only(top: 20),
               padding: EdgeInsets.only(top: 15, bottom: 15, left: 15),
