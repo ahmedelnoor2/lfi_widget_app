@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:webviewx/webviewx.dart';
@@ -65,33 +64,8 @@ class _CarousalState extends State<Carousal> {
               onTap: () {
                 if (slider['path'] == '/faq') {
                   _launchUrl(
-                      'https://docs.lyotrade.com/introduction/what-is-lyotrade');
-                  // js.context.callMethod('open', [
-                  //   'https://docs.lyotrade.com/introduction/what-is-lyotrade'
-                  // ]);
-                  // showModalBottomSheet<void>(
-                  //   isScrollControlled: true,
-                  //   context: context,
-                  //   builder: (BuildContext context) {
-                  //     return StatefulBuilder(
-                  //       builder:
-                  //           (BuildContext context, StateSetter setState) {
-                  //         return Scaffold(
-                  //           appBar: hiddenAppBarWithDefaultHeight(),
-                  //           body: WebViewX(
-                  //             width: width,
-                  //             height: height * 0.8,
-                  //             initialContent:
-                  //                 'https://docs.lyotrade.com/introduction/what-is-lyotrade',
-                  //             initialSourceType: SourceType.url,
-                  //             onWebViewCreated: (controller) =>
-                  //                 webviewController = controller,
-                  //           ),
-                  //         );
-                  //       },
-                  //     );
-                  //   },
-                  // );
+                    'https://docs.lyotrade.com/introduction/what-is-lyotrade',
+                  );
                 } else if (slider['path'] == '/lyowallet') {
                   _launchUrl('https://wallet.lyofi.com');
                 } else {
@@ -100,7 +74,10 @@ class _CarousalState extends State<Carousal> {
               },
               child: SizedBox(
                 width: width,
-                child: Image.asset('assets/img/${slider['link']}'),
+                child: Image.asset(
+                  'assets/img/${slider['link']}',
+                  fit: BoxFit.cover,
+                ),
               ),
             );
           },

@@ -300,6 +300,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
       "symbol": _coinShowName,
       "trustType": 0,
     });
+    getDigitalBalance();
     setState(() {
       _addressController.clear();
       _amountController.clear();

@@ -164,7 +164,6 @@ class _StakeOrderState extends State<StakeOrder> {
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
 
-    var public = Provider.of<Public>(context, listen: true);
     var staking = Provider.of<Staking>(context, listen: true);
 
     return Scaffold(

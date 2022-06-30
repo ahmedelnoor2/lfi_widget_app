@@ -49,6 +49,11 @@ class _AssetsState extends State<Assets> {
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
     await asset.getTotalBalance(auth);
+    if (asset.accountBalance.isNotEmpty) {
+      setState(() {
+        _totalBalanceSymbol = asset.accountBalance['totalBalanceSymbol'];
+      });
+    }
   }
 
   void toggleHideBalances() {
@@ -160,7 +165,7 @@ class _AssetsState extends State<Assets> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    'Total Assets in USD',
+                                    'Total Assets in $_totalBalanceSymbol',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
@@ -222,7 +227,7 @@ class _AssetsState extends State<Assets> {
                                                     padding: EdgeInsets.only(
                                                         right: 10),
                                                     child: Text(
-                                                      '${_hideBalances ? _hideBalanceString : asset.totalAccountBalance['totalbalance']} BTC',
+                                                      '${_hideBalances ? _hideBalanceString : asset.totalAccountBalance['totalbalance']} $_totalBalanceSymbol',
                                                       style: TextStyle(
                                                           fontSize: 20,
                                                           fontWeight:

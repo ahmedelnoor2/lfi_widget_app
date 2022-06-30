@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/user.dart';
+import 'package:lyotrade/screens/common/lyo_buttons.dart';
 
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
@@ -229,17 +230,18 @@ class _SideBarState extends State<SideBar> {
               ),
             ),
             auth.userInfo.isNotEmpty
-                ? SizedBox(
-                    width: width * 0.5,
-                    child: ElevatedButton(
+                ? Container(
+                    padding: EdgeInsets.only(right: 10, left: 10),
+                    child: LyoButton(
                       onPressed: () {
                         auth.logout(context);
                       },
-                      child: const Text(
-                        'Logout',
-                      ),
-                    ),
-                  )
+                      text: 'Logout',
+                      active: true,
+                      activeColor: linkColor,
+                      activeTextColor: Colors.black,
+                      isLoading: false,
+                    ))
                 : Container()
           ],
         ),

@@ -162,6 +162,7 @@ class Auth with ChangeNotifier {
         Navigator.pushNamedAndRemoveUntil(ctx, '/', (route) => false);
       }
     } catch (error) {
+      print(error);
       // throw error;
     }
   }

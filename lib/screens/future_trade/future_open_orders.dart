@@ -6,6 +6,8 @@ import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/future_market.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/no_data.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/screens/future_trade/common/leverage_level.dart';
 import 'package:lyotrade/screens/trade/common/percentage_indicator.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
@@ -205,7 +207,7 @@ class _FutureOpenOrdersState extends State<FutureOpenOrders>
             IconButton(
               onPressed: () {
                 auth.isAuthenticated
-                    ? Navigator.pushNamed(context, '/trade_history')
+                    ? snackAlert(context, SnackTypes.warning, 'Coming Soon...')
                     : Navigator.pushNamed(context, '/authentication');
               },
               icon: Icon(

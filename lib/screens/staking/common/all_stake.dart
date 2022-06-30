@@ -41,6 +41,21 @@ class _AllStakeState extends State<AllStake> {
   Future<void> getAllStakes() async {
     var public = Provider.of<Public>(context, listen: false);
     await public.getStakeLists();
+    List _currentProcessing = [];
+    for (var stake in public.stakeLists) {
+      if (_filterType == 'Processing') {
+        if (stake['status'] == 1) {
+          _currentProcessing.add(stake);
+        }
+      }
+    }
+    if (_currentProcessing.isEmpty) {
+      setState(() {
+        _filterType = 'All';
+      });
+      snackAlert(
+          context, SnackTypes.warning, 'Active projects are not availalbe');
+    }
   }
 
   Future<void> getStakeInfo(stakeId) async {

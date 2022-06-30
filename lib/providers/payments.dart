@@ -136,7 +136,8 @@ class Payments with ChangeNotifier {
       if (responseData['code'] == '0') {
         _cryptoCurrencies = responseData['data'];
         _cryptoSearchCurrencies = responseData['data'];
-        _selectedCryptoCurrency = responseData['data'][0];
+        _selectedCryptoCurrency = responseData['data']
+            .firstWhere((item) => item['ticker'] == 'usdttrc20');
         return notifyListeners();
       } else if (responseData['code'] == '10002') {
         snackAlert(

@@ -90,8 +90,6 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
       }
     }
 
-    print(_defaultNetwork);
-
     // Map _availableCoinLists = {};
     // if (asset.accountBalance.isNotEmpty) {
     //   asset.accountBalance['allCoinMap'].forEach((key, value) {
