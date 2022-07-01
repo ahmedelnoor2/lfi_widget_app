@@ -1,12 +1,12 @@
 import 'dart:convert';
 
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:k_chart/entity/index.dart';
 import 'package:lyotrade/screens/common/alert.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
+import 'package:lyotrade/screens/take_loan/take_loan.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 
 class LoanProvider with ChangeNotifier {
@@ -19,33 +19,76 @@ class LoanProvider with ChangeNotifier {
     'Content-Type': 'application/x-www-form-urlencoded'
   };
 
-  var issenderenable = false;
-  var isreciverenable = false;
+  List _fromCurrenciesList = [];
 
-  // Currencies
-  List _sendercurrences = [];
+  List get fromCurrenciesList {
+    return _fromCurrenciesList;
+  }
 
-  Future<void> setsendercurrences(value) async {
-    _sendercurrences = value;
+  String _selectedFromCurrencyCoin = 'BTC(Bitcoin)';
+
+  String get selectedFromCurrencyCoin {
+    return _selectedFromCurrencyCoin;
+  }
+
+  void setSelectedFromCurrencyCoin(coin) {
+    _selectedFromCurrencyCoin = coin;
     notifyListeners();
   }
 
-  Iterable get sendercurrences {
-    return _sendercurrences;
+  Map _fromCurrencies = {};
+
+  Map get fromCurrencies {
+    return _fromCurrencies;
   }
 
-  List _recivercurrencies = [];
-  Future<void> setrecivercurrences(value) async {
-    _recivercurrencies = value;
+  Map _fromSelectedCurrency = {};
+
+  Map get fromSelectedCurrency {
+    return _fromSelectedCurrency;
+  }
+
+  void setFromSelectedCurrency(currency) {
+    _fromSelectedCurrency = currency;
     notifyListeners();
   }
 
-  Iterable get recivercurrencies {
-    return _recivercurrencies;
+/////to cuurency//
+  ///
+  List _toCurrenciesList = [];
+
+  List get toCurrenciesList {
+    return _toCurrenciesList;
   }
 
-  var senderintialvalue;
-  var reciverintialvalue;
+  String _selectedToCurrencyCoin = "USDT(TRX)";
+
+  String get selectedToCurrencyCoin {
+    return _selectedToCurrencyCoin;
+  }
+
+  void setSelectedToCurrencyCoin(coin) {
+    _selectedToCurrencyCoin = coin;
+    notifyListeners();
+  }
+
+  Map _toCurrencies = {};
+
+  Map get toCurrencies {
+    return _toCurrencies;
+  }
+
+  Map _toSelectedCurrency = {};
+
+  Map get toSelectedCurrency {
+    return _toSelectedCurrency;
+  }
+
+  void setToSelectedCurrency(currency) {
+    _toSelectedCurrency = currency;
+    notifyListeners();
+  }
+
   Future<void> getCurrencies() async {
     var url = Uri.https(
       loanApiUrl,
@@ -58,30 +101,56 @@ class LoanProvider with ChangeNotifier {
         headers: headers,
       );
 
-      final responseData = json.decode(response.body);
+      final responseData = jsonDecode(response.body);
 
       if (responseData['result']) {
-        var myresponsedata=responseData['response'];
-      var filteredCollateral =  myresponsedata.where((currency) =>
-            (currency['is_loan_deposit_enabled'] == true &&
-                currency['is_stable'] == false)).toList();
-        var filteredLoans = responseData['response'].where((currency) =>
-            (currency['is_stable'] == true &&
-                currency['is_loan_receive_enabled'] == true)).toList();
-        setsendercurrences(filteredCollateral);
-        setrecivercurrences(filteredLoans);
-        senderintialvalue =  filteredCollateral[0];
-        reciverintialvalue = filteredLoans[0];
-    
+        var myresponsedata = responseData['response'];
+
+        /// filtering data
+        _fromCurrenciesList.clear();
+        for (var resData in myresponsedata) {
+          if ((resData['is_loan_deposit_enabled'] == true) &&
+              (resData['is_stable'] == false)) {
+            _fromCurrencies['${resData['code']}(${resData['name']})'] = resData;
+            _fromCurrenciesList.add('${resData['code']}(${resData['name']})');
+            if ('${resData['code']}(${resData['name']})' ==
+                _selectedFromCurrencyCoin) {
+              _fromSelectedCurrency = resData;
+
+              from_code = _fromSelectedCurrency['code'];
+              from_network = _fromSelectedCurrency['network'];
+            }
+          }
+        }
+
+        _toCurrenciesList.clear();
+
+        for (var resData in myresponsedata) {
+          if ((resData['is_stable'] == true) &&
+              (resData['is_loan_receive_enabled'] == true)) {
+            _toCurrencies['${resData['code']}(${resData['network']})'] =
+                resData;
+            _toCurrenciesList.add('${resData['code']}(${resData['network']})');
+
+            if ('${resData['code']}(${resData['network']})' ==
+                _selectedToCurrencyCoin) {
+              _toSelectedCurrency = resData;
+              to_code = _toSelectedCurrency['code'];
+              to_network = _toSelectedCurrency['network'];
+            }
+          }
+        }
+
         return notifyListeners();
       } else {
-        _sendercurrences = [];
-        _recivercurrencies = [];
+        _fromCurrenciesList = [];
+        _toCurrenciesList = [];
+
         return notifyListeners();
       }
     } catch (error) {
       print(error);
-    
+
       return;
     }
   }
@@ -94,22 +163,27 @@ class LoanProvider with ChangeNotifier {
     return _loanestimate;
   }
 
-  var from_code = 'BTC';
-  var from_network = 'BTC';
-  var to_code = 'USDT';
-  var to_network = 'ETH';
+  String from_code = 'BTC';
+  String from_network = 'BTC';
+  String to_code = 'USDT';
+  String to_network = 'ETH';
   var amount = 1;
   var exchange = 'direct';
   var ltv_percent = 0.5;
 
-  Future<void> getloanestimate(amount) async {
+  final TextEditingController _textEditingControllereciver =
+      TextEditingController();
+
+  var yourloan;
+
+  Future<void> getloanestimate() async {
     var url = Uri.https(loanApiUrl, loansApiestimate, {
-      'from_code': 'BTC',
-      'from_network': 'BTC',
-      'to_code': 'USDT',
-      'to_network': 'ETH',
+      'from_code': '$from_code',
+      'from_network': '$from_network',
+      'to_code': '$to_code',
+      'to_network': '$to_network',
       'amount': '$amount',
-      'exchange': 'direct',
+      'exchange': '$exchange',
       'ltv_percent': '$ltv_percent'
     });
 
@@ -122,8 +196,11 @@ class LoanProvider with ChangeNotifier {
 
       if (responseData['result']) {
         _loanestimate = responseData['response'];
+      //  amount=responseData['response']['amount_from'];
+        yourloan = responseData['response']['down_limit'];
 
-        print(_loanestimate);
+        print(yourloan);
+
         return notifyListeners();
       } else {
         _loanestimate = [];
@@ -144,6 +221,7 @@ class LoanProvider with ChangeNotifier {
   }
 
   var loanid;
+
   bool result = false;
 
   Future<void> getCreateLoan() async {
@@ -152,7 +230,7 @@ class LoanProvider with ChangeNotifier {
       '$loanApiVersion/create_loan',
     );
     String myJSON =
-        '{"deposit":{"currency_code":"BTC","currency_network":"BTC","expected_amount":"1"},"loan":{"currency_code":"USDT","currency_network":"ETH"},"ltv_percent":"0.8", "referral":"" }';
+        '{"deposit":{"currency_code":"$from_code","currency_network":"$from_network","expected_amount":"$amount"},"loan":{"currency_code":"$to_code","currency_network":"$to_network"},"ltv_percent":"$ltv_percent", "referral":"" }';
     var data = jsonEncode(myJSON);
     try {
       final response =
@@ -160,9 +238,9 @@ class LoanProvider with ChangeNotifier {
       final responseData = json.decode(response.body);
       if (responseData['result']) {
         result = responseData['result'];
-
         loanid = responseData['response']['loan_id'];
-        print(loanid);
+
+        print(yourloan);
         _createloan = responseData['response'];
 
         return notifyListeners();
@@ -170,9 +248,8 @@ class LoanProvider with ChangeNotifier {
         _loanestimate = [];
         return notifyListeners();
       }
-    } catch (error) {
-      print(error);
-      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+    } catch (ctx) {
+      snackAlert(ctx, SnackTypes.errors, 'Coin Is not Available.');
       return;
     }
   }

@@ -35,6 +35,7 @@ class _ConfirmloanState extends State<Confirmloan> {
     var loanProvider = Provider.of<LoanProvider>(context, listen: false);
 
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: hiddenAppBar(),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
