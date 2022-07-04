@@ -22,6 +22,9 @@ import 'package:lyotrade/screens/auth/authentication.dart';
 import 'package:lyotrade/screens/buy_sell/BuySellCrypto.dart';
 import 'package:lyotrade/screens/dashboard.dart';
 import 'package:lyotrade/screens/future_trade/future_trade.dart';
+import 'package:lyotrade/screens/kyc/enitityverificatrion.dart';
+import 'package:lyotrade/screens/kyc/kycscreen.dart';
+import 'package:lyotrade/screens/kyc/perosmalvarification.dart';
 import 'package:lyotrade/screens/market/market.dart';
 import 'package:lyotrade/screens/referal/referal.dart';
 import 'package:lyotrade/screens/security/email_change.dart';
@@ -232,6 +235,10 @@ class MyApp extends StatelessWidget {
               Confirmloan.routeName: (context) => const Confirmloan(),
               TakeLoan.routeName: (context) => const TakeLoan(),
               Referal.routeName:((context) =>  Referal()),
+              Kycscreen.routeName:((context) =>  Kycscreen()),
+              personalverification.routeName:(context) => personalverification(),
+
+              EnitityVerification.routeName:((context) => EnitityVerification()),
             },
           );
         },

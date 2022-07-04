@@ -120,6 +120,19 @@ class _SideBarState extends State<SideBar> {
               ),
             ),
             Card(
+                child: ListTile(
+              title: Text('KYC'),
+              subtitle: Text(
+                'Complete your KYC..',
+                style: TextStyle(
+                  fontSize: 12,
+                ),
+              ),
+              onTap: () {
+                Navigator.pushNamed(context, '/Kycscreen_screen');
+              },
+            )),
+            Card(
               child: Column(
                 children: [
                   ListTile(
