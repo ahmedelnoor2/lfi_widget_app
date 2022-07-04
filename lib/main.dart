@@ -28,6 +28,7 @@ import 'package:lyotrade/screens/kyc/perosmalvarification.dart';
 import 'package:lyotrade/screens/market/market.dart';
 import 'package:lyotrade/screens/referal/referal.dart';
 import 'package:lyotrade/screens/security/email_change.dart';
+import 'package:lyotrade/screens/security/forgot/forgotpassword.dart';
 import 'package:lyotrade/screens/security/google_auth.dart';
 import 'package:lyotrade/screens/security/password.dart';
 import 'package:lyotrade/screens/security/phone.dart';
@@ -224,6 +225,7 @@ class MyApp extends StatelessWidget {
               Security.routeName: (context) => const Security(),
               Phone.routeName: (context) => const Phone(),
               Password.routeName: (context) => const Password(),
+              Forgotpassword.routeName:(context) => Forgotpassword(),
               GoogleAuth.routeName: (context) => const GoogleAuth(),
               EmailChange.routeName: (context) => const EmailChange(),
               Transactions.routeName: (context) => const Transactions(),
@@ -237,7 +239,7 @@ class MyApp extends StatelessWidget {
               Referal.routeName:((context) =>  Referal()),
               Kycscreen.routeName:((context) =>  Kycscreen()),
               personalverification.routeName:(context) => personalverification(),
-
+               
               EnitityVerification.routeName:((context) => EnitityVerification()),
             },
           );

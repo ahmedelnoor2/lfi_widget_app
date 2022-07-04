@@ -18,7 +18,9 @@ class _personalverificationState extends State<personalverification>
     return Scaffold(
         appBar: hiddenAppBar(),
         body: SingleChildScrollView(
-          child: Column(children: [
+          child: Column(
+            
+            children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
