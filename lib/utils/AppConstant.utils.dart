@@ -12,6 +12,7 @@ var paymentsApi = 'payments.lyotrade.com';
 var changeNowApi = 'https://content-api.changenow.io';
 
 var exApi = kIsWeb ? '/api/fe-ex-api' : '/fe-ex-api';
+var fePubApi = kIsWeb ? '/api' : '/';
 var futExApi = '/fe-co-api';
 var plfApi = kIsWeb ? '/service/fe-platform-api' : '/fe-platform-api';
 var loanApiVersion = '/v2';

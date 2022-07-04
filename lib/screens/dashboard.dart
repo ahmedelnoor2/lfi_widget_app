@@ -42,6 +42,7 @@ class _DashboardState extends State<Dashboard> {
   @override
   void initState() {
     // checkScreenSize();
+    getPublicInfo();
     getAssetsRate();
     checkLoginStatus();
     super.initState();
@@ -53,6 +54,11 @@ class _DashboardState extends State<Dashboard> {
       _channel.sink.close();
     }
     super.dispose();
+  }
+
+  Future<void> getPublicInfo() async {
+    var public = Provider.of<Public>(context, listen: false);
+    await public.getPublicInfo();
   }
 
   Future<void> checkScreenSize() async {

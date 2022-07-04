@@ -83,7 +83,7 @@ class _SideBarState extends State<SideBar> {
                               'Login',
                               style: TextStyle(fontSize: 20),
                             ),
-                            subtitle: const Text('Welcome to LYOTrade'),
+                            subtitle: const Text('Welcome to LYOTRADE'),
                             trailing: const Icon(
                               Icons.chevron_right,
                             ),

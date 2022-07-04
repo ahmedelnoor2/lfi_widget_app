@@ -1,0 +1,45 @@
+<html>
+    <body>
+        <div id="ncaptcha"></div>
+        <script src="./hello.js"></script>
+
+        <script>
+            var h5 = false;
+            var appkey = 'FFFF00000000016C4A73';
+            var scene = 'other';
+            var h5scene = '';
+            var aeis = false;
+            var lang = 'en';
+
+            function onCallback(data) {
+                console.log(data);
+            }
+
+            var nc_token = [this.appkey, (new Date()).getTime(), Math.random()].join(':')
+            var noCaptcha = window.noCaptcha || window.NoCaptcha
+                // var ncScene = !!this.h5 ? this.h5scene : this.scene
+                console.log('No Captach', noCaptcha);
+                var nc = noCaptcha({
+                    renderTo: '#ncaptcha',
+                    appkey: appkey,
+                    scene: scene,
+                    token: nc_token,
+                    language: lang,
+                    callback: function (data) {
+                        onCallback(data);
+                        // _this.$emit('callback', {
+                        //     csessionid: data.csessionid,
+                        //     sig: data.sig,
+                        //     token: nc_token,
+                        //     scene: ncScene,
+                        //     nc: nc
+                        // })
+                    },
+                    error: function (s) {
+                        console.error(s)
+                    }
+                }).reset()
+                console.log(nc)
+        </script>
+    </body>
+</html>

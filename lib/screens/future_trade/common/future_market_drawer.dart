@@ -196,6 +196,7 @@ class _FutureMarketDrawerState extends State<FutureMarketDrawer>
                 return ListTile(
                   onTap: () async {
                     await futureMarket.setActiveMarket(_market);
+                    futureMarket.getMarketInfo(context, _market['id']);
                     widget.updateMarket();
                     Navigator.pop(context);
                   },

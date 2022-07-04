@@ -37,3 +37,8 @@ String getNumberString(context, item) {
     ).format(0);
   }
 }
+
+String truncateTo(String stringValue, int maxLength) =>
+    (stringValue.length <= maxLength)
+        ? stringValue
+        : stringValue.substring(0, maxLength);

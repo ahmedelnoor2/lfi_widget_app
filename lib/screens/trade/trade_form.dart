@@ -7,8 +7,10 @@ import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
+import 'package:lyotrade/screens/future_trade/future_trade_form.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:lyotrade/utils/Number.utils.dart';
 import 'package:provider/provider.dart';
 
 class TradeForm extends StatefulWidget {
@@ -363,6 +365,14 @@ class _TradeFormState extends State<TradeForm> {
                           },
                           controller: _priceField,
                           style: TextStyle(fontSize: 16),
+                          inputFormatters: [
+                            DecimalTextInputFormatter(
+                              decimalRange: public.activeMarket.isNotEmpty
+                                  ? public.activeMarket['price']
+                                  : 4,
+                              coUnit: 2,
+                            ),
+                          ],
                           keyboardType: const TextInputType.numberWithOptions(
                             decimal: true,
                           ),
@@ -428,6 +438,14 @@ class _TradeFormState extends State<TradeForm> {
                             return null;
                           },
                           style: TextStyle(fontSize: 16),
+                          inputFormatters: [
+                            DecimalTextInputFormatter(
+                              decimalRange: public.activeMarket.isNotEmpty
+                                  ? public.activeMarket['volume']
+                                  : 4,
+                              coUnit: 2,
+                            ),
+                          ],
                           keyboardType:
                               TextInputType.numberWithOptions(decimal: true),
                           decoration: InputDecoration(
@@ -492,6 +510,14 @@ class _TradeFormState extends State<TradeForm> {
                       return null;
                     },
                     style: TextStyle(fontSize: 16),
+                    inputFormatters: [
+                      DecimalTextInputFormatter(
+                        decimalRange: public.activeMarket.isNotEmpty
+                            ? public.activeMarket['price']
+                            : 4,
+                        coUnit: 2,
+                      ),
+                    ],
                     keyboardType:
                         TextInputType.numberWithOptions(decimal: true),
                     decoration: InputDecoration(
@@ -780,19 +806,17 @@ class _TradeFormState extends State<TradeForm> {
                   setState(() {
                     _currentAmountSelection = 100;
                     if (_isBuy && (_orderType == 2)) {
-                      _totalField.text = (double.parse(asset
-                                          .accountBalance['allCoinMap'][
-                                      public.activeMarket['name'].split('/')[1]]
-                                  ['normal_balance']) *
-                              1)
-                          .toStringAsPrecision(6);
+                      _totalField.text = truncateTo(
+                          '${(double.parse(asset.accountBalance['allCoinMap'][public.activeMarket['name'].split('/')[1]]['normal_balance']) * 1)}',
+                          public.activeMarket.isNotEmpty
+                              ? public.activeMarket['price']
+                              : 4);
                     } else {
-                      _amountField.text = (double.parse(asset
-                                          .accountBalance['allCoinMap'][
-                                      public.activeMarket['name'].split('/')[0]]
-                                  ['normal_balance']) *
-                              1)
-                          .toStringAsPrecision(6);
+                      _amountField.text = truncateTo(
+                          '${(double.parse(asset.accountBalance['allCoinMap'][public.activeMarket['name'].split('/')[0]]['normal_balance']) * 1)}',
+                          public.activeMarket.isNotEmpty
+                              ? public.activeMarket['price']
+                              : 4);
                     }
                   });
                   if (_isBuy && (_orderType == 2)) {

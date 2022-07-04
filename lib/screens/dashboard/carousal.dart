@@ -48,7 +48,7 @@ class _CarousalState extends State<Carousal> {
 
     return CarouselSlider(
       options: CarouselOptions(
-        height: height * 0.12,
+        height: height * 0.15,
         viewportFraction: 1,
         // aspectRatio: 0,
         enableInfiniteScroll: true,
@@ -72,11 +72,19 @@ class _CarousalState extends State<Carousal> {
                   Navigator.pushNamed(context, '${slider['path']}');
                 }
               },
-              child: SizedBox(
+              child: Container(
                 width: width,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    style: BorderStyle.solid,
+                    width: 0.3,
+                    color: Color(0xff5E6292),
+                  ),
+                ),
                 child: Image.asset(
                   'assets/img/${slider['link']}',
-                  fit: BoxFit.cover,
+                  fit: BoxFit.fill,
                 ),
               ),
             );
