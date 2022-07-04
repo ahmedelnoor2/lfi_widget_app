@@ -44,25 +44,35 @@ class _HotlinksState extends State<Hotlinks> {
             ),
           ),
           GestureDetector(
-            onTap: () {},
-            child: Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.only(
-                    bottom: 2,
+            onTap: () {
+
+
+
+            },
+            child: GestureDetector(
+              onTap: (() {
+                 Navigator.pushNamed(context, '/referal_screen');
+              }),
+              child: Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(
+                      bottom: 2,
+                    ),
+                    child: Image.asset(
+                      'assets/img/refer.png',
+                      width: 28,
+                    ),
                   ),
-                  child: Image.asset(
-                    'assets/img/refer.png',
-                    width: 28,
-                  ),
-                ),
-                Text(
-                  'Referral',
-                  style: TextStyle(
-                    fontSize: 12,
-                  ),
-                )
-              ],
+                  Text(
+                      'Referral',
+                      style: TextStyle(
+                        fontSize: 12,
+                      ),
+                    ),
+                
+                ],
+              ),
             ),
           ),
           GestureDetector(

@@ -23,6 +23,7 @@ import 'package:lyotrade/screens/buy_sell/BuySellCrypto.dart';
 import 'package:lyotrade/screens/dashboard.dart';
 import 'package:lyotrade/screens/future_trade/future_trade.dart';
 import 'package:lyotrade/screens/market/market.dart';
+import 'package:lyotrade/screens/referal/referal.dart';
 import 'package:lyotrade/screens/security/email_change.dart';
 import 'package:lyotrade/screens/security/google_auth.dart';
 import 'package:lyotrade/screens/security/password.dart';
@@ -230,6 +231,7 @@ class MyApp extends StatelessWidget {
               BuySellCrypto.routeName: (context) => const BuySellCrypto(),
               Confirmloan.routeName: (context) => const Confirmloan(),
               TakeLoan.routeName: (context) => const TakeLoan(),
+              Referal.routeName:((context) =>  Referal()),
             },
           );
         },
