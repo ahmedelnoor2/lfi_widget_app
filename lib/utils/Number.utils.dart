@@ -37,3 +37,12 @@ String getNumberString(context, item) {
     ).format(0);
   }
 }
+
+String truncateTo(String stringValue, int maxLength) => stringValue
+            .split('.')
+            .length >=
+        2
+    ? (stringValue.split('.')[1].length <= maxLength)
+        ? stringValue
+        : '${stringValue.split('.')[0]}.${stringValue.split('.')[1].substring(0, maxLength)}'
+    : stringValue;

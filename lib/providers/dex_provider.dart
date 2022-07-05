@@ -61,7 +61,8 @@ class DexProvider with ChangeNotifier {
       'active': 'true',
     };
 
-    var url = Uri.https(dexSwapApi, '/v1/currencies/', queryParameters);
+    var url =
+        Uri.https(dexSwapApi, '$exDexSwap/v1/currencies/', queryParameters);
 
     try {
       final response = await http.get(url, headers: headers);
@@ -108,7 +109,7 @@ class DexProvider with ChangeNotifier {
 
     var url = Uri.https(
         dexSwapApi,
-        '/v1/exchange-amount/$amount/${fromCurrency}_$toCurrency',
+        '$exDexSwap/v1/exchange-amount/$amount/${fromCurrency}_$toCurrency',
         queryParameters);
 
     try {
@@ -155,7 +156,7 @@ class DexProvider with ChangeNotifier {
 
     var url = Uri.https(
       dexSwapApi,
-      '/v1/exchange-range/${fromCurrency}_$toCurrency',
+      '$exDexSwap/v1/exchange-range/${fromCurrency}_$toCurrency',
       queryParameters,
     );
 
@@ -194,7 +195,7 @@ class DexProvider with ChangeNotifier {
 
     var url = Uri.https(
       dexSwapApi,
-      '/v2/validate/address',
+      '$exDexSwap/v2/validate/address',
       formData,
     );
 
@@ -231,7 +232,7 @@ class DexProvider with ChangeNotifier {
   Future<void> processSwapPayment(ctx, formData) async {
     var url = Uri.https(
       dexSwapApi,
-      '/v1/transactions/$dexApiKey',
+      '$exDexSwap/v1/transactions/$dexApiKey',
     );
 
     var postData = json.encode(formData);

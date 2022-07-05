@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lyotrade/providers/asset.dart';
@@ -291,48 +292,51 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SizedBox(
-                width: width * 0.27,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: _isBuy ? Color(0xff26A160) : Color(0xff292C51),
-                    textStyle: TextStyle(),
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _isBuy = true;
-                    });
-                    // setAvailalbePrice();
-                  },
-                  child: Text(
-                    'Open',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: width * 0.27,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: _isBuy ? Color(0xff292C51) : Color(0xffD84646),
-                    textStyle: TextStyle(),
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _isBuy = false;
-                    });
-                    // setAvailalbePrice();
-                  },
-                  child: Text(
-                    'Close',
-                    style: TextStyle(color: Colors.white),
+          Container(
+            margin: kIsWeb ? EdgeInsets.only(bottom: 8) : EdgeInsets.zero,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SizedBox(
+                  width: width * 0.27,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: _isBuy ? Color(0xff26A160) : Color(0xff292C51),
+                      textStyle: TextStyle(),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isBuy = true;
+                      });
+                      // setAvailalbePrice();
+                    },
+                    child: Text(
+                      'Open',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
-              ),
-            ],
+                SizedBox(
+                  width: width * 0.27,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: _isBuy ? Color(0xff292C51) : Color(0xffD84646),
+                      textStyle: TextStyle(),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isBuy = false;
+                      });
+                      // setAvailalbePrice();
+                    },
+                    child: Text(
+                      'Close',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           PopupMenuButton(
             child: Container(
@@ -1117,6 +1121,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                   style: ElevatedButton.styleFrom(
                     primary: Color(0xff26A160),
                     textStyle: TextStyle(),
+                    padding: kIsWeb ? EdgeInsets.all(18) : EdgeInsets.zero,
                   ),
                   child: Text(
                     auth.isAuthenticated

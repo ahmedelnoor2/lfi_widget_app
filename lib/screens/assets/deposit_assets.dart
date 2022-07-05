@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lyotrade/providers/asset.dart';
@@ -39,6 +39,7 @@ class _DepositAssetsState extends State<DepositAssets> {
   String _defaultNetwork = 'ERC20';
   String _defaultCoin = 'USDT';
   List _allNetworks = [];
+  Image? _qrCode;
 
   @override
   void initState() {
@@ -50,6 +51,20 @@ class _DepositAssetsState extends State<DepositAssets> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  Future<void> loadQrCode() async {
+    var asset = Provider.of<Asset>(context, listen: false);
+
+    setState(() {
+      _qrCode = Image.memory(
+        base64Decode(
+          asset.changeAddress['addressQRCode']
+              .split(',')[1]
+              .replaceAll("\n", ""),
+        ),
+      );
+    });
   }
 
   Future<void> getDigitalBalance() async {
@@ -105,6 +120,7 @@ class _DepositAssetsState extends State<DepositAssets> {
         });
       }
     });
+    loadQrCode();
 
     setState(() {
       _loadingAddress = false;
@@ -288,23 +304,23 @@ class _DepositAssetsState extends State<DepositAssets> {
                             color: secondaryTextColor,
                           ),
                         ),
-                        Container(
-                          padding: EdgeInsets.only(right: 5),
-                          child: Text('Fee:'),
-                        ),
-                        Container(
-                          padding: EdgeInsets.only(right: 5),
-                          child: Text(
-                            '${asset.getCost['defaultFee']}',
-                            style: TextStyle(
-                              color: linkColor,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.only(right: 5),
-                          child: Text(getCoinName(_defaultCoin)),
-                        ),
+                        // Container(
+                        //   padding: EdgeInsets.only(right: 5),
+                        //   child: Text('Fee:'),
+                        // ),
+                        // Container(
+                        //   padding: EdgeInsets.only(right: 5),
+                        //   child: Text(
+                        //     '${asset.getCost['defaultFee']}',
+                        //     style: TextStyle(
+                        //       color: linkColor,
+                        //     ),
+                        //   ),
+                        // ),
+                        // Container(
+                        //   padding: EdgeInsets.only(right: 5),
+                        //   child: Text(getCoinName(_defaultCoin)),
+                        // ),
                       ],
                     ),
                   ),
@@ -377,14 +393,10 @@ class _DepositAssetsState extends State<DepositAssets> {
                             height: width * 0.45,
                             child: _loadingAddress
                                 ? depositQrSkull(context)
-                                : asset.changeAddress['addressQRCode'] != null
-                                    ? Image.memory(
-                                        base64Decode(
-                                          asset.changeAddress['addressQRCode']
-                                              .split(',')[1]
-                                              .replaceAll("\n", ""),
-                                        ),
-                                      )
+                                : (asset.changeAddress['addressQRCode'] !=
+                                            null &&
+                                        _qrCode != null)
+                                    ? _qrCode
                                     : const CircularProgressIndicator
                                         .adaptive(),
                           ),
@@ -401,56 +413,70 @@ class _DepositAssetsState extends State<DepositAssets> {
                   ),
                   Container(
                     width: width,
-                    height: height * 0.058,
                     padding: EdgeInsets.only(
                       top: 5,
                       bottom: 5,
                     ),
-                    child: Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          style: BorderStyle.solid,
-                          width: 0.3,
-                          color: Color(0xff5E6292),
+                    child: InkWell(
+                      onTap: () {
+                        Clipboard.setData(
+                          ClipboardData(
+                            text: _defaultNetwork == 'XRP'
+                                ? asset.changeAddress['addressStr']
+                                    .split('_')[0]
+                                : asset.changeAddress['addressStr'],
+                          ),
+                        );
+                        snackAlert(context, SnackTypes.success, 'Copied');
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            style: BorderStyle.solid,
+                            width: 0.3,
+                            color: Color(0xff5E6292),
+                          ),
                         ),
+                        child: _loadingAddress
+                            ? depositAddressSkull(context)
+                            : Row(
+                                children: [
+                                  SizedBox(
+                                    width: width * 0.8,
+                                    child: Text(
+                                      '${_defaultNetwork == 'XRP' ? asset.changeAddress['addressStr'].split('_')[0] : asset.changeAddress['addressStr']}',
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      Clipboard.setData(
+                                        ClipboardData(
+                                          text: _defaultNetwork == 'XRP'
+                                              ? asset
+                                                  .changeAddress['addressStr']
+                                                  .split('_')[0]
+                                              : asset
+                                                  .changeAddress['addressStr'],
+                                        ),
+                                      );
+                                      snackAlert(context, SnackTypes.success,
+                                          'Copied');
+                                    },
+                                    child: Image.asset(
+                                      'assets/img/copy.png',
+                                      width: 18,
+                                    ),
+                                  ),
+                                ],
+                              ),
                       ),
-                      child: _loadingAddress
-                          ? depositAddressSkull(context)
-                          : Row(
-                              children: [
-                                SizedBox(
-                                  width: width * 0.8,
-                                  child: Text(
-                                    '${_defaultNetwork == 'XRP' ? asset.changeAddress['addressStr'].split('_')[0] : asset.changeAddress['addressStr']}',
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    Clipboard.setData(
-                                      ClipboardData(
-                                        text: _defaultNetwork == 'XRP'
-                                            ? asset.changeAddress['addressStr']
-                                                .split('_')[0]
-                                            : asset.changeAddress['addressStr'],
-                                      ),
-                                    );
-                                    snackAlert(
-                                        context, SnackTypes.success, 'Copied');
-                                  },
-                                  child: Image.asset(
-                                    'assets/img/copy.png',
-                                    width: 18,
-                                  ),
-                                ),
-                              ],
-                            ),
                     ),
                   ),
                   _defaultNetwork == 'XRP'
                       ? Container(
                           width: width,
-                          height: height * 0.058,
+                          height: height * 0.09,
                           padding: EdgeInsets.only(
                             top: 5,
                             bottom: 5,
@@ -569,40 +595,42 @@ class _DepositAssetsState extends State<DepositAssets> {
                       ],
                     ),
                   ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: SizedBox(
-                      // padding: const EdgeInsets.all(40),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SizedBox(
-                            width: width * 0.44,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                captureScreen();
-                                snackAlert(context, SnackTypes.success,
-                                    'Address saved to Gallery or Photos.');
-                              },
-                              child: const Text('Save Address'),
+                  kIsWeb
+                      ? Container()
+                      : Align(
+                          alignment: Alignment.bottomCenter,
+                          child: SizedBox(
+                            // padding: const EdgeInsets.all(40),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(
+                                  width: width * 0.44,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      captureScreen();
+                                      snackAlert(context, SnackTypes.success,
+                                          'Address saved to Gallery or Photos.');
+                                    },
+                                    child: const Text('Save Address'),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: width * 0.44,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      share(
+                                        '${asset.getCost['withdrawLimitSymbol']} Address',
+                                        asset.changeAddress['addressStr'],
+                                      );
+                                    },
+                                    child: const Text('Share Address'),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          SizedBox(
-                            width: width * 0.44,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                share(
-                                  '${asset.getCost['withdrawLimitSymbol']} Address',
-                                  asset.changeAddress['addressStr'],
-                                );
-                              },
-                              child: const Text('Share Address'),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                        ),
                 ],
               ),
             ),

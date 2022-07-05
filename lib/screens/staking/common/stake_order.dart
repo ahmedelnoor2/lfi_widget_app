@@ -6,6 +6,7 @@ import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/staking.dart';
 import 'package:lyotrade/screens/common/header.dart';
+import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
@@ -103,15 +104,6 @@ class _StakeOrderState extends State<StakeOrder> {
     var staking = Provider.of<Staking>(context, listen: false);
     var public = Provider.of<Public>(context, listen: false);
 
-    print({
-      'appKey': staking.stakeOrderData["appKey"],
-      'assetType': _currentAccount['accountType'],
-      'googleCode': _authCodeController.text,
-      'orderNum': staking.stakeOrderData["orderNum"],
-      'smsAuthCode': "",
-      'userId': staking.stakeOrderData["userId"],
-    });
-
     await staking.payStakeOrder(
       context,
       {
@@ -172,7 +164,6 @@ class _StakeOrderState extends State<StakeOrder> {
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
 
-    var public = Provider.of<Public>(context, listen: true);
     var staking = Provider.of<Staking>(context, listen: true);
 
     return Scaffold(
@@ -211,12 +202,12 @@ class _StakeOrderState extends State<StakeOrder> {
               padding: EdgeInsets.all(10),
               child: Row(
                 children: [
-                  Container(
-                    padding: EdgeInsets.only(right: 10),
-                    child: Image.network(
-                      '${public.publicInfoMarket['market']['coinList'][staking.stakeOrderData['payCoinSymbol']]['icon']}',
-                    ),
-                  ),
+                  // Container(
+                  //   padding: EdgeInsets.only(right: 10),
+                  //   child: Image.network(
+                  //     '${public.publicInfoMarket['market']['coinList'][staking.stakeOrderData['payCoinSymbol']]['icon']}',
+                  //   ),
+                  // ),
                   Text(
                     '${staking.stakeOrderData['showName']}',
                     style: TextStyle(fontSize: 20),
@@ -340,15 +331,15 @@ class _StakeOrderState extends State<StakeOrder> {
                 ],
               ),
             ),
-            Container(
-              padding: EdgeInsets.only(bottom: 15, top: 10),
-              width: width * 0.9,
-              child: ElevatedButton(
-                onPressed: () {
-                  processStakeOrder();
-                },
-                child: Text('Confirm'),
-              ),
+            LyoButton(
+              onPressed: () {
+                processStakeOrder();
+              },
+              text: 'Confrim',
+              active: true,
+              activeColor: linkColor,
+              activeTextColor: Colors.black,
+              isLoading: false,
             ),
           ],
         ),
@@ -445,59 +436,96 @@ class _StakeOrderState extends State<StakeOrder> {
           ),
           Form(
             key: _formStakeKey,
-            child: TextFormField(
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter verification code';
-                }
-                return null;
-              },
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: stakeOrderData['googleStatus'] == "1"
-                    ? 'Google verification code'
-                    : 'SMS verification code',
-                suffix: stakeOrderData['googleStatus'] == "1"
-                    ? TextButton(
-                        onPressed: () async {
-                          ClipboardData? data = await Clipboard.getData(
-                            Clipboard.kTextPlain,
-                          );
-                          _authCodeController.text = '${data!.text}';
-                        },
-                        child: const Icon(Icons.paste),
-                      )
-                    : TextButton(
-                        onPressed: _startTimerSecur
-                            ? null
-                            : () {
-                                setState(() {
-                                  _startSecur = 90;
-                                });
-                                startTimer();
-                              },
-                        child: Text(_startTimerSecur
-                            ? '${_startSecur}s Get it again'
-                            : 'Click to send'),
-                      ),
+            child: Container(
+              margin: EdgeInsets.only(top: 20),
+              padding: EdgeInsets.only(top: 15, bottom: 15, left: 15),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(
+                  style: BorderStyle.solid,
+                  width: 0.3,
+                  color: Color(0xff5E6292),
+                ),
               ),
-              controller: _authCodeController,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(
+                    width: width * 0.49,
+                    child: TextFormField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter verification code';
+                        }
+                        return null;
+                      },
+                      controller: _authCodeController,
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.zero,
+                        isDense: true,
+                        border: UnderlineInputBorder(
+                          borderSide: BorderSide.none,
+                        ),
+                        hintStyle: TextStyle(
+                          fontSize: 14,
+                        ),
+                        hintText: stakeOrderData['googleStatus'] == "1"
+                            ? 'Google verification code'
+                            : 'SMS verification code',
+                      ),
+                    ),
+                  ),
+                  stakeOrderData['googleStatus'] == "1"
+                      ? Container(
+                          padding: EdgeInsets.only(right: 10),
+                          child: GestureDetector(
+                            onTap: () async {
+                              ClipboardData? data = await Clipboard.getData(
+                                Clipboard.kTextPlain,
+                              );
+                              _authCodeController.text = '${data!.text}';
+                            },
+                            child: Text(
+                              'Paste',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: linkColor,
+                              ),
+                            ),
+                          ),
+                        )
+                      : Container(
+                          padding: EdgeInsets.only(right: 10),
+                          child: TextButton(
+                            onPressed: _startTimerSecur
+                                ? null
+                                : () {
+                                    setState(() {
+                                      _startSecur = 90;
+                                    });
+                                    startTimer();
+                                  },
+                            child: Text(_startTimerSecur
+                                ? '${_startSecur}s Get it again'
+                                : 'Click to send'),
+                          ),
+                        ),
+                ],
+              ),
             ),
           ),
-          Container(
-            width: width,
-            padding: EdgeInsets.only(bottom: width * 0.1),
-            child: ElevatedButton(
-              onPressed: () {
-                if (_formStakeKey.currentState!.validate()) {
-                  // If the form is valid, display a snackbar. In the real world,
-                  // you'd often call a server or save the information in a database.
-                  payStakeOrder();
-                }
-              },
-              child: const Text('Pay'),
-            ),
-          ),
+          LyoButton(
+            onPressed: () {
+              if (_formStakeKey.currentState!.validate()) {
+                payStakeOrder();
+              }
+            },
+            text: 'Pay',
+            active: true,
+            activeColor: linkColor,
+            activeTextColor: Colors.black,
+            isLoading: false,
+          )
         ],
       ),
     );

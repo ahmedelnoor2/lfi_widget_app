@@ -11,6 +11,7 @@ import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
+// import 'package:url_launcher/url_launcher.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -43,6 +44,11 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
     _cryptoController.dispose();
     super.dispose();
   }
+
+  // void _launchUrl(_url) async {
+  //   final Uri url = Uri.parse(_url);
+  //   if (!await launchUrl(url)) throw 'Could not launch $url';
+  // }
 
   Future<void> getDigitalBalance() async {
     setState(() {
@@ -83,8 +89,6 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
         }
       }
     }
-
-    print(_defaultNetwork);
 
     // Map _availableCoinLists = {};
     // if (asset.accountBalance.isNotEmpty) {
@@ -206,6 +210,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
     });
     if (payments.changenowTransaction.isNotEmpty) {
       if (payments.changenowTransaction['redirect_url'] != null) {
+        // _launchUrl(payments.changenowTransaction['redirect_url']);
         Navigator.pushNamed(context, '/process_payment');
       }
     }

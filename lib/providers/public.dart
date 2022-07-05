@@ -227,6 +227,36 @@ class Public with ChangeNotifier {
     return notifyListeners();
   }
 
+  // Get public info
+  Map _publicInfo = {};
+
+  Map get publicInfo {
+    return _publicInfo;
+  }
+
+  Future<void> getPublicInfo() async {
+    var url = Uri.https(
+      lyoApiUrl,
+      '$lyoPubApi/fePublicInfo/en_US',
+    );
+
+    try {
+      final response = await http.get(
+        url,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+      // print(json.decode(response.body.split('window.publicInfo=')[1]));
+      _publicInfo = responseData;
+      return notifyListeners();
+    } catch (error) {
+      print(error);
+      // throw error;
+      return;
+    }
+  }
+
   Future<void> filterMarketSearchResults(
     query,
     _searchAllMarkets,

@@ -1,3 +1,13 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:archive/archive_io.dart';
+import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/screens/common/lyo_buttons.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:uuid/uuid.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:lyotrade/screens/common/captcha.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
@@ -5,6 +15,11 @@ import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:flutter_aliyun_captcha/flutter_aliyun_captcha.dart';
+// import 'package:g_recaptcha_v3/g_recaptcha_v3.dart';
+// import 'package:webview_flutter/webview_flutter.dart';
+// import 'package:slider_captcha/slider_capchar.dart';
+import 'package:webviewx/webviewx.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class Login extends StatefulWidget {
   const Login({
@@ -21,36 +36,91 @@ class Login extends StatefulWidget {
 }
 
 class _Login extends State<Login> {
+  var uuid = const Uuid();
+  var _channel;
+  WebViewXController? _controller;
   static final AliyunCaptchaController _captchaController =
       AliyunCaptchaController();
-  bool _enableLogin = false;
+  bool _enableLogin = true;
   final _formLoginKey = GlobalKey<FormState>();
 
   final String mobileNumber = '';
   final String loginPword = '';
   bool _readPassword = true;
+  String _sessionId = '';
+
+  String _verificationType = '';
 
   late TextEditingController _mobileNumber;
   late TextEditingController _loginPword;
 
   @override
   void initState() {
-    super.initState();
+    setState(() {
+      _sessionId = uuid.v1();
+    });
     _mobileNumber = TextEditingController();
     _loginPword = TextEditingController();
+    checkVerificationMethod();
+    if (kIsWeb) {
+      connectWebSocket();
+    }
+    super.initState();
   }
 
   @override
   void dispose() {
     _mobileNumber.dispose();
     _loginPword.dispose();
+    if (_channel != null) {
+      _channel.sink.close();
+    }
     super.dispose();
+  }
+
+  void checkVerificationMethod() {
+    var public = Provider.of<Public>(context, listen: false);
+
+    if (public.publicInfo.isNotEmpty) {
+      setState(() {
+        _verificationType = public.publicInfo['switch']['verificationType'];
+      });
+    }
+  }
+
+  Future<void> connectWebSocket() async {
+    _channel = WebSocketChannel.connect(
+      Uri.parse('wss://api.m.lyotrade.com:8060/'),
+    );
+
+    _channel.sink.add(_sessionId);
+
+    _channel.stream.listen((message) {
+      extractStreamData(message);
+    });
+  }
+
+  void extractStreamData(streamData) async {
+    if (streamData != null) {
+      final data = jsonDecode(streamData);
+      widget.onCaptchaVerification(data['data']);
+    }
   }
 
   void toggleLoginButton(value) {
     setState(() {
       _enableLogin = value;
     });
+  }
+
+  Future<void> getCaptchaData() async {
+    var auth = Provider.of<Auth>(context, listen: false);
+    // await auth.getCaptcha();
+    // print(auth.captchaData);
+    widget.onLogin({
+      'mobileNumber': _mobileNumber.text,
+      'loginPword': _loginPword.text,
+    }, auth.captchaData);
   }
 
   @override
@@ -139,41 +209,48 @@ class _Login extends State<Login> {
             ],
           ),
         ),
-        Captcha(
-          onCaptchaVerification: (value) {
-            toggleLoginButton(true);
-            if (value.containsKey('sig')) {
+        _verificationType == '1'
+            ? kIsWeb
+                ? Align(
+                    alignment: Alignment.center,
+                    child: Container(
+                      width: width,
+                      padding: EdgeInsets.only(left: 10, top: 10, right: 10),
+                      child: _buildCaptchaView(),
+                    ),
+                  )
+                : Captcha(
+                    onCaptchaVerification: (value) {
+                      toggleLoginButton(true);
+                      if (value.containsKey('sig')) {
+                      } else {
+                        toggleLoginButton(false);
+                      }
+                      widget.onCaptchaVerification(value);
+                    },
+                    captchaController: _captchaController,
+                  )
+            : Container(),
+        LyoButton(
+          text: 'Login',
+          active: (_enableLogin || kIsWeb),
+          isLoading: false,
+          activeColor: linkColor,
+          activeTextColor: Colors.black,
+          onPressed: () {
+            if (_formLoginKey.currentState!.validate()) {
+              // If the form is valid, display a snackbar. In the real world,
+              // you'd often call a server or save the information in a database.
+              snackAlert(context, SnackTypes.warning, 'Processing...');
+              setState(() {
+                _enableLogin = false;
+              });
+              getCaptchaData();
             } else {
-              toggleLoginButton(false);
+              _captchaController.refresh({});
+              _captchaController.reset();
             }
-            widget.onCaptchaVerification(value);
           },
-          captchaController: _captchaController,
-        ),
-        SizedBox(
-          width: width * 1,
-          child: ElevatedButton(
-            onPressed: _enableLogin
-                ? () {
-                    if (_formLoginKey.currentState!.validate()) {
-                      // If the form is valid, display a snackbar. In the real world,
-                      // you'd often call a server or save the information in a database.
-                      snackAlert(context, SnackTypes.warning, 'Processing...');
-                      setState(() {
-                        _enableLogin = false;
-                      });
-                      widget.onLogin({
-                        'mobileNumber': _mobileNumber.text,
-                        'loginPword': _loginPword.text,
-                      }, _captchaController);
-                    } else {
-                      _captchaController.refresh({});
-                      _captchaController.reset();
-                    }
-                  }
-                : null,
-            child: const Text('Login'),
-          ),
         ),
         Container(
           padding: const EdgeInsets.only(top: 10),
@@ -181,7 +258,8 @@ class _Login extends State<Login> {
             alignment: Alignment.bottomCenter,
             child: GestureDetector(
               onTap: () {
-                //
+                // _callPlatformIndependentJsMethod();
+                snackAlert(context, SnackTypes.warning, 'Coming Soon...');
               },
               child: Text(
                 'Forgot password?',
@@ -195,6 +273,26 @@ class _Login extends State<Login> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildCaptchaView() {
+    return WebViewX(
+      key: const ValueKey('webviewx'),
+      height: height * 0.09,
+      width: width,
+      initialContent: '<div></div>',
+      initialSourceType: SourceType.html,
+      onWebViewCreated: (controller) async {
+        _controller = controller;
+        await _controller!.loadContent(
+            'https://captcha.m.lyotrade.com?userId=$_sessionId',
+            SourceType.url);
+      },
+      onPageStarted: (src) =>
+          debugPrint('A new page has started loading: $src\n'),
+      onPageFinished: (src) =>
+          debugPrint('The page has finished loading: $src\n'),
     );
   }
 }

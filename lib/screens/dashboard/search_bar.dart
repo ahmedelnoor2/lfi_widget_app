@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 
@@ -48,31 +50,36 @@ class _SearchBarState extends State<SearchBar> {
                   ),
                 ),
               ),
-              Container(
-                padding: EdgeInsets.only(left: 15),
-                child: SizedBox(
-                  width: width * 0.63,
-                  child: Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Color(0xff292C51),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(right: 10),
-                          child: Image.asset('assets/img/search.png'),
-                        ),
-                        Text(
-                          'Search LYO',
-                          style: TextStyle(
-                            color: secondaryTextColor,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
+              InkWell(
+                onTap: () {
+                  snackAlert(context, SnackTypes.warning, 'Coming Soon...');
+                },
+                child: Container(
+                  padding: EdgeInsets.only(left: 15),
+                  child: SizedBox(
+                    width: width * 0.63,
+                    child: Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Color(0xff292C51),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(right: 10),
+                            child: Image.asset('assets/img/search.png'),
                           ),
-                        ),
-                      ],
+                          Text(
+                            'Search LYO',
+                            style: TextStyle(
+                              color: secondaryTextColor,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -84,7 +91,9 @@ class _SearchBarState extends State<SearchBar> {
             child: Row(
               children: [
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    snackAlert(context, SnackTypes.warning, 'Coming Soon...');
+                  },
                   child: Image.asset(
                     'assets/img/scanner.png',
                     width: 24,
@@ -93,7 +102,9 @@ class _SearchBarState extends State<SearchBar> {
                 Container(
                   padding: EdgeInsets.only(left: 10),
                   child: GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      snackAlert(context, SnackTypes.warning, 'Coming Soon...');
+                    },
                     child: Image.asset(
                       'assets/img/notification.png',
                       width: 24,

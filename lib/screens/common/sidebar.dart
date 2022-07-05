@@ -1,12 +1,15 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/user.dart';
+import 'package:lyotrade/screens/common/lyo_buttons.dart';
 
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 
 import 'package:provider/provider.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class SideBar extends StatefulWidget {
   const SideBar({Key? key}) : super(key: key);
@@ -17,11 +20,22 @@ class SideBar extends StatefulWidget {
 
 class _SideBarState extends State<SideBar> {
   bool _payWithLyoCred = false;
+  bool _processLogout = false;
+
+  String _versionNumber = '0.0';
 
   @override
   void initState() {
+    checkVersion();
     checkFeeCoinStatus();
     super.initState();
+  }
+
+  Future<void> checkVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      _versionNumber = packageInfo.version;
+    });
   }
 
   void checkFeeCoinStatus() {
@@ -49,7 +63,7 @@ class _SideBarState extends State<SideBar> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             SizedBox(
-              height: width * 0.46,
+              height: kIsWeb ? 120 : width * 0.46,
               child: DrawerHeader(
                 padding: EdgeInsets.zero,
                 child: Column(
@@ -81,7 +95,7 @@ class _SideBarState extends State<SideBar> {
                               'Login',
                               style: TextStyle(fontSize: 20),
                             ),
-                            subtitle: const Text('Welcome to LYOTrade'),
+                            subtitle: const Text('Welcome to LYOTRADE'),
                             trailing: const Icon(
                               Icons.chevron_right,
                             ),
@@ -228,18 +242,36 @@ class _SideBarState extends State<SideBar> {
               ),
             ),
             auth.userInfo.isNotEmpty
-                ? SizedBox(
-                    width: width * 0.5,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        auth.logout(context);
-                      },
-                      child: const Text(
-                        'Logout',
-                      ),
-                    ),
-                  )
-                : Container()
+                ? Container(
+                    padding: EdgeInsets.only(right: 10, left: 10),
+                    child: LyoButton(
+                      onPressed: _processLogout
+                          ? null
+                          : () async {
+                              setState(() {
+                                _processLogout = true;
+                              });
+                              await auth.logout(context);
+                              setState(() {
+                                _processLogout = false;
+                              });
+                              Navigator.pushNamedAndRemoveUntil(
+                                  context, '/', (route) => false);
+                            },
+                      text: 'Logout',
+                      active: true,
+                      activeColor: linkColor,
+                      activeTextColor: Colors.black,
+                      isLoading: _processLogout,
+                    ))
+                : Container(),
+            Align(
+              alignment: Alignment.center,
+              child: Container(
+                padding: EdgeInsets.only(top: 10),
+                child: Text('Version: $_versionNumber'),
+              ),
+            ),
           ],
         ),
       ),

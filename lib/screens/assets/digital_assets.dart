@@ -334,13 +334,13 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                       Text('Hide Small Balance'),
                     ],
                   ),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Icon(
-                      Icons.search,
-                      size: 18,
-                    ),
-                  )
+                  // GestureDetector(
+                  //   onTap: () {},
+                  //   child: Icon(
+                  //     Icons.search,
+                  //     size: 18,
+                  //   ),
+                  // )
                 ],
               ),
             ),
@@ -448,7 +448,7 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                                               fontSize: 16),
                                         ),
                                         Text(
-                                          'LYO Credit',
+                                          '${public.publicInfoMarket['market']['coinList'][asset['coin']]['longName']}',
                                           style: TextStyle(
                                             fontSize: 12,
                                             color: secondaryTextColor,

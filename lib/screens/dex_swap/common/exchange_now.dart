@@ -928,7 +928,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
   }
 
   Widget sendingWidget(context, dexProvider) {
-    return Container(
+    return SingleChildScrollView(
       padding: EdgeInsets.all(10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

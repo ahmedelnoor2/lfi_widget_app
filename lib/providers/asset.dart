@@ -8,6 +8,8 @@ import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Translate.utils.dart';
 
 class Asset with ChangeNotifier {
+  String _defaultCoin = 'LYO1';
+  String _defaultMarginCoin = 'LYO01';
   Map _accountBalance = {};
   Map _p2pBalance = {};
   Map _marginBalance = {};
@@ -26,11 +28,55 @@ class Asset with ChangeNotifier {
   bool _hideBalances = false;
   final String _hideBalanceString = '******';
 
+  List _marginAssets = [];
+  Map _selectedP2pAssets = {};
+  Map _selectedMarginAssets = {};
+
   Map<String, String> headers = {
     'Content-type': 'application/json;charset=utf-8',
     'Accept': 'application/json',
     'exchange-token': '',
   };
+
+  String get defaultCoin {
+    return _defaultCoin;
+  }
+
+  void setDefaultCoin(defCoin) {
+    _defaultCoin = defCoin;
+    notifyListeners();
+  }
+
+  Map get selectedP2pAssets {
+    return _selectedP2pAssets;
+  }
+
+  void setSelectedP2pAssets(asset) {
+    _selectedP2pAssets = asset;
+    notifyListeners();
+  }
+
+  String get defaultMarginCoin {
+    return _defaultMarginCoin;
+  }
+
+  void setDefaultMarginCoin(marginCoin) {
+    _defaultMarginCoin = marginCoin;
+    notifyListeners();
+  }
+
+  Map get selectedMarginAssets {
+    return _selectedMarginAssets;
+  }
+
+  void setSelectedMarginAssets(selectedCoin) {
+    _selectedMarginAssets = selectedCoin;
+    notifyListeners();
+  }
+
+  List get marginAssets {
+    return _marginAssets;
+  }
 
   Map get accountBalance {
     return _accountBalance;
@@ -218,6 +264,13 @@ class Asset with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         _p2pBalance = responseData['data'];
+
+        _p2pBalance['allCoinMap'].forEach((p2pAccount) {
+          if (p2pAccount['coinSymbol'] == _defaultCoin) {
+            _selectedP2pAssets = p2pAccount;
+          }
+        });
+        notifyListeners();
       } else if (responseData['code'] == "10002") {
         snackAlert(
             ctx, SnackTypes.warning, 'Session Expired, Please login back');
@@ -253,6 +306,22 @@ class Asset with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         _marginBalance = responseData['data'];
+
+        _marginBalance['leverMap'].forEach((k, v) {
+          if (k.split('/')[0] == _defaultMarginCoin) {
+            _selectedMarginAssets = {
+              'coin': k.split('/')[0],
+              'market': k,
+              'values': v,
+            };
+          }
+          _marginAssets.add({
+            'coin': k.split('/')[0],
+            'market': k,
+            'values': v,
+          });
+        });
+        notifyListeners();
       } else {
         _marginBalance = {};
       }
@@ -649,7 +718,12 @@ class Asset with ChangeNotifier {
       final responseData = json.decode(response.body);
 
       if (responseData['code'] == '0') {
-        snackAlert(ctx, SnackTypes.success, 'Transfer successful');
+        if (responseData['msg'] == 'success') {
+          snackAlert(ctx, SnackTypes.success, 'Trasnfer Successful.');
+        } else {
+          snackAlert(
+              ctx, SnackTypes.warning, getTranslate(responseData['msg']));
+        }
       } else if (responseData['code'] == 10002) {
         snackAlert(ctx, SnackTypes.warning, 'Please login to access');
       } else {
@@ -696,6 +770,101 @@ class Asset with ChangeNotifier {
         } else {
           snackAlert(ctx, SnackTypes.success, 'Transfer Successful');
         }
+      } else if (responseData['code'] == 10002) {
+        snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+      } else {
+        snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
+      }
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
+      // throw error;
+    }
+  }
+
+  Future<void> withdrawAddressValidate(ctx, auth, formData) async {
+    /*
+    * Params
+      "address": "0x215c92caf0e55c8f9e8fafb1a2d8efcd5298da40",
+      "coinSymbol": "LYO1",
+    */
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/addr/add_withdraw_addr_validate_v4',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        // if (responseData['msg'] == 'Failure to transfer leveraged funds！') {
+        //   snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
+        // } else if (responseData['msg'] == 'Insufficient Balance') {
+        //   snackAlert(ctx, SnackTypes.errors, 'Insufficient Balance');
+        // } else {
+        // }
+        snackAlert(ctx, SnackTypes.success, 'Address validated');
+      } else if (responseData['code'] == 10002) {
+        snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+      } else {
+        snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
+      }
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
+      // throw error;
+    }
+  }
+
+  // operationType: "17"
+
+  Future<void> processWithdrawal(ctx, auth, formData) async {
+    /*
+    * Params
+      "address": "0x215c92caf0e55c8f9e8fafb1a2d8efcd5298da40",
+      "addressId": "",
+      "amount": "50.80000000",
+      "emailValidCode": "057401",
+      "fee": "20.2",
+      "googleCode": "816218",
+      "symbol": "LYO1",
+      "trustType": 0,
+    */
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/finance/do_withdraw_v4',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        // if (responseData['msg'] == 'Failure to transfer leveraged funds！') {
+        //   snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
+        // } else if (responseData['msg'] == 'Insufficient Balance') {
+        //   snackAlert(ctx, SnackTypes.errors, 'Insufficient Balance');
+        // } else {
+        // }
+        snackAlert(
+            ctx, SnackTypes.success, 'Successfully created withdraw request');
       } else if (responseData['code'] == 10002) {
         snackAlert(ctx, SnackTypes.warning, 'Please login to access');
       } else {

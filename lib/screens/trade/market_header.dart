@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
@@ -93,20 +95,30 @@ class _MarketHeaderState extends State<MarketHeader> {
                   ),
                 ),
               ),
-              Container(
-                padding: EdgeInsets.only(left: 10),
-                child: Icon(
-                  Icons.monetization_on,
-                  color: secondaryTextColor,
-                  size: 20,
+              InkWell(
+                onTap: () {
+                  snackAlert(context, SnackTypes.warning, 'Coming Soon...');
+                },
+                child: Container(
+                  padding: EdgeInsets.only(left: 10),
+                  child: Icon(
+                    Icons.monetization_on,
+                    color: secondaryTextColor,
+                    size: 20,
+                  ),
                 ),
               ),
-              Container(
-                padding: EdgeInsets.only(left: 10),
-                child: Icon(
-                  Icons.more_horiz,
-                  color: secondaryTextColor,
-                  size: 20,
+              InkWell(
+                onTap: () {
+                  snackAlert(context, SnackTypes.warning, 'Coming Soon...');
+                },
+                child: Container(
+                  padding: EdgeInsets.only(left: 10),
+                  child: Icon(
+                    Icons.more_horiz,
+                    color: secondaryTextColor,
+                    size: 20,
+                  ),
                 ),
               ),
             ],

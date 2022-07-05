@@ -118,7 +118,7 @@ bottomNav(context, auth) {
                     transitionDuration: Duration(seconds: 0),
                   ),
                 )
-              : Navigator.push(
+              : Navigator.pushReplacement(
                   context,
                   PageRouteBuilder(
                     settings: RouteSettings(name: Authentication.routeName),

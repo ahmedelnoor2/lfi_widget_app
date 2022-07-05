@@ -2,6 +2,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:lyotrade/screens/dashboard/skeleton/dashboard_skull.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
+import 'package:lyotrade/utils/Coins.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/utils/Number.utils.dart';
@@ -33,7 +34,7 @@ class _LiveFeedState extends State<LiveFeed> {
           : Column(
               children: [
                 Container(
-                  height: height * 0.115,
+                  height: 100,
                   padding: EdgeInsets.only(
                     top: width * 0.04,
                     bottom: width * 0.04,
@@ -64,7 +65,7 @@ class _LiveFeedState extends State<LiveFeed> {
                     Container(
                       padding: EdgeInsets.only(right: 3),
                       child: Text(
-                        '${market['market']}',
+                        '${getMarketName(market['market'])}',
                         style: TextStyle(
                           fontSize: 14,
                           color: secondaryTextColor,

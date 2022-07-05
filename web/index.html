@@ -16,9 +16,26 @@
   -->
   <base href="$FLUTTER_BASE_HREF">
 
-  <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0;">
+
+  <meta property="og:type" content="website">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="600" />
+  <meta property="og:image:height" content="600" />
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image:width" content="600">
+  <meta property="og:image" content="https://saas-oss.oss-cn-hongkong.aliyuncs.com/upload/20220411223652879.png"/>
+  <meta name="twitter:image" content="https://saas-oss.oss-cn-hongkong.aliyuncs.com/upload/20220411223652879.png">
+  <meta name="keyWords" content="Crypto Exchange, Blockchain Exchange, Trading, BTC price, ETH price, LYOToken, LYOPAY, cheapest crypto exchange, LYOTrade"/>
+  <meta name="twitter:title" content="Buy/Sell Cryptocurrency Powered by LYOPAY"/>
+  <meta property="og:title" content="Buy/Sell Cryptocurrency Powered by LYOPAY"/>
+  <meta name="description" content="LYOTRADE makes buying and selling cryptocurrency easy and safe">
+  <meta property="og:description" content="LYOTRADE makes buying and selling cryptocurrency easy and safe"/>
+  <meta name="twitter:description" content="LYOTRADE makes buying and selling cryptocurrency easy and safe">
+  <link type="image/x-icon" rel="shortcut icon" href="https://saas-oss.oss-cn-hongkong.aliyuncs.com/upload/20220203154834372.png">
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -31,8 +48,30 @@
 
   <title>lyotrade</title>
   <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      background-color: #0A143B;
+    }
+    .centered {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      margin-top: -45.5px;
+      margin-left: -136.5px;
+    }
+  </style>
 </head>
 <body>
+  <center>
+    <div class="centered">
+      <div>
+        <img src="https://lyopay.lyotechlabs.com/lyotrade-assets/logo.svg"/>
+      </div>
+      <div>
+        <img src="/assets/assets/img/loader.gif" width="50" alt="lyotrade logo">
+      </div>
+    </div>
+  </center>
   <!-- This script installs service_worker.js to provide PWA functionality to
        application. For more information, see:
        https://developers.google.com/web/fundamentals/primers/service-workers -->
@@ -100,5 +139,6 @@
       loadMainDartJs();
     }
   </script>
+  <!-- <script src="https://unpkg.com/@suolun/aliyun-captcha@1.0.0/lib/umd/index.js"></script> -->
 </body>
 </html>

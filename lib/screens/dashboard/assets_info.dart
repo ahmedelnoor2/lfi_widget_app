@@ -113,7 +113,8 @@ class _AssetsInfoState extends State<AssetsInfo>
                   Column(
                     children: widget.headerSymbols.map(
                       (item) {
-                        return item['coin'] == 'LYO1'
+                        return (item['coin'] == 'LYO1' ||
+                                item['coin'] == 'LUNA')
                             ? Container()
                             : InkWell(
                                 onTap: () {
@@ -125,8 +126,8 @@ class _AssetsInfoState extends State<AssetsInfo>
                                 },
                                 child: Container(
                                   padding: EdgeInsets.only(
-                                    bottom: width * 0.005,
-                                    top: width * 0.01,
+                                    bottom: 5,
+                                    top: 5,
                                   ),
                                   child: Row(
                                     mainAxisAlignment:
