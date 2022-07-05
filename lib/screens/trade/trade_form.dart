@@ -98,6 +98,8 @@ class _TradeFormState extends State<TradeForm> {
   }
 
   void calculateTotal(field) {
+    var public = Provider.of<Public>(context, listen: false);
+
     if (field == 'amount') {
       if (_amountField.text.isNotEmpty) {
         try {
@@ -105,8 +107,11 @@ class _TradeFormState extends State<TradeForm> {
             _amount = double.parse(_amountField.text);
             _total = double.parse(_amountField.text) * _price;
           });
-          _totalField.text =
-              '${(double.parse(_amountField.text) * _price).toStringAsFixed(4)}';
+          _totalField.text = truncateTo(
+              '${double.parse(_amountField.text) * _price}',
+              public.activeMarket.isNotEmpty
+                  ? public.activeMarket['price']
+                  : 4);
         } catch (e) {
           //
         }
@@ -120,8 +125,9 @@ class _TradeFormState extends State<TradeForm> {
           _price = double.parse(_priceField.text);
           _total = double.parse(_priceField.text) * _amount;
         });
-        _totalField.text =
-            '${(double.parse(_priceField.text) * _amount).toStringAsFixed(4)}';
+        _totalField.text = truncateTo(
+            '${double.parse(_priceField.text) * _amount}',
+            public.activeMarket.isNotEmpty ? public.activeMarket['price'] : 4);
       } else {
         setState(() {
           _price = 0.00;
@@ -132,11 +138,11 @@ class _TradeFormState extends State<TradeForm> {
     if (field == 'total') {
       if (_totalField.text.isNotEmpty) {
         try {
-          setState(() {
-            _total = double.parse(_totalField.text);
-            _amount = double.parse(_totalField.text) / _price;
-          });
-          _amountField.text = '${double.parse(_totalField.text) / _price}';
+          _amountField.text = truncateTo(
+              '${double.parse(_totalField.text) / _price}',
+              public.activeMarket.isNotEmpty
+                  ? public.activeMarket['volume']
+                  : 4);
         } catch (e) {
           //
         }
@@ -153,6 +159,37 @@ class _TradeFormState extends State<TradeForm> {
       await public.amountFieldDisable();
     });
     calculateTotal('price');
+  }
+
+  String getAmountValue(public, asset, percentage) {
+    double minSell = public.activeMarket.isNotEmpty
+        ? public.activeMarket['marketSellMin']
+        : 0.00;
+
+    var amountValue = (double.parse(asset.accountBalance['allCoinMap']
+            [public.activeMarket['name'].split('/')[0]]['normal_balance']) *
+        percentage);
+    if (amountValue >= minSell) {
+      return truncateTo('$amountValue',
+          public.activeMarket.isNotEmpty ? public.activeMarket['price'] : 4);
+    } else {
+      return '0.00';
+    }
+  }
+
+  String getPriceValue(public, asset, percentage) {
+    double minBuy = public.activeMarket.isNotEmpty
+        ? public.activeMarket['marketBuyMin']
+        : 0.00;
+    var priceValue = (double.parse(asset.accountBalance['allCoinMap']
+            [public.activeMarket['name'].split('/')[1]]['normal_balance']) *
+        percentage);
+    if (priceValue >= minBuy) {
+      return truncateTo('$priceValue',
+          public.activeMarket.isNotEmpty ? public.activeMarket['price'] : 4);
+    } else {
+      return '0.00';
+    }
   }
 
   Future<void> createOrder() async {
@@ -632,19 +669,9 @@ class _TradeFormState extends State<TradeForm> {
                   setState(() {
                     _currentAmountSelection = 25;
                     if (_isBuy && (_orderType == 2)) {
-                      _totalField.text = (double.parse(asset
-                                          .accountBalance['allCoinMap'][
-                                      public.activeMarket['name'].split('/')[1]]
-                                  ['normal_balance']) *
-                              0.25)
-                          .toStringAsPrecision(6);
+                      _totalField.text = getPriceValue(public, asset, 0.25);
                     } else {
-                      _amountField.text = (double.parse(asset
-                                          .accountBalance['allCoinMap'][
-                                      public.activeMarket['name'].split('/')[0]]
-                                  ['normal_balance']) *
-                              0.25)
-                          .toStringAsPrecision(6);
+                      _amountField.text = getAmountValue(public, asset, 0.25);
                     }
                   });
                   if (_isBuy && (_orderType == 2)) {
@@ -690,19 +717,9 @@ class _TradeFormState extends State<TradeForm> {
                   setState(() {
                     _currentAmountSelection = 50;
                     if (_isBuy && (_orderType == 2)) {
-                      _totalField.text = (double.parse(asset
-                                          .accountBalance['allCoinMap'][
-                                      public.activeMarket['name'].split('/')[1]]
-                                  ['normal_balance']) *
-                              0.50)
-                          .toStringAsPrecision(6);
+                      _totalField.text = getPriceValue(public, asset, 0.50);
                     } else {
-                      _amountField.text = (double.parse(asset
-                                          .accountBalance['allCoinMap'][
-                                      public.activeMarket['name'].split('/')[0]]
-                                  ['normal_balance']) *
-                              0.50)
-                          .toStringAsPrecision(6);
+                      _amountField.text = getAmountValue(public, asset, 0.50);
                     }
                   });
                   if (_isBuy && (_orderType == 2)) {
@@ -748,19 +765,9 @@ class _TradeFormState extends State<TradeForm> {
                   setState(() {
                     _currentAmountSelection = 75;
                     if (_isBuy && (_orderType == 2)) {
-                      _totalField.text = (double.parse(asset
-                                          .accountBalance['allCoinMap'][
-                                      public.activeMarket['name'].split('/')[1]]
-                                  ['normal_balance']) *
-                              0.75)
-                          .toStringAsPrecision(6);
+                      _totalField.text = getPriceValue(public, asset, 0.75);
                     } else {
-                      _amountField.text = (double.parse(asset
-                                          .accountBalance['allCoinMap'][
-                                      public.activeMarket['name'].split('/')[0]]
-                                  ['normal_balance']) *
-                              0.75)
-                          .toStringAsPrecision(6);
+                      _amountField.text = getAmountValue(public, asset, 0.75);
                     }
                   });
                   if (_isBuy && (_orderType == 2)) {
@@ -806,17 +813,9 @@ class _TradeFormState extends State<TradeForm> {
                   setState(() {
                     _currentAmountSelection = 100;
                     if (_isBuy && (_orderType == 2)) {
-                      _totalField.text = truncateTo(
-                          '${(double.parse(asset.accountBalance['allCoinMap'][public.activeMarket['name'].split('/')[1]]['normal_balance']) * 1)}',
-                          public.activeMarket.isNotEmpty
-                              ? public.activeMarket['price']
-                              : 4);
+                      _totalField.text = getPriceValue(public, asset, 1);
                     } else {
-                      _amountField.text = truncateTo(
-                          '${(double.parse(asset.accountBalance['allCoinMap'][public.activeMarket['name'].split('/')[0]]['normal_balance']) * 1)}',
-                          public.activeMarket.isNotEmpty
-                              ? public.activeMarket['price']
-                              : 4);
+                      _amountField.text = getAmountValue(public, asset, 1);
                     }
                   });
                   if (_isBuy && (_orderType == 2)) {

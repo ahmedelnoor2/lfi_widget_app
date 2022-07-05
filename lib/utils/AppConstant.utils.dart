@@ -5,6 +5,7 @@ var width;
 var currentindex = 0;
 
 var apiUrl = kIsWeb ? 'api.m.lyotrade.com' : 'www.lyotrade.com';
+var lyoApiUrl = 'api.m.lyotrade.com';
 var futApiUrl = 'futures.lyotrade.com';
 var serviceApi = kIsWeb ? 'api.m.lyotrade.com' : 'service.lyotrade.com';
 var loanApiUrl = 'api.coinrabbit.io';
@@ -12,6 +13,7 @@ var paymentsApi = 'payments.lyotrade.com';
 var changeNowApi = 'https://content-api.changenow.io';
 
 var exApi = kIsWeb ? '/api/fe-ex-api' : '/fe-ex-api';
+var lyoPubApi = '/api';
 var fePubApi = kIsWeb ? '/api' : '/';
 var futExApi = '/fe-co-api';
 var plfApi = kIsWeb ? '/service/fe-platform-api' : '/fe-platform-api';

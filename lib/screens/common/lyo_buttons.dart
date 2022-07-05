@@ -32,13 +32,13 @@ class LyoButton extends StatelessWidget {
           padding: EdgeInsets.all(10),
           decoration: BoxDecoration(
             // color: Color(0xff5E6292),
-            color: !active ? Color(0xff292C51) : activeColor,
+            color: (!active || isLoading) ? Color(0xff292C51) : activeColor,
             borderRadius: BorderRadius.circular(5),
             border: Border.all(
               // style: BorderStyle.solid,
               width: 0,
               // color: Color(0xff5E6292),
-              color: !active ? Colors.transparent : activeColor,
+              color: (!active || isLoading) ? Colors.transparent : activeColor,
             ),
           ),
           child: Align(

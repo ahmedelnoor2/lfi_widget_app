@@ -24,7 +24,7 @@ class MarketDrawer extends StatefulWidget {
 
 class _MarketDrawerState extends State<MarketDrawer>
     with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
+  TabController? _tabController;
   final TextEditingController _searchController = TextEditingController();
 
   var _channel;
@@ -160,25 +160,27 @@ class _MarketDrawerState extends State<MarketDrawer>
               ),
             ),
           ),
+          _tabController != null
+              ? SizedBox(
+                  height: 40,
+                  child: TabBar(
+                    onTap: (value) {
+                      setState(() {
+                        _currentMarketSort = public.publicInfoMarket['market']
+                            ['marketSort'][value];
+                      });
+                    },
+                    controller: _tabController,
+                    tabs: public.publicInfoMarket['market']['marketSort']
+                        .map<Widget>(
+                          (mname) => Tab(text: '$mname'),
+                        )
+                        .toList(),
+                  ),
+                )
+              : Container(),
           SizedBox(
-            height: 40,
-            child: TabBar(
-              onTap: (value) {
-                setState(() {
-                  _currentMarketSort =
-                      public.publicInfoMarket['market']['marketSort'][value];
-                });
-              },
-              controller: _tabController,
-              tabs: public.publicInfoMarket['market']['marketSort']
-                  .map<Widget>(
-                    (mname) => Tab(text: '$mname'),
-                  )
-                  .toList(),
-            ),
-          ),
-          SizedBox(
-            height: height * 0.79,
+            height: height * 0.76,
             child: ListView.builder(
               shrinkWrap: true,
               itemCount: public.allSearchMarket[_currentMarketSort].isNotEmpty

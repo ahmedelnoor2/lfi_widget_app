@@ -44,6 +44,7 @@ import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 

@@ -158,11 +158,11 @@ class Auth with ChangeNotifier {
         _isAuthenticated = false;
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('authToken', _loginVerificationToken);
-        notifyListeners();
-        Navigator.pushNamedAndRemoveUntil(ctx, '/', (route) => false);
+        return notifyListeners();
       }
     } catch (error) {
       print(error);
+      return;
       // throw error;
     }
   }

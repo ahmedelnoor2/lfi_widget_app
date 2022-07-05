@@ -9,6 +9,7 @@ import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 
 import 'package:provider/provider.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class SideBar extends StatefulWidget {
   const SideBar({Key? key}) : super(key: key);
@@ -19,11 +20,22 @@ class SideBar extends StatefulWidget {
 
 class _SideBarState extends State<SideBar> {
   bool _payWithLyoCred = false;
+  bool _processLogout = false;
+
+  String _versionNumber = '0.0';
 
   @override
   void initState() {
+    checkVersion();
     checkFeeCoinStatus();
     super.initState();
+  }
+
+  Future<void> checkVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      _versionNumber = packageInfo.version;
+    });
   }
 
   void checkFeeCoinStatus() {
@@ -233,16 +245,33 @@ class _SideBarState extends State<SideBar> {
                 ? Container(
                     padding: EdgeInsets.only(right: 10, left: 10),
                     child: LyoButton(
-                      onPressed: () {
-                        auth.logout(context);
-                      },
+                      onPressed: _processLogout
+                          ? null
+                          : () async {
+                              setState(() {
+                                _processLogout = true;
+                              });
+                              await auth.logout(context);
+                              setState(() {
+                                _processLogout = false;
+                              });
+                              Navigator.pushNamedAndRemoveUntil(
+                                  context, '/', (route) => false);
+                            },
                       text: 'Logout',
                       active: true,
                       activeColor: linkColor,
                       activeTextColor: Colors.black,
-                      isLoading: false,
+                      isLoading: _processLogout,
                     ))
-                : Container()
+                : Container(),
+            Align(
+              alignment: Alignment.center,
+              child: Container(
+                padding: EdgeInsets.only(top: 10),
+                child: Text('Version: $_versionNumber'),
+              ),
+            ),
           ],
         ),
       ),

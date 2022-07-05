@@ -236,8 +236,8 @@ class Public with ChangeNotifier {
 
   Future<void> getPublicInfo() async {
     var url = Uri.https(
-      apiUrl,
-      '$fePubApi/fePublicInfo/en_US',
+      lyoApiUrl,
+      '$lyoPubApi/fePublicInfo/en_US',
     );
 
     try {
@@ -251,6 +251,7 @@ class Public with ChangeNotifier {
       _publicInfo = responseData;
       return notifyListeners();
     } catch (error) {
+      print(error);
       // throw error;
       return;
     }

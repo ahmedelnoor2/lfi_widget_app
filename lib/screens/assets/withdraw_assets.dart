@@ -233,9 +233,8 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
 
   Future<void> checkUserAuthMethods() async {
     var auth = Provider.of<Auth>(context, listen: false);
-
     if (auth.userInfo.isNotEmpty) {
-      if (auth.userInfo['googleStatus'] != 0 ||
+      if (auth.userInfo['googleStatus'] == 0 &&
           auth.userInfo['mobileNumber'].isEmpty) {
         return showAlert(
           context,
@@ -294,20 +293,56 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
   }
 
   Future<void> verifyAddress() async {
-    setState(() {
-      _validateEmailProcess = true;
-      _verifyAddress = true;
-    });
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
 
-    asset.withdrawAddressValidate(context, auth, {
-      "address": _addressController.text,
-      "coinSymbol": _coinShowName,
-    });
-    setState(() {
-      _verifyAddress = false;
-    });
+    if (auth.userInfo['googleStatus'] == 0) {
+      return showAlert(
+        context,
+        Icon(
+          Icons.featured_play_list,
+        ),
+        'Tips',
+        <Widget>[
+          Text(
+            'For the security of your account, please open at least one verification method',
+            style: TextStyle(
+              fontSize: 12,
+            ),
+          ),
+          ListTile(
+            title: Text(
+              'Connect Google verification',
+              style: TextStyle(
+                fontSize: 12,
+              ),
+            ),
+            trailing: Icon(
+              Icons.check,
+              size: 15,
+              color: (auth.userInfo['googleStatus'] == 0)
+                  ? secondaryTextColor
+                  : greenIndicator,
+            ),
+          ),
+          Divider(),
+        ],
+        'Settings',
+      );
+    } else {
+      setState(() {
+        _validateEmailProcess = true;
+        _verifyAddress = true;
+      });
+
+      asset.withdrawAddressValidate(context, auth, {
+        "address": _addressController.text,
+        "coinSymbol": _coinShowName,
+      });
+      setState(() {
+        _verifyAddress = false;
+      });
+    }
   }
 
   Future<void> processWithdrawAmount() async {

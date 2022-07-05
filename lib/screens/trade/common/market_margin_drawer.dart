@@ -152,7 +152,7 @@ class _MarketMarginDrawerState extends State<MarketMarginDrawer> {
             ),
           ),
           SizedBox(
-            height: height * 0.794,
+            height: height * 0.76,
             child: ListView.builder(
               shrinkWrap: true,
               itemCount:
