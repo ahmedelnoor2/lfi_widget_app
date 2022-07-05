@@ -17,7 +17,7 @@ class _ReferalState extends State<Referal> with SingleTickerProviderStateMixin {
   TabController? _tabController;
 
   var _pages = [
-    CommisonPage(),
+  CommisonPage(),
    Postionpage(),
   ];
 
@@ -199,8 +199,8 @@ class _ReferalState extends State<Referal> with SingleTickerProviderStateMixin {
             child: Container(
               height: 30,
               padding: EdgeInsets.symmetric(horizontal: 15, vertical: 2),
-  decoration: BoxDecoration(
-      color:  selectboxcolour, borderRadius: BorderRadius.circular(5)),
+               decoration: BoxDecoration(
+                color:  selectboxcolour, borderRadius: BorderRadius.circular(5)),
               child: DropdownButton<String>(
                 underline: SizedBox(),
                 value: dropdownValue,

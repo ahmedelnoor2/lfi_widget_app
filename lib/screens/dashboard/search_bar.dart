@@ -93,7 +93,13 @@ class _SearchBarState extends State<SearchBar> {
                 Container(
                   padding: EdgeInsets.only(left: 10),
                   child: GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                   ///first check auth 
+                  
+                  Navigator.pushNamed(context, '/notification_screen');
+
+
+                    },
                     child: Image.asset(
                       'assets/img/notification.png',
                       width: 24,

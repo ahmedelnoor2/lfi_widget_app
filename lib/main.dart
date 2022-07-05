@@ -26,6 +26,7 @@ import 'package:lyotrade/screens/kyc/enitityverificatrion.dart';
 import 'package:lyotrade/screens/kyc/kycscreen.dart';
 import 'package:lyotrade/screens/kyc/perosmalvarification.dart';
 import 'package:lyotrade/screens/market/market.dart';
+import 'package:lyotrade/screens/notification/notifcationmessage.dart';
 import 'package:lyotrade/screens/referal/referal.dart';
 import 'package:lyotrade/screens/security/email_change.dart';
 import 'package:lyotrade/screens/security/forgot/forgotpassword.dart';
@@ -70,6 +71,7 @@ class MyApp extends StatelessWidget {
       child: Consumer<Auth>(
         builder: (context, auth, _) {
           return MaterialApp(
+            debugShowCheckedModeBanner: false,
             title: 'LYOTRADE',
             theme: ThemeData(
               // This is the theme of your application.
@@ -241,6 +243,7 @@ class MyApp extends StatelessWidget {
               personalverification.routeName:(context) => personalverification(),
                
               EnitityVerification.routeName:((context) => EnitityVerification()),
+              Notificationsscreen.routeName:((context) => const Notificationsscreen()),
             },
           );
         },
