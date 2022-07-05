@@ -5,27 +5,29 @@ import 'package:lyotrade/screens/security/forgot/widget/custom_text_field.dart';
 import 'package:lyotrade/screens/security/forgot/widget/error_dialog.dart';
 import 'package:lyotrade/screens/security/forgot/widget/loading_dialog.dart';
 
+import '../../../utils/Colors.utils.dart';
 
 
-class Forgotloginform extends StatefulWidget {
-  const Forgotloginform({Key? key}) : super(key: key);
+
+class Forgotphoneform extends StatefulWidget {
+  const Forgotphoneform({Key? key}) : super(key: key);
 
   @override
-  _ForgotloginformState createState() => _ForgotloginformState();
+  _ForgotphoneformState createState() => _ForgotphoneformState();
 }
 
 
 
-class _ForgotloginformState extends State<Forgotloginform>
+class _ForgotphoneformState extends State<Forgotphoneform>
 {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  TextEditingController emailController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
 
 
 
   formValidation()
   {
-    if(emailController.text.isNotEmpty )
+    if( phoneController.text.isNotEmpty )
     {
       //login
       loginNow();
@@ -75,8 +77,8 @@ class _ForgotloginformState extends State<Forgotloginform>
               children: [
                 CustomTextField(
                   data: Icons.password,
-                  controller: emailController,
-                  hintText: "Email",
+                  controller:  phoneController,
+                  hintText: "Phone number",
                   isObsecre: false,
                 ),
                 
@@ -91,7 +93,7 @@ class _ForgotloginformState extends State<Forgotloginform>
                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold,),
               ),
               style: ElevatedButton.styleFrom(
-                primary: Colors.cyan,
+              primary: bluechartColor,
                 padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 10),
               ),
               onPressed: ()

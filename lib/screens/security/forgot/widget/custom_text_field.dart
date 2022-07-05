@@ -21,26 +21,22 @@ class CustomTextField extends StatelessWidget
   Widget build(BuildContext context)
   {
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-      ),
       padding: const EdgeInsets.all(8.0),
       margin: const EdgeInsets.all(10),
       child: TextFormField(
-        enabled: enabled,
-        controller: controller,
-        obscureText: isObsecre!,
-        cursorColor: Theme.of(context).primaryColor,
-        decoration: InputDecoration(
-          border: InputBorder.none,
-          prefixIcon: Icon(
-            data,
-            color: Colors.cyan,
-          ),
-          focusColor: Theme.of(context).primaryColor,
-          hintText: hintText,
-        ),
+        autocorrect: true,
+            decoration: InputDecoration(
+              hintText: hintText,
+              hintStyle: TextStyle(color: Colors.grey),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                borderSide: BorderSide(color: Colors.grey, width: 1),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                borderSide: BorderSide(color: Colors.grey, width: 1),
+              ),
+            ),
       ),
     );
   }

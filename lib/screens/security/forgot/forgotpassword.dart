@@ -1,14 +1,12 @@
-import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:lyotrade/screens/common/header.dart';
-import 'package:lyotrade/providers/auth.dart';
-import 'package:lyotrade/screens/referal/pages/commision_record.dart';
-import 'package:lyotrade/utils/AppConstant.utils.dart';
-import 'package:lyotrade/utils/Colors.utils.dart';
-import 'package:lyotrade/utils/Country.utils.dart';
-import 'package:provider/provider.dart';
+import 'package:lyotrade/screens/security/forgot/forgotemailform.dart';
 
-import 'forgotloginform.dart';
+import 'package:lyotrade/utils/Colors.utils.dart';
+
+
+import 'forgotlphoneform.dart';
 
 class Forgotpassword extends StatefulWidget {
   static const routeName = '/forgotForgotpassword';
@@ -23,7 +21,7 @@ class _ForgotpasswordState extends State<Forgotpassword>
   TabController? _tabController;
   final _formKey = GlobalKey<FormState>();
 
-  var _pages = [Forgotloginform(), EmailMethod()];
+  var _pages = [Forgotphoneform(),Forgotemailform()];
 
   @override
   void initState() {
@@ -104,92 +102,92 @@ class _ForgotpasswordState extends State<Forgotpassword>
   }
 }
 
-// Login Button Method Widget
-Widget PhoneMethod() {
-  return Column(
-    children: [
-      SizedBox(
-        height: 40,
-      ),
-      Container(
-          padding: EdgeInsets.all(10.0),
-          child: TextField(
-            autocorrect: true,
-            decoration: InputDecoration(
-              hintText: 'Phone Number',
-              hintStyle: TextStyle(color: Colors.grey),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                borderSide: BorderSide(color: Colors.grey, width: 1),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                borderSide: BorderSide(color: Colors.grey, width: 1),
-              ),
-            ),
-          )),
-      SizedBox(height: 50),
-      Container(
-        width: 380,
-        child: ElevatedButton(
-          child: Text(
-            "Next",
-            style: TextStyle(
-              color: whiteTextColor,
-            ),
-          ),
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-              primary: bluechartColor,
-              padding: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
-              textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        ),
-      ),
-    ],
-  );
-}
+// // Login Button Method Widget
+// Widget PhoneMethod() {
+//   return Column(
+//     children: [
+//       SizedBox(
+//         height: 40,
+//       ),
+//       Container(
+//           padding: EdgeInsets.all(10.0),
+//           child: TextField(
+//             autocorrect: true,
+//             decoration: InputDecoration(
+//               hintText: 'Phone Number',
+//               hintStyle: TextStyle(color: Colors.grey),
+//               enabledBorder: OutlineInputBorder(
+//                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
+//                 borderSide: BorderSide(color: Colors.grey, width: 1),
+//               ),
+//               focusedBorder: OutlineInputBorder(
+//                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
+//                 borderSide: BorderSide(color: Colors.grey, width: 1),
+//               ),
+//             ),
+//           )),
+//       SizedBox(height: 50),
+//       Container(
+//         width: 380,
+//         child: ElevatedButton(
+//           child: Text(
+//             "Next",
+//             style: TextStyle(
+//               color: whiteTextColor,
+//             ),
+//           ),
+//           onPressed: () {},
+//           style: ElevatedButton.styleFrom(
+//               primary: bluechartColor,
+//               padding: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+//               textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+//         ),
+//       ),
+//     ],
+//   );
+// }
 
-// Login Button Method Widget
-Widget EmailMethod() {
-  return Column(
-    children: [
-      SizedBox(
-        height: 40,
-      ),
-      Container(
-          padding: EdgeInsets.all(10.0),
-          child: TextField(
-            autocorrect: true,
-            decoration: InputDecoration(
-              hintText: 'Email',
-              hintStyle: TextStyle(color: Colors.grey),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                borderSide: BorderSide(color: Colors.grey, width: 1),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                borderSide: BorderSide(color: Colors.grey, width: 1),
-              ),
-            ),
-          )),
-      SizedBox(height: 50),
-      Container(
-        width: 380,
-        child: ElevatedButton(
-          child: Text(
-            "Next",
-            style: TextStyle(
-              color: whiteTextColor,
-            ),
-          ),
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-              primary: bluechartColor,
-              padding: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
-              textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        ),
-      ),
-    ],
-  );
-}
+// // Login Button Method Widget
+// Widget EmailMethod() {
+//   return Column(
+//     children: [
+//       SizedBox(
+//         height: 40,
+//       ),
+//       Container(
+//           padding: EdgeInsets.all(10.0),
+//           child: TextField(
+//             autocorrect: true,
+//             decoration: InputDecoration(
+//               hintText: 'Email',
+//               hintStyle: TextStyle(color: Colors.grey),
+//               enabledBorder: OutlineInputBorder(
+//                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
+//                 borderSide: BorderSide(color: Colors.grey, width: 1),
+//               ),
+//               focusedBorder: OutlineInputBorder(
+//                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
+//                 borderSide: BorderSide(color: Colors.grey, width: 1),
+//               ),
+//             ),
+//           )),
+//       SizedBox(height: 50),
+//       Container(
+//         width: 380,
+//         child: ElevatedButton(
+//           child: Text(
+//             "Next",
+//             style: TextStyle(
+//               color: whiteTextColor,
+//             ),
+//           ),
+//           onPressed: () {},
+//           style: ElevatedButton.styleFrom(
+//               primary: bluechartColor,
+//               padding: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+//               textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+//         ),
+//       ),
+//     ],
+//   );
+// }
