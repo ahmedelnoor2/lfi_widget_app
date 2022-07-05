@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/dex_provider.dart';
@@ -45,7 +46,9 @@ import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky,
+      overlays: [SystemUiOverlay.top]).then((_) => runApp(const MyApp()));
+  // runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -54,6 +57,8 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    // SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack,
+    //     overlays: [SystemUiOverlay.top]);
     double _letterSpacing = 0.3;
 
     return MultiProvider(

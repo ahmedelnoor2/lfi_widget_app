@@ -126,88 +126,95 @@ class _AuthenticationState extends State<Authentication> {
     });
   }
 
+  Future<bool> _onWillPop() async {
+    return (await showDialog(
+          context: context,
+          builder: (context) => new AlertDialog(
+            title: new Text('Are you sure?'),
+            content: new Text('Do you want to exit an App'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: new Text('No'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: new Text('Yes'),
+              ),
+            ],
+          ),
+        )) ??
+        false;
+  }
+
   @override
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
 
-    return Scaffold(
-      // appBar: appBar(context, null),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.only(top: width * 0.08),
-        child: Container(
-          padding: EdgeInsets.only(top: width * 0.1),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.only(left: 10),
-                height: height * 0.20,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        Navigator.maybePop(context);
-                      },
-                      icon: const Icon(Icons.close),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.only(top: 10, right: 30),
-                      child: Column(
-                        children: [
-                          const Image(
-                            image: AssetImage('assets/img/logo_s.png'),
-                            width: 100,
-                          ),
-                          Text('v$_versionNumber'),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.all(width * 0.08),
-                child: _verifyEmail
-                    ? EmailVerification(
-                        token: _token,
-                        operationType: _authLogin
-                            ? '4'
-                            : _isMobile
-                                ? '25'
-                                : '1',
-                        toggleEmailVerification: () {
-                          toggleEmailVerification();
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        // appBar: appBar(context, null),
+        body: SingleChildScrollView(
+          padding: EdgeInsets.only(top: width * 0.08),
+          child: Container(
+            padding: EdgeInsets.only(top: width * 0.1),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.only(left: 10),
+                  height: height * 0.20,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
                         },
-                        emailVerification: _emailVerification,
-                        currentCoutnry: _countryCode,
-                        isMobile: _isMobile,
-                      )
-                    : _authLogin
-                        ? Login(onLogin: (value, captchaController) async {
-                            // print('--------------------');
-                            // print(captchaController);
+                        icon: const Icon(Icons.close),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.only(top: 10, right: 30),
+                        child: Column(
+                          children: [
+                            const Image(
+                              image: AssetImage('assets/img/logo_s.png'),
+                              width: 100,
+                            ),
+                            Text('v$_versionNumber'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(width * 0.08),
+                  child: _verifyEmail
+                      ? EmailVerification(
+                          token: _token,
+                          operationType: _authLogin
+                              ? '4'
+                              : _isMobile
+                                  ? '25'
+                                  : '1',
+                          toggleEmailVerification: () {
+                            toggleEmailVerification();
+                          },
+                          emailVerification: _emailVerification,
+                          currentCoutnry: _countryCode,
+                          isMobile: _isMobile,
+                        )
+                      : _authLogin
+                          ? Login(onLogin: (value, captchaController) async {
+                              // print('--------------------');
+                              // print(captchaController);
 
-                            String result = await processLogin(value);
-                            if (result.isNotEmpty) {
-                              setState(() {
-                                _token = result;
-                                _verifyEmail = true;
-                              });
-                            } else {
-                              captchaController.reset();
-                            }
-                          }, onCaptchaVerification: (value) {
-                            setState(() {
-                              _captchaVerification = value;
-                            });
-                          })
-                        : Signup(
-                            onRegister: (value, captchaController) async {
-                              String result = await processSignup(value);
+                              String result = await processLogin(value);
                               if (result.isNotEmpty) {
                                 setState(() {
                                   _token = result;
@@ -216,52 +223,69 @@ class _AuthenticationState extends State<Authentication> {
                               } else {
                                 captchaController.reset();
                               }
-                            },
-                            onCaptchaVerification: (value) {
+                            }, onCaptchaVerification: (value) {
                               setState(() {
                                 _captchaVerification = value;
                               });
+                            })
+                          : Signup(
+                              onRegister: (value, captchaController) async {
+                                String result = await processSignup(value);
+                                if (result.isNotEmpty) {
+                                  setState(() {
+                                    _token = result;
+                                    _verifyEmail = true;
+                                  });
+                                } else {
+                                  captchaController.reset();
+                                }
+                              },
+                              onCaptchaVerification: (value) {
+                                setState(() {
+                                  _captchaVerification = value;
+                                });
+                              },
+                            ),
+                ),
+                Container(
+                  padding: const EdgeInsets.only(bottom: 100),
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: _verifyEmail
+                        ? Container()
+                        : GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _authLogin = !_authLogin;
+                              });
                             },
-                          ),
-              ),
-              Container(
-                padding: const EdgeInsets.only(bottom: 100),
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: _verifyEmail
-                      ? Container()
-                      : GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _authLogin = !_authLogin;
-                            });
-                          },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                _authLogin
-                                    ? 'Don\'t have an account?'
-                                    : 'Already have an account?',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.only(left: 5),
-                                child: Text(
-                                  _authLogin ? 'Sign Up' : 'Sign In',
-                                  style: TextStyle(
-                                    color: linkColor,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  _authLogin
+                                      ? 'Don\'t have an account?'
+                                      : 'Already have an account?',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.only(left: 5),
+                                  child: Text(
+                                    _authLogin ? 'Sign Up' : 'Sign In',
+                                    style: TextStyle(
+                                      color: linkColor,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

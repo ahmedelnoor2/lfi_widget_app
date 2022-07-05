@@ -89,7 +89,7 @@ class Auth with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final String? catchedAuthToken = prefs.getString('authToken');
     authToken = catchedAuthToken ?? '';
-    _isAuthenticated = catchedAuthToken!.isNotEmpty ? true : false;
+    _isAuthenticated = authToken.isNotEmpty ? true : false;
     _loginVerificationToken = authToken;
     headers['exchange-token'] = authToken;
     await getUserInfo();
