@@ -61,7 +61,6 @@ class _AuthenticationState extends State<Authentication> {
   }
 
   Future<String> processSignup(value) async {
-    // print(_captchaVerification);
     var auth = Provider.of<Auth>(context, listen: false);
 
     if (value['emailSignup']) {
