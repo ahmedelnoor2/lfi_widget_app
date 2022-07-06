@@ -477,6 +477,9 @@ class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
                           'emailSignup': _emailSignup,
                         }, _captchaController);
                       }
+                      setState(() {
+                        _enableSignup = true;
+                      });
                     } else {
                       _captchaController.reset();
                     }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/auth/emailverification.dart';
 import 'package:lyotrade/screens/auth/login.dart';
 import 'package:lyotrade/screens/auth/signup.dart';
@@ -26,11 +27,13 @@ class _AuthenticationState extends State<Authentication> {
   String _countryCode = '';
   Map _captchaVerification = {};
   bool _isMobile = true;
+  String _verificationType = '0';
 
   String _versionNumber = '0.0';
 
   @override
   void initState() {
+    checkVerificationMethod();
     checkVersion();
     super.initState();
   }
@@ -38,6 +41,16 @@ class _AuthenticationState extends State<Authentication> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  void checkVerificationMethod() {
+    var public = Provider.of<Public>(context, listen: false);
+
+    if (public.publicInfo.isNotEmpty) {
+      setState(() {
+        _verificationType = public.publicInfo['switch']['verificationType'];
+      });
+    }
   }
 
   Future<void> checkVersion() async {
@@ -52,39 +65,81 @@ class _AuthenticationState extends State<Authentication> {
     var auth = Provider.of<Auth>(context, listen: false);
 
     if (value['emailSignup']) {
-      String emailToken = await auth.checkEmailRegistration(context, {
-        'csessionid': kIsWeb
-            ? _captchaVerification['csessionid']
-            : _captchaVerification['sessionId'],
-        'email': value['email'],
-        'invitedCode': value['invitedCode'],
-        'loginPword': value['loginPword'],
-        'newPassword': value['newPassword'],
-        'scene': 'other',
-        'sig': _captchaVerification['sig'],
-        'token': _captchaVerification['token'],
-        'verificationType': '1',
-      });
+      Map _formParams = {};
+      if (_verificationType == '1') {
+        _formParams = {
+          'csessionid': kIsWeb
+              ? _captchaVerification['csessionid']
+              : _captchaVerification['sessionId'],
+          'email': value['email'],
+          'invitedCode': value['invitedCode'],
+          'loginPword': value['loginPword'],
+          'newPassword': value['newPassword'],
+          'scene': 'other',
+          'sig': _captchaVerification['sig'],
+          'token': _captchaVerification['token'],
+          'verificationType': '1',
+        };
+      } else {
+        _formParams = {
+          'geetest_challenge': "sys_conf_validate",
+          'geetest_seccode': "sys_conf_validate",
+          'geetest_validate': "sys_conf_validate",
+          'email': value['email'],
+          'invitedCode': value['invitedCode'],
+          'loginPword': value['loginPword'],
+          'newPassword': value['newPassword'],
+          'scene': 'other',
+          'token': true,
+          'verificationType': '0',
+        };
+      }
+
+      String emailToken =
+          await auth.checkEmailRegistration(context, _formParams);
       return emailToken;
     } else {
       setState(() {
+        _isMobile = false;
+        _emailVerification = false;
         _countryCode = value['countryCode'];
         _emailVerification = false;
       });
-      String emailToken = await auth.checkMobileRegistration(context, {
-        'csessionid': kIsWeb
-            ? _captchaVerification['csessionid']
-            : _captchaVerification['sessionId'],
-        'countryCode': value['countryCode'],
-        'mobileNumber': value['mobileNumber'],
-        'invitedCode': value['invitedCode'],
-        'loginPword': value['loginPword'],
-        'newPassword': value['newPassword'],
-        'scene': 'other',
-        'sig': _captchaVerification['sig'],
-        'token': _captchaVerification['token'],
-        'verificationType': '1',
-      });
+
+      Map _formParams = {};
+
+      if (_verificationType == '1') {
+        _formParams = {
+          'csessionid': kIsWeb
+              ? _captchaVerification['csessionid']
+              : _captchaVerification['sessionId'],
+          'countryCode': value['countryCode'],
+          'mobileNumber': value['mobileNumber'],
+          'invitedCode': value['invitedCode'],
+          'loginPword': value['loginPword'],
+          'newPassword': value['newPassword'],
+          'scene': 'other',
+          'sig': _captchaVerification['sig'],
+          'token': _captchaVerification['token'],
+          'verificationType': '1',
+        };
+      } else {
+        _formParams = {
+          'geetest_challenge': "sys_conf_validate",
+          'geetest_seccode': "sys_conf_validate",
+          'geetest_validate': "sys_conf_validate",
+          'countryCode': value['countryCode'],
+          'mobileNumber': value['mobileNumber'],
+          'invitedCode': value['invitedCode'],
+          'loginPword': value['loginPword'],
+          'newPassword': value['newPassword'],
+          'scene': 'other',
+          'token': true,
+          'verificationType': '0',
+        };
+      }
+      String emailToken =
+          await auth.checkMobileRegistration(context, _formParams);
       return emailToken;
     }
   }
@@ -95,6 +150,7 @@ class _AuthenticationState extends State<Authentication> {
           r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$",
           caseSensitive: false),
     );
+
     setState(() {
       _isMobile = !isEmail;
       _emailVerification = isEmail ? true : false;

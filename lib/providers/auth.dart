@@ -292,18 +292,7 @@ class Auth with ChangeNotifier {
       '$exApi/user/reg_mobile_chk_info',
     );
 
-    var postData = json.encode({
-      'csessionid': formData['csessionid'],
-      'countryCode': formData['countryCode'],
-      'mobileNumber': formData['mobileNumber'],
-      'invitedCode': formData['invitedCode'],
-      'loginPword': formData['loginPword'],
-      'newPassword': formData['newPassword'],
-      'scene': formData['scene'],
-      'sig': formData['sig'],
-      'token': formData['token'],
-      'verificationType': formData['verificationType'],
-    });
+    var postData = json.encode(formData);
 
     print(postData);
 
@@ -367,6 +356,8 @@ class Auth with ChangeNotifier {
     );
 
     var postData = json.encode(formData);
+
+    print(postData);
 
     try {
       final response = await http.post(url, body: postData, headers: headers);
