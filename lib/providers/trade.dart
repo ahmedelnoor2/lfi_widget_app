@@ -148,6 +148,7 @@ class Trading with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         _transactionHistory = responseData['data']['list'];
+        
         return notifyListeners();
       } else {
         _transactionHistory = [];
