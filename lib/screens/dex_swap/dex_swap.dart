@@ -3,6 +3,7 @@ import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/dex_provider.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/dex_swap/common/exchange_now.dart';
+import 'package:lyotrade/utils/ScreenControl.utils.dart';
 import 'package:provider/provider.dart';
 
 class DexSwap extends StatefulWidget {
@@ -47,53 +48,58 @@ class _DexSwapState extends State<DexSwap> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            onPressed: () {
-              clearPaymentProcess();
-            },
-            icon: Icon(Icons.chevron_left),
-          ),
-          bottom: TabBar(
-            tabs: [
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  'Exchange Now',
-                  style: TextStyle(
-                    fontSize: 18,
+    return WillPopScope(
+      onWillPop: () {
+        return onAndroidBackPress(context);
+      },
+      child: DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+              onPressed: () {
+                clearPaymentProcess();
+              },
+              icon: Icon(Icons.chevron_left),
+            ),
+            bottom: TabBar(
+              tabs: [
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'Exchange Now',
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),
                   ),
                 ),
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'Fixed Rate',
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            title: Text(
+              'DEX Swap',
+              style: TextStyle(
+                fontSize: 20,
+                fontStyle: FontStyle.normal,
               ),
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  'Fixed Rate',
-                  style: TextStyle(
-                    fontSize: 18,
-                  ),
-                ),
+            ),
+          ),
+          body: TabBarView(
+            children: [
+              ExchangeNow(),
+              Center(
+                child: Text('Coming Soon...'),
               ),
             ],
           ),
-          title: Text(
-            'DEX Swap',
-            style: TextStyle(
-              fontSize: 20,
-              fontStyle: FontStyle.normal,
-            ),
-          ),
-        ),
-        body: TabBarView(
-          children: [
-            ExchangeNow(),
-            Center(
-              child: Text('Coming Soon...'),
-            ),
-          ],
         ),
       ),
     );

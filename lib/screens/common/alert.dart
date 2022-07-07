@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 Future<void> showAlert(context, icon, title, message, action) async {
   return showDialog<void>(
@@ -23,7 +26,11 @@ Future<void> showAlert(context, icon, title, message, action) async {
             ),
             IconButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                if (action == 'Exit') {
+                  exit(0);
+                } else {
+                  Navigator.of(context).pop();
+                }
               },
               icon: const Icon(
                 Icons.close,
@@ -43,6 +50,8 @@ Future<void> showAlert(context, icon, title, message, action) async {
             onPressed: () {
               if (action == 'Settings') {
                 Navigator.pushNamed(context, '/security');
+              } else if (action == 'Exit') {
+                exit(0);
               } else {
                 Navigator.of(context).pop();
               }

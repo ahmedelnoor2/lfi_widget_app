@@ -17,6 +17,7 @@ import 'package:lyotrade/screens/dashboard/latest_listing.dart';
 import 'package:lyotrade/screens/dashboard/live_feed.dart';
 import 'package:lyotrade/screens/dashboard/search_bar.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
+import 'package:lyotrade/utils/ScreenControl.utils.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -42,6 +43,7 @@ class _DashboardState extends State<Dashboard> {
   @override
   void initState() {
     // checkScreenSize();
+    checkSocket();
     getPublicInfo();
     getAssetsRate();
     checkLoginStatus();
@@ -54,6 +56,11 @@ class _DashboardState extends State<Dashboard> {
       _channel.sink.close();
     }
     super.dispose();
+  }
+
+  Future<void> checkSocket() async {
+    var public = Provider.of<Public>(context, listen: false);
+    await public.checkSocket(context);
   }
 
   Future<void> getPublicInfo() async {
@@ -203,42 +210,47 @@ class _DashboardState extends State<Dashboard> {
     var public = Provider.of<Public>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
 
-    return Scaffold(
-      key: _key,
-      appBar: hiddenAppBar(),
-      drawer: const SideBar(),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          getAssetsRate();
-          checkLoginStatus();
-          await Future.delayed(const Duration(seconds: 2));
-        },
-        child: SingleChildScrollView(
-          child: Container(
-            width: width,
-            padding: EdgeInsets.all(width * 0.015),
-            child: Column(
-              // mainAxisAlignment: MainAxisAlignment.center,
-              // crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SearchBar(handleDrawer: _handleDrawer),
-                Carousal(),
-                Announcement(),
-                LiveFeed(
-                  headerSymbols: public.headerSymbols,
-                ),
-                BuyCrypto(channel: _channel),
-                LatestListing(),
-                Hotlinks(channel: _channel),
-                AssetsInfo(
-                  headerSymbols: public.headerSymbols,
-                ),
-              ],
+    return WillPopScope(
+      onWillPop: () {
+        return onAndroidBackPress(context);
+      },
+      child: Scaffold(
+        key: _key,
+        appBar: hiddenAppBar(),
+        drawer: const SideBar(),
+        body: RefreshIndicator(
+          onRefresh: () async {
+            getAssetsRate();
+            checkLoginStatus();
+            await Future.delayed(const Duration(seconds: 2));
+          },
+          child: SingleChildScrollView(
+            child: Container(
+              width: width,
+              padding: EdgeInsets.all(width * 0.015),
+              child: Column(
+                // mainAxisAlignment: MainAxisAlignment.center,
+                // crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SearchBar(handleDrawer: _handleDrawer),
+                  Carousal(),
+                  Announcement(),
+                  LiveFeed(
+                    headerSymbols: public.headerSymbols,
+                  ),
+                  BuyCrypto(channel: _channel),
+                  LatestListing(),
+                  Hotlinks(channel: _channel),
+                  AssetsInfo(
+                    headerSymbols: public.headerSymbols,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
+        bottomNavigationBar: bottomNav(context, auth),
       ),
-      bottomNavigationBar: bottomNav(context, auth),
     );
   }
 }

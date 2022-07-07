@@ -57,8 +57,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    // SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack,
-    //     overlays: [SystemUiOverlay.top]);
     double _letterSpacing = 0.3;
 
     return MultiProvider(
