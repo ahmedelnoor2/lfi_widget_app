@@ -380,7 +380,7 @@ class _TradeHistoryState extends State<TradeHistory>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox(
-                    width: width * 0.65,
+                    width: width * 0.5,
                     child: Row(
                       children: [
                         Column(

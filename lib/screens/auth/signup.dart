@@ -1,4 +1,11 @@
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/public.dart';
+import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
+import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
@@ -7,6 +14,9 @@ import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:lyotrade/utils/Country.utils.dart';
 import 'package:flutter_aliyun_captcha/flutter_aliyun_captcha.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+
+import 'package:webviewx/webviewx.dart';
 
 class Signup extends StatefulWidget {
   const Signup({
@@ -23,12 +33,17 @@ class Signup extends StatefulWidget {
 }
 
 class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
+  var uuid = const Uuid();
+  var _channel;
+  WebViewXController? _controller;
   static final AliyunCaptchaController _captchaController =
       AliyunCaptchaController();
   late final TabController _tabController =
       TabController(length: 2, vsync: this);
-  bool _enableSignup = false;
+  bool _enableSignup = true;
   final _formKey = GlobalKey<FormState>();
+
+  String _verificationType = '';
 
   bool termsAndCondition = false;
   bool _emailSignup = true;
@@ -36,6 +51,7 @@ class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
 
   bool _readPassword = true;
   bool _readConfirmPassword = true;
+  String _sessionId = '';
 
   late TextEditingController _emailOrPhone;
   late TextEditingController _loginPword;
@@ -44,6 +60,13 @@ class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
 
   @override
   void initState() {
+    setState(() {
+      _sessionId = uuid.v1();
+    });
+    if (kIsWeb) {
+      connectWebSocket();
+    }
+    checkVerificationMethod();
     _emailOrPhone = TextEditingController();
     _loginPword = TextEditingController();
     _newPassword = TextEditingController();
@@ -53,11 +76,43 @@ class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
 
   @override
   void dispose() {
+    if (_channel != null) {
+      _channel.sink.close();
+    }
     _emailOrPhone.dispose();
     _loginPword.dispose();
     _newPassword.dispose();
     _invitedCode.dispose();
     super.dispose();
+  }
+
+  Future<void> connectWebSocket() async {
+    _channel = WebSocketChannel.connect(
+      Uri.parse('wss://api.m.lyotrade.com:8060/'),
+    );
+
+    _channel.sink.add(_sessionId);
+
+    _channel.stream.listen((message) {
+      extractStreamData(message);
+    });
+  }
+
+  void extractStreamData(streamData) async {
+    if (streamData != null) {
+      final data = jsonDecode(streamData);
+      widget.onCaptchaVerification(data['data']);
+    }
+  }
+
+  void checkVerificationMethod() {
+    var public = Provider.of<Public>(context, listen: false);
+
+    if (public.publicInfo.isNotEmpty) {
+      setState(() {
+        _verificationType = public.publicInfo['switch']['verificationType'];
+      });
+    }
   }
 
   void toggleLoginButton(value) {
@@ -367,19 +422,35 @@ class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
             ),
           ),
         ),
-        Captcha(
-          onCaptchaVerification: (value) {
-            toggleLoginButton(true);
-            if (value.containsKey('sig')) {
-            } else {
-              toggleLoginButton(false);
-            }
-            widget.onCaptchaVerification(value);
-          },
-        ),
-        SizedBox(
-          width: width * 1,
-          child: ElevatedButton(
+        _verificationType == '1'
+            ? kIsWeb
+                ? Align(
+                    alignment: Alignment.center,
+                    child: Container(
+                      width: width,
+                      padding: EdgeInsets.only(left: 10, top: 10, right: 10),
+                      child: _buildCaptchaView(),
+                    ),
+                  )
+                : Captcha(
+                    onCaptchaVerification: (value) {
+                      toggleLoginButton(true);
+                      if (value.containsKey('sig')) {
+                      } else {
+                        toggleLoginButton(false);
+                      }
+                      widget.onCaptchaVerification(value);
+                    },
+                  )
+            : Container(),
+        Container(
+          padding: EdgeInsets.only(top: 20),
+          child: LyoButton(
+            text: 'Sign Up',
+            active: (_enableSignup && termsAndCondition),
+            isLoading: false,
+            activeColor: linkColor,
+            activeTextColor: Colors.black,
             onPressed: (_enableSignup && termsAndCondition)
                 ? () {
                     if (_formKey.currentState!.validate()) {
@@ -411,10 +482,29 @@ class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
                     }
                   }
                 : null,
-            child: const Text('Sign Up'),
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildCaptchaView() {
+    return WebViewX(
+      key: const ValueKey('webviewx'),
+      height: height * 0.09,
+      width: width,
+      initialContent: '<div></div>',
+      initialSourceType: SourceType.html,
+      onWebViewCreated: (controller) async {
+        _controller = controller;
+        await _controller!.loadContent(
+            'https://captcha.m.lyotrade.com?userId=$_sessionId',
+            SourceType.url);
+      },
+      onPageStarted: (src) =>
+          debugPrint('A new page has started loading: $src\n'),
+      onPageFinished: (src) =>
+          debugPrint('The page has finished loading: $src\n'),
     );
   }
 }

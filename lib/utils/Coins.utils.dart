@@ -12,3 +12,21 @@ String getCoinType(String coinType) {
       return 'EUSDT';
   }
 }
+
+String getCoinName(String coinName) {
+  switch (coinName) {
+    case 'LYO1':
+      return 'LYO';
+    default:
+      return coinName;
+  }
+}
+
+String getMarketName(String coinName) {
+  switch (coinName) {
+    case 'LYO1/USDT':
+      return 'LYO/USDT';
+    default:
+      return coinName;
+  }
+}

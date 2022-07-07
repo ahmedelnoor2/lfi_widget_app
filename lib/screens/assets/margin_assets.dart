@@ -4,6 +4,7 @@ import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/screens/assets/skeleton/assets_skull.dart';
 import 'package:lyotrade/screens/common/alert.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
+import 'package:lyotrade/utils/Coins.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 
 import 'package:lyotrade/providers/public.dart';
@@ -312,13 +313,13 @@ class _MarginAssetsState extends State<MarginAssets> {
                       Text('Hide Small Balance'),
                     ],
                   ),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Icon(
-                      Icons.search,
-                      size: 18,
-                    ),
-                  )
+                  // GestureDetector(
+                  //   onTap: () {},
+                  //   child: Icon(
+                  //     Icons.search,
+                  //     size: 18,
+                  //   ),
+                  // )
                 ],
               ),
             ),
@@ -420,14 +421,14 @@ class _MarginAssetsState extends State<MarginAssets> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          '${asset['values']['name']}',
+                                          '${getCoinName(asset['values']['name'])}',
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16,
                                           ),
                                         ),
                                         Text(
-                                          'LYO Credit',
+                                          '${public.publicInfoMarket['market']['coinList'][asset['values']['baseCoin']]['longName']}',
                                           style: TextStyle(
                                             fontSize: 12,
                                             color: secondaryTextColor,

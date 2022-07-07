@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:archive/archive.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/bottomnav.dart';
@@ -17,6 +19,7 @@ import 'package:lyotrade/screens/dashboard/search_bar.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Dashboard extends StatefulWidget {
   static const routeName = '/dashboard';
@@ -30,6 +33,7 @@ class _DashboardState extends State<Dashboard> {
   final TextEditingController _searchController = TextEditingController();
   final GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
   var _channel;
+  final Uri _url = Uri.parse('https://flutter.dev');
 
   _handleDrawer() async {
     _key.currentState?.openDrawer();
@@ -37,6 +41,8 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   void initState() {
+    // checkScreenSize();
+    getPublicInfo();
     getAssetsRate();
     checkLoginStatus();
     super.initState();
@@ -48,6 +54,31 @@ class _DashboardState extends State<Dashboard> {
       _channel.sink.close();
     }
     super.dispose();
+  }
+
+  Future<void> getPublicInfo() async {
+    var public = Provider.of<Public>(context, listen: false);
+    await public.getPublicInfo();
+  }
+
+  Future<void> checkScreenSize() async {
+    width = MediaQuery.of(context).size.width;
+    if (kIsWeb) {
+      if (width >= 480) {
+        if (await canLaunchUrl(_url)) {
+          await launchUrl(_url);
+        } else {
+          // can't launch url, there is some error
+          throw "Could not launch $_url";
+        }
+      } else {
+        getAssetsRate();
+        checkLoginStatus();
+      }
+    } else {
+      getAssetsRate();
+      checkLoginStatus();
+    }
   }
 
   Future<void> getAssetsRate() async {
@@ -138,8 +169,11 @@ class _DashboardState extends State<Dashboard> {
 
   void extractStreamData(streamData, public) async {
     if (streamData != null) {
-      var inflated = zlib.decode(streamData as List<int>);
+      var inflated =
+          GZipDecoder().decodeBytes(streamData as List<int>, verify: false);
+      // var inflated = zlib.decode(streamData as List<int>);
       var data = utf8.decode(inflated);
+      // print(data);
       if (json.decode(data)['channel'] != null) {
         var marketData = json.decode(data);
         for (int i = 0; i < public.headerSymbols.length; i++) {
@@ -172,27 +206,34 @@ class _DashboardState extends State<Dashboard> {
       key: _key,
       appBar: hiddenAppBar(),
       drawer: const SideBar(),
-      body: SingleChildScrollView(
-        child: Container(
-          width: width,
-          padding: EdgeInsets.all(width * 0.015),
-          child: Column(
-            // mainAxisAlignment: MainAxisAlignment.center,
-            // crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SearchBar(handleDrawer: _handleDrawer),
-              Carousal(),
-              Announcement(),
-              LiveFeed(
-                headerSymbols: public.headerSymbols,
-              ),
-              BuyCrypto(),
-              LatestListing(),
-              Hotlinks(),
-              AssetsInfo(
-                headerSymbols: public.headerSymbols,
-              ),
-            ],
+      body: RefreshIndicator(
+        onRefresh: () async {
+          getAssetsRate();
+          checkLoginStatus();
+          await Future.delayed(const Duration(seconds: 2));
+        },
+        child: SingleChildScrollView(
+          child: Container(
+            width: width,
+            padding: EdgeInsets.all(width * 0.015),
+            child: Column(
+              // mainAxisAlignment: MainAxisAlignment.center,
+              // crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SearchBar(handleDrawer: _handleDrawer),
+                Carousal(),
+                Announcement(),
+                LiveFeed(
+                  headerSymbols: public.headerSymbols,
+                ),
+                BuyCrypto(channel: _channel),
+                LatestListing(),
+                Hotlinks(channel: _channel),
+                AssetsInfo(
+                  headerSymbols: public.headerSymbols,
+                ),
+              ],
+            ),
           ),
         ),
       ),

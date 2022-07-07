@@ -162,7 +162,7 @@ class FutureMarket with ChangeNotifier {
 
   Future<void> getPublicSpotInfoMarket() async {
     var url = Uri.https(
-      futApiUrl,
+      apiUrl,
       '$exApi/common/public_info_market',
     );
 

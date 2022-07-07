@@ -3,6 +3,7 @@ import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/staking.dart';
 import 'package:lyotrade/screens/common/alert.dart';
+import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
@@ -20,9 +21,10 @@ class _AllStakeState extends State<AllStake> {
   final _formStakeKey = GlobalKey<FormState>();
   final TextEditingController _amountController = TextEditingController();
 
-  String _filterType = 'All';
+  String _filterType = 'Processing';
   bool _isAgree = false;
   String _activeStakeId = '';
+  String _prospectiveEarnings = "0";
 
   @override
   void initState() {
@@ -39,12 +41,40 @@ class _AllStakeState extends State<AllStake> {
   Future<void> getAllStakes() async {
     var public = Provider.of<Public>(context, listen: false);
     await public.getStakeLists();
+    List _currentProcessing = [];
+    for (var stake in public.stakeLists) {
+      if (_filterType == 'Processing') {
+        if (stake['status'] == 1) {
+          _currentProcessing.add(stake);
+        }
+      }
+    }
+    if (_currentProcessing.isEmpty) {
+      setState(() {
+        _filterType = 'All';
+      });
+      snackAlert(
+          context, SnackTypes.warning, 'Active projects are not availalbe');
+    }
   }
 
   Future<void> getStakeInfo(stakeId) async {
     var public = Provider.of<Public>(context, listen: false);
     await public.getStakeInfo(stakeId);
   }
+
+  // void calculateProspectiveEarnings(stake, value) {
+  //   double.parse('${stake['gainRate']}');
+  //   setState(() {
+  //     _prospectiveEarnings =
+  //         (((((720 / 360) * double.parse('${stake['gainRate']}')) / 100) *
+  //                     double.parse(value)) +
+  //                 double.parse(value))
+  //             .toStringAsFixed(4);
+  //   });
+
+  //   // ((((720 / 360) * 24) / 100) * 1);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -166,7 +196,9 @@ class _AllStakeState extends State<AllStake> {
                   ),
                 ),
                 Text(
-                  '${public.publicInfoMarket['market']['coinList'][stake['gainCoin']]['longName']}',
+                  public.publicInfoMarket.isEmpty
+                      ? '--'
+                      : '${public.publicInfoMarket['market']['coinList'][stake['gainCoin']]['longName']}',
                   style: TextStyle(fontSize: 16),
                 ),
               ],
@@ -258,6 +290,7 @@ class _AllStakeState extends State<AllStake> {
                   ),
                   onPressed: () async {
                     public.getStakeInfo(stake['id']);
+                    staking.getActiveStakeInfo(context, auth, stake['id']);
                     showModalBottomSheet<void>(
                       context: context,
                       isScrollControlled: true,
@@ -688,6 +721,18 @@ class _AllStakeState extends State<AllStake> {
                               SizedBox(
                                 width: width * 0.69,
                                 child: TextFormField(
+                                  onChanged: (value) {
+                                    double.parse('${stake['gainRate']}');
+                                    setState(() {
+                                      _prospectiveEarnings = (((((720 / 360) *
+                                                          double.parse(
+                                                              '${stake['gainRate']}')) /
+                                                      100) *
+                                                  double.parse(value)) +
+                                              double.parse(value))
+                                          .toStringAsFixed(4);
+                                    });
+                                  },
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
                                       return 'Please enter amount';
@@ -765,6 +810,7 @@ class _AllStakeState extends State<AllStake> {
                       ),
                       Container(
                         padding: EdgeInsets.only(top: 10, bottom: 5),
+                        width: width,
                         child: Container(
                           padding: EdgeInsets.all(12),
                           decoration: BoxDecoration(
@@ -776,13 +822,11 @@ class _AllStakeState extends State<AllStake> {
                               // color: Colors.,
                             ),
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                '${staking.activeStakeInfo['lockDay'] ?? '--'} days prospective earnings: ${staking.activeStakeInfo['totalUserGainAmount']} ${staking.activeStakeInfo['gainCoin']}',
-                              ),
-                            ],
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              '${staking.activeStakeInfo['lockDay'] ?? '--'} days prospective earnings: $_prospectiveEarnings ${staking.activeStakeInfo['gainCoin']}',
+                            ),
                           ),
                         ),
                       ),
@@ -817,37 +861,36 @@ class _AllStakeState extends State<AllStake> {
                           ],
                         ),
                       ),
-                      Container(
-                        padding: EdgeInsets.only(bottom: 15),
-                        width: width * 0.9,
-                        child: ElevatedButton(
-                          onPressed: _isAgree
-                              ? () {
-                                  if (_formStakeKey.currentState!.validate()) {
-                                    if (double.parse(_amountController.text) <=
-                                        0) {
-                                      showAlert(
-                                        context,
-                                        Icon(Icons.warning_amber),
-                                        'Form Error',
-                                        [Text('Amount is invalid')],
-                                        'Ok',
-                                      );
-                                    } else {
-                                      staking
-                                          .createStakingOrder(context, auth, {
-                                        'projectId': _activeStakeId,
-                                        'amount': double.parse(
-                                            _amountController.text),
-                                        'returnUrl':
-                                            'https://www.lyotrade.com/en_US/freeStaking/$_activeStakeId',
-                                      });
-                                    }
+                      LyoButton(
+                        onPressed: _isAgree
+                            ? () {
+                                if (_formStakeKey.currentState!.validate()) {
+                                  if (double.parse(_amountController.text) <=
+                                      0) {
+                                    showAlert(
+                                      context,
+                                      Icon(Icons.warning_amber),
+                                      'Form Error',
+                                      [Text('Amount is invalid')],
+                                      'Ok',
+                                    );
+                                  } else {
+                                    staking.createStakingOrder(context, auth, {
+                                      'projectId': _activeStakeId,
+                                      'amount':
+                                          double.parse(_amountController.text),
+                                      'returnUrl':
+                                          'https://www.lyotrade.com/en_US/freeStaking/$_activeStakeId',
+                                    });
                                   }
                                 }
-                              : null,
-                          child: Text('Agree to PoS'),
-                        ),
+                              }
+                            : null,
+                        text: 'Agree to PoS',
+                        isLoading: false,
+                        active: true,
+                        activeColor: linkColor,
+                        activeTextColor: Colors.black,
                       ),
                     ],
                   )
@@ -861,6 +904,7 @@ class _AllStakeState extends State<AllStake> {
   Widget _stakeDetails(context, stake, setState) {
     height = MediaQuery.of(context).size.height;
     var public = Provider.of<Public>(context, listen: true);
+    var staking = Provider.of<Staking>(context, listen: true);
 
     // List _marginCoins = _defaultMarginPair.split('/');
 
@@ -1019,7 +1063,7 @@ class _AllStakeState extends State<AllStake> {
                               Container(
                                 padding: EdgeInsets.only(right: 5),
                                 child: Text(
-                                  '${public.stakeInfo['totalAmount']}',
+                                  '${staking.activeStakeInfo.isNotEmpty ? staking.activeStakeInfo['totalAmount'] : public.stakeInfo['totalAmount']}',
                                   style: TextStyle(
                                     fontSize: 24,
                                     color: linkColor,
@@ -1046,7 +1090,7 @@ class _AllStakeState extends State<AllStake> {
                               Container(
                                 padding: EdgeInsets.only(right: 5),
                                 child: Text(
-                                  '${public.stakeInfo['totalGainAmount']}',
+                                  '${staking.activeStakeInfo.isNotEmpty ? staking.activeStakeInfo['totalGainAmount'] : public.stakeInfo['totalGainAmount']}',
                                   style: TextStyle(
                                     fontSize: 24,
                                     color: linkColor,
@@ -1073,7 +1117,7 @@ class _AllStakeState extends State<AllStake> {
                               Container(
                                 padding: EdgeInsets.only(right: 5),
                                 child: Text(
-                                  '${public.stakeInfo['totalUserGainAmount']}',
+                                  '${staking.activeStakeInfo.isNotEmpty ? staking.activeStakeInfo['totalUserGainAmount'] : public.stakeInfo['totalUserGainAmount']}',
                                   style: TextStyle(
                                     fontSize: 24,
                                     color: linkColor,

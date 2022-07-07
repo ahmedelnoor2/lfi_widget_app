@@ -26,15 +26,15 @@ class _TransferAssetsState extends State<TransferAssets> {
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
 
-  String _defaultCoin = 'LYO1';
+  // String _defaultCoin = 'LYO1';
   List _toAccounts = ['P2P Account', 'Margin Account'];
   String _selectedToAccount = 'P2P Account';
-  String _defaultMarginCoin = 'BTC';
+  // String _defaultMarginCoin = 'BTC';
   List _allNetworks = [];
-  List _p2pAssets = [];
-  List _marginAssets = [];
-  Map _selectedMarginAssets = {};
-  Map _selectedP2pAssets = {};
+  // List _p2pAssets = [];
+  // List _marginAssets = [];
+  // Map _selectedMarginAssets = {};
+  // Map _selectedP2pAssets = {};
   bool _fromDigitalAccountToOtherAccount = true;
 
   String _availableBalanceFrom = '0.000';
@@ -57,7 +57,8 @@ class _TransferAssetsState extends State<TransferAssets> {
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
     await asset.getAccountBalance(context, auth, "");
-    getCoinCosts(_defaultCoin);
+    await asset.getP2pBalance(context, auth);
+    getCoinCosts(asset.defaultCoin);
   }
 
   Future<void> getP2pBalance() async {
@@ -66,16 +67,16 @@ class _TransferAssetsState extends State<TransferAssets> {
 
     await asset.getP2pBalance(context, auth);
 
-    asset.p2pBalance['allCoinMap'].forEach((p2pAccount) {
-      if (p2pAccount['coinSymbol'] == _defaultCoin) {
-        setState(() {
-          _selectedP2pAssets = p2pAccount;
-        });
-      }
-    });
-    setState(() {
-      _p2pAssets = asset.p2pBalance['allCoinMap'];
-    });
+    // asset.p2pBalance['allCoinMap'].forEach((p2pAccount) {
+    //   if (p2pAccount['coinSymbol'] == _defaultCoin) {
+    //     setState(() {
+    //       _selectedP2pAssets = p2pAccount;
+    //     });
+    //   }
+    // });
+    // setState(() {
+    //   _p2pAssets = asset.p2pBalance['allCoinMap'];
+    // });
   }
 
   Future<void> getMarginlBalance() async {
@@ -83,35 +84,35 @@ class _TransferAssetsState extends State<TransferAssets> {
     var asset = Provider.of<Asset>(context, listen: false);
 
     await asset.getMarginBalance(auth);
-    List _margAssets = [];
-    asset.marginBalance['leverMap'].forEach((k, v) {
-      if (k.split('/')[0] == _defaultMarginCoin) {
-        setState(() {
-          _selectedMarginAssets = {
-            'coin': k.split('/')[0],
-            'market': k,
-            'values': v,
-          };
-        });
-      }
-      _margAssets.add({
-        'coin': k.split('/')[0],
-        'market': k,
-        'values': v,
-      });
-    });
-    setState(() {
-      _marginAssets = _margAssets;
-    });
+    // List _margAssets = [];
+    // asset.marginBalance['leverMap'].forEach((k, v) {
+    //   if (k.split('/')[0] == _defaultMarginCoin) {
+    //     setState(() {
+    //       _selectedMarginAssets = {
+    //         'coin': k.split('/')[0],
+    //         'market': k,
+    //         'values': v,
+    //       };
+    //     });
+    //   }
+    //   _margAssets.add({
+    //     'coin': k.split('/')[0],
+    //     'market': k,
+    //     'values': v,
+    //   });
+    // });
+    // setState(() {
+    //   _marginAssets = _margAssets;
+    // });
   }
 
   Future<void> getCoinCosts(netwrkType) async {
-    setState(() {
-      _defaultCoin = netwrkType;
-    });
-    var auth = Provider.of<Auth>(context, listen: false);
-    var asset = Provider.of<Asset>(context, listen: false);
+    // setState(() {
+    //   _defaultCoin = netwrkType;
+    // });
     var public = Provider.of<Public>(context, listen: false);
+    var asset = Provider.of<Asset>(context, listen: false);
+    asset.setDefaultCoin(netwrkType);
 
     if (public.publicInfoMarket['market']['followCoinList'][netwrkType] !=
         null) {
@@ -121,41 +122,58 @@ class _TransferAssetsState extends State<TransferAssets> {
 
       public.publicInfoMarket['market']['followCoinList'][netwrkType]
           .forEach((k, v) {
+        asset.setDefaultCoin(netwrkType);
         setState(() {
           _allNetworks.add(v);
-          _defaultCoin = netwrkType;
+          // _defaultCoin = netwrkType;
         });
       });
     } else {
+      asset.setDefaultCoin(netwrkType);
       setState(() {
         _allNetworks.clear();
         _allNetworks
             .add(public.publicInfoMarket['market']['coinList'][netwrkType]);
-        _defaultCoin = netwrkType;
+        // _defaultCoin = netwrkType;
       });
     }
-    getP2pBalance();
-    getMarginlBalance();
+    setState(() {
+      _availableBalanceFrom = _fromDigitalAccountToOtherAccount
+          ? '${asset.accountBalance['allCoinMap'][asset.defaultCoin]['normal_balance']}'
+          : _selectedToAccount == 'Margin Account'
+              ? getMarketBalanceCoin(asset)
+              : '${asset.selectedP2pAssets['normal']}';
+      _availableBalanceTo = _fromDigitalAccountToOtherAccount
+          ? _selectedToAccount == 'Margin Account'
+              ? getMarketBalanceCoin(asset)
+              : '${asset.selectedP2pAssets['normal']}'
+          : '${asset.accountBalance['allCoinMap'][asset.defaultCoin]['normal_balance']}';
+    });
+    // getP2pBalance();
+    // getMarginlBalance();
   }
 
   void selectP2pCoin(account) {
     var asset = Provider.of<Asset>(context, listen: false);
+    asset.setSelectedP2pAssets(account);
+    asset.setDefaultCoin(account['coinSymbol']);
+    asset.setDefaultMarginCoin(account['coinSymbol']);
     setState(() {
-      _selectedP2pAssets = account;
-      _defaultCoin = account['coinSymbol'];
+      // _selectedP2pAssets = account;
+      // _defaultCoin = account['coinSymbol'];
       _availableBalanceFrom = _fromDigitalAccountToOtherAccount
           ? '${asset.accountBalance['allCoinMap'][account['coinSymbol']]['normal_balance']}'
-          : '${account['normal']}';
+          : '${asset.selectedP2pAssets['normal']}';
       _availableBalanceTo = _fromDigitalAccountToOtherAccount
-          ? '0'
+          ? '${asset.selectedP2pAssets['normal']}'
           : '${asset.accountBalance['allCoinMap'][account['coinSymbol']]['normal_balance']}';
     });
   }
 
-  String getMarketBalanceCoin() {
-    return _defaultMarginCoin == _selectedMarginAssets['coin']
-        ? '${_selectedMarginAssets['values']['baseTotalBalance']}'
-        : '${_selectedMarginAssets['values']['quoteTotalBalance']}';
+  String getMarketBalanceCoin(asset) {
+    return asset.defaultMarginCoin == asset.selectedMarginAssets['coin']
+        ? '${asset.selectedMarginAssets['values']['baseTotalBalance']}'
+        : '${asset.selectedMarginAssets['values']['quoteTotalBalance']}';
   }
 
   Future<void> transferringAsset() async {
@@ -165,7 +183,7 @@ class _TransferAssetsState extends State<TransferAssets> {
     if (_selectedToAccount == 'P2P Account') {
       Map formData = {
         "amount": _amountController.text,
-        "coinSymbol": _defaultMarginCoin,
+        "coinSymbol": asset.defaultMarginCoin,
         "fromAccount": _fromDigitalAccountToOtherAccount ? "1" : "2",
         "toAccount": _fromDigitalAccountToOtherAccount ? "2" : "1",
       };
@@ -175,9 +193,9 @@ class _TransferAssetsState extends State<TransferAssets> {
     } else {
       Map formData = {
         "amount": _amountController.text,
-        "coinSymbol": _defaultMarginCoin,
+        "coinSymbol": asset.defaultMarginCoin,
         "fromAccount": _fromDigitalAccountToOtherAccount ? "1" : "2",
-        "symbol": _selectedMarginAssets['values']['symbol'],
+        "symbol": asset.selectedMarginAssets['values']['symbol'],
         "toAccount": _fromDigitalAccountToOtherAccount ? "2" : "1",
       };
 
@@ -195,6 +213,9 @@ class _TransferAssetsState extends State<TransferAssets> {
     var public = Provider.of<Public>(context, listen: true);
     var asset = Provider.of<Asset>(context, listen: true);
 
+    // print(asset.p2pBalance);
+    // print(_availableBalanceTo);
+
     // print(_marginAssets);
     // print(_selectedMarginAssets);
     // print(_selectedP2pAssets);
@@ -208,8 +229,8 @@ class _TransferAssetsState extends State<TransferAssets> {
         context,
         width,
         height,
-        _selectedP2pAssets,
-        _p2pAssets,
+        asset.selectedP2pAssets,
+        asset.p2pBalance.isNotEmpty ? asset.p2pBalance['allCoinMap'] : [],
         public,
         selectP2pCoin,
       ),
@@ -220,7 +241,7 @@ class _TransferAssetsState extends State<TransferAssets> {
             left: 15,
             bottom: 15,
           ),
-          height: height * 0.95,
+          height: height * 0.9,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -280,14 +301,14 @@ class _TransferAssetsState extends State<TransferAssets> {
                           Column(
                             children: [
                               _fromDigitalAccountToOtherAccount
-                                  ? digitalAccounts(context, public)
+                                  ? digitalAccounts(context, public, asset)
                                   : otherAccounts(context, public, asset),
                               SizedBox(
                                 width: width * 0.72,
                                 child: Divider(),
                               ),
                               !_fromDigitalAccountToOtherAccount
-                                  ? digitalAccounts(context, public)
+                                  ? digitalAccounts(context, public, asset)
                                   : otherAccounts(context, public, asset),
                             ],
                           ),
@@ -299,16 +320,15 @@ class _TransferAssetsState extends State<TransferAssets> {
                                     !_fromDigitalAccountToOtherAccount;
                                 _availableBalanceFrom =
                                     _fromDigitalAccountToOtherAccount
-                                        ? '${asset.accountBalance['allCoinMap'][_defaultCoin]['normal_balance']}'
+                                        ? '${asset.accountBalance['allCoinMap'][asset.defaultCoin]['normal_balance']}'
                                         : _selectedToAccount == 'Margin Account'
-                                            ? getMarketBalanceCoin()
-                                            : '${_selectedP2pAssets['normal']}';
-                                _availableBalanceTo =
-                                    _fromDigitalAccountToOtherAccount
-                                        ? _selectedToAccount == 'Margin Account'
-                                            ? getMarketBalanceCoin()
-                                            : '${_selectedP2pAssets['normal']}'
-                                        : '${asset.accountBalance['allCoinMap'][_defaultCoin]['normal_balance']}';
+                                            ? getMarketBalanceCoin(asset)
+                                            : '${asset.selectedP2pAssets['normal']}';
+                                _availableBalanceTo = _fromDigitalAccountToOtherAccount
+                                    ? _selectedToAccount == 'Margin Account'
+                                        ? getMarketBalanceCoin(asset)
+                                        : '${asset.selectedP2pAssets['normal']}'
+                                    : '${asset.accountBalance['allCoinMap'][asset.defaultCoin]['normal_balance']}';
                               });
                             },
                             icon: Image.asset(
@@ -340,7 +360,7 @@ class _TransferAssetsState extends State<TransferAssets> {
                                 ),
                               ),
                               Text(
-                                '$_availableBalanceFrom ${_selectedToAccount == 'Margin Account' ? _defaultMarginCoin : _defaultCoin}',
+                                '$_availableBalanceFrom ${_selectedToAccount == 'Margin Account' ? asset.defaultMarginCoin : asset.defaultCoin}',
                                 style: TextStyle(
                                   color: secondaryTextColor,
                                   fontWeight: FontWeight.w600,
@@ -360,7 +380,7 @@ class _TransferAssetsState extends State<TransferAssets> {
                               ),
                             ),
                             Text(
-                              '$_availableBalanceTo ${_selectedToAccount == 'Margin Account' ? _defaultMarginCoin : _defaultCoin}',
+                              '$_availableBalanceTo ${_selectedToAccount == 'Margin Account' ? asset.defaultMarginCoin : asset.defaultCoin}',
                               style: TextStyle(
                                 color: secondaryTextColor,
                                 fontWeight: FontWeight.w600,
@@ -393,9 +413,15 @@ class _TransferAssetsState extends State<TransferAssets> {
                                   _selectedToAccount == 'Margin Account'
                                       ? showModalBottomSheet<void>(
                                           context: context,
+                                          isScrollControlled: true,
                                           builder: (BuildContext context) {
-                                            return selectPair(
-                                                context, public, asset);
+                                            return StatefulBuilder(
+                                              builder: (BuildContext context,
+                                                  StateSetter setState) {
+                                                return selectPair(context,
+                                                    public, asset, setState);
+                                              },
+                                            );
                                           },
                                         )
                                       : _scaffoldKey.currentState!.openDrawer();
@@ -420,14 +446,14 @@ class _TransferAssetsState extends State<TransferAssets> {
                                             child: CircleAvatar(
                                               radius: 12,
                                               child: Image.network(
-                                                '${public.publicInfoMarket['market']['coinList'][_defaultMarginCoin]['icon']}',
+                                                '${public.publicInfoMarket['market']['coinList'][asset.defaultMarginCoin]['icon']}',
                                               ),
                                             ),
                                           ),
                                           Container(
                                             padding: EdgeInsets.only(right: 5),
                                             child: Text(
-                                              '${_selectedMarginAssets['market'] ?? '--'}',
+                                              '${asset.selectedMarginAssets['market'] ?? '--'}',
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.bold,
@@ -457,13 +483,20 @@ class _TransferAssetsState extends State<TransferAssets> {
                       ),
                     ),
                   ),
-                  GestureDetector(
+                  InkWell(
                     onTap: () {
                       _selectedToAccount == 'Margin Account'
                           ? showModalBottomSheet<void>(
                               context: context,
+                              isScrollControlled: true,
                               builder: (BuildContext context) {
-                                return selectCoin(context, public);
+                                return StatefulBuilder(
+                                  builder: (BuildContext context,
+                                      StateSetter setState) {
+                                    return selectCoin(
+                                        context, public, asset, setState);
+                                  },
+                                );
                               },
                             )
                           : _scaffoldKey.currentState!.openDrawer();
@@ -488,8 +521,8 @@ class _TransferAssetsState extends State<TransferAssets> {
                                   radius: 12,
                                   child: Image.network(
                                     _selectedToAccount == 'Margin Account'
-                                        ? '${public.publicInfoMarket['market']['coinList'][_defaultMarginCoin]['icon']}'
-                                        : '${public.publicInfoMarket['market']['coinList'][_defaultCoin]['icon']}',
+                                        ? '${public.publicInfoMarket['market']['coinList'][asset.defaultMarginCoin]['icon']}'
+                                        : '${public.publicInfoMarket['market']['coinList'][asset.defaultCoin]['icon']}',
                                   ),
                                 ),
                               ),
@@ -497,8 +530,8 @@ class _TransferAssetsState extends State<TransferAssets> {
                                 padding: EdgeInsets.only(right: 5),
                                 child: Text(
                                   _selectedToAccount == 'Margin Account'
-                                      ? _defaultMarginCoin
-                                      : _defaultCoin,
+                                      ? asset.defaultMarginCoin
+                                      : asset.defaultCoin,
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -507,8 +540,8 @@ class _TransferAssetsState extends State<TransferAssets> {
                               ),
                               Text(
                                 _selectedToAccount == 'Margin Account'
-                                    ? '${public.publicInfoMarket['market']['coinList'][_defaultMarginCoin]['longName']}'
-                                    : '${public.publicInfoMarket['market']['coinList'][_defaultCoin]['longName']}',
+                                    ? '${public.publicInfoMarket['market']['coinList'][asset.defaultMarginCoin]['longName']}'
+                                    : '${public.publicInfoMarket['market']['coinList'][asset.defaultCoin]['longName']}',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.normal,
@@ -583,9 +616,10 @@ class _TransferAssetsState extends State<TransferAssets> {
                                       padding: EdgeInsets.only(right: 10),
                                       child: GestureDetector(
                                         onTap: () async {
-                                          _amountController.text = asset
-                                                  .accountBalance['allCoinMap']
-                                              [_defaultCoin]['normal_balance'];
+                                          _amountController.text =
+                                              asset.accountBalance['allCoinMap']
+                                                      [asset.defaultCoin]
+                                                  ['normal_balance'];
                                         },
                                         child: Text(
                                           'ALL',
@@ -613,7 +647,7 @@ class _TransferAssetsState extends State<TransferAssets> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Can be transferred (${_selectedToAccount == 'Margin Account' ? _defaultMarginCoin : _defaultCoin}):',
+                                'Can be transferred (${_selectedToAccount == 'Margin Account' ? asset.defaultMarginCoin : asset.defaultCoin}):',
                                 style: TextStyle(
                                   color: secondaryTextColor,
                                   fontWeight: FontWeight.w600,
@@ -660,15 +694,14 @@ class _TransferAssetsState extends State<TransferAssets> {
                   ),
                 ],
               ),
-              Container(
-                padding: EdgeInsets.only(bottom: 15),
+              SizedBox(
                 width: width * 0.9,
                 child: ElevatedButton(
                   onPressed: () {
                     transferringAsset();
                     // snackAlert(context, SnackTypes.warning, 'Coming soon...');
                   },
-                  child: Text('Transfer'),
+                  child: const Text('Transfer'),
                 ),
               ),
             ],
@@ -678,7 +711,7 @@ class _TransferAssetsState extends State<TransferAssets> {
     );
   }
 
-  Widget digitalAccounts(context, public) {
+  Widget digitalAccounts(context, public, asset) {
     return SizedBox(
       width: width * 0.72,
       child: Row(
@@ -697,8 +730,8 @@ class _TransferAssetsState extends State<TransferAssets> {
                   radius: 12,
                   child: Image.network(
                     _selectedToAccount == 'Margin Account'
-                        ? '${public.publicInfoMarket['market']['coinList'][_defaultMarginCoin]['icon']}'
-                        : '${public.publicInfoMarket['market']['coinList'][_defaultCoin]['icon']}',
+                        ? '${public.publicInfoMarket['market']['coinList'][asset.defaultMarginCoin]['icon']}'
+                        : '${public.publicInfoMarket['market']['coinList'][asset.defaultCoin]['icon']}',
                   ),
                 ),
               ),
@@ -733,8 +766,8 @@ class _TransferAssetsState extends State<TransferAssets> {
                   radius: 12,
                   child: Image.network(
                     _selectedToAccount == 'Margin Account'
-                        ? '${public.publicInfoMarket['market']['coinList'][_defaultMarginCoin]['icon']}'
-                        : '${public.publicInfoMarket['market']['coinList'][_defaultCoin]['icon']}',
+                        ? '${public.publicInfoMarket['market']['coinList'][asset.defaultMarginCoin]['icon']}'
+                        : '${public.publicInfoMarket['market']['coinList'][asset.defaultCoin]['icon']}',
                   ),
                 ),
               ),
@@ -756,21 +789,26 @@ class _TransferAssetsState extends State<TransferAssets> {
                   setState(() {
                     _selectedToAccount = newValue!;
                     _availableBalanceFrom = _fromDigitalAccountToOtherAccount
-                        ? '${asset.accountBalance['allCoinMap'][_defaultCoin]['normal_balance']}'
+                        ? '${asset.accountBalance['allCoinMap'][asset.defaultCoin]['normal_balance']}'
                         : _selectedToAccount == 'Margin Account'
-                            ? getMarketBalanceCoin()
-                            : '${_selectedP2pAssets['normal']}';
+                            ? getMarketBalanceCoin(asset)
+                            : '${asset.selectedP2pAssets['normal']}';
                     _availableBalanceTo = _fromDigitalAccountToOtherAccount
                         ? _selectedToAccount == 'Margin Account'
-                            ? getMarketBalanceCoin()
-                            : '${_selectedP2pAssets['normal']}'
-                        : '${asset.accountBalance['allCoinMap'][_defaultCoin]['normal_balance']}';
+                            ? getMarketBalanceCoin(asset)
+                            : '${asset.selectedP2pAssets['normal']}'
+                        : '${asset.accountBalance['allCoinMap'][asset.defaultCoin]['normal_balance']}';
                   });
                 },
                 items: _toAccounts.map<DropdownMenuItem<String>>((value) {
                   return DropdownMenuItem<String>(
                     value: value,
-                    child: Text(value),
+                    child: Text(
+                      value,
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
                   );
                 }).toList(),
               ),
@@ -781,7 +819,7 @@ class _TransferAssetsState extends State<TransferAssets> {
     );
   }
 
-  Widget selectPair(context, public, assetProvider) {
+  Widget selectPair(context, public, assetProvider, setState) {
     width = MediaQuery.of(context).size.width;
 
     return Container(
@@ -814,20 +852,21 @@ class _TransferAssetsState extends State<TransferAssets> {
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             padding: EdgeInsets.zero,
-            itemCount: _marginAssets.length,
+            itemCount: assetProvider.marginAssets.length,
             itemBuilder: (BuildContext context, int index) {
-              var asset = _marginAssets[index];
+              var asset = assetProvider.marginAssets[index];
 
               return ListTile(
                 onTap: () {
+                  assetProvider.setSelectedMarginAssets(asset);
                   setState(() {
-                    _selectedMarginAssets = asset;
-                    _defaultMarginCoin = asset['coin'];
+                    // _selectedMarginAssets = asset;
+                    asset.defaultMarginCoin = asset['coin'];
                     _availableBalanceFrom = _fromDigitalAccountToOtherAccount
                         ? '${assetProvider.accountBalance['allCoinMap'][asset['coin']]['normal_balance']}'
-                        : getMarketBalanceCoin();
+                        : getMarketBalanceCoin(asset);
                     _availableBalanceTo = _fromDigitalAccountToOtherAccount
-                        ? getMarketBalanceCoin()
+                        ? getMarketBalanceCoin(asset)
                         : '${assetProvider.accountBalance['allCoinMap'][asset['coin']]['normal_balance']}';
                   });
                   Navigator.pop(context);
@@ -841,7 +880,8 @@ class _TransferAssetsState extends State<TransferAssets> {
                 title: Text('${asset['market']}'),
                 trailing: Icon(
                   Icons.check,
-                  color: _selectedMarginAssets['coin'] == asset['coin']
+                  color: assetProvider.selectedMarginAssets['coin'] ==
+                          asset['coin']
                       ? greenIndicator
                       : secondaryTextColor,
                 ),
@@ -853,10 +893,10 @@ class _TransferAssetsState extends State<TransferAssets> {
     );
   }
 
-  Widget selectCoin(context, public) {
+  Widget selectCoin(context, public, asset, setState) {
     width = MediaQuery.of(context).size.width;
 
-    List _marginCoins = _selectedMarginAssets['market'].split('/');
+    List _marginCoins = asset.selectedMarginAssets['market'].split('/');
 
     return Container(
       padding: EdgeInsets.all(10),
@@ -894,8 +934,21 @@ class _TransferAssetsState extends State<TransferAssets> {
 
               return ListTile(
                 onTap: () {
+                  asset.setDefaultMarginCoin(marketCoin);
                   setState(() {
-                    _defaultMarginCoin = marketCoin;
+                    // _defaultMarginCoin = marketCoin;
+                    _fromDigitalAccountToOtherAccount =
+                        !_fromDigitalAccountToOtherAccount;
+                    _availableBalanceFrom = _fromDigitalAccountToOtherAccount
+                        ? '${asset.accountBalance['allCoinMap'][asset.defaultCoin]['normal_balance']}'
+                        : _selectedToAccount == 'Margin Account'
+                            ? getMarketBalanceCoin(asset)
+                            : '${asset.selectedP2pAssets['normal']}';
+                    _availableBalanceTo = _fromDigitalAccountToOtherAccount
+                        ? _selectedToAccount == 'Margin Account'
+                            ? getMarketBalanceCoin(asset)
+                            : '${asset.selectedP2pAssets['normal']}'
+                        : '${asset.accountBalance['allCoinMap'][asset.defaultCoin]['normal_balance']}';
                   });
                   Navigator.pop(context);
                 },
@@ -908,7 +961,7 @@ class _TransferAssetsState extends State<TransferAssets> {
                 title: Text(marketCoin),
                 trailing: Icon(
                   Icons.check,
-                  color: _defaultMarginCoin == marketCoin
+                  color: asset.defaultMarginCoin == marketCoin
                       ? greenIndicator
                       : secondaryTextColor,
                 ),

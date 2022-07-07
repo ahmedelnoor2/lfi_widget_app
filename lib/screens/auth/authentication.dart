@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:lyotrade/screens/auth/emailverification.dart';
 import 'package:lyotrade/screens/auth/login.dart';
 import 'package:lyotrade/screens/auth/signup.dart';
-import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class Authentication extends StatefulWidget {
   static const routeName = '/authentication';
@@ -26,13 +27,35 @@ class _AuthenticationState extends State<Authentication> {
   Map _captchaVerification = {};
   bool _isMobile = true;
 
+  String _versionNumber = '0.0';
+
+  @override
+  void initState() {
+    checkVersion();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  Future<void> checkVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      _versionNumber = packageInfo.version;
+    });
+  }
+
   Future<String> processSignup(value) async {
-    print(_captchaVerification);
+    // print(_captchaVerification);
     var auth = Provider.of<Auth>(context, listen: false);
 
     if (value['emailSignup']) {
       String emailToken = await auth.checkEmailRegistration(context, {
-        'csessionid': _captchaVerification['sessionId'],
+        'csessionid': kIsWeb
+            ? _captchaVerification['csessionid']
+            : _captchaVerification['sessionId'],
         'email': value['email'],
         'invitedCode': value['invitedCode'],
         'loginPword': value['loginPword'],
@@ -49,7 +72,9 @@ class _AuthenticationState extends State<Authentication> {
         _emailVerification = false;
       });
       String emailToken = await auth.checkMobileRegistration(context, {
-        'csessionid': _captchaVerification['sessionId'],
+        'csessionid': kIsWeb
+            ? _captchaVerification['csessionid']
+            : _captchaVerification['sessionId'],
         'countryCode': value['countryCode'],
         'mobileNumber': value['mobileNumber'],
         'invitedCode': value['invitedCode'],
@@ -77,13 +102,19 @@ class _AuthenticationState extends State<Authentication> {
 
     var auth = Provider.of<Auth>(context, listen: false);
     String loginToken = await auth.login(context, {
-      'csessionid': _captchaVerification['sessionId'],
+      "geetest_challenge": "sys_conf_validate",
+      "geetest_seccode": "sys_conf_validate",
+      "geetest_validate": "sys_conf_validate",
+      // 'csessionid': kIsWeb
+      //     ? _captchaVerification['csessionid']
+      //     : _captchaVerification['sessionId'],
       'mobileNumber': value['mobileNumber'],
       'loginPword': value['loginPword'],
       'scene': 'other',
-      'sig': _captchaVerification['sig'],
-      'token': _captchaVerification['token'],
-      'verificationType': '1',
+      // 'sig': _captchaVerification['sig'],
+      // 'token': _captchaVerification['token'],
+      'token': true,
+      'verificationType': '0',
     });
 
     return loginToken;
@@ -100,8 +131,6 @@ class _AuthenticationState extends State<Authentication> {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
 
-    var auth = Provider.of<Auth>(context, listen: true);
-
     return Scaffold(
       // appBar: appBar(context, null),
       body: SingleChildScrollView(
@@ -114,22 +143,27 @@ class _AuthenticationState extends State<Authentication> {
             children: [
               Container(
                 padding: const EdgeInsets.only(left: 10),
-                height: height * 0.10,
+                height: height * 0.20,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     IconButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.maybePop(context);
                       },
                       icon: const Icon(Icons.close),
                     ),
                     Container(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: const Image(
-                        image: AssetImage('assets/img/logo_s.png'),
-                        width: 150,
+                      padding: const EdgeInsets.only(top: 10, right: 30),
+                      child: Column(
+                        children: [
+                          const Image(
+                            image: AssetImage('assets/img/logo_s.png'),
+                            width: 100,
+                          ),
+                          Text('v$_versionNumber'),
+                        ],
                       ),
                     ),
                   ],
@@ -154,6 +188,9 @@ class _AuthenticationState extends State<Authentication> {
                       )
                     : _authLogin
                         ? Login(onLogin: (value, captchaController) async {
+                            // print('--------------------');
+                            // print(captchaController);
+
                             String result = await processLogin(value);
                             if (result.isNotEmpty) {
                               setState(() {

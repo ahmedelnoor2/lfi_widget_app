@@ -80,7 +80,6 @@ class _PasswordState extends State<Password> {
       'googleCode': '',
       'smsAuthCode': _phoneVerificationCode.text
     });
-    print(mobVeri);
     return mobVeri;
   }
 

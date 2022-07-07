@@ -5,7 +5,12 @@ import 'package:lyotrade/screens/common/types.dart';
 import 'package:provider/provider.dart';
 
 class Hotlinks extends StatefulWidget {
-  const Hotlinks({Key? key}) : super(key: key);
+  const Hotlinks({
+    Key? key,
+    required this.channel,
+  }) : super(key: key);
+
+  final channel;
 
   @override
   State<Hotlinks> createState() => _HotlinksState();
@@ -22,7 +27,9 @@ class _HotlinksState extends State<Hotlinks> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              snackAlert(context, SnackTypes.warning, 'Coming Soon...');
+            },
             child: Column(
               children: [
                 Container(
@@ -45,32 +52,25 @@ class _HotlinksState extends State<Hotlinks> {
           ),
           GestureDetector(
             onTap: () {
-
-
-
+              snackAlert(context, SnackTypes.warning, 'Coming Soon...');
             },
-            child: GestureDetector(
-              onTap: (() {
-                 Navigator.pushNamed(context, '/referal_screen');
-              }),
-              child: Column(
-                children: [
-                  Container(
-                    padding: EdgeInsets.only(
-                      bottom: 2,
-                    ),
-                    child: Image.asset(
-                      'assets/img/refer.png',
-                      width: 28,
+            child: Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.only(
+                    bottom: 2,
+                  ),
+                  child: Image.asset(
+                    'assets/img/refer.png',
+                    width: 28,
+                  ),
+                ),
+                Text(
+                    'Referral',
+                    style: TextStyle(
+                      fontSize: 12,
                     ),
                   ),
-                  Text(
-                      'Referral',
-                      style: TextStyle(
-                        fontSize: 12,
-                      ),
-                    ),
-                
                 ],
               ),
             ),
@@ -82,6 +82,9 @@ class _HotlinksState extends State<Hotlinks> {
                   snackAlert(context, SnackTypes.warning,
                       'Deposit limited(Please check KYC status)');
                 } else {
+                  if (widget.channel != null) {
+                    widget.channel.sink.close();
+                  }
                   Navigator.pushNamed(context, '/deposit_assets');
                 }
               } else {
@@ -110,11 +113,12 @@ class _HotlinksState extends State<Hotlinks> {
           ),
           GestureDetector(
             onTap: () {
-              //if (auth.isAuthenticated) {
-                Navigator.pushNamed(context, '/crypto_loan');
-             // } else {
-             //   Navigator.pushNamed(context, '/authentication');
-            //  }
+              if (auth.isAuthenticated) {
+                snackAlert(context, SnackTypes.warning, 'Coming Soon...');
+                // Navigator.pushNamed(context, '/crypto_loan');
+              } else {
+                Navigator.pushNamed(context, '/authentication');
+              }
             },
             child: Column(
               children: [
@@ -124,7 +128,7 @@ class _HotlinksState extends State<Hotlinks> {
                   ),
                   child: Image.asset(
                     'assets/img/bot.png',
-                    width: 28,
+                    width: 27,
                   ),
                 ),
                 Text(
@@ -137,7 +141,21 @@ class _HotlinksState extends State<Hotlinks> {
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              if (auth.isAuthenticated) {
+                if (auth.userInfo['realAuthType'] == 0) {
+                  snackAlert(context, SnackTypes.warning,
+                      'Deposit limited(Please check KYC status)');
+                } else {
+                  if (widget.channel != null) {
+                    widget.channel.sink.close();
+                  }
+                  Navigator.pushNamed(context, '/dex_swap');
+                }
+              } else {
+                Navigator.pushNamed(context, '/authentication');
+              }
+            },
             child: Column(
               children: [
                 Container(
@@ -145,12 +163,12 @@ class _HotlinksState extends State<Hotlinks> {
                     bottom: 2,
                   ),
                   child: Image.asset(
-                    'assets/img/applications.png',
-                    width: 28,
+                    'assets/img/swap.png',
+                    width: 27,
                   ),
                 ),
                 Text(
-                  'More',
+                  'Swap',
                   style: TextStyle(
                     fontSize: 12,
                   ),

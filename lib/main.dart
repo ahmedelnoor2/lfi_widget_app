@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/dex_provider.dart';
 import 'package:lyotrade/providers/future_market.dart';
 import 'package:lyotrade/providers/loan_provider.dart';
+import 'package:lyotrade/providers/payments.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/staking.dart';
 import 'package:lyotrade/providers/trade.dart';
@@ -19,8 +21,11 @@ import 'package:lyotrade/screens/assets/transactions.dart';
 import 'package:lyotrade/screens/assets/transfer_assets.dart';
 import 'package:lyotrade/screens/assets/withdraw_assets.dart';
 import 'package:lyotrade/screens/auth/authentication.dart';
-import 'package:lyotrade/screens/buy_sell/BuySellCrypto.dart';
+import 'package:lyotrade/screens/buy_sell/buy_sell_crypto.dart';
+import 'package:lyotrade/screens/buy_sell/buy_sell_transactions.dart';
+import 'package:lyotrade/screens/buy_sell/common/process_payment.dart';
 import 'package:lyotrade/screens/dashboard.dart';
+import 'package:lyotrade/screens/dex_swap/dex_swap.dart';
 import 'package:lyotrade/screens/future_trade/future_trade.dart';
 import 'package:lyotrade/screens/kyc/enitityverificatrion.dart';
 import 'package:lyotrade/screens/kyc/kycscreen.dart';
@@ -45,7 +50,8 @@ import 'package:lyotrade/screens/trade/trade_history.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -67,6 +73,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<FutureMarket>(create: (_) => FutureMarket()),
         ChangeNotifierProvider<Staking>(create: (_) => Staking()),
         ChangeNotifierProvider<LoanProvider>(create: (_) => LoanProvider(),lazy: true,)
+        ChangeNotifierProvider<Payments>(create: (_) => Payments()),
+        ChangeNotifierProvider<DexProvider>(create: (_) => DexProvider()),
       ],
       child: Consumer<Auth>(
         builder: (context, auth, _) {
@@ -241,9 +249,12 @@ class MyApp extends StatelessWidget {
               Referal.routeName:((context) =>  Referal()),
               Kycscreen.routeName:((context) =>  Kycscreen()),
               personalverification.routeName:(context) => personalverification(),
-               
               EnitityVerification.routeName:((context) => EnitityVerification()),
               Notificationsscreen.routeName:((context) => const Notificationsscreen()),
+              ProcessPayment.routeName: (context) => const ProcessPayment(),
+              BuySellTransactions.routeName: (context) =>
+                  const BuySellTransactions(),
+              DexSwap.routeName: (context) => const DexSwap(),
             },
           );
         },

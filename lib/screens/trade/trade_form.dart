@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
@@ -7,8 +7,10 @@ import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
+import 'package:lyotrade/screens/future_trade/future_trade_form.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:lyotrade/utils/Number.utils.dart';
 import 'package:provider/provider.dart';
 
 class TradeForm extends StatefulWidget {
@@ -96,6 +98,8 @@ class _TradeFormState extends State<TradeForm> {
   }
 
   void calculateTotal(field) {
+    var public = Provider.of<Public>(context, listen: false);
+
     if (field == 'amount') {
       if (_amountField.text.isNotEmpty) {
         try {
@@ -103,8 +107,11 @@ class _TradeFormState extends State<TradeForm> {
             _amount = double.parse(_amountField.text);
             _total = double.parse(_amountField.text) * _price;
           });
-          _totalField.text =
-              '${(double.parse(_amountField.text) * _price).toStringAsFixed(4)}';
+          _totalField.text = truncateTo(
+              '${double.parse(_amountField.text) * _price}',
+              public.activeMarket.isNotEmpty
+                  ? public.activeMarket['price']
+                  : 4);
         } catch (e) {
           //
         }
@@ -118,8 +125,9 @@ class _TradeFormState extends State<TradeForm> {
           _price = double.parse(_priceField.text);
           _total = double.parse(_priceField.text) * _amount;
         });
-        _totalField.text =
-            '${(double.parse(_priceField.text) * _amount).toStringAsFixed(4)}';
+        _totalField.text = truncateTo(
+            '${double.parse(_priceField.text) * _amount}',
+            public.activeMarket.isNotEmpty ? public.activeMarket['price'] : 4);
       } else {
         setState(() {
           _price = 0.00;
@@ -130,11 +138,11 @@ class _TradeFormState extends State<TradeForm> {
     if (field == 'total') {
       if (_totalField.text.isNotEmpty) {
         try {
-          setState(() {
-            _total = double.parse(_totalField.text);
-            _amount = double.parse(_totalField.text) / _price;
-          });
-          _amountField.text = '${double.parse(_totalField.text) / _price}';
+          _amountField.text = truncateTo(
+              '${double.parse(_totalField.text) / _price}',
+              public.activeMarket.isNotEmpty
+                  ? public.activeMarket['volume']
+                  : 4);
         } catch (e) {
           //
         }
@@ -151,6 +159,37 @@ class _TradeFormState extends State<TradeForm> {
       await public.amountFieldDisable();
     });
     calculateTotal('price');
+  }
+
+  String getAmountValue(public, asset, percentage) {
+    double minSell = public.activeMarket.isNotEmpty
+        ? public.activeMarket['marketSellMin']
+        : 0.00;
+
+    var amountValue = (double.parse(asset.accountBalance['allCoinMap']
+            [public.activeMarket['name'].split('/')[0]]['normal_balance']) *
+        percentage);
+    if (amountValue >= minSell) {
+      return truncateTo('$amountValue',
+          public.activeMarket.isNotEmpty ? public.activeMarket['price'] : 4);
+    } else {
+      return '0.00';
+    }
+  }
+
+  String getPriceValue(public, asset, percentage) {
+    double minBuy = public.activeMarket.isNotEmpty
+        ? public.activeMarket['marketBuyMin']
+        : 0.00;
+    var priceValue = (double.parse(asset.accountBalance['allCoinMap']
+            [public.activeMarket['name'].split('/')[1]]['normal_balance']) *
+        percentage);
+    if (priceValue >= minBuy) {
+      return truncateTo('$priceValue',
+          public.activeMarket.isNotEmpty ? public.activeMarket['price'] : 4);
+    } else {
+      return '0.00';
+    }
   }
 
   Future<void> createOrder() async {
@@ -206,54 +245,57 @@ class _TradeFormState extends State<TradeForm> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SizedBox(
-                width: width * 0.27,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: _isBuy ? Color(0xff26A160) : Color(0xff292C51),
-                    textStyle: TextStyle(),
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _amountField.clear();
-                      _totalField.clear();
-                      _currentAmountSelection = 0;
-                      _isBuy = true;
-                    });
-                    setAvailalbePrice();
-                  },
-                  child: Text(
-                    'Buy',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: width * 0.27,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: _isBuy ? Color(0xff292C51) : Color(0xffD84646),
-                    textStyle: TextStyle(),
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _amountField.clear();
-                      _totalField.clear();
-                      _currentAmountSelection = 0;
-                      _isBuy = false;
-                    });
-                    setAvailalbePrice();
-                  },
-                  child: Text(
-                    'Sell',
-                    style: TextStyle(color: Colors.white),
+          Container(
+            margin: kIsWeb ? EdgeInsets.only(bottom: 8) : EdgeInsets.zero,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SizedBox(
+                  width: width * 0.27,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: _isBuy ? Color(0xff26A160) : Color(0xff292C51),
+                      textStyle: TextStyle(),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _amountField.clear();
+                        _totalField.clear();
+                        _currentAmountSelection = 0;
+                        _isBuy = true;
+                      });
+                      setAvailalbePrice();
+                    },
+                    child: Text(
+                      'Buy',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
-              ),
-            ],
+                SizedBox(
+                  width: width * 0.27,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: _isBuy ? Color(0xff292C51) : Color(0xffD84646),
+                      textStyle: TextStyle(),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _amountField.clear();
+                        _totalField.clear();
+                        _currentAmountSelection = 0;
+                        _isBuy = false;
+                      });
+                      setAvailalbePrice();
+                    },
+                    child: Text(
+                      'Sell',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           PopupMenuButton(
             child: Container(
@@ -360,6 +402,14 @@ class _TradeFormState extends State<TradeForm> {
                           },
                           controller: _priceField,
                           style: TextStyle(fontSize: 16),
+                          inputFormatters: [
+                            DecimalTextInputFormatter(
+                              decimalRange: public.activeMarket.isNotEmpty
+                                  ? public.activeMarket['price']
+                                  : 4,
+                              coUnit: 2,
+                            ),
+                          ],
                           keyboardType: const TextInputType.numberWithOptions(
                             decimal: true,
                           ),
@@ -425,6 +475,14 @@ class _TradeFormState extends State<TradeForm> {
                             return null;
                           },
                           style: TextStyle(fontSize: 16),
+                          inputFormatters: [
+                            DecimalTextInputFormatter(
+                              decimalRange: public.activeMarket.isNotEmpty
+                                  ? public.activeMarket['volume']
+                                  : 4,
+                              coUnit: 2,
+                            ),
+                          ],
                           keyboardType:
                               TextInputType.numberWithOptions(decimal: true),
                           decoration: InputDecoration(
@@ -489,6 +547,14 @@ class _TradeFormState extends State<TradeForm> {
                       return null;
                     },
                     style: TextStyle(fontSize: 16),
+                    inputFormatters: [
+                      DecimalTextInputFormatter(
+                        decimalRange: public.activeMarket.isNotEmpty
+                            ? public.activeMarket['price']
+                            : 4,
+                        coUnit: 2,
+                      ),
+                    ],
                     keyboardType:
                         TextInputType.numberWithOptions(decimal: true),
                     decoration: InputDecoration(
@@ -575,6 +641,7 @@ class _TradeFormState extends State<TradeForm> {
               style: ElevatedButton.styleFrom(
                 primary: _isBuy ? Color(0xff26A160) : Color(0xffD84646),
                 textStyle: TextStyle(),
+                padding: kIsWeb ? EdgeInsets.all(18) : EdgeInsets.zero,
               ),
               child: Text(
                 auth.isAuthenticated
@@ -602,19 +669,9 @@ class _TradeFormState extends State<TradeForm> {
                   setState(() {
                     _currentAmountSelection = 25;
                     if (_isBuy && (_orderType == 2)) {
-                      _totalField.text = (double.parse(asset
-                                          .accountBalance['allCoinMap'][
-                                      public.activeMarket['name'].split('/')[1]]
-                                  ['normal_balance']) *
-                              0.25)
-                          .toStringAsPrecision(6);
+                      _totalField.text = getPriceValue(public, asset, 0.25);
                     } else {
-                      _amountField.text = (double.parse(asset
-                                          .accountBalance['allCoinMap'][
-                                      public.activeMarket['name'].split('/')[0]]
-                                  ['normal_balance']) *
-                              0.25)
-                          .toStringAsPrecision(6);
+                      _amountField.text = getAmountValue(public, asset, 0.25);
                     }
                   });
                   if (_isBuy && (_orderType == 2)) {
@@ -660,19 +717,9 @@ class _TradeFormState extends State<TradeForm> {
                   setState(() {
                     _currentAmountSelection = 50;
                     if (_isBuy && (_orderType == 2)) {
-                      _totalField.text = (double.parse(asset
-                                          .accountBalance['allCoinMap'][
-                                      public.activeMarket['name'].split('/')[1]]
-                                  ['normal_balance']) *
-                              0.50)
-                          .toStringAsPrecision(6);
+                      _totalField.text = getPriceValue(public, asset, 0.50);
                     } else {
-                      _amountField.text = (double.parse(asset
-                                          .accountBalance['allCoinMap'][
-                                      public.activeMarket['name'].split('/')[0]]
-                                  ['normal_balance']) *
-                              0.50)
-                          .toStringAsPrecision(6);
+                      _amountField.text = getAmountValue(public, asset, 0.50);
                     }
                   });
                   if (_isBuy && (_orderType == 2)) {
@@ -718,19 +765,9 @@ class _TradeFormState extends State<TradeForm> {
                   setState(() {
                     _currentAmountSelection = 75;
                     if (_isBuy && (_orderType == 2)) {
-                      _totalField.text = (double.parse(asset
-                                          .accountBalance['allCoinMap'][
-                                      public.activeMarket['name'].split('/')[1]]
-                                  ['normal_balance']) *
-                              0.75)
-                          .toStringAsPrecision(6);
+                      _totalField.text = getPriceValue(public, asset, 0.75);
                     } else {
-                      _amountField.text = (double.parse(asset
-                                          .accountBalance['allCoinMap'][
-                                      public.activeMarket['name'].split('/')[0]]
-                                  ['normal_balance']) *
-                              0.75)
-                          .toStringAsPrecision(6);
+                      _amountField.text = getAmountValue(public, asset, 0.75);
                     }
                   });
                   if (_isBuy && (_orderType == 2)) {
@@ -776,19 +813,9 @@ class _TradeFormState extends State<TradeForm> {
                   setState(() {
                     _currentAmountSelection = 100;
                     if (_isBuy && (_orderType == 2)) {
-                      _totalField.text = (double.parse(asset
-                                          .accountBalance['allCoinMap'][
-                                      public.activeMarket['name'].split('/')[1]]
-                                  ['normal_balance']) *
-                              1)
-                          .toStringAsPrecision(6);
+                      _totalField.text = getPriceValue(public, asset, 1);
                     } else {
-                      _amountField.text = (double.parse(asset
-                                          .accountBalance['allCoinMap'][
-                                      public.activeMarket['name'].split('/')[0]]
-                                  ['normal_balance']) *
-                              1)
-                          .toStringAsPrecision(6);
+                      _amountField.text = getAmountValue(public, asset, 1);
                     }
                   });
                   if (_isBuy && (_orderType == 2)) {
