@@ -66,13 +66,12 @@ class _HotlinksState extends State<Hotlinks> {
                   ),
                 ),
                 Text(
-                    'Referral',
-                    style: TextStyle(
-                      fontSize: 12,
-                    ),
+                  'Referral',
+                  style: TextStyle(
+                    fontSize: 12,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
           GestureDetector(

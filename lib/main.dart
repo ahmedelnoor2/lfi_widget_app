@@ -72,7 +72,10 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<Trading>(create: (_) => Trading()),
         ChangeNotifierProvider<FutureMarket>(create: (_) => FutureMarket()),
         ChangeNotifierProvider<Staking>(create: (_) => Staking()),
-        ChangeNotifierProvider<LoanProvider>(create: (_) => LoanProvider(),lazy: true,)
+        ChangeNotifierProvider<LoanProvider>(
+          create: (_) => LoanProvider(),
+          lazy: true,
+        ),
         ChangeNotifierProvider<Payments>(create: (_) => Payments()),
         ChangeNotifierProvider<DexProvider>(create: (_) => DexProvider()),
       ],
@@ -235,7 +238,7 @@ class MyApp extends StatelessWidget {
               Security.routeName: (context) => const Security(),
               Phone.routeName: (context) => const Phone(),
               Password.routeName: (context) => const Password(),
-              Forgotpassword.routeName:(context) => Forgotpassword(),
+              Forgotpassword.routeName: (context) => Forgotpassword(),
               GoogleAuth.routeName: (context) => const GoogleAuth(),
               EmailChange.routeName: (context) => const EmailChange(),
               Transactions.routeName: (context) => const Transactions(),
@@ -246,11 +249,14 @@ class MyApp extends StatelessWidget {
               BuySellCrypto.routeName: (context) => const BuySellCrypto(),
               Confirmloan.routeName: (context) => const Confirmloan(),
               TakeLoan.routeName: (context) => const TakeLoan(),
-              Referal.routeName:((context) =>  Referal()),
-              Kycscreen.routeName:((context) =>  Kycscreen()),
-              personalverification.routeName:(context) => personalverification(),
-              EnitityVerification.routeName:((context) => EnitityVerification()),
-              Notificationsscreen.routeName:((context) => const Notificationsscreen()),
+              Referal.routeName: ((context) => Referal()),
+              Kycscreen.routeName: ((context) => Kycscreen()),
+              personalverification.routeName: (context) =>
+                  personalverification(),
+              EnitityVerification.routeName: ((context) =>
+                  EnitityVerification()),
+              Notificationsscreen.routeName: ((context) =>
+                  const Notificationsscreen()),
               ProcessPayment.routeName: (context) => const ProcessPayment(),
               BuySellTransactions.routeName: (context) =>
                   const BuySellTransactions(),
