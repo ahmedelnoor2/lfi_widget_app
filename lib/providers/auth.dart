@@ -252,17 +252,7 @@ class Auth with ChangeNotifier {
       '$exApi/user/reg_email_chk_info/',
     );
 
-    var postData = json.encode({
-      'csessionid': formData['csessionid'],
-      'email': formData['email'],
-      'invitedCode': formData['invitedCode'],
-      'loginPword': formData['loginPword'],
-      'newPassword': formData['newPassword'],
-      'scene': formData['scene'],
-      'sig': formData['sig'],
-      'token': formData['token'],
-      'verificationType': formData['verificationType'],
-    });
+    var postData = json.encode(formData);
 
     print(postData);
 
@@ -270,6 +260,8 @@ class Auth with ChangeNotifier {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
+
+      print(responseData);
       if (responseData['code'] == '0') {
         _emailVerificationToken = responseData['data']['token'];
         _loginVerificationToken = _emailVerificationToken;

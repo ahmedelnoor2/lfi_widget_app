@@ -194,12 +194,16 @@ class Payments with ChangeNotifier {
         snackAlert(
             ctx, SnackTypes.warning, 'Session Expired, Please login back');
       } else {
-        _estimateRate = {};
+        _estimateRate = {
+          'value': 0,
+        };
         _estimateLoader = false;
         return notifyListeners();
       }
     } catch (error) {
-      print(error);
+      _estimateRate = {
+        'value': 0,
+      };
       _estimateLoader = false;
       // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
       return notifyListeners();

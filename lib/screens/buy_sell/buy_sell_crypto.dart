@@ -181,6 +181,10 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
       setState(() {
         _cryptoController.text = payments.estimateRate['value'];
       });
+    } else {
+      setState(() {
+        _cryptoController.text = '0';
+      });
     }
     getDigitalBalance();
     setState(() {
@@ -305,9 +309,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                     child: TextFormField(
                                       onChanged: (value) {
                                         if (value.isNotEmpty) {
-                                          if (double.parse(value) > 50) {
-                                            estimateCrypto(payments);
-                                          }
+                                          estimateCrypto(payments);
                                         }
                                       },
                                       controller: _fiatController,

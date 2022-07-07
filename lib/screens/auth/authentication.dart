@@ -66,7 +66,13 @@ class _AuthenticationState extends State<Authentication> {
   Future<String> processSignup(value) async {
     var auth = Provider.of<Auth>(context, listen: false);
 
+    print(value);
+
     if (value['emailSignup']) {
+      setState(() {
+        _isMobile = false;
+        _emailVerification = true;
+      });
       Map _formParams = {};
       if (_verificationType == '1') {
         _formParams = {

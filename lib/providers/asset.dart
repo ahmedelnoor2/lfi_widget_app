@@ -9,7 +9,7 @@ import 'package:lyotrade/utils/Translate.utils.dart';
 
 class Asset with ChangeNotifier {
   String _defaultCoin = 'LYO1';
-  String _defaultMarginCoin = 'LYO01';
+  String _defaultMarginCoin = 'BTC';
   Map _accountBalance = {};
   Map _p2pBalance = {};
   Map _marginBalance = {};
@@ -700,13 +700,19 @@ class Asset with ChangeNotifier {
       toAccount: "2" 2 = P2P Account 
     */
     headers['exchange-token'] = auth.loginVerificationToken;
+    headers['exchange-client'] = 'pc';
+    headers['exchange-language'] = 'en_US';
 
     var url = Uri.https(
       apiUrl,
       '$exApi/finance/otc_transfer',
     );
 
+    print(url);
+
     var postData = json.encode(formData);
+
+    print(postData);
 
     try {
       final response = await http.post(
@@ -716,6 +722,8 @@ class Asset with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
+
+      print(responseData);
 
       if (responseData['code'] == '0') {
         if (responseData['msg'] == 'success') {

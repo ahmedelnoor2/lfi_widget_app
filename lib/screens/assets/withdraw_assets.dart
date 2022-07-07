@@ -720,6 +720,9 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                         validator: (value) {
                                           if (value == null || value.isEmpty) {
                                             return 'Please enter amount';
+                                          } else if (double.parse(value) <
+                                              asset.getCost['withdraw_min']) {
+                                            return 'Minimum withdrawal amount is ${asset.getCost['withdraw_min']}';
                                           }
                                           return null;
                                         },
