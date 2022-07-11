@@ -196,6 +196,20 @@ class _SecurityState extends State<Security> {
                 ),
               ),
             ),
+            const Divider(),
+            ListTile(
+              onTap: () {
+                Navigator.pushNamed(context, '/disable_account');
+              },
+              leading: const Icon(Icons.disabled_by_default),
+              title: const Text('Disable my account'),
+              subtitle: const Text(
+                'Raise a ticket to disable the account',
+                style: TextStyle(fontSize: 12),
+              ),
+              trailing: Icon(Icons.chevron_right),
+            ),
+            const Divider(),
           ],
         )),
       ),

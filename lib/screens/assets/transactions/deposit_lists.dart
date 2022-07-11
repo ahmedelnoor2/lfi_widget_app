@@ -71,7 +71,7 @@ Widget depositList(context, width, height, allDeposits) {
                             children: [
                               Text('${getCoinName(deposit['symbol'])}'),
                               Text(
-                                '${DateFormat('yyyy-mm-dd hh:mm:ss').format(DateTime.parse('${deposit['createdAt']}'))}',
+                                '${DateFormat('dd-MM-y H:mm').format(DateTime.parse(deposit['createdAt']))}',
                                 style: TextStyle(
                                     color: secondaryTextColor, fontSize: 12),
                               ),

@@ -71,7 +71,7 @@ Widget withdrawList(context, width, height, allWithdrawals) {
                             children: [
                               Text('${getCoinName(withdrawal['symbol'])}'),
                               Text(
-                                '${DateFormat('yyyy-mm-dd hh:mm:ss').format(DateTime.parse('${withdrawal['createdAt']}'))}',
+                                '${DateFormat('dd-MM-y H:mm').format(DateTime.parse(withdrawal['createdAt']))}',
                                 style: TextStyle(
                                     color: secondaryTextColor, fontSize: 12),
                               ),
