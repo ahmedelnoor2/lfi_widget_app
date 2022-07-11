@@ -64,7 +64,7 @@ class _TransferAssetsState extends State<TransferAssets> {
     getCoinCosts(asset.defaultCoin);
     setState(() {
       _availableBalanceFrom = _fromDigitalAccountToOtherAccount
-          ? '${asset.accountBalance['allCoinMap'][asset.defaultCoin]['normal_balance']}'
+          ? '${asset.accountBalance['allCoinMap'][_selectedToAccount == 'P2P Account' ? asset.defaultCoin : asset.defaultMarginCoin]['normal_balance']}'
           : _selectedToAccount == 'Margin Account'
               ? getMarketBalanceCoin(asset)
               : '${asset.selectedP2pAssets['normal']}';
@@ -72,7 +72,17 @@ class _TransferAssetsState extends State<TransferAssets> {
           ? _selectedToAccount == 'Margin Account'
               ? getMarketBalanceCoin(asset)
               : '${asset.selectedP2pAssets['normal']}'
-          : '${asset.accountBalance['allCoinMap'][asset.defaultCoin]['normal_balance']}';
+          : '${asset.accountBalance['allCoinMap'][_selectedToAccount == 'P2P Account' ? asset.defaultCoin : asset.defaultMarginCoin]['normal_balance']}';
+      // _availableBalanceFrom = _fromDigitalAccountToOtherAccount
+      //     ? '${asset.accountBalance['allCoinMap'][_selectedToAccount == 'P2P Account' ? asset.defaultCoin : asset.defaultMarginCoin]['normal_balance']}'
+      //     : _selectedToAccount == 'Margin Account'
+      //         ? getMarketBalanceCoin(asset)
+      //         : '${asset.selectedP2pAssets['normal']}';
+      // _availableBalanceTo = _fromDigitalAccountToOtherAccount
+      //     ? _selectedToAccount == 'Margin Account'
+      //         ? getMarketBalanceCoin(asset)
+      //         : '${asset.selectedP2pAssets['normal']}'
+      //     : '${asset.accountBalance['allCoinMap'][_selectedToAccount == 'P2P Account' ? asset.defaultCoin : asset.defaultMarginCoin]['normal_balance']}';
     });
   }
 
@@ -127,7 +137,7 @@ class _TransferAssetsState extends State<TransferAssets> {
     // });
     var public = Provider.of<Public>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
-    asset.setDefaultCoin(netwrkType);
+    // asset.setDefaultCoin(netwrkType);
 
     if (public.publicInfoMarket['market']['followCoinList'][netwrkType] !=
         null) {
@@ -137,14 +147,14 @@ class _TransferAssetsState extends State<TransferAssets> {
 
       public.publicInfoMarket['market']['followCoinList'][netwrkType]
           .forEach((k, v) {
-        asset.setDefaultCoin(netwrkType);
+        // asset.setDefaultCoin(netwrkType);
         setState(() {
           _allNetworks.add(v);
           // _defaultCoin = netwrkType;
         });
       });
     } else {
-      asset.setDefaultCoin(netwrkType);
+      // asset.setDefaultCoin(netwrkType);
       setState(() {
         _allNetworks.clear();
         _allNetworks
@@ -154,7 +164,7 @@ class _TransferAssetsState extends State<TransferAssets> {
     }
     setState(() {
       _availableBalanceFrom = _fromDigitalAccountToOtherAccount
-          ? '${asset.accountBalance['allCoinMap'][asset.defaultCoin]['normal_balance']}'
+          ? '${asset.accountBalance['allCoinMap'][_selectedToAccount == 'P2P Account' ? asset.defaultCoin : asset.defaultMarginCoin]['normal_balance']}'
           : _selectedToAccount == 'Margin Account'
               ? getMarketBalanceCoin(asset)
               : '${asset.selectedP2pAssets['normal']}';
@@ -162,7 +172,7 @@ class _TransferAssetsState extends State<TransferAssets> {
           ? _selectedToAccount == 'Margin Account'
               ? getMarketBalanceCoin(asset)
               : '${asset.selectedP2pAssets['normal']}'
-          : '${asset.accountBalance['allCoinMap'][asset.defaultCoin]['normal_balance']}';
+          : '${asset.accountBalance['allCoinMap'][_selectedToAccount == 'P2P Account' ? asset.defaultCoin : asset.defaultMarginCoin]['normal_balance']}';
     });
     // getP2pBalance();
     // getMarginlBalance();
@@ -176,12 +186,15 @@ class _TransferAssetsState extends State<TransferAssets> {
     setState(() {
       // _selectedP2pAssets = account;
       // _defaultCoin = account['coinSymbol'];
+      // _availableBalanceFrom = _fromDigitalAccountToOtherAccount
+      //     ? '${asset.accountBalance['allCoinMap'][account['coinSymbol']]['normal_balance']}'
+      //     : '${asset.selectedP2pAssets['normal']}';
       _availableBalanceFrom = _fromDigitalAccountToOtherAccount
-          ? '${asset.accountBalance['allCoinMap'][account['coinSymbol']]['normal_balance']}'
+          ? '${asset.accountBalance['allCoinMap'][_selectedToAccount == 'P2P Account' ? asset.defaultCoin : asset.defaultMarginCoin]['normal_balance']}'
           : '${asset.selectedP2pAssets['normal']}';
       _availableBalanceTo = _fromDigitalAccountToOtherAccount
           ? '${asset.selectedP2pAssets['normal']}'
-          : '${asset.accountBalance['allCoinMap'][account['coinSymbol']]['normal_balance']}';
+          : '${asset.accountBalance['allCoinMap'][_selectedToAccount == 'P2P Account' ? asset.defaultCoin : asset.defaultMarginCoin]['normal_balance']}';
     });
   }
 
@@ -203,13 +216,14 @@ class _TransferAssetsState extends State<TransferAssets> {
     if (_selectedToAccount == 'P2P Account') {
       Map formData = {
         "amount": _amountController.text,
-        "coinSymbol": asset.defaultMarginCoin,
+        "coinSymbol": asset.defaultCoin,
         "fromAccount": _fromDigitalAccountToOtherAccount ? "1" : "2",
         "toAccount": _fromDigitalAccountToOtherAccount ? "2" : "1",
       };
 
       await asset.makeOtcTransfer(context, auth, formData);
       // getP2pBalance();
+      getDigitalBalance();
     } else {
       Map formData = {
         "amount": _amountController.text,
@@ -221,8 +235,8 @@ class _TransferAssetsState extends State<TransferAssets> {
 
       await asset.makeMarginTransfer(context, auth, formData);
       // getMarginlBalance();
+      getDigitalBalance();
     }
-    getDigitalBalance();
     setState(() {
       _processTransfer = false;
     });
@@ -955,8 +969,6 @@ class _TransferAssetsState extends State<TransferAssets> {
                   asset.setDefaultMarginCoin(marketCoin);
                   setState(() {
                     // _defaultMarginCoin = marketCoin;
-                    _fromDigitalAccountToOtherAccount =
-                        !_fromDigitalAccountToOtherAccount;
                     _availableBalanceFrom = _fromDigitalAccountToOtherAccount
                         ? '${asset.accountBalance['allCoinMap'][_selectedToAccount == 'P2P Account' ? asset.defaultCoin : asset.defaultMarginCoin]['normal_balance']}'
                         : _selectedToAccount == 'Margin Account'

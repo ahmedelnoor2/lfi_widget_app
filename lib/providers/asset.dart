@@ -42,9 +42,9 @@ class Asset with ChangeNotifier {
     return _defaultCoin;
   }
 
-  void setDefaultCoin(defCoin) {
+  Future<void> setDefaultCoin(defCoin) async {
     _defaultCoin = defCoin;
-    notifyListeners();
+    return notifyListeners();
   }
 
   Map get selectedP2pAssets {
@@ -306,14 +306,25 @@ class Asset with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         _marginBalance = responseData['data'];
+        _marginAssets = [];
 
         _marginBalance['leverMap'].forEach((k, v) {
-          if (k.split('/')[0] == _defaultMarginCoin) {
-            _selectedMarginAssets = {
-              'coin': k.split('/')[0],
-              'market': k,
-              'values': v,
-            };
+          if (_selectedMarginAssets.isEmpty) {
+            if (k.split('/')[0] == _defaultMarginCoin) {
+              _selectedMarginAssets = {
+                'coin': k.split('/')[0],
+                'market': k,
+                'values': v,
+              };
+            }
+          } else {
+            if (k.split('/')[0] == _selectedMarginAssets['coin']) {
+              _selectedMarginAssets = {
+                'coin': k.split('/')[0],
+                'market': k,
+                'values': v,
+              };
+            }
           }
           _marginAssets.add({
             'coin': k.split('/')[0],
@@ -708,11 +719,7 @@ class Asset with ChangeNotifier {
       '$exApi/finance/otc_transfer',
     );
 
-    print(url);
-
     var postData = json.encode(formData);
-
-    print(postData);
 
     try {
       final response = await http.post(
@@ -723,8 +730,6 @@ class Asset with ChangeNotifier {
 
       final responseData = json.decode(response.body);
 
-      print(responseData);
-
       if (responseData['code'] == '0') {
         if (responseData['msg'] == 'success') {
           snackAlert(ctx, SnackTypes.success, 'Trasnfer Successful.');
@@ -732,13 +737,17 @@ class Asset with ChangeNotifier {
           snackAlert(
               ctx, SnackTypes.warning, getTranslate(responseData['msg']));
         }
+        return;
       } else if (responseData['code'] == 10002) {
         snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+        return;
       } else {
         snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
+        return;
       }
     } catch (error) {
       snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
+      return;
       // throw error;
     }
   }
@@ -778,13 +787,17 @@ class Asset with ChangeNotifier {
         } else {
           snackAlert(ctx, SnackTypes.success, 'Transfer Successful');
         }
+        return;
       } else if (responseData['code'] == 10002) {
         snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+        return;
       } else {
         snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
+        return;
       }
     } catch (error) {
       snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
+      return;
       // throw error;
     }
   }
@@ -882,5 +895,17 @@ class Asset with ChangeNotifier {
       snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
       // throw error;
     }
+  }
+
+  // Transaction Details
+  Map _transactionDetails = {};
+
+  Map get transactionDetails {
+    return _transactionDetails;
+  }
+
+  Future<void> setTransactionDetails(transaction) async {
+    _transactionDetails = transaction;
+    return notifyListeners();
   }
 }

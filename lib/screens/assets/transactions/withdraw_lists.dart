@@ -1,6 +1,9 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/asset.dart';
+import 'package:lyotrade/utils/Coins.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:provider/provider.dart';
 
 Widget withdrawList(context, width, height, allWithdrawals) {
   return Column(
@@ -42,7 +45,9 @@ Widget withdrawList(context, width, height, allWithdrawals) {
           itemBuilder: (BuildContext context, int index) {
             var withdrawal = allWithdrawals[index];
             return InkWell(
-              onTap: () {
+              onTap: () async {
+                var asset = Provider.of<Asset>(context, listen: false);
+                await asset.setTransactionDetails(withdrawal);
                 Navigator.pushNamed(context, '/transaction_details');
               },
               child: Container(
@@ -64,7 +69,7 @@ Widget withdrawList(context, width, height, allWithdrawals) {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('${withdrawal['symbol']}'),
+                              Text('${getCoinName(withdrawal['symbol'])}'),
                               Text(
                                 '${DateFormat('yyyy-mm-dd hh:mm:ss').format(DateTime.parse('${withdrawal['createdAt']}'))}',
                                 style: TextStyle(
