@@ -109,7 +109,6 @@ class _EmailVerificationState extends State<EmailVerification> {
           'smsCode': _emailVeirficationCode.text,
           'token': widget.token,
         });
-        print(mobileVeri);
         return mobileVeri;
       } else {
         String emailVeri = await auth.confirmLoginCode(context, {

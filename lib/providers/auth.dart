@@ -128,7 +128,6 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> checkResponseCode(ctx, code) async {
-    print(code);
     if ('$code' == '10002') {
       _loginVerificationToken = '';
       _userInfo = {};
@@ -173,23 +172,13 @@ class Auth with ChangeNotifier {
       '$exApi/user/login_in',
     );
 
-    var postData = json.encode({
-      'csessionid': formData['csessionid'],
-      'mobileNumber': formData['mobileNumber'],
-      'loginPword': formData['loginPword'],
-      'scene': formData['scene'],
-      'sig': formData['sig'],
-      'token': formData['token'],
-      'verificationType': formData['verificationType'],
-    });
-
-    print(postData);
+    var postData = json.encode(formData);
 
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
-      print(responseData);
+
       if (responseData['code'] == 0) {
         if (responseData['data']['googleAuth'] == '1') {
           _googleAuth = true;
@@ -220,7 +209,9 @@ class Auth with ChangeNotifier {
 
     if (_googleAuth) {
       postData = json.encode({
-        'googleCode': formData['emailCode'],
+        'googleCode': formData['emailCode'] != null
+            ? formData['emailCode']
+            : formData['smsCode'],
         'token': formData['token'],
       });
     }

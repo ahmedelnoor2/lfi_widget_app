@@ -66,8 +66,6 @@ class _AuthenticationState extends State<Authentication> {
   Future<String> processSignup(value) async {
     var auth = Provider.of<Auth>(context, listen: false);
 
-    print(value);
-
     if (value['emailSignup']) {
       setState(() {
         _isMobile = false;
@@ -159,6 +157,8 @@ class _AuthenticationState extends State<Authentication> {
           caseSensitive: false),
     );
 
+    print(isEmail);
+
     setState(() {
       _isMobile = !isEmail;
       _emailVerification = isEmail ? true : false;
@@ -174,7 +174,8 @@ class _AuthenticationState extends State<Authentication> {
       //     : _captchaVerification['sessionId'],
       'mobileNumber': value['mobileNumber'],
       'loginPword': value['loginPword'],
-      'scene': 'other',
+      "nc": null,
+      // 'scene': 'other',
       // 'sig': _captchaVerification['sig'],
       // 'token': _captchaVerification['token'],
       'token': true,
