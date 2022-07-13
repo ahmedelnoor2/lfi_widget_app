@@ -29,6 +29,7 @@ import 'package:lyotrade/screens/dashboard.dart';
 import 'package:lyotrade/screens/dex_swap/dex_swap.dart';
 import 'package:lyotrade/screens/future_trade/future_trade.dart';
 import 'package:lyotrade/screens/market/market.dart';
+import 'package:lyotrade/screens/pix_payment/pix_payment.dart';
 import 'package:lyotrade/screens/security/disable_account.dart';
 import 'package:lyotrade/screens/security/email_change.dart';
 import 'package:lyotrade/screens/security/google_auth.dart';
@@ -245,6 +246,7 @@ class MyApp extends StatelessWidget {
                   const BuySellTransactions(),
               DexSwap.routeName: (context) => const DexSwap(),
               DisableAccount.routeName: (context) => const DisableAccount(),
+              PixPayment.routeName: (context) => const PixPayment(),
             },
           );
         },

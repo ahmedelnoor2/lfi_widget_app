@@ -16,6 +16,7 @@ import 'package:lyotrade/screens/dashboard/hotlinks.dart';
 import 'package:lyotrade/screens/dashboard/latest_listing.dart';
 import 'package:lyotrade/screens/dashboard/live_feed.dart';
 import 'package:lyotrade/screens/dashboard/search_bar.dart';
+import 'package:lyotrade/screens/dashboard/top_gateway.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/ScreenControl.utils.dart';
 import 'package:provider/provider.dart';
@@ -240,6 +241,7 @@ class _DashboardState extends State<Dashboard> {
                   ),
                   BuyCrypto(channel: _channel),
                   LatestListing(),
+                  TopGateway(),
                   Hotlinks(channel: _channel),
                   AssetsInfo(
                     headerSymbols: public.headerSymbols,
