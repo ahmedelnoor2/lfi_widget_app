@@ -278,7 +278,7 @@ class _TakeLoanState extends State<TakeLoan> {
                                   onChanged: (s) {
                                     var reverse='reverse';
                                     provider.exchange=reverse;
-                                    print(provider.exchange);
+                                  
                                     provider.yourloan = int.parse(s);
                                     provider.amount=provider.yourloan;
                                     print(provider.amount);

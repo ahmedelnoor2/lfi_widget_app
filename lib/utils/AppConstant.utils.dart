@@ -11,6 +11,8 @@ var serviceApi = kIsWeb ? 'api.m.lyotrade.com' : 'service.lyotrade.com';
 var loanApiUrl = 'api.dash.lyotrade.com';
 var paymentsApi = 'payments.lyotrade.com';
 var changeNowApi = 'https://content-api.changenow.io';
+//var referralbaseurl= 'https://www.lyotrade.com';
+var referral='/fe-ex-api/agentV2';
 
 var exApi = kIsWeb ? '/api/fe-ex-api' : '/fe-ex-api';
 var lyoPubApi = '/api';

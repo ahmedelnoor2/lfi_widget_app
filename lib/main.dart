@@ -6,6 +6,7 @@ import 'package:lyotrade/providers/future_market.dart';
 import 'package:lyotrade/providers/loan_provider.dart';
 import 'package:lyotrade/providers/payments.dart';
 import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/providers/referral.dart';
 import 'package:lyotrade/providers/staking.dart';
 import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/providers/user.dart';
@@ -32,6 +33,7 @@ import 'package:lyotrade/screens/kyc/kycscreen.dart';
 import 'package:lyotrade/screens/kyc/perosmalvarification.dart';
 import 'package:lyotrade/screens/market/market.dart';
 import 'package:lyotrade/screens/notification/notifcationmessage.dart';
+
 import 'package:lyotrade/screens/referal/referal.dart';
 import 'package:lyotrade/screens/security/email_change.dart';
 import 'package:lyotrade/screens/security/forgot/forgotpassword.dart';
@@ -65,6 +67,7 @@ class MyApp extends StatelessWidget {
 
     return MultiProvider(
       providers: [
+       
         ChangeNotifierProvider<Auth>(create: (_) => Auth()),
         ChangeNotifierProvider<Public>(create: (_) => Public()),
         ChangeNotifierProvider<Asset>(create: (_) => Asset()),
@@ -76,8 +79,14 @@ class MyApp extends StatelessWidget {
           create: (_) => LoanProvider(),
           lazy: true,
         ),
+       
         ChangeNotifierProvider<Payments>(create: (_) => Payments()),
         ChangeNotifierProvider<DexProvider>(create: (_) => DexProvider()),
+        ChangeNotifierProvider< ReferralProvider>(create: (_) => ReferralProvider()),
+    
+  
+        
+       
       ],
       child: Consumer<Auth>(
         builder: (context, auth, _) {
@@ -261,6 +270,7 @@ class MyApp extends StatelessWidget {
               BuySellTransactions.routeName: (context) =>
                   const BuySellTransactions(),
               DexSwap.routeName: (context) => const DexSwap(),
+              Referal.routeName:(context) =>  Referal(),
             },
           );
         },
