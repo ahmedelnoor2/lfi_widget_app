@@ -3,7 +3,11 @@ import 'package:flutter/src/animation/animation_controller.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/ticker_provider.dart';
+import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:provider/provider.dart';
 
 class TopGateway extends StatefulWidget {
   const TopGateway({Key? key}) : super(key: key);
@@ -30,9 +34,20 @@ class _TopGatewayState extends State<TopGateway>
 
   @override
   Widget build(BuildContext context) {
+    var auth = Provider.of<Auth>(context, listen: true);
+
     return InkWell(
       onTap: () {
-        Navigator.pushNamed(context, '/pix_payment');
+        if (auth.isAuthenticated) {
+          if (auth.userInfo['realAuthType'] == 0) {
+            snackAlert(context, SnackTypes.warning,
+                'Deposit limited(Please check KYC status)');
+          } else {
+            Navigator.pushNamed(context, '/pix_payment');
+          }
+        } else {
+          Navigator.pushNamed(context, '/authentication');
+        }
       },
       child: Container(
         padding: EdgeInsets.all(5),
@@ -49,7 +64,7 @@ class _TopGatewayState extends State<TopGateway>
               tileMode: TileMode.mirror,
             ),
           ),
-          padding: EdgeInsets.all(12),
+          padding: EdgeInsets.only(right: 12, left: 12),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -77,35 +92,67 @@ class _TopGatewayState extends State<TopGateway>
                   ),
                 ],
               ),
-              Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.only(right: 18),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(bottom: 2),
-                          child: Text(
-                            'BRL',
-                            style: TextStyle(
-                              fontSize: 14,
-                              // color: secondaryTextColor,
+              Container(
+                padding: EdgeInsets.only(right: 10),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.only(top: 5),
+                      width: 55,
+                      height: 60,
+                      child: Stack(
+                        children: [
+                          const Align(
+                            alignment: Alignment.topCenter,
+                            child: Icon(
+                              Icons.redo,
+                              size: 18,
                             ),
                           ),
-                        ),
-                        Text(
-                          'USDT',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(50),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.5),
+                                    spreadRadius: 1,
+                                    blurRadius: 5,
+                                  ),
+                                ],
+                              ),
+                              child: Image.asset(
+                                'assets/img/usdt.png',
+                                width: 30,
+                              ),
+                            ),
                           ),
-                        ),
-                      ],
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(50),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.5),
+                                    spreadRadius: 1,
+                                    blurRadius: 5,
+                                  ),
+                                ],
+                              ),
+                              child: Image.asset(
+                                'assets/img/brl.png',
+                                width: 30,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              )
+                  ],
+                ),
+              ),
             ],
           ),
         ),
