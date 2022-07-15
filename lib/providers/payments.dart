@@ -292,4 +292,203 @@ class Payments with ChangeNotifier {
       return notifyListeners();
     }
   }
+
+  // PIX payment providers
+  Map _pixKycClients = {};
+
+  Map get pixKycClients {
+    return _pixKycClients;
+  }
+
+  Future<void> getKycVerificationDetails(postData) async {
+    var url = Uri.https(
+      lyoApiUrl,
+      '/payment_gateway/pix/list_pix_kyc_clients',
+    );
+
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode(postData),
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+      print(responseData);
+
+      if (responseData['code'] == '0') {
+        _pixKycClients = responseData['data'];
+        return notifyListeners();
+      } else {
+        _pixKycClients = {};
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return notifyListeners();
+    }
+  }
+
+  // New KYC
+  Map _newKyc = {};
+
+  Map get newKyc {
+    return _newKyc;
+  }
+
+  Future<void> requestKyc(ctx, postData) async {
+    var url = Uri.https(
+      lyoApiUrl,
+      '/payment_gateway/pix/kyc',
+    );
+
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode(postData),
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _newKyc = responseData['data'];
+        return notifyListeners();
+      } else {
+        _newKyc = {};
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      _newKyc = {};
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return notifyListeners();
+    }
+  }
+
+  Future<void> reRequestKyc(postData) async {
+    var url = Uri.https(
+      lyoApiUrl,
+      '/payment_gateway/pix/kyc',
+    );
+
+    try {
+      final response = await http.put(
+        url,
+        body: json.encode(postData),
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _newKyc = responseData['data'];
+        return notifyListeners();
+      } else {
+        _newKyc = {};
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      _newKyc = {};
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return notifyListeners();
+    }
+  }
+
+  double _pixCurrencyExchange = 5.6;
+
+  double get pixCurrencyExchange {
+    return _pixCurrencyExchange;
+  }
+
+  Future<void> getPixCurrencyExchangeRate(postData) async {
+    var url = Uri.https(
+      lyoApiUrl,
+      '/payment_gateway/pix/get_exchange_rate',
+    );
+
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode(postData),
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _pixCurrencyExchange = double.parse(responseData['data']['price']);
+        return notifyListeners();
+      } else {
+        _pixCurrencyExchange = 5.6;
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return notifyListeners();
+    }
+  }
+
+  // PIX client transactions
+  Map _kycTransaction = {};
+
+  Map get kycTransaction {
+    return _kycTransaction;
+  }
+
+  Future<void> getKycVerificationTransaction(uuid) async {
+    var url = Uri.https(
+      lyoApiUrl,
+      '/payment_gateway/pix/get_client_kyc_transactions/$uuid',
+    );
+
+    try {
+      final response = await http.get(
+        url,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _kycTransaction = responseData['data'][0];
+        return notifyListeners();
+      } else {
+        _kycTransaction = {};
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      _kycTransaction = {};
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return notifyListeners();
+    }
+  }
+
+  //
+  String _awaitingTime = '--';
+
+  String get awaitingTime {
+    return _awaitingTime;
+  }
+
+  void setAwaitingTime(value) {
+    _awaitingTime = value;
+    notifyListeners();
+  }
+
+  //
+  int _clientUpdateCall = 100;
+
+  int get clientUpdateCall {
+    return _clientUpdateCall;
+  }
+
+  void setClientUpdateCall(value) {
+    _clientUpdateCall = value;
+    notifyListeners();
+  }
 }

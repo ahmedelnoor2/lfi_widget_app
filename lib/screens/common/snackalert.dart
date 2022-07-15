@@ -26,7 +26,9 @@ snackAlert(ctx, type, message) {
       backgroundColor: getBgColor(type),
       content: Text(
         '$message',
-        style: TextStyle(color: whiteTextColor),
+        style: TextStyle(
+          color: type == SnackTypes.warning ? Colors.black : whiteTextColor,
+        ),
       ),
     ),
   );
