@@ -525,21 +525,26 @@ class _PixPaymentState extends State<PixPayment>
                             _processKyc = false;
                           });
 
-                          showModalBottomSheet<void>(
-                            isScrollControlled: true,
-                            context: context,
-                            builder: (BuildContext context) {
-                              return StatefulBuilder(
-                                builder: (BuildContext context,
-                                    StateSetter setState) {
-                                  return kycInformation(
-                                    context,
-                                    setState,
-                                  );
-                                },
-                              );
-                            },
-                          );
+                          if (payments.pixKycClients['activate']) {
+                            Navigator.pushNamed(
+                                context, '/pix_process_payment');
+                          } else {
+                            showModalBottomSheet<void>(
+                              isScrollControlled: true,
+                              context: context,
+                              builder: (BuildContext context) {
+                                return StatefulBuilder(
+                                  builder: (BuildContext context,
+                                      StateSetter setState) {
+                                    return kycInformation(
+                                      context,
+                                      setState,
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          }
                         }
                       },
                 text: 'Continue',
@@ -559,14 +564,18 @@ class _PixPaymentState extends State<PixPayment>
   }
 
   Future<void> getClientUpdate(payments) async {
-    print(payments.clientUpdateCall);
     if (payments.clientUpdateCall == 1) {
       var auth = Provider.of<Auth>(context, listen: false);
       var payments = Provider.of<Payments>(context, listen: false);
-      // await payments.getKycVerificationDetails(auth.userInfo['id']);
+      await payments.getKycVerificationTransaction(
+        payments.pixKycClients['client_uuid'],
+      );
       await payments.getKycVerificationDetails({
         'userId': auth.userInfo['id'],
       });
+      if (payments.pixKycClients['activate']) {
+        Navigator.pushNamed(context, '/pix_process_payment');
+      }
     }
   }
 
@@ -575,29 +584,41 @@ class _PixPaymentState extends State<PixPayment>
 
     if (payments.kycTransaction.isNotEmpty) {
       if (payments.kycTransaction['status'] == 'PROCESSING') {
-        setState(() {
-          _timer = Timer.periodic(
-            const Duration(seconds: 1),
-            (Timer timer) {
-              final nowDate = DateTime.now().toLocal();
-              var endDate = DateTime.parse(payments.kycTransaction['date_end'])
-                  .toLocal()
-                  .add(Duration(
-                      hours: int.parse(
-                          nowDate.timeZoneOffset.toString().split(":")[0])));
-              final difference = nowDate.difference(endDate).toString();
-              final hour = difference.split(':')[0].replaceAll(RegExp('-'), '');
-              final minute = difference.split(':')[1];
-              final second = difference.split(':')[2].split('.')[0];
-              payments.setAwaitingTime('$hour hour $minute min $second sec');
-              payments.setClientUpdateCall(payments.clientUpdateCall - 1);
-              if (payments.clientUpdateCall == 0) {
-                payments.setClientUpdateCall(100);
-              }
-              getClientUpdate(payments);
-            },
+        if (_timer == null) {
+          setState(() {
+            _timer = Timer.periodic(
+              const Duration(seconds: 1),
+              (Timer timer) {
+                final nowDate = DateTime.now().toLocal();
+                var endDate = DateTime.parse(
+                        payments.kycTransaction['date_end'])
+                    .toLocal()
+                    .add(Duration(
+                        hours: int.parse(
+                            nowDate.timeZoneOffset.toString().split(":")[0])));
+                final difference = nowDate.difference(endDate).toString();
+                final hour =
+                    difference.split(':')[0].replaceAll(RegExp('-'), '');
+                final minute = difference.split(':')[1];
+                final second = difference.split(':')[2].split('.')[0];
+                payments.setAwaitingTime('$hour hour $minute min $second sec');
+                payments.setClientUpdateCall(payments.clientUpdateCall - 1);
+                if (payments.clientUpdateCall == 0) {
+                  payments.setClientUpdateCall(10);
+                }
+                getClientUpdate(payments);
+              },
+            );
+          });
+        } else {
+          setState(() {
+            _timer!.cancel();
+            _timer = null;
+          });
+          payments.getKycVerificationTransaction(
+            payments.pixKycClients['client_uuid'],
           );
-        });
+        }
       }
     }
 

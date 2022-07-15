@@ -314,7 +314,6 @@ class Payments with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-      print(responseData);
 
       if (responseData['code'] == '0') {
         _pixKycClients = responseData['data'];
@@ -481,7 +480,7 @@ class Payments with ChangeNotifier {
   }
 
   //
-  int _clientUpdateCall = 100;
+  int _clientUpdateCall = 10;
 
   int get clientUpdateCall {
     return _clientUpdateCall;
