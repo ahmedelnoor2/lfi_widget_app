@@ -293,6 +293,79 @@ class Payments with ChangeNotifier {
     }
   }
 
+  // Get TX details
+  Map _getTxDetails = {};
+
+  Map get getTxDetails {
+    return _getTxDetails;
+  }
+
+  Future<void> decryptPixQR(postData) async {
+    var url = Uri.https(
+      lyoApiUrl,
+      '/payment_gateway/pix/get_tx_details',
+    );
+
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode(postData),
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _getTxDetails = responseData['data'];
+        return notifyListeners();
+      } else {
+        _getTxDetails = {};
+        return notifyListeners();
+      }
+    } catch (error) {
+      _getTxDetails = {};
+      print(error);
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return notifyListeners();
+    }
+  }
+
+  // Get all transactions
+  List _allPixTransactions = [];
+
+  List get allPixTransactions {
+    return _allPixTransactions;
+  }
+
+  Future<void> getAllPixTransactions(uuid) async {
+    var url = Uri.https(
+      lyoApiUrl,
+      '/payment_gateway/pix/get_client_kyc_transactions/$uuid',
+    );
+
+    try {
+      final response = await http.get(
+        url,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _allPixTransactions = responseData['data'];
+        return notifyListeners();
+      } else {
+        _allPixTransactions = [];
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      _allPixTransactions = [];
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return notifyListeners();
+    }
+  }
+
   // PIX payment providers
   Map _pixKycClients = {};
 
@@ -315,6 +388,8 @@ class Payments with ChangeNotifier {
 
       final responseData = json.decode(response.body);
 
+      print(responseData);
+
       if (responseData['code'] == '0') {
         _pixKycClients = responseData['data'];
         return notifyListeners();
@@ -323,6 +398,7 @@ class Payments with ChangeNotifier {
         return notifyListeners();
       }
     } catch (error) {
+      _pixKycClients = {};
       print(error);
       // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
       return notifyListeners();
@@ -355,13 +431,16 @@ class Payments with ChangeNotifier {
         _newKyc = responseData['data'];
         return notifyListeners();
       } else {
+        Navigator.pop(ctx);
+        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
         _newKyc = {};
         return notifyListeners();
       }
     } catch (error) {
       print(error);
       _newKyc = {};
-      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      Navigator.pop(ctx);
+      snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
       return notifyListeners();
     }
   }
@@ -438,6 +517,11 @@ class Payments with ChangeNotifier {
     return _kycTransaction;
   }
 
+  void clearKycTransactions() {
+    _kycTransaction = {};
+    notifyListeners();
+  }
+
   Future<void> getKycVerificationTransaction(uuid) async {
     var url = Uri.https(
       lyoApiUrl,
@@ -460,7 +544,6 @@ class Payments with ChangeNotifier {
         return notifyListeners();
       }
     } catch (error) {
-      print(error);
       _kycTransaction = {};
       // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
       return notifyListeners();
@@ -489,5 +572,52 @@ class Payments with ChangeNotifier {
   void setClientUpdateCall(value) {
     _clientUpdateCall = value;
     notifyListeners();
+  }
+
+  // PIX create new transaction
+  Map _pixNewTransaction = {};
+
+  Map get pixNewTransaction {
+    return _pixNewTransaction;
+  }
+
+  String _transactionValue = '--';
+
+  String get transactionValue {
+    return _transactionValue;
+  }
+
+  Future<void> createNewPixTransaction(ctx, postData, txValue) async {
+    var url = Uri.https(
+      lyoApiUrl,
+      '/payment_gateway/pix/create_transaction',
+    );
+
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode(postData),
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _transactionValue = txValue;
+        _pixNewTransaction = responseData['data'];
+        return notifyListeners();
+      } else {
+        snackAlert(ctx, SnackTypes.errors, responseData['error'][0]);
+        _transactionValue = '--';
+        _pixNewTransaction = {};
+        return notifyListeners();
+      }
+    } catch (error) {
+      _transactionValue = '--';
+      _pixNewTransaction = {};
+      print(error);
+      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again.');
+      return notifyListeners();
+    }
   }
 }

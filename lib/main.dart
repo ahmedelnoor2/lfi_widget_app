@@ -31,6 +31,7 @@ import 'package:lyotrade/screens/future_trade/future_trade.dart';
 import 'package:lyotrade/screens/market/market.dart';
 import 'package:lyotrade/screens/pix_payment/pix_payment.dart';
 import 'package:lyotrade/screens/pix_payment/pix_process_payment.dart';
+import 'package:lyotrade/screens/pix_payment/pix_transactions.dart';
 import 'package:lyotrade/screens/security/disable_account.dart';
 import 'package:lyotrade/screens/security/email_change.dart';
 import 'package:lyotrade/screens/security/google_auth.dart';
@@ -250,6 +251,7 @@ class MyApp extends StatelessWidget {
               PixPayment.routeName: (context) => const PixPayment(),
               PixProcessPayment.routeName: (context) =>
                   const PixProcessPayment(),
+              PixTransactions.routeName: (context) => const PixTransactions(),
             },
           );
         },

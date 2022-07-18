@@ -52,6 +52,9 @@ Future<void> showAlert(context, icon, title, message, action) async {
                 Navigator.pushNamed(context, '/security');
               } else if (action == 'Exit') {
                 exit(0);
+              } else if (action == 'Cancel Transaction') {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
               } else {
                 Navigator.of(context).pop();
               }

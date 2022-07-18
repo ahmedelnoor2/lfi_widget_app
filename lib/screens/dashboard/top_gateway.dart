@@ -4,6 +4,7 @@ import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/ticker_provider.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/payments.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
@@ -35,6 +36,7 @@ class _TopGatewayState extends State<TopGateway>
   @override
   Widget build(BuildContext context) {
     var auth = Provider.of<Auth>(context, listen: true);
+    var payments = Provider.of<Payments>(context, listen: true);
 
     return InkWell(
       onTap: () {
@@ -42,6 +44,8 @@ class _TopGatewayState extends State<TopGateway>
           if (auth.userInfo['realAuthType'] == 0) {
             snackAlert(context, SnackTypes.warning,
                 'Deposit limited(Please check KYC status)');
+            payments.clearKycTransactions();
+            Navigator.pushNamed(context, '/pix_payment');
           } else {
             Navigator.pushNamed(context, '/pix_payment');
           }
