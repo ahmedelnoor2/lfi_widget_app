@@ -77,7 +77,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<Staking>(create: (_) => Staking()),
         ChangeNotifierProvider<LoanProvider>(
           create: (_) => LoanProvider(),
-          lazy: true,
+          
         ),
        
         ChangeNotifierProvider<Payments>(create: (_) => Payments()),

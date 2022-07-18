@@ -202,8 +202,8 @@ class _ConfirmloanState extends State<Confirmloan> {
                       children: [
                         Text('Your loan:'),
                         Text(
-                          loanProvider.loanstatus['loan']['expected_amount'] ??
-                              '',
+                          'loan'
+                          //loanProvider.loanstatus['loan']['expected_amount'].toString()
                         ),
                         Text('USDT'),
                         Container(
@@ -399,7 +399,7 @@ class _ConfirmloanState extends State<Confirmloan> {
                   ),
                   ElevatedButton(
                   
-                      onPressed: () async {
+                      onPressed:agree? () async {
                         if (_textEditingControllerAddress.text.isEmpty ||
                             _textEditingControllerEmail.text.isEmpty) {
                           Fluttertoast.showToast(
@@ -411,9 +411,9 @@ class _ConfirmloanState extends State<Confirmloan> {
                               textColor: Colors.white,
                               fontSize: 16.0);
                         } else {
-                          await agree
-                              ? loanProvider
+                           loanProvider
                                   .getConfirm(
+                                   
                                       _textEditingControllerAddress.text
                                           .toString(),
                                       _textEditingControllerEmail.text
@@ -425,10 +425,12 @@ class _ConfirmloanState extends State<Confirmloan> {
                                       timeInSecForIosWeb: 1,
                                       backgroundColor: Colors.red,
                                       textColor: Colors.white,
-                                      fontSize: 16.0))
-                              : null;
+                                      fontSize: 16.0));
+                             
                         }
-                      },
+                     
+                      }
+                         :null,
                       child: const Text('Confirm'))
                 ],
               ),

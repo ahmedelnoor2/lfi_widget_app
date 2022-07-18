@@ -20,8 +20,8 @@ getBgColor(type) {
   return color;
 }
 
-snackAlert(ctx, type, message) {
-  return ScaffoldMessenger.of(ctx).showSnackBar(
+snackAlert( BuildContext ctx, type, message) {
+  return ScaffoldMessenger.of( ctx).showSnackBar(
     SnackBar(
       backgroundColor: getBgColor(type),
       content: Text(

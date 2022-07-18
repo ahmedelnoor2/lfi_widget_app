@@ -12,11 +12,14 @@ import 'package:lyotrade/utils/AppConstant.utils.dart';
 class LoanProvider with ChangeNotifier {
   Map<String, String> headers = {
     'Content-type': 'application/json;charset=utf-8',
-    'Accept': 'application/json',
+    'Accept': 'exchange-token',
+    'Authorization': 'd0435db6-d4f5-4065-8024-c62684de12fb',
   };
 
   Map<String, String> headers1 = {
-    'Content-Type': 'application/x-www-form-urlencoded'
+    'Content-Type': 'application/x-www-form-urlencoded',
+    'Accept': 'exchange-token',
+    'Authorization': 'd0435db6-d4f5-4065-8024-c62684de12fb',
   };
 
   List _fromCurrenciesList = [];
@@ -174,7 +177,7 @@ class LoanProvider with ChangeNotifier {
   final TextEditingController _textEditingControllereciver =
       TextEditingController();
 
-  var yourloan;
+  var yourloan = 11095.39;
 
   Future<void> getloanestimate() async {
     var url = Uri.https(loanApiUrl, loansApiestimate, {
@@ -192,11 +195,13 @@ class LoanProvider with ChangeNotifier {
         url,
         headers: headers,
       );
+      print(url);
       final responseData = json.decode(response.body);
+      print(responseData);
 
       if (responseData['result']) {
         _loanestimate = responseData['response'];
-      //  amount=responseData['response']['amount_from'];
+        //  amount=responseData['response']['amount_from'];
         yourloan = responseData['response']['down_limit'];
 
         print(yourloan);
@@ -229,18 +234,22 @@ class LoanProvider with ChangeNotifier {
       loanApiUrl,
       '$loanApiVersion/create_loan',
     );
+
     String myJSON =
         '{"deposit":{"currency_code":"$from_code","currency_network":"$from_network","expected_amount":"$amount"},"loan":{"currency_code":"$to_code","currency_network":"$to_network"},"ltv_percent":"$ltv_percent", "referral":"" }';
     var data = jsonEncode(myJSON);
+
     try {
       final response =
           await http.post(url, body: {'parameters': data}, headers: headers1);
+
       final responseData = json.decode(response.body);
+
       if (responseData['result']) {
         result = responseData['result'];
+        
         loanid = responseData['response']['loan_id'];
 
-        print(yourloan);
         _createloan = responseData['response'];
 
         return notifyListeners();
@@ -248,8 +257,10 @@ class LoanProvider with ChangeNotifier {
         _loanestimate = [];
         return notifyListeners();
       }
-    } catch (ctx) {
-      snackAlert(ctx, SnackTypes.errors, 'Coin Is not Available.');
+    } on BuildContext catch (mycontext, ctx) {
+      {
+        snackAlert(mycontext, ctx, 'Coin is not Avaliable');
+      }
       return;
     }
   }
@@ -295,8 +306,7 @@ class LoanProvider with ChangeNotifier {
     }
   }
 
-  /////// loan Confirm api ///
-
+bool isconfirm=false;
   Future<void> getConfirm(reciveraddress, email) async {
     var url = Uri.https(
       loanApiUrl,
@@ -312,18 +322,18 @@ class LoanProvider with ChangeNotifier {
     var body = jsonEncode(data);
 
     try {
+      
       final response = await http.post(url, headers: headers, body: body);
 
       final responseData = json.decode(response.body);
-      if (responseData['result']) {
-        //  _loanstatus= responseData['response'];
-
-        //  print(_loanestimate);
+      if (responseData['result']==200) {
+      isconfirm==true;
         return notifyListeners();
       } else {
-        // _loanstatus = [];
+       isconfirm==false;
         return notifyListeners();
       }
+      
     } catch (error) {
       print(error);
       // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');

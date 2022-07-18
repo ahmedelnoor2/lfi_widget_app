@@ -32,7 +32,7 @@ class ReferralProvider with ChangeNotifier {
   Future<void> getreferral(auth) async {
     headers['exchange-token'] = auth.loginVerificationToken;
 
-    print(headers['exchange-token']);
+    
     var url = Uri.https(
       apiUrl,
       '$referral/agent_data_query',

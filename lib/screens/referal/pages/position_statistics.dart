@@ -15,7 +15,7 @@ class _PostionpageState extends State<Postionpage> {
   Widget build(BuildContext context) {
     var auth = Provider.of<Auth>(context, listen: false);
     var referalprovider = Provider.of<ReferralProvider>(context, listen: false);
-  print(referalprovider.positiondatalist);
+ 
     return FutureBuilder(
         future: referalprovider.getpositionreferral(auth),
         builder: (context, dataSnapshot) {

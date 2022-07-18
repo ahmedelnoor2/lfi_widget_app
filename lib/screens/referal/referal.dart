@@ -45,6 +45,7 @@ class _ReferalState extends State<Referal> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     var auth = Provider.of<Auth>(context, listen: false);
     var referalprovider = Provider.of<ReferralProvider>(context, listen: false);
+   
 
     final _size = MediaQuery.of(context).size;
     return Scaffold(
@@ -87,7 +88,7 @@ class _ReferalState extends State<Referal> with SingleTickerProviderStateMixin {
                   return Center(
                     child: CircularProgressIndicator(),
                   );
-                } else {
+                 } else {
                   if (dataSnapshot.error != null) {
                     return Center(
                       child: Text('An error occured'),

@@ -41,7 +41,7 @@ class _TakeLoanState extends State<TakeLoan> {
   @override
   void initState() {
     getCurrencies();
-    getloanestimate();
+
     super.initState();
   }
 
@@ -276,19 +276,15 @@ class _TakeLoanState extends State<TakeLoan> {
                                   keyboardType: TextInputType.number,
                                   //controller: _textEditingControllereciver,
                                   onChanged: (s) {
-                                    var reverse='reverse';
-                                    provider.exchange=reverse;
-                                  
-                                    provider.yourloan = int.parse(s);
-                                    provider.amount=provider.yourloan;
+                                    var reverse = 'reverse';
+                                    provider.exchange = reverse;
+
+                                    provider.amount = provider.yourloan.toInt();
                                     print(provider.amount);
                                     provider.getloanestimate();
                                   },
                                   initialValue:
-                                      loanProvider.loanestimate['down_limit'] ==
-                                              null
-                                          ? ''
-                                          : provider.loanestimate['down_limit'],
+                                      loanProvider.yourloan.toString(),
                                   decoration: new InputDecoration(
                                     border: InputBorder.none,
                                     focusedBorder: InputBorder.none,
@@ -430,89 +426,112 @@ class _TakeLoanState extends State<TakeLoan> {
             Padding(
                 padding: const EdgeInsets.only(
                     left: 16, right: 16, top: 8, bottom: 8),
-                child: Consumer<LoanProvider>(builder: (context, provider, __) {
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Loan Term',
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w400,
-                              fontFamily: 'Yantramanav',
-                              color: seconadarytextcolour,
-                            ),
-                          ),
-                          Text(
-                            'Unlimited',
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w400,
-                              fontFamily: 'Yantramanav',
-                              color: whiteTextColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Monthly Interest',
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w400,
-                              fontFamily: 'Yantramanav',
-                              color: seconadarytextcolour,
-                            ),
-                          ),
-                          Text(
-                            provider.loanestimate['interest_amounts']['month']
-                                .toString(),
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w400,
-                              fontFamily: 'Yantramanav',
-                              color: whiteTextColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Liquidation Price',
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w400,
-                              fontFamily: 'Yantramanav',
-                              color: seconadarytextcolour,
-                            ),
-                          ),
-                          Text(
-                            provider.loanestimate['down_limit'].toString(),
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w400,
-                              fontFamily: 'Yantramanav',
-                              color: whiteTextColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  );
-                })),
+                child: FutureBuilder(
+                    future: loanProvider.getloanestimate(),
+                    builder: (context, dataSnapshot) {
+                      if (dataSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      } else {
+                        if (dataSnapshot.error != null) {
+                          return Center(
+                            child: Text('An error occured'),
+                          );
+                        } else {
+                          return Consumer<LoanProvider>(
+                              builder: (context, provider, __) {
+                            return Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Loan Term',
+                                      style: TextStyle(
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.w400,
+                                        fontFamily: 'Yantramanav',
+                                        color: seconadarytextcolour,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Unlimited',
+                                      style: TextStyle(
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.w400,
+                                        fontFamily: 'Yantramanav',
+                                        color: whiteTextColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Monthly Interest',
+                                      style: TextStyle(
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.w400,
+                                        fontFamily: 'Yantramanav',
+                                        color: seconadarytextcolour,
+                                      ),
+                                    ),
+                                    Text(
+                                      provider.loanestimate['interest_amounts']
+                                              ['month']
+                                          .toString(),
+                                      style: TextStyle(
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.w400,
+                                        fontFamily: 'Yantramanav',
+                                        color: whiteTextColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Liquidation Price',
+                                      style: TextStyle(
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.w400,
+                                        fontFamily: 'Yantramanav',
+                                        color: seconadarytextcolour,
+                                      ),
+                                    ),
+                                    Text(
+                                      provider.loanestimate['down_limit']
+                                          .toString(),
+                                      style: TextStyle(
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.w400,
+                                        fontFamily: 'Yantramanav',
+                                        color: whiteTextColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            );
+                          });
+                        }
+                      }
+                    })),
             Spacer(),
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -540,7 +559,7 @@ class _TakeLoanState extends State<TakeLoan> {
                           textColor: Colors.white,
                           fontSize: 16.0);
                     } else {
-                      showDialog(
+                     showDialog(
                           context: context,
                           builder: (BuildContext context) {
                             return Center(
@@ -551,6 +570,9 @@ class _TakeLoanState extends State<TakeLoan> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     CircularProgressIndicator(),
+                                    SizedBox(
+                                      width: 20,
+                                    ),
                                     Container(
                                         child: Text(
                                       'Loading...',
@@ -565,14 +587,15 @@ class _TakeLoanState extends State<TakeLoan> {
                               ),
                             );
                           });
-
+                 
                       await loanProvider.getCreateLoan().whenComplete(() =>
                           loanProvider
                               .getLoanStatus(loanProvider.loanid)
                               .whenComplete(() => Navigator.pushNamed(
                                   context, '/confirm_loan')));
-
+                      
                       Navigator.pop(context);
+                     
                     }
                   },
                 ),
