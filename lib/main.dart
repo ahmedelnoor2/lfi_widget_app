@@ -6,6 +6,7 @@ import 'package:lyotrade/providers/future_market.dart';
 import 'package:lyotrade/providers/loan_provider.dart';
 import 'package:lyotrade/providers/payments.dart';
 import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/providers/referral.dart';
 import 'package:lyotrade/providers/staking.dart';
 import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/providers/user.dart';
@@ -32,6 +33,7 @@ import 'package:lyotrade/screens/kyc/kycscreen.dart';
 import 'package:lyotrade/screens/kyc/perosmalvarification.dart';
 import 'package:lyotrade/screens/market/market.dart';
 import 'package:lyotrade/screens/notification/notifcationmessage.dart';
+
 import 'package:lyotrade/screens/referal/referal.dart';
 import 'package:lyotrade/screens/security/email_change.dart';
 import 'package:lyotrade/screens/security/forgot/forgotpassword.dart';
@@ -65,6 +67,7 @@ class MyApp extends StatelessWidget {
 
     return MultiProvider(
       providers: [
+       
         ChangeNotifierProvider<Auth>(create: (_) => Auth()),
         ChangeNotifierProvider<Public>(create: (_) => Public()),
         ChangeNotifierProvider<Asset>(create: (_) => Asset()),
@@ -72,9 +75,18 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<Trading>(create: (_) => Trading()),
         ChangeNotifierProvider<FutureMarket>(create: (_) => FutureMarket()),
         ChangeNotifierProvider<Staking>(create: (_) => Staking()),
-        ChangeNotifierProvider<LoanProvider>(create: (_) => LoanProvider(),lazy: true,)
+        ChangeNotifierProvider<LoanProvider>(
+          create: (_) => LoanProvider(),
+          lazy: true,
+        ),
+       
         ChangeNotifierProvider<Payments>(create: (_) => Payments()),
         ChangeNotifierProvider<DexProvider>(create: (_) => DexProvider()),
+        ChangeNotifierProvider< ReferralProvider>(create: (_) => ReferralProvider()),
+    
+  
+        
+       
       ],
       child: Consumer<Auth>(
         builder: (context, auth, _) {
@@ -235,7 +247,7 @@ class MyApp extends StatelessWidget {
               Security.routeName: (context) => const Security(),
               Phone.routeName: (context) => const Phone(),
               Password.routeName: (context) => const Password(),
-              Forgotpassword.routeName:(context) => Forgotpassword(),
+              Forgotpassword.routeName: (context) => Forgotpassword(),
               GoogleAuth.routeName: (context) => const GoogleAuth(),
               EmailChange.routeName: (context) => const EmailChange(),
               Transactions.routeName: (context) => const Transactions(),
@@ -246,15 +258,19 @@ class MyApp extends StatelessWidget {
               BuySellCrypto.routeName: (context) => const BuySellCrypto(),
               Confirmloan.routeName: (context) => const Confirmloan(),
               TakeLoan.routeName: (context) => const TakeLoan(),
-              Referal.routeName:((context) =>  Referal()),
-              Kycscreen.routeName:((context) =>  Kycscreen()),
-              personalverification.routeName:(context) => personalverification(),
-              EnitityVerification.routeName:((context) => EnitityVerification()),
-              Notificationsscreen.routeName:((context) => const Notificationsscreen()),
+              Referal.routeName: ((context) => Referal()),
+              Kycscreen.routeName: ((context) => Kycscreen()),
+              personalverification.routeName: (context) =>
+                  personalverification(),
+              EnitityVerification.routeName: ((context) =>
+                  EnitityVerification()),
+              Notificationsscreen.routeName: ((context) =>
+                  const Notificationsscreen()),
               ProcessPayment.routeName: (context) => const ProcessPayment(),
               BuySellTransactions.routeName: (context) =>
                   const BuySellTransactions(),
               DexSwap.routeName: (context) => const DexSwap(),
+              Referal.routeName:(context) =>  Referal(),
             },
           );
         },

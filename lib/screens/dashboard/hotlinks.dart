@@ -52,7 +52,13 @@ class _HotlinksState extends State<Hotlinks> {
           ),
           GestureDetector(
             onTap: () {
-              snackAlert(context, SnackTypes.warning, 'Coming Soon...');
+
+              if (auth.isAuthenticated) {
+               // snackAlert(context, SnackTypes.warning, 'Coming Soon...');
+                 Navigator.pushNamed(context, '/referal_screen');
+              } else {
+                Navigator.pushNamed(context, '/authentication');
+              }
             },
             child: Column(
               children: [
@@ -66,13 +72,12 @@ class _HotlinksState extends State<Hotlinks> {
                   ),
                 ),
                 Text(
-                    'Referral',
-                    style: TextStyle(
-                      fontSize: 12,
-                    ),
+                  'Referral',
+                  style: TextStyle(
+                    fontSize: 12,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
           GestureDetector(
