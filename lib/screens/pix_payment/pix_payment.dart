@@ -1103,12 +1103,13 @@ class _PixPaymentState extends State<PixPayment>
                                       padding: EdgeInsets.only(right: 10),
                                       child: Icon(
                                         Icons.timer,
+                                        color: warningColor,
                                       ),
                                     ),
                                     Text(
                                       'Awaiting payment',
                                       style: TextStyle(
-                                        color: secondaryTextColor,
+                                        color: warningColor,
                                       ),
                                     ),
                                   ],
