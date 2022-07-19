@@ -44,9 +44,8 @@ class _TopGatewayState extends State<TopGateway>
           if (auth.userInfo['realAuthType'] == 0) {
             snackAlert(context, SnackTypes.warning,
                 'Deposit limited(Please check KYC status)');
-            payments.clearKycTransactions();
-            Navigator.pushNamed(context, '/pix_payment');
           } else {
+            payments.clearKycTransactions();
             Navigator.pushNamed(context, '/pix_payment');
           }
         } else {

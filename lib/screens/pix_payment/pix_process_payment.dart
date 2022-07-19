@@ -93,8 +93,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                       difference.split(':')[0].replaceAll(RegExp('-'), '');
                   final minute = difference.split(':')[1];
                   final second = difference.split(':')[2].split('.')[0];
-                  payments
-                      .setAwaitingTime('$hour hour $minute min $second sec');
+                  payments.setAwaitingTime('0$hour:$minute:$second');
                 },
               );
             });
@@ -521,17 +520,15 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                     alignment: Alignment.center,
                                     child: _currentTransaction['status'] ==
                                             'ACCEPTED'
-                                        ? Icon(
-                                            Icons.check,
-                                            color: successColor,
-                                            size: 40,
+                                        ? Image.asset(
+                                            'assets/img/approved.png',
+                                            width: 50,
                                           )
                                         : _currentTransaction['status'] ==
                                                 'CHARGEBACK'
-                                            ? Icon(
-                                                Icons.cancel,
-                                                color: errorColor,
-                                                size: 40,
+                                            ? Image.asset(
+                                                'assets/img/rejected.png',
+                                                width: 50,
                                               )
                                             : Icon(
                                                 Icons.timer,
@@ -576,7 +573,13 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                 _currentTransaction['status'] == 'PROCESSING'
                                     ? Container(
                                         padding: EdgeInsets.all(5),
-                                        child: Text(payments.awaitingTime),
+                                        child: Text(
+                                          payments.awaitingTime,
+                                          style: TextStyle(
+                                            color: linkColor,
+                                            fontSize: 16,
+                                          ),
+                                        ),
                                       )
                                     : InkWell(
                                         onTap: () {

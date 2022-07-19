@@ -115,7 +115,7 @@ class _PixTransactionsState extends State<PixTransactions>
                         Text(
                           '${transaction['status']}',
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
                             color: transaction['status'] == 'ACCEPTED'
                                 ? successColor
                                 : transaction['status'] == 'PROCESSING'

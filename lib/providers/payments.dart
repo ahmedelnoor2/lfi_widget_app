@@ -388,8 +388,6 @@ class Payments with ChangeNotifier {
 
       final responseData = json.decode(response.body);
 
-      print(responseData);
-
       if (responseData['code'] == '0') {
         _pixKycClients = responseData['data'];
         return notifyListeners();
@@ -445,7 +443,7 @@ class Payments with ChangeNotifier {
     }
   }
 
-  Future<void> reRequestKyc(postData) async {
+  Future<void> reRequestKyc(ctx, postData) async {
     var url = Uri.https(
       lyoApiUrl,
       '/payment_gateway/pix/kyc',
@@ -462,12 +460,23 @@ class Payments with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         _newKyc = responseData['data'];
+        snackAlert(ctx, SnackTypes.success, 'Resent KYC verifcation');
         return notifyListeners();
       } else {
+        snackAlert(
+          ctx,
+          SnackTypes.errors,
+          'Failed to resend KYC verification, try again or contact to the support',
+        );
         _newKyc = {};
         return notifyListeners();
       }
     } catch (error) {
+      snackAlert(
+        ctx,
+        SnackTypes.errors,
+        'Failed to resend KYC verification, please contact to the support',
+      );
       print(error);
       _newKyc = {};
       // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
@@ -551,7 +560,7 @@ class Payments with ChangeNotifier {
   }
 
   //
-  String _awaitingTime = '--';
+  String _awaitingTime = '00:00:00';
 
   String get awaitingTime {
     return _awaitingTime;

@@ -34,7 +34,7 @@ class _BuyCryptoState extends State<BuyCrypto> {
             if (auth.isAuthenticated) {
               if (auth.userInfo['realAuthType'] == 0) {
                 snackAlert(context, SnackTypes.warning,
-                    'Deposit limited(Please check KYC status)');
+                    'This feature is not active (Please check KYC status)');
               } else {
                 Navigator.pushNamed(context, '/buy_sell_crypto');
               }
