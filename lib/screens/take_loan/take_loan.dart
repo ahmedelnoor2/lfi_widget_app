@@ -10,6 +10,9 @@ import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 
+import '../common/widget/error_dialog.dart';
+import '../common/widget/loading_dialog.dart';
+
 class TakeLoan extends StatefulWidget {
   static const routeName = '/crypto_loan';
 
@@ -56,10 +59,51 @@ class _TakeLoanState extends State<TakeLoan> {
     await loanProvider.getloanestimate();
   }
 
-  // Future<void> getCreateLoan() async {
-  //   var loanProvider = Provider.of<LoanProvider>(context, listen: false);
-  //   await loanProvider.getCreateLoan();
-  // }
+  formValidation() {
+    if (_textEditingControllereciver.text.isEmpty &&
+        _textEditingControllesender.text.isEmpty) {
+      showDialog(
+          context: context,
+          builder: (c) {
+            return ErrorDialog(
+              message: "Please write sender/reciver.",
+            );
+          });
+    } else {
+      loancreateNow();
+    }
+  }
+
+  loancreateNow() async {
+    var loanProvider = Provider.of<LoanProvider>(context, listen: false);
+    showDialog(
+        context: context,
+        builder: (c) {
+          return LoadingDialog(
+            message: "Checking"
+          );
+        });
+
+    await loanProvider.getCreateLoan().whenComplete(() {
+      if (loanProvider.result == true) {
+        loanProvider
+            .getLoanStatus(loanProvider.loanid)
+            .whenComplete(() {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/confirm_loan');
+            });
+            
+      } else {
+        showDialog(
+            context: context,
+            builder: (c) {
+              return ErrorDialog(
+                message: 'Some Thing went Wrong!',
+              );
+            });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -549,54 +593,7 @@ class _TakeLoanState extends State<TakeLoan> {
                   ),
                   color: buttoncolour,
                   onPressed: () async {
-                    if (_textEditingControllesender.text.isEmpty) {
-                      Fluttertoast.showToast(
-                          msg: "Field is Empty",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.CENTER,
-                          timeInSecForIosWeb: 1,
-                          backgroundColor: Colors.red,
-                          textColor: Colors.white,
-                          fontSize: 16.0);
-                    } else {
-                     showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return Center(
-                              child: Container(
-                                height: 100,
-                                color: Colors.white,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    CircularProgressIndicator(),
-                                    SizedBox(
-                                      width: 20,
-                                    ),
-                                    Container(
-                                        child: Text(
-                                      'Loading...',
-                                      style: TextStyle(
-                                          decoration: TextDecoration.none,
-                                          fontSize: 14,
-                                          color: Colors.black),
-                                      textAlign: TextAlign.center,
-                                    )),
-                                  ],
-                                ),
-                              ),
-                            );
-                          });
-                 
-                      await loanProvider.getCreateLoan().whenComplete(() =>
-                          loanProvider
-                              .getLoanStatus(loanProvider.loanid)
-                              .whenComplete(() => Navigator.pushNamed(
-                                  context, '/confirm_loan')));
-                      
-                      Navigator.pop(context);
-                     
-                    }
+                    formValidation();
                   },
                 ),
               ),

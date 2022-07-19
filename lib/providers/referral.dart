@@ -52,9 +52,9 @@ class ReferralProvider with ChangeNotifier {
 
     try {
       final response = await http.post(url, headers: headers, body: body);
-
+        print(response.body);
       final responseData = json.decode(response.body);
-       print(responseData);
+       
     
       if (responseData['msg'] == 'success') {
         _referraldata = responseData['data'];

@@ -218,6 +218,78 @@ class LoanProvider with ChangeNotifier {
     }
   }
 
+///////recive email for verify//
+  ///
+  Future<void> getemail(ctx, email) async {
+    var url = Uri.https(
+      apiurlemailtoken,
+      '$getemailverifytoken/send_token',
+    );
+
+    try {
+      final response = await http.post(url, body: {"email": "$email"});
+
+      print(response.body);
+
+      final responseData = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        isemailwidgitconverter=
+        snackAlert(ctx, SnackTypes.success, responseData['message'].toString());
+
+        return notifyListeners();
+      } else {
+        snackAlert(ctx, SnackTypes.warning, 'Some thing went wrong!!');
+        return notifyListeners();
+      }
+    } catch (ctx) {
+      {
+        print('error verify email token');
+      }
+      return;
+    }
+  }
+
+  ////
+
+  bool isemailwidgitconverter = false;
+
+////// email verify otp
+  Future<void> getemailverfiyOtp(ctx, email, token) async {
+    var url = Uri.https(
+      apiurlemailtoken,
+      '$getemailverifytoken/verify_otp_email',
+    );
+
+    try {
+      final response =
+          await http.post(url, body: {"email": "$email", "token": "$token"});
+
+      print(response.body);
+
+      final responseData = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        
+       isemailwidgitconverter =true;
+
+      
+        snackAlert(ctx, SnackTypes.success, responseData['message'].toString());
+
+        return notifyListeners();
+      } else {
+       
+        snackAlert(ctx, SnackTypes.warning, 'Some thing went wrong!!');
+        return notifyListeners();
+      }
+    } catch (ctx) {
+      {
+        print('error verify email token');
+      }
+      return;
+    }
+  }
+
   ///create loan api
   var _createloan;
 
@@ -247,8 +319,10 @@ class LoanProvider with ChangeNotifier {
 
       if (responseData['result']) {
         result = responseData['result'];
-        
+
         loanid = responseData['response']['loan_id'];
+        print('check loan ...');
+        print(loanid);
 
         _createloan = responseData['response'];
 
@@ -287,8 +361,6 @@ class LoanProvider with ChangeNotifier {
     try {
       final response = await http.post(url, headers: headers, body: body);
 
-      print(response.statusCode);
-
       final responseData = json.decode(response.body);
       if (responseData['result']) {
         _loanstatus = responseData['response'];
@@ -306,34 +378,35 @@ class LoanProvider with ChangeNotifier {
     }
   }
 
-bool isconfirm=false;
-  Future<void> getConfirm(reciveraddress, email) async {
+  var isconfirm;
+  Future<void> getConfirm(myloanid, reciveraddress, email) async {
     var url = Uri.https(
       loanApiUrl,
       '$loanApiVersion/confirm_loan',
     );
+    print(url);
 
     var data = {
-      'loan_id': '4689901146',
+      'loan_id': '$myloanid',
       "receive_address": '$reciveraddress',
       "email": '$email'
     };
 
     var body = jsonEncode(data);
+    print(data);
 
     try {
-      
       final response = await http.post(url, headers: headers, body: body);
-
+      print('checkk...');
+      print(response.body);
       final responseData = json.decode(response.body);
-      if (responseData['result']==200) {
-      isconfirm==true;
+
+      if (responseData['result'] == 200) {
+        isconfirm = responseData['result'];
         return notifyListeners();
       } else {
-       isconfirm==false;
         return notifyListeners();
       }
-      
     } catch (error) {
       print(error);
       // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');

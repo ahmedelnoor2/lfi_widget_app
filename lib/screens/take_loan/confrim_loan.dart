@@ -3,9 +3,12 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:lyotrade/providers/loan_provider.dart';
 import 'package:lyotrade/screens/common/header.dart';
+import 'package:lyotrade/screens/common/widget/loading_dialog.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 
 import 'package:provider/provider.dart';
+
+import '../common/widget/error_dialog.dart';
 
 class Confirmloan extends StatefulWidget {
   static const routeName = '/confirm_loan';
@@ -24,12 +27,51 @@ class _ConfirmloanState extends State<Confirmloan> {
       TextEditingController();
   final TextEditingController _textEditingControllerhistory =
       TextEditingController();
-
+  final TextEditingController _textotpcontrolller = TextEditingController();
   //  Future<void> doconfirm(loanid,reciveraddres,email) async {
   //   var loanProvider = Provider.of<LoanProvider>(context, listen: false);
   //   await loanProvider.getConfirm(loanid,reciveraddres,email);
   // }
+
   final _formKey = GlobalKey<FormState>();
+
+  emailformValidation() {
+    if (_textEditingControllerEmail.text.isEmpty) {
+      showDialog(
+          context: context,
+          builder: (c) {
+            return ErrorDialog(
+              message: "Please write Email.",
+            );
+          });
+    } else {
+      verifynow();
+    }
+  }
+
+  verifynow() async {
+    var loanProvider = Provider.of<LoanProvider>(context, listen: false);
+    showDialog(
+        context: context,
+        builder: (c) {
+          return LoadingDialog(message: "Checking");
+        });
+
+    await loanProvider
+        .getemail(context, _textEditingControllerEmail.text.toString())
+        .whenComplete(() {
+      if (loanProvider.isemailwidgitconverter = true) {
+        setState(() {
+          loanProvider.isemailwidgitconverter = true;
+        });
+      } else {
+        setState(() {
+          loanProvider.isemailwidgitconverter = false;
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var loanProvider = Provider.of<LoanProvider>(context, listen: false);
@@ -201,10 +243,9 @@ class _ConfirmloanState extends State<Confirmloan> {
                     child: Row(
                       children: [
                         Text('Your loan:'),
-                        Text(
-                          'loan'
-                          //loanProvider.loanstatus['loan']['expected_amount'].toString()
-                        ),
+                        Text('loan'
+                            //loanProvider.loanstatus['loan']['expected_amount'].toString()
+                            ),
                         Text('USDT'),
                         Container(
                           child: Text('ETH'),
@@ -321,12 +362,7 @@ class _ConfirmloanState extends State<Confirmloan> {
                   labelText: 'TX7gY7ts8PpJYcupF4kHpkGazopd9jH8Cs',
                 ),
                 onChanged: (text) {
-                  setState(() {
-                    //  fullName = text;
-                    //you can access nameController in its scope to get
-                    // the value of text entered as shown below
-                    //fullName = nameController.text;
-                  });
+                  setState(() {});
                 },
               )),
               Row(
@@ -347,21 +383,21 @@ class _ConfirmloanState extends State<Confirmloan> {
                         labelText: 'example@gmail.com',
                       ),
                       onChanged: (text) {
-                        setState(() {
-                          //  fullName = text;
-                          //you can access nameController in its scope to get
-                          // the value of text entered as shown below
-                          //fullName = nameController.text;
-                        });
+                        setState(() {});
                       },
                     ),
                   ),
-                  Container(
-                    child: Text('Verify'),
-                    margin: const EdgeInsets.all(15.0),
-                    padding: const EdgeInsets.all(3.0),
-                    decoration: BoxDecoration(
-                        border: Border.all(color: Colors.blueAccent)),
+                  GestureDetector(
+                    onTap: () async {
+                      await emailformValidation();
+                    },
+                    child: Container(
+                      child: Text('Verify'),
+                      margin: const EdgeInsets.all(15.0),
+                      padding: const EdgeInsets.all(3.0),
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.blueAccent)),
+                    ),
                   )
                 ],
               ),
@@ -398,39 +434,47 @@ class _ConfirmloanState extends State<Confirmloan> {
                         border: Border.all(color: Colors.blueAccent)),
                   ),
                   ElevatedButton(
-                  
-                      onPressed:agree? () async {
-                        if (_textEditingControllerAddress.text.isEmpty ||
-                            _textEditingControllerEmail.text.isEmpty) {
-                          Fluttertoast.showToast(
-                              msg: "Field is empty",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.CENTER,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.red,
-                              textColor: Colors.white,
-                              fontSize: 16.0);
-                        } else {
-                           loanProvider
-                                  .getConfirm(
-                                   
-                                      _textEditingControllerAddress.text
-                                          .toString(),
-                                      _textEditingControllerEmail.text
-                                          .toString())
-                                  .whenComplete(() => Fluttertoast.showToast(
-                                      msg: "Confirm Your Loan Thanks",
-                                      toastLength: Toast.LENGTH_SHORT,
-                                      gravity: ToastGravity.CENTER,
-                                      timeInSecForIosWeb: 1,
-                                      backgroundColor: Colors.red,
-                                      textColor: Colors.white,
-                                      fontSize: 16.0));
-                             
-                        }
-                     
-                      }
-                         :null,
+                      onPressed: agree
+                          ? () async {
+                              if (_textEditingControllerAddress.text.isEmpty ||
+                                  _textEditingControllerEmail.text.isEmpty) {
+                                showDialog(
+                                    context: context,
+                                    builder: (c) {
+                                      return ErrorDialog(
+                                        message: "Please write Address/Email.",
+                                      );
+                                    });
+                              } else {
+                                await loanProvider
+                                    .getConfirm(
+                                        loanProvider.loanid,
+                                        _textEditingControllerAddress.text
+                                            .trim(),
+                                        _textEditingControllerEmail.text.trim())
+                                    .whenComplete(() {
+                                  if (loanProvider.isconfirm == 200) {
+                                    Fluttertoast.showToast(
+                                        msg: "Confirm Your Loan Thanks",
+                                        toastLength: Toast.LENGTH_SHORT,
+                                        gravity: ToastGravity.CENTER,
+                                        timeInSecForIosWeb: 1,
+                                        backgroundColor: Colors.red,
+                                        textColor: Colors.white,
+                                        fontSize: 16.0);
+                                  } else {
+                                    showDialog(
+                                        context: context,
+                                        builder: (c) {
+                                          return ErrorDialog(
+                                            message: "Some Thing went Wrong!.",
+                                          );
+                                        });
+                                  }
+                                });
+                              }
+                            }
+                          : null,
                       child: const Text('Confirm'))
                 ],
               ),
