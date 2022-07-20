@@ -484,6 +484,43 @@ class Payments with ChangeNotifier {
     }
   }
 
+  // Pix Commission Rate
+  double _pixCurrencyCommission = 0;
+
+  double get pixCurrencyCommission {
+    return _pixCurrencyCommission;
+  }
+
+  Future<void> getPixCurrencyCommissionRate() async {
+    var url = Uri.https(
+      lyoApiUrl,
+      '/payment_gateway/pix-setting/get-commission',
+    );
+
+    try {
+      final response = await http.get(
+        url,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0' || responseData['code'] == '200') {
+        _pixCurrencyCommission =
+            double.parse(responseData['data']['processingFees']);
+        return notifyListeners();
+      } else {
+        _pixCurrencyCommission = 0;
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return notifyListeners();
+    }
+  }
+
+  // Pix Currency Exchange Rate
   double _pixCurrencyExchange = 5.6;
 
   double get pixCurrencyExchange {
@@ -628,5 +665,17 @@ class Payments with ChangeNotifier {
       snackAlert(ctx, SnackTypes.errors, 'Server error, please try again.');
       return notifyListeners();
     }
+  }
+
+  // Select Transaction
+  Map _selectedTransaction = {};
+
+  Map get selectedTransaction {
+    return _selectedTransaction;
+  }
+
+  Future<void> setSelectedTransaction(transaction) async {
+    _selectedTransaction = transaction;
+    return notifyListeners();
   }
 }

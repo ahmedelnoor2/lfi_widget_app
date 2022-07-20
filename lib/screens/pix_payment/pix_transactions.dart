@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:lyotrade/providers/payments.dart';
 import 'package:lyotrade/screens/common/header.dart';
+import 'package:lyotrade/screens/pix_payment/pix_payment_details.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
@@ -90,7 +91,14 @@ class _PixTransactionsState extends State<PixTransactions>
                 itemBuilder: (BuildContext context, int index) {
                   var transaction = allTransactions[index];
                   return ListTile(
-                    title: Text(
+                    onTap: () async {
+                      payments.decryptPixQR(
+                        {"qr_code": transaction['qr_code']},
+                      );
+                      await payments.setSelectedTransaction(transaction);
+                      Navigator.pushNamed(context, PixPaymentDetails.routeName);
+                    },
+                    title: const Text(
                       'BRL',
                       style: TextStyle(
                         fontSize: 18,
@@ -98,7 +106,7 @@ class _PixTransactionsState extends State<PixTransactions>
                       ),
                     ),
                     subtitle: Text(
-                      DateFormat('yyy-mm-dd hh:mm:ss')
+                      DateFormat('dd-MM-y H:mm')
                           .format(DateTime.parse('${transaction['date_end']}')),
                     ),
                     trailing: Column(

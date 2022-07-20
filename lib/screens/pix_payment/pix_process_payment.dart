@@ -172,7 +172,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                             ),
                           ),
                           Text(
-                            'Transfer money to prcess with order',
+                            'Transfer money to process with order',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -581,27 +581,14 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                           ),
                                         ),
                                       )
-                                    : InkWell(
-                                        onTap: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: Container(
-                                          padding: EdgeInsets.all(5),
-                                          child: Text(
-                                            'Go Back',
-                                            style: TextStyle(
-                                              color: linkColor,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
+                                    : Container(),
                               ],
                             ),
                           ),
                         ),
                       ],
                     ),
-                  )
+                  ),
                 ],
               ),
             ],

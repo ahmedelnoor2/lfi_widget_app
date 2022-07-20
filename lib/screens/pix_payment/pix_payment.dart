@@ -51,6 +51,7 @@ class _PixPaymentState extends State<PixPayment>
   bool _loading = false;
   bool _processKyc = false;
   bool _processTransaction = false;
+  String _sendUsdtAmount = '';
   Map _userAddresses = {};
 
   String _transactionType = 'bank_transfer';
@@ -99,11 +100,13 @@ class _PixPaymentState extends State<PixPayment>
   Future<void> getExchangeRate() async {
     setState(() {
       _loading = true;
+      _sendUsdtAmount = '';
     });
     var auth = Provider.of<Auth>(context, listen: false);
 
     var payments = Provider.of<Payments>(context, listen: false);
     await payments.getPixCurrencyExchangeRate({"type": "Dollar"});
+    await payments.getPixCurrencyCommissionRate();
 
     await payments.getKycVerificationDetails({
       'userId': auth.userInfo['id'],
@@ -135,12 +138,22 @@ class _PixPaymentState extends State<PixPayment>
       if (value.isNotEmpty) {
         setState(() {
           _amountUsdtController.text =
-              (double.parse(value) / payments.pixCurrencyExchange)
+              ((double.parse(value) / payments.pixCurrencyExchange) -
+                      ((double.parse(value) / payments.pixCurrencyExchange) *
+                          (double.parse('${payments.pixCurrencyCommission}') /
+                              100)))
+                  .toStringAsFixed(4);
+          _sendUsdtAmount =
+              ((double.parse(value) / payments.pixCurrencyExchange) +
+                      ((double.parse(value) / payments.pixCurrencyExchange) *
+                          (double.parse('${payments.pixCurrencyCommission}') /
+                              100)))
                   .toStringAsFixed(4);
         });
       } else {
         setState(() {
           _amountUsdtController.clear();
+          _sendUsdtAmount = '';
         });
       }
     }
@@ -149,8 +162,13 @@ class _PixPaymentState extends State<PixPayment>
       if (value.isNotEmpty) {
         setState(() {
           _amountBrlController.text =
-              (double.parse(value) * payments.pixCurrencyExchange)
+              ((double.parse(value) * payments.pixCurrencyExchange) +
+                      ((double.parse(value) * payments.pixCurrencyExchange) *
+                          (double.parse('${payments.pixCurrencyCommission}') /
+                              100)))
                   .toStringAsFixed(2);
+          _sendUsdtAmount =
+              '${(double.parse('$value') + (double.parse('$value') * (double.parse('${payments.pixCurrencyCommission}') / 100)))}';
         });
       } else {
         setState(() {
@@ -167,10 +185,12 @@ class _PixPaymentState extends State<PixPayment>
     });
     var auth = Provider.of<Auth>(context, listen: false);
     var payments = Provider.of<Payments>(context, listen: false);
+
     await payments.requestKyc(context, {
       "client_id": '${auth.userInfo['id']}',
       "email": _email,
-      "cpf": _cpf,
+      "cpf":
+          '${_cpf.substring(0, 3)}.${_cpf.substring(3, 6)}.${_cpf.substring(6, 9)}-${_cpf.substring(9, 11)}',
       "name": _name,
     });
 
@@ -184,7 +204,10 @@ class _PixPaymentState extends State<PixPayment>
       showModalBottomSheet<void>(
         useRootNavigator: true,
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(25.0),
+          ),
+        ),
         // isScrollControlled: true,
         context: context,
         builder: (BuildContext context) {
@@ -197,7 +220,7 @@ class _PixPaymentState extends State<PixPayment>
                 child: kycInformation(
                   context,
                   setState,
-                  0.75,
+                  0.9,
                 ),
               );
             },
@@ -568,7 +591,7 @@ class _PixPaymentState extends State<PixPayment>
                                 ),
                                 Container(
                                   child: Text(
-                                    '0 Fee, Real-time payment',
+                                    '${payments.pixCurrencyCommission}% Fee, Real-time payment',
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: secondaryTextColor,
@@ -615,7 +638,7 @@ class _PixPaymentState extends State<PixPayment>
                                     {
                                       "client_id":
                                           payments.pixKycClients['userId'],
-                                      "value": _amountUsdtController.text,
+                                      "value": _sendUsdtAmount,
                                       "client": payments.pixKycClients,
                                       "userAddresses": _userAddresses,
                                     },
@@ -630,8 +653,10 @@ class _PixPaymentState extends State<PixPayment>
                               } else {
                                 showModalBottomSheet<void>(
                                   shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.vertical(
-                                          top: Radius.circular(25.0))),
+                                    borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(25.0),
+                                    ),
+                                  ),
                                   isScrollControlled: true,
                                   context: context,
                                   builder: (BuildContext context) {
@@ -646,7 +671,7 @@ class _PixPaymentState extends State<PixPayment>
                                           child: kycInformation(
                                             context,
                                             setState,
-                                            0.75,
+                                            0.9,
                                           ),
                                         );
                                       },
@@ -657,8 +682,10 @@ class _PixPaymentState extends State<PixPayment>
                             } else {
                               showModalBottomSheet<void>(
                                 shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.vertical(
-                                        top: Radius.circular(25.0))),
+                                  borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(25.0),
+                                  ),
+                                ),
                                 context: context,
                                 isScrollControlled: true,
                                 builder: (BuildContext context) {
@@ -710,9 +737,9 @@ class _PixPaymentState extends State<PixPayment>
       await payments.getKycVerificationDetails({
         'userId': auth.userInfo['id'],
       });
-      if (payments.pixKycClients['activate']) {
-        Navigator.pushNamed(context, '/pix_process_payment');
-      }
+      await payments.getAllPixTransactions(
+        payments.pixKycClients['client_uuid'],
+      );
     }
   }
 
@@ -811,7 +838,7 @@ class _PixPaymentState extends State<PixPayment>
                           Divider(),
                           Container(
                             child: Text(
-                              'The QR code with 5 Dollar deposit is used to verify your CPF account. once Approved, yyou will be redirect to next screen fro transferrring payments for deposit.',
+                              'The QR code with 5 Dollar deposit is used to verify your CPF account. Once Approved, you will be redirect to next screen for transferring payments for deposit.',
                               style: TextStyle(
                                 color: secondaryTextColor,
                                 fontSize: 12,
@@ -1305,10 +1332,31 @@ class _PixPaymentState extends State<PixPayment>
                                 : payments.kycTransaction['status'] ==
                                         'ACCEPTED'
                                     ? TextButton(
-                                        onPressed: () {
+                                        onPressed: () async {
                                           Navigator.pop(context);
-                                          Navigator.pushNamed(
-                                              context, '/pix_process_payment');
+                                          setState(() {
+                                            _processTransaction = true;
+                                          });
+                                          await payments
+                                              .createNewPixTransaction(
+                                            context,
+                                            {
+                                              "client_id": payments
+                                                  .pixKycClients['userId'],
+                                              "value": _sendUsdtAmount,
+                                              "client": payments.pixKycClients,
+                                              "userAddresses": _userAddresses,
+                                            },
+                                            _amountBrlController.text,
+                                          );
+                                          setState(() {
+                                            _processTransaction = false;
+                                          });
+                                          if (payments
+                                              .pixNewTransaction.isNotEmpty) {
+                                            Navigator.pushNamed(context,
+                                                '/pix_process_payment');
+                                          }
                                         },
                                         child: Text('Continue'),
                                       )
