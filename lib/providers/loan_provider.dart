@@ -170,15 +170,15 @@ class LoanProvider with ChangeNotifier {
   String from_network = 'BTC';
   String to_code = 'USDT';
   String to_network = 'ETH';
-  var amount = 1;
+  var amount = '1';
   var exchange = 'direct';
   var ltv_percent = 0.5;
 
   final TextEditingController _textEditingControllereciver =
       TextEditingController();
 
-  var yourloan = 11095.39;
-
+  var reciveramount = '';
+  var senderamount = '';
   Future<void> getloanestimate() async {
     var url = Uri.https(loanApiUrl, loansApiestimate, {
       'from_code': '$from_code',
@@ -195,16 +195,15 @@ class LoanProvider with ChangeNotifier {
         url,
         headers: headers,
       );
-      print(url);
+      
       final responseData = json.decode(response.body);
-      print(responseData);
-
+      
       if (responseData['result']) {
         _loanestimate = responseData['response'];
-        //  amount=responseData['response']['amount_from'];
-        yourloan = responseData['response']['down_limit'];
+        senderamount = responseData['response']['amount_from'];
+        reciveramount  = responseData['response']['amount_to'];
 
-        print(yourloan);
+       
 
         return notifyListeners();
       } else {
@@ -220,6 +219,7 @@ class LoanProvider with ChangeNotifier {
 
 ///////recive email for verify//
   ///
+  bool isemailwidgitconverter = false;
   Future<void> getemail(ctx, email) async {
     var url = Uri.https(
       apiurlemailtoken,
@@ -234,8 +234,10 @@ class LoanProvider with ChangeNotifier {
       final responseData = json.decode(response.body);
 
       if (response.statusCode == 200) {
-        isemailwidgitconverter=
-        snackAlert(ctx, SnackTypes.success, responseData['message'].toString());
+        isemailwidgitconverter = true;
+        
+        snackAlert(
+            ctx, SnackTypes.success, responseData['message'].toString());
 
         return notifyListeners();
       } else {
@@ -252,10 +254,11 @@ class LoanProvider with ChangeNotifier {
 
   ////
 
-  bool isemailwidgitconverter = false;
+  
 
 ////// email verify otp
-  Future<void> getemailverfiyOtp(ctx, email, token) async {
+var sucessotp;
+  Future<void> sendOtp(ctx, email, token) async {
     var url = Uri.https(
       apiurlemailtoken,
       '$getemailverifytoken/verify_otp_email',
@@ -265,21 +268,17 @@ class LoanProvider with ChangeNotifier {
       final response =
           await http.post(url, body: {"email": "$email", "token": "$token"});
 
-      print(response.body);
+  
 
       final responseData = json.decode(response.body);
 
       if (response.statusCode == 200) {
-        
-       isemailwidgitconverter =true;
-
-      
+        sucessotp=response.statusCode;
         snackAlert(ctx, SnackTypes.success, responseData['message'].toString());
 
         return notifyListeners();
       } else {
-       
-        snackAlert(ctx, SnackTypes.warning, 'Some thing went wrong!!');
+        snackAlert(ctx, SnackTypes.warning,responseData['message'].toString());
         return notifyListeners();
       }
     } catch (ctx) {
@@ -314,15 +313,15 @@ class LoanProvider with ChangeNotifier {
     try {
       final response =
           await http.post(url, body: {'parameters': data}, headers: headers1);
-
+     
       final responseData = json.decode(response.body);
+      print(responseData);
 
       if (responseData['result']) {
         result = responseData['result'];
 
         loanid = responseData['response']['loan_id'];
-        print('check loan ...');
-        print(loanid);
+        
 
         _createloan = responseData['response'];
 
@@ -398,8 +397,9 @@ class LoanProvider with ChangeNotifier {
     try {
       final response = await http.post(url, headers: headers, body: body);
       print('checkk...');
-      print(response.body);
+      print(response.statusCode);
       final responseData = json.decode(response.body);
+      print(responseData);
 
       if (responseData['result'] == 200) {
         isconfirm = responseData['result'];

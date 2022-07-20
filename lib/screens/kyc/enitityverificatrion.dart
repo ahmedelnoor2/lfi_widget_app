@@ -67,8 +67,8 @@ class _EnitityVerificationState extends State<EnitityVerification>
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.w500),
                           ),
-                        ),
-                        Card(
+                         ),
+                         Card(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[

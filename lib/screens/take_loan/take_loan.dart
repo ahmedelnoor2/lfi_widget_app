@@ -24,27 +24,17 @@ class TakeLoan extends StatefulWidget {
 
 class _TakeLoanState extends State<TakeLoan> {
   final TextEditingController _textEditingControllesender =
-      TextEditingController(text: '1');
+      TextEditingController();
   final TextEditingController _textEditingControllereciver =
       TextEditingController();
 
-  // final List<Map> _myJson = [
-  //   {"id": '1', "image": "assets/img/currency.png", "name": "Lyo"},
-  //   {"id": '2', "image": "assets/img/currency.png", "name": "USD"},
-  // ];
-
-  // final List<Map> _myJsonlist = [
-  //   {"id": '1', "detail": "Unlimited", "name": "Long Term"},
-  //   {"id": '2', "detail": "140.01 USDT", "name": "Monthly Interest"},
-  //   {"id": '3', "detail": "11627.56 BTC/USDT", "name": "Liquidation Price"},
-  // ];
   List<dynamic> percentageList = [0.5, 0.7, 0.8];
 
   int _itemPosition = 0;
   @override
   void initState() {
     getCurrencies();
-
+    getloanestimate();
     super.initState();
   }
 
@@ -56,7 +46,12 @@ class _TakeLoanState extends State<TakeLoan> {
   Future<void> getloanestimate() async {
     var loanProvider = Provider.of<LoanProvider>(context, listen: false);
 
-    await loanProvider.getloanestimate();
+    await loanProvider.getloanestimate().whenComplete(() {
+      setState(() {
+        _textEditingControllereciver.text = loanProvider.reciveramount;
+        _textEditingControllesender.text=loanProvider.senderamount;
+      });
+    });
   }
 
   formValidation() {
@@ -79,20 +74,15 @@ class _TakeLoanState extends State<TakeLoan> {
     showDialog(
         context: context,
         builder: (c) {
-          return LoadingDialog(
-            message: "Checking"
-          );
+          return LoadingDialog(message: "Checking");
         });
 
     await loanProvider.getCreateLoan().whenComplete(() {
       if (loanProvider.result == true) {
-        loanProvider
-            .getLoanStatus(loanProvider.loanid)
-            .whenComplete(() {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, '/confirm_loan');
-            });
-            
+        loanProvider.getLoanStatus(loanProvider.loanid).whenComplete(() {
+          Navigator.pop(context);
+          Navigator.pushNamed(context, '/confirm_loan');
+        });
       } else {
         showDialog(
             context: context,
@@ -141,7 +131,7 @@ class _TakeLoanState extends State<TakeLoan> {
                 ),
                 IconButton(
                   onPressed: () {
-                    print(loanProvider.yourloan);
+                    
                   },
                   icon: Icon(Icons.history),
                 )
@@ -210,9 +200,16 @@ class _TakeLoanState extends State<TakeLoan> {
                                   keyboardType: TextInputType.number,
                                   controller: _textEditingControllesender,
                                   onChanged: (s) {
-                                    provider.amount = int.parse(s);
-                                    print(provider.amount);
-                                    provider.getloanestimate();
+                                     var direct = 'direct';
+                                    provider.exchange = direct;
+                                    provider.amount = s;
+                                    
+                                    provider.getloanestimate().whenComplete(() {
+                                      setState(() {
+                                        _textEditingControllereciver.text =
+                                            loanProvider.reciveramount;
+                                      });
+                                    });
                                   },
                                   decoration: new InputDecoration(
                                     border: InputBorder.none,
@@ -244,8 +241,7 @@ class _TakeLoanState extends State<TakeLoan> {
                                             .fromSelectedCurrency['code'];
                                         provider.from_network = provider
                                             .fromSelectedCurrency['network'];
-                                        print(provider.from_code);
-                                        print(provider.to_code);
+                                        
                                         provider.getloanestimate();
                                       });
                                     },
@@ -318,17 +314,18 @@ class _TakeLoanState extends State<TakeLoan> {
                                 Expanded(
                                     child: TextFormField(
                                   keyboardType: TextInputType.number,
-                                  //controller: _textEditingControllereciver,
+                                  controller: _textEditingControllereciver,
                                   onChanged: (s) {
                                     var reverse = 'reverse';
                                     provider.exchange = reverse;
-
-                                    provider.amount = provider.yourloan.toInt();
-                                    print(provider.amount);
-                                    provider.getloanestimate();
+                                    provider.amount =s;
+                                    provider.getloanestimate().whenComplete(() {
+                                      setState(() {
+                                       _textEditingControllesender.text=loanProvider.senderamount;
+                                     
+                                      });
+                                    });
                                   },
-                                  initialValue:
-                                      loanProvider.yourloan.toString(),
                                   decoration: new InputDecoration(
                                     border: InputBorder.none,
                                     focusedBorder: InputBorder.none,
@@ -429,7 +426,13 @@ class _TakeLoanState extends State<TakeLoan> {
                                       _itemPosition = i;
                                       loanProvider.ltv_percent =
                                           percentageList[i];
-                                      loanProvider.getloanestimate();
+                                      loanProvider.getloanestimate().whenComplete(() {
+
+                                        setState(() {
+                                          _textEditingControllereciver.text =
+                                            loanProvider.reciveramount;
+                                        });
+                                      });
                                     });
                                   },
                                   child: Container(
