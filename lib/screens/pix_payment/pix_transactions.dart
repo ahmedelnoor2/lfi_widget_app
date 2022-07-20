@@ -106,8 +106,9 @@ class _PixTransactionsState extends State<PixTransactions>
                       ),
                     ),
                     subtitle: Text(
-                      DateFormat('dd-MM-y H:mm')
-                          .format(DateTime.parse('${transaction['date_end']}')),
+                      DateFormat('dd-MM-y H:mm').format(
+                        DateTime.parse('${transaction['date_end']}'),
+                      ),
                     ),
                     trailing: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
