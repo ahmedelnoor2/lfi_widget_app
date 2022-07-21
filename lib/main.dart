@@ -67,7 +67,6 @@ class MyApp extends StatelessWidget {
 
     return MultiProvider(
       providers: [
-       
         ChangeNotifierProvider<Auth>(create: (_) => Auth()),
         ChangeNotifierProvider<Public>(create: (_) => Public()),
         ChangeNotifierProvider<Asset>(create: (_) => Asset()),
@@ -77,16 +76,11 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<Staking>(create: (_) => Staking()),
         ChangeNotifierProvider<LoanProvider>(
           create: (_) => LoanProvider(),
-          
         ),
-       
         ChangeNotifierProvider<Payments>(create: (_) => Payments()),
         ChangeNotifierProvider<DexProvider>(create: (_) => DexProvider()),
-        ChangeNotifierProvider< ReferralProvider>(create: (_) => ReferralProvider()),
-    
-  
-        
-       
+        ChangeNotifierProvider<ReferralProvider>(
+            create: (_) => ReferralProvider()),
       ],
       child: Consumer<Auth>(
         builder: (context, auth, _) {
@@ -270,7 +264,7 @@ class MyApp extends StatelessWidget {
               BuySellTransactions.routeName: (context) =>
                   const BuySellTransactions(),
               DexSwap.routeName: (context) => const DexSwap(),
-              Referal.routeName:(context) =>  Referal(),
+              Referal.routeName: (context) => Referal(),
             },
           );
         },

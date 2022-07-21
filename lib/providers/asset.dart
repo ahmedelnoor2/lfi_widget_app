@@ -17,7 +17,7 @@ class Asset with ChangeNotifier {
   Map _getCost = {};
   Map _changeAddress = {};
   List _digitialAss = [];
-  List _allDigAsset = [];
+  final List _allDigAsset = [];
   List _depositLists = [];
   List _withdrawLists = [];
   List _p2pLists = [];
@@ -28,7 +28,7 @@ class Asset with ChangeNotifier {
   bool _hideBalances = false;
   final String _hideBalanceString = '******';
 
-  List _marginAssets = [];
+  final List _marginAssets = [];
   Map _selectedP2pAssets = {};
   Map _selectedMarginAssets = {};
 
