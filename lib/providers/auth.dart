@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:lyotrade/screens/common/alert.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
+import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/Translate.utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -89,7 +91,7 @@ class Auth with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final String? catchedAuthToken = prefs.getString('authToken');
     authToken = catchedAuthToken ?? '';
-    _isAuthenticated = authToken.isNotEmpty ? true : false;
+    _isAuthenticated = catchedAuthToken!.isNotEmpty ? true : false;
     _loginVerificationToken = authToken;
     headers['exchange-token'] = authToken;
     await getUserInfo();
@@ -128,6 +130,7 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> checkResponseCode(ctx, code) async {
+    print(code);
     if ('$code' == '10002') {
       _loginVerificationToken = '';
       _userInfo = {};
@@ -172,13 +175,23 @@ class Auth with ChangeNotifier {
       '$exApi/user/login_in',
     );
 
-    var postData = json.encode(formData);
+    var postData = json.encode({
+      'csessionid': formData['csessionid'],
+      'mobileNumber': formData['mobileNumber'],
+      'loginPword': formData['loginPword'],
+      'scene': formData['scene'],
+      'sig': formData['sig'],
+      'token': formData['token'],
+      'verificationType': formData['verificationType'],
+    });
+
+    print(postData);
 
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
-
+      print(responseData);
       if (responseData['code'] == 0) {
         if (responseData['data']['googleAuth'] == '1') {
           _googleAuth = true;
@@ -209,9 +222,7 @@ class Auth with ChangeNotifier {
 
     if (_googleAuth) {
       postData = json.encode({
-        'googleCode': formData['emailCode'] != null
-            ? formData['emailCode']
-            : formData['smsCode'],
+        'googleCode': formData['emailCode'],
         'token': formData['token'],
       });
     }
@@ -243,7 +254,17 @@ class Auth with ChangeNotifier {
       '$exApi/user/reg_email_chk_info/',
     );
 
-    var postData = json.encode(formData);
+    var postData = json.encode({
+      'csessionid': formData['csessionid'],
+      'email': formData['email'],
+      'invitedCode': formData['invitedCode'],
+      'loginPword': formData['loginPword'],
+      'newPassword': formData['newPassword'],
+      'scene': formData['scene'],
+      'sig': formData['sig'],
+      'token': formData['token'],
+      'verificationType': formData['verificationType'],
+    });
 
     print(postData);
 
@@ -251,8 +272,6 @@ class Auth with ChangeNotifier {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
-
-      print(responseData);
       if (responseData['code'] == '0') {
         _emailVerificationToken = responseData['data']['token'];
         _loginVerificationToken = _emailVerificationToken;
@@ -275,7 +294,18 @@ class Auth with ChangeNotifier {
       '$exApi/user/reg_mobile_chk_info',
     );
 
-    var postData = json.encode(formData);
+    var postData = json.encode({
+      'csessionid': formData['csessionid'],
+      'countryCode': formData['countryCode'],
+      'mobileNumber': formData['mobileNumber'],
+      'invitedCode': formData['invitedCode'],
+      'loginPword': formData['loginPword'],
+      'newPassword': formData['newPassword'],
+      'scene': formData['scene'],
+      'sig': formData['sig'],
+      'token': formData['token'],
+      'verificationType': formData['verificationType'],
+    });
 
     print(postData);
 
@@ -295,6 +325,59 @@ class Auth with ChangeNotifier {
       return '';
     } catch (error) {
       print(error);
+      return '';
+      // throw error;
+    }
+  }
+
+  Future<String> sendStakeMobileValidCode(ctx, formData) async {
+    var url = Uri.https(
+      serviceApi,
+      '$exApi/common/smsValidCode',
+    );
+
+    var postData = json.encode(formData);
+
+    print(postData);
+
+    try {
+      final response = await http.post(url, body: postData, headers: headers);
+
+      final responseData = json.decode(response.body);
+
+      print(responseData);
+
+      if (responseData['code'] == '0') {
+        showAlert(
+          ctx,
+          Icon(
+            Icons.check,
+            color: successColor,
+          ),
+          'SMS Sent',
+          [
+            Text('Verification code sent to your mobile.'),
+          ],
+          'Ok',
+        );
+      } else {
+        showAlert(
+          ctx,
+          Icon(
+            Icons.error,
+            color: errorColor,
+          ),
+          'SMS Error',
+          [
+            Text(getTranslate(responseData['msg'])),
+          ],
+          'Ok',
+        );
+      }
+
+      return '';
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server Error!');
       return '';
       // throw error;
     }
@@ -339,8 +422,6 @@ class Auth with ChangeNotifier {
     );
 
     var postData = json.encode(formData);
-
-    print(postData);
 
     try {
       final response = await http.post(url, body: postData, headers: headers);

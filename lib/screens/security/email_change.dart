@@ -19,6 +19,7 @@ class EmailChange extends StatefulWidget {
 class _EmailChangeState extends State<EmailChange> {
   final _formKey = GlobalKey<FormState>();
   final _formFieldKey = GlobalKey<FormFieldState>();
+  final TextEditingController _emailAddress = TextEditingController();
   final TextEditingController _emailVerification = TextEditingController();
   final TextEditingController _newEmailAddress = TextEditingController();
   final TextEditingController _newEmailVerification = TextEditingController();
@@ -193,8 +194,10 @@ class _EmailChangeState extends State<EmailChange> {
                       padding: const EdgeInsets.only(right: 5),
                       child: const Icon(Icons.email),
                     ),
-                    const Text(
-                      'Modify e-mail',
+                    Text(
+                      auth.userInfo['email'].isEmpty
+                          ? 'Connect e-mail'
+                          : 'Modify e-mail',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
@@ -202,12 +205,14 @@ class _EmailChangeState extends State<EmailChange> {
                   ],
                 ),
               ),
-              Text(
-                'It is forbidden to withdraw coins within 48 hours after modifying the email.',
-                style: TextStyle(
-                  color: orangeBGColor,
-                ),
-              ),
+              auth.userInfo['email'].isEmpty
+                  ? Container()
+                  : Text(
+                      'It is forbidden to withdraw coins within 48 hours after modifying the email.',
+                      style: TextStyle(
+                        color: orangeBGColor,
+                      ),
+                    ),
               Container(
                 padding: const EdgeInsets.only(
                   top: 20,
@@ -215,6 +220,21 @@ class _EmailChangeState extends State<EmailChange> {
                 ),
                 child: Column(
                   children: [
+                    auth.userInfo['email'].isEmpty
+                        ? TextFormField(
+                            key: _formFieldKey,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter email address';
+                              }
+                              return null;
+                            },
+                            decoration: const InputDecoration(
+                              labelText: 'E-mail address',
+                            ),
+                            controller: _emailAddress,
+                          )
+                        : Container(),
                     TextFormField(
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -239,84 +259,92 @@ class _EmailChangeState extends State<EmailChange> {
                           )),
                       controller: _emailVerification,
                     ),
-                    TextFormField(
-                      key: _formFieldKey,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter new email address';
-                        }
-                        return null;
-                      },
-                      decoration: const InputDecoration(
-                        labelText: 'New e-mail address',
-                      ),
-                      controller: _newEmailAddress,
-                    ),
-                    TextFormField(
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter new email verification code';
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                          labelText: 'New e-mail verification code',
-                          suffix: TextButton(
-                            onPressed: _startTimerNew
-                                ? null
-                                : () {
-                                    if (_formFieldKey.currentState!
-                                        .validate()) {
-                                      setState(() {
-                                        _startNew = 90;
-                                      });
-                                      startTimer('new-email');
-                                    }
-                                  },
-                            child: Text(_startTimerNew
-                                ? '${_startNew}s Get it again'
-                                : 'Click to send'),
-                          )),
-                      controller: _newEmailVerification,
-                    ),
-                    TextFormField(
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter email verification code';
-                        }
-                        return null;
-                      },
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        labelText: auth.googleAuth
-                            ? 'Google verification code'
-                            : 'SMS verification code',
-                        suffix: auth.googleAuth
-                            ? TextButton(
-                                onPressed: () async {
-                                  ClipboardData? data = await Clipboard.getData(
-                                    Clipboard.kTextPlain,
-                                  );
-                                  _securityVerification.text = '${data!.text}';
-                                },
-                                child: const Icon(Icons.paste),
-                              )
-                            : TextButton(
-                                onPressed: _startTimerSecur
-                                    ? null
-                                    : () {
-                                        setState(() {
-                                          _startSecur = 90;
-                                        });
-                                        startTimer('security');
+                    auth.userInfo['email'].isEmpty
+                        ? Container()
+                        : TextFormField(
+                            key: _formFieldKey,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter new email address';
+                              }
+                              return null;
+                            },
+                            decoration: const InputDecoration(
+                              labelText: 'New e-mail address',
+                            ),
+                            controller: _newEmailAddress,
+                          ),
+                    auth.userInfo['email'].isEmpty
+                        ? Container()
+                        : TextFormField(
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter new email verification code';
+                              }
+                              return null;
+                            },
+                            decoration: InputDecoration(
+                                labelText: 'New e-mail verification code',
+                                suffix: TextButton(
+                                  onPressed: _startTimerNew
+                                      ? null
+                                      : () {
+                                          if (_formFieldKey.currentState!
+                                              .validate()) {
+                                            setState(() {
+                                              _startNew = 90;
+                                            });
+                                            startTimer('new-email');
+                                          }
+                                        },
+                                  child: Text(_startTimerNew
+                                      ? '${_startNew}s Get it again'
+                                      : 'Click to send'),
+                                )),
+                            controller: _newEmailVerification,
+                          ),
+                    auth.userInfo['email'].isEmpty
+                        ? Container()
+                        : TextFormField(
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter email verification code';
+                              }
+                              return null;
+                            },
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              labelText: auth.googleAuth
+                                  ? 'Google verification code'
+                                  : 'SMS verification code',
+                              suffix: auth.googleAuth
+                                  ? TextButton(
+                                      onPressed: () async {
+                                        ClipboardData? data =
+                                            await Clipboard.getData(
+                                          Clipboard.kTextPlain,
+                                        );
+                                        _securityVerification.text =
+                                            '${data!.text}';
                                       },
-                                child: Text(_startTimerSecur
-                                    ? '${_startSecur}s Get it again'
-                                    : 'Click to send'),
-                              ),
-                      ),
-                      controller: _securityVerification,
-                    ),
+                                      child: const Icon(Icons.paste),
+                                    )
+                                  : TextButton(
+                                      onPressed: _startTimerSecur
+                                          ? null
+                                          : () {
+                                              setState(() {
+                                                _startSecur = 90;
+                                              });
+                                              startTimer('security');
+                                            },
+                                      child: Text(_startTimerSecur
+                                          ? '${_startSecur}s Get it again'
+                                          : 'Click to send'),
+                                    ),
+                            ),
+                            controller: _securityVerification,
+                          ),
                   ],
                 ),
               ),

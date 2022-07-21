@@ -151,7 +151,9 @@ class _SecurityState extends State<Security> {
                     Navigator.pushNamed(context, '/email_change');
                   }
                 },
-                child: const Text('Change'),
+                child: Text(
+                  auth.userInfo['email'].isEmpty ? 'Connect' : 'Change',
+                ),
               ),
             ),
             const Divider(),
@@ -166,6 +168,8 @@ class _SecurityState extends State<Security> {
                 onPressed: () {
                   if (auth.userInfo['mobileNumber'].isEmpty) {
                     Navigator.pushNamed(context, '/phone_number');
+                  } else {
+                    snackAlert(context, SnackTypes.warning, 'Coming Soon...');
                   }
                 },
                 child: Text(
