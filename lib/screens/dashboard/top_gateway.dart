@@ -37,6 +37,7 @@ class _TopGatewayState extends State<TopGateway>
   Widget build(BuildContext context) {
     var auth = Provider.of<Auth>(context, listen: true);
     var payments = Provider.of<Payments>(context, listen: true);
+    // print(auth.userInfo);
 
     return InkWell(
       onTap: () {

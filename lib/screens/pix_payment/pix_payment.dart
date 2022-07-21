@@ -797,7 +797,7 @@ class _PixPaymentState extends State<PixPayment>
       },
       child: Container(
         padding: EdgeInsets.only(right: 10, left: 10),
-        height: height * heightCal,
+        height: height * 0.9,
         child: Form(
           key: _formAdditinalInformationKey,
           child: Column(

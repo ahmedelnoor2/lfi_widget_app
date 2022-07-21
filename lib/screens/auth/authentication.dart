@@ -196,6 +196,8 @@ class _AuthenticationState extends State<Authentication> {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
 
+    print('test');
+
     return WillPopScope(
       onWillPop: () {
         return onAndroidBackPress(context);
