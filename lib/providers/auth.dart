@@ -227,6 +227,8 @@ class Auth with ChangeNotifier {
       });
     }
 
+    print(postData);
+
     try {
       final response = await http.post(url, body: postData, headers: headers);
 

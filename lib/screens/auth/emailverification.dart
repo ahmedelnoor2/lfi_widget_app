@@ -104,7 +104,13 @@ class _EmailVerificationState extends State<EmailVerification> {
     var auth = Provider.of<Auth>(context, listen: false);
 
     if (widget.operationType == '4' || widget.operationType == '25') {
-      if (widget.isMobile) {
+      if (auth.googleAuth) {
+        String emailVeri = await auth.confirmLoginCode(context, {
+          'emailCode': _emailVeirficationCode.text,
+          'token': widget.token,
+        });
+        return emailVeri;
+      } else if (widget.isMobile) {
         String mobileVeri = await auth.confirmLoginCode(context, {
           'smsCode': _emailVeirficationCode.text,
           'token': widget.token,
@@ -115,16 +121,20 @@ class _EmailVerificationState extends State<EmailVerification> {
           'emailCode': _emailVeirficationCode.text,
           'token': widget.token,
         });
-        print(emailVeri);
         return emailVeri;
       }
     } else {
-      if (widget.emailVerification) {
+      if (auth.googleAuth) {
+        String emailVeri = await auth.confirmLoginCode(context, {
+          'emailCode': _emailVeirficationCode.text,
+          'token': widget.token,
+        });
+        return emailVeri;
+      } else if (widget.emailVerification) {
         String emailVeri = await auth.confirmEmailCode(context, {
           'emailCode': _emailVeirficationCode.text,
           'token': widget.token,
         });
-        print(emailVeri);
         return emailVeri;
       } else {
         String mobileVeri = await auth.confirmMobileVerification(context, {
