@@ -138,7 +138,9 @@ class _EmailChangeState extends State<EmailChange> {
     } else if (type == 'new-email') {
       await auth.sendEmailValidCode(context, {
         "token": "",
-        "email": _newEmailAddress.text,
+        "email": _emailAddress.text.isNotEmpty
+            ? _emailAddress.text
+            : _newEmailAddress.text,
         "operationType": 2,
       });
     } else if (type == 'security') {
