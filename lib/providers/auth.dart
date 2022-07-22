@@ -580,4 +580,34 @@ class Auth with ChangeNotifier {
       // throw error;
     }
   }
+
+  // bind new email
+  Future<void> bindNewEmail(ctx, formData) async {
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/user/email_bind_save_v4',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(url, body: postData, headers: headers);
+
+      final responseData = json.decode(response.body);
+      if (responseData['code'] == '0') {
+        snackAlert(ctx, SnackTypes.success, 'Email is successfully added.');
+        Navigator.pop(ctx);
+        return;
+      } else {
+        print('Code: ${responseData['code']}');
+        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+      }
+
+      return responseData['code'];
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server Error!');
+      return;
+      // throw error;
+    }
+  }
 }

@@ -724,13 +724,22 @@ class _AllStakeState extends State<AllStake> {
                                   onChanged: (value) {
                                     double.parse('${stake['gainRate']}');
                                     setState(() {
-                                      _prospectiveEarnings = (((((720 / 360) *
-                                                          double.parse(
-                                                              '${stake['gainRate']}')) /
-                                                      100) *
-                                                  double.parse(value)) +
-                                              double.parse(value))
-                                          .toStringAsFixed(4);
+                                      if (value.isNotEmpty) {
+                                        setState(() {
+                                          _prospectiveEarnings = (((((720 /
+                                                                  360) *
+                                                              double.parse(
+                                                                  '${stake['gainRate']}')) /
+                                                          100) *
+                                                      double.parse(value)) +
+                                                  double.parse(value))
+                                              .toStringAsFixed(4);
+                                        });
+                                      } else {
+                                        setState(() {
+                                          _prospectiveEarnings = "0";
+                                        });
+                                      }
                                     });
                                   },
                                   validator: (value) {

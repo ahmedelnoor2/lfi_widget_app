@@ -170,6 +170,23 @@ class _EmailChangeState extends State<EmailChange> {
     });
   }
 
+  Future<void> bindNewEmail() async {
+    setState(() {
+      _processing = true;
+    });
+    var auth = Provider.of<Auth>(context, listen: false);
+    await auth.bindNewEmail(context, {
+      'email': _emailAddress.text,
+      'emailValidCode': _emailVerification.text,
+      'googleCode': "",
+      'smsValidCode': ""
+    });
+    await auth.getUserInfo();
+    setState(() {
+      _processing = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
@@ -251,7 +268,11 @@ class _EmailChangeState extends State<EmailChange> {
                                     setState(() {
                                       _start = 90;
                                     });
-                                    startTimer('email');
+                                    if (auth.userInfo['email'].isEmpty) {
+                                      startTimer('new-email');
+                                    } else {
+                                      startTimer('email');
+                                    }
                                   },
                             child: Text(_startTimer
                                 ? '${_start}s Get it again'
@@ -356,9 +377,11 @@ class _EmailChangeState extends State<EmailChange> {
                       ? null
                       : () {
                           if (_formKey.currentState!.validate()) {
-                            // If the form is valid, display a snackbar. In the real world,
-                            // you'd often call a server or save the information in a database.
-                            emailUpdate();
+                            if (auth.userInfo['email'].isEmpty) {
+                              bindNewEmail();
+                            } else {
+                              emailUpdate();
+                            }
                           }
                         },
                   child: const Text('Connect'),

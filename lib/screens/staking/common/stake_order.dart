@@ -47,30 +47,6 @@ class _StakeOrderState extends State<StakeOrder> {
     super.dispose();
   }
 
-  void startTimer() {
-    setState(() {
-      _startTimerSecur = true;
-    });
-
-    sendVerificationCode();
-    const oneSecSecur = Duration(seconds: 1);
-    _timerSecur = Timer.periodic(
-      oneSecSecur,
-      (Timer timer) {
-        if (_startSecur == 0) {
-          setState(() {
-            _startTimerSecur = false;
-          });
-          _timerSecur!.cancel();
-        } else {
-          setState(() {
-            _startSecur--;
-          });
-        }
-      },
-    );
-  }
-
   Future<void> sendVerificationCode() async {
     var auth = Provider.of<Auth>(context, listen: false);
 
@@ -421,6 +397,30 @@ class _StakeOrderState extends State<StakeOrder> {
   }
 
   Widget _verifyAuth(context, stakeOrderData, setState) {
+    void startTimer() {
+      setState(() {
+        _startTimerSecur = true;
+      });
+
+      sendVerificationCode();
+      const oneSecSecur = Duration(seconds: 1);
+      _timerSecur = Timer.periodic(
+        oneSecSecur,
+        (Timer timer) {
+          if (_startSecur == 0) {
+            setState(() {
+              _startTimerSecur = false;
+            });
+            _timerSecur!.cancel();
+          } else {
+            setState(() {
+              _startSecur--;
+            });
+          }
+        },
+      );
+    }
+
     return Container(
       padding: EdgeInsets.all(10),
       height: height * 0.5,
