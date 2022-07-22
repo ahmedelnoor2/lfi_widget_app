@@ -231,26 +231,29 @@ class _Login extends State<Login> {
                     captchaController: _captchaController,
                   )
             : Container(),
-        LyoButton(
-          text: 'Login',
-          active: (_enableLogin || kIsWeb),
-          isLoading: false,
-          activeColor: linkColor,
-          activeTextColor: Colors.black,
-          onPressed: () {
-            if (_formLoginKey.currentState!.validate()) {
-              // If the form is valid, display a snackbar. In the real world,
-              // you'd often call a server or save the information in a database.
-              snackAlert(context, SnackTypes.warning, 'Processing...');
-              setState(() {
-                _enableLogin = false;
-              });
-              getCaptchaData();
-            } else {
-              _captchaController.refresh({});
-              _captchaController.reset();
-            }
-          },
+        Container(
+          padding: EdgeInsets.only(top: 20),
+          child: LyoButton(
+            text: 'Login',
+            active: (_enableLogin || kIsWeb),
+            isLoading: false,
+            activeColor: linkColor,
+            activeTextColor: Colors.black,
+            onPressed: () {
+              if (_formLoginKey.currentState!.validate()) {
+                // If the form is valid, display a snackbar. In the real world,
+                // you'd often call a server or save the information in a database.
+                snackAlert(context, SnackTypes.warning, 'Processing...');
+                setState(() {
+                  _enableLogin = false;
+                });
+                getCaptchaData();
+              } else {
+                _captchaController.refresh({});
+                _captchaController.reset();
+              }
+            },
+          ),
         ),
         Container(
           padding: const EdgeInsets.only(top: 10),

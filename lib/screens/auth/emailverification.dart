@@ -302,7 +302,7 @@ class _EmailVerificationState extends State<EmailVerification> {
             //   ],
             // ),
             Container(
-              padding: EdgeInsets.only(top: 10),
+              padding: EdgeInsets.only(top: 20),
               child: LyoButton(
                 text: 'Verify',
                 active: true,

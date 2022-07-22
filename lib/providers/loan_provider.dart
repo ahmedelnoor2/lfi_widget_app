@@ -160,9 +160,9 @@ class LoanProvider with ChangeNotifier {
 
 ////Loan estimates api//
   ///
-  var _loanestimate;
+  Map _loanestimate = {};
 
-  get loanestimate {
+  Map get loanestimate {
     return _loanestimate;
   }
 
@@ -195,19 +195,16 @@ class LoanProvider with ChangeNotifier {
         url,
         headers: headers,
       );
-      
+
       final responseData = json.decode(response.body);
-      
+
       if (responseData['result']) {
         _loanestimate = responseData['response'];
         senderamount = responseData['response']['amount_from'];
-        reciveramount  = responseData['response']['amount_to'];
-
-       
-
+        reciveramount = responseData['response']['amount_to'];
         return notifyListeners();
       } else {
-        _loanestimate = [];
+        _loanestimate = {};
         return notifyListeners();
       }
     } catch (error) {
@@ -235,9 +232,8 @@ class LoanProvider with ChangeNotifier {
 
       if (response.statusCode == 200) {
         isemailwidgitconverter = true;
-        
-        snackAlert(
-            ctx, SnackTypes.success, responseData['message'].toString());
+
+        snackAlert(ctx, SnackTypes.success, responseData['message'].toString());
 
         return notifyListeners();
       } else {
@@ -254,10 +250,8 @@ class LoanProvider with ChangeNotifier {
 
   ////
 
-  
-
 ////// email verify otp
-var sucessotp;
+  var sucessotp;
   Future<void> sendOtp(ctx, email, token) async {
     var url = Uri.https(
       apiurlemailtoken,
@@ -268,17 +262,15 @@ var sucessotp;
       final response =
           await http.post(url, body: {"email": "$email", "token": "$token"});
 
-  
-
       final responseData = json.decode(response.body);
 
       if (response.statusCode == 200) {
-        sucessotp=response.statusCode;
+        sucessotp = response.statusCode;
         snackAlert(ctx, SnackTypes.success, responseData['message'].toString());
 
         return notifyListeners();
       } else {
-        snackAlert(ctx, SnackTypes.warning,responseData['message'].toString());
+        snackAlert(ctx, SnackTypes.warning, responseData['message'].toString());
         return notifyListeners();
       }
     } catch (ctx) {
@@ -313,21 +305,19 @@ var sucessotp;
     try {
       final response =
           await http.post(url, body: {'parameters': data}, headers: headers1);
-     
+
       final responseData = json.decode(response.body);
-      print(responseData);
 
       if (responseData['result']) {
         result = responseData['result'];
 
         loanid = responseData['response']['loan_id'];
-        
 
         _createloan = responseData['response'];
 
         return notifyListeners();
       } else {
-        _loanestimate = [];
+        _loanestimate = {};
         return notifyListeners();
       }
     } on BuildContext catch (mycontext, ctx) {

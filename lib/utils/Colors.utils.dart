@@ -46,7 +46,7 @@ var whiteTextColor = Colors.white;
 var whitebgColor = Colors.white;
 var blackTextColor = Colors.black;
 var secondaryTextColor = Color(0xffBABABA);
-var natuaraldark=Color(0xff747584);
+var natuaraldark = Color(0xff747584);
 
 var secondaryTextColor400 = Color(0xff5E6292);
 
@@ -89,11 +89,9 @@ var darkgreyColor = Color(0xFF6d6d6d); //
 // Icon Colors
 var orangeBGColor = Color(0xFFFF9000);
 
-
 //button colour
 
-var buttoncolour=Color(0xFF5E6292);
-var selectboxcolour=Color(0xFF292C51);
-var seconadarytextcolour=Color(0xFF5E6292);
-var selecteditembordercolour=Color(0XFF01FEF5);
-
+var buttoncolour = Color(0xFF5E6292);
+var selectboxcolour = Color(0xFF25284A);
+var seconadarytextcolour = Color(0xFF5E6292);
+var selecteditembordercolour = Color(0XFF01FEF5);
