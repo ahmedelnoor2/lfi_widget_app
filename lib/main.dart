@@ -26,6 +26,7 @@ import 'package:lyotrade/screens/buy_sell/buy_sell_crypto.dart';
 import 'package:lyotrade/screens/buy_sell/buy_sell_transactions.dart';
 import 'package:lyotrade/screens/buy_sell/common/process_payment.dart';
 import 'package:lyotrade/screens/dashboard.dart';
+import 'package:lyotrade/screens/dashboard/market_search.dart';
 import 'package:lyotrade/screens/dex_swap/dex_swap.dart';
 import 'package:lyotrade/screens/future_trade/future_trade.dart';
 import 'package:lyotrade/screens/market/market.dart';
@@ -255,6 +256,7 @@ class MyApp extends StatelessWidget {
               PixTransactions.routeName: (context) => const PixTransactions(),
               PixPaymentDetails.routeName: (context) =>
                   const PixPaymentDetails(),
+              MarketSearch.routeName: (context) => const MarketSearch(),
             },
           );
         },

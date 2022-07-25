@@ -4,6 +4,7 @@ import 'package:archive/archive.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/providers/user.dart';
 import 'package:lyotrade/screens/common/bottomnav.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/providers/auth.dart';
@@ -241,7 +242,7 @@ class _DashboardState extends State<Dashboard> {
                   ),
                   BuyCrypto(channel: _channel),
                   LatestListing(),
-                  // TopGateway(),
+                  TopGateway(),
                   Hotlinks(channel: _channel),
                   AssetsInfo(
                     headerSymbols: public.headerSymbols,

@@ -227,8 +227,6 @@ class Auth with ChangeNotifier {
       });
     }
 
-    print(postData);
-
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
@@ -237,7 +235,7 @@ class Auth with ChangeNotifier {
       if (responseData['code'] == 0) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('authToken', _loginVerificationToken);
-        snackAlert(ctx, SnackTypes.success, 'Email is successfully verified.');
+        snackAlert(ctx, SnackTypes.success, 'Login Success');
       } else {
         snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
