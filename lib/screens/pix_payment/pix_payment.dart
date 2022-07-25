@@ -1095,7 +1095,7 @@ class _PixPaymentState extends State<PixPayment>
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Name'),
+                              Text('Full Name'),
                             ],
                           ),
                         ),
