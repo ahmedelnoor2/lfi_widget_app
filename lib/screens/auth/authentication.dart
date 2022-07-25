@@ -95,7 +95,6 @@ class _AuthenticationState extends State<Authentication> {
           'invitedCode': value['invitedCode'],
           'loginPword': value['loginPword'],
           'newPassword': value['newPassword'],
-          'scene': 'other',
           'token': true,
           'verificationType': '0',
         };
@@ -109,7 +108,6 @@ class _AuthenticationState extends State<Authentication> {
         _isMobile = false;
         _emailVerification = false;
         _countryCode = value['countryCode'];
-        _emailVerification = false;
       });
 
       Map _formParams = {};
@@ -139,7 +137,6 @@ class _AuthenticationState extends State<Authentication> {
           'invitedCode': value['invitedCode'],
           'loginPword': value['loginPword'],
           'newPassword': value['newPassword'],
-          'scene': 'other',
           'token': true,
           'verificationType': '0',
         };

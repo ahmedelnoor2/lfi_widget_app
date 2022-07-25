@@ -1,6 +1,5 @@
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lyotrade/providers/auth.dart';
@@ -77,17 +76,16 @@ class _SearchBarState extends State<SearchBar>
         children: [
           Row(
             children: [
-              Container(
-                padding: EdgeInsets.only(left: 10),
-                child: GestureDetector(
-                  onTap: () {
-                    // Navigator.pushNamed(context, '/authentication');
-                    if (_currentRoute == '/' || _currentRoute == '/dashboard') {
-                      widget.handleDrawer();
-                    } else {
-                      Navigator.pop(context);
-                    }
-                  },
+              InkWell(
+                onTap: () {
+                  if (_currentRoute == '/' || _currentRoute == '/dashboard') {
+                    widget.handleDrawer();
+                  } else {
+                    Navigator.pop(context);
+                  }
+                },
+                child: Container(
+                  padding: EdgeInsets.only(left: 10, right: 15),
                   child: CircleAvatar(
                     child: Image.asset('assets/img/user.png'),
                     radius: 12,
@@ -97,34 +95,30 @@ class _SearchBarState extends State<SearchBar>
               InkWell(
                 onTap: () {
                   Navigator.pushNamed(context, '/market_search');
-                  // snackAlert(context, SnackTypes.warning, 'Coming Soon...');
                 },
-                child: Container(
-                  padding: EdgeInsets.only(left: 15),
-                  child: SizedBox(
-                    width: width * 0.63,
-                    child: Container(
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Color(0xff292C51),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.only(right: 10),
-                            child: Image.asset('assets/img/search.png'),
+                child: SizedBox(
+                  width: width * 0.63,
+                  child: Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Color(0xff292C51),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.only(right: 10),
+                          child: Image.asset('assets/img/search.png'),
+                        ),
+                        Text(
+                          'Search LYO',
+                          style: TextStyle(
+                            color: secondaryTextColor,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
                           ),
-                          Text(
-                            'Search LYO',
-                            style: TextStyle(
-                              color: secondaryTextColor,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

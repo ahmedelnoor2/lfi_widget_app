@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:archive/archive.dart';
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/public.dart';
@@ -145,27 +144,38 @@ class _MarketSearchState extends State<MarketSearch>
                   color: Color(0xff5E6292),
                 ),
               ),
-              child: TextField(
-                onChanged: (value) async {
-                  // await asset.filterSearchResults(value);
-                  await public.filterMarketSearchResults(
-                    value,
-                    public.allMarkets[_currentMarketSort],
-                    _currentMarketSort,
-                  );
-                },
-                controller: _searchController,
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.zero,
-                  isDense: true,
-                  border: UnderlineInputBorder(
-                    borderSide: BorderSide.none,
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(right: 8),
+                    child: Icon(Icons.search),
                   ),
-                  hintStyle: TextStyle(
-                    fontSize: 14,
+                  SizedBox(
+                    width: width * 0.75,
+                    child: TextField(
+                      onChanged: (value) async {
+                        // await asset.filterSearchResults(value);
+                        await public.filterMarketSearchResults(
+                          value,
+                          public.allMarkets[_currentMarketSort],
+                          _currentMarketSort,
+                        );
+                      },
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.zero,
+                        isDense: true,
+                        border: UnderlineInputBorder(
+                          borderSide: BorderSide.none,
+                        ),
+                        hintStyle: TextStyle(
+                          fontSize: 14,
+                        ),
+                        hintText: "Search",
+                      ),
+                    ),
                   ),
-                  hintText: "Search",
-                ),
+                ],
               ),
             ),
           ),
@@ -188,9 +198,13 @@ class _MarketSearchState extends State<MarketSearch>
                   ),
                 )
               : Container(),
-          SizedBox(
+          Container(
+            padding: EdgeInsets.only(top: 10),
             height: height * 0.74,
-            child: ListView.builder(
+            child: ListView.separated(
+              separatorBuilder: (context, index) {
+                return Divider();
+              },
               shrinkWrap: true,
               itemCount: public.allSearchMarket[_currentMarketSort].isNotEmpty
                   ? public.allSearchMarket[_currentMarketSort].length
@@ -276,7 +290,7 @@ class _MarketSearchState extends State<MarketSearch>
                       Text(
                         '${public.activeMarketAllTicks[_market['symbol']] != null ? public.activeMarketAllTicks[_market['symbol']]['close'] : '--'}',
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: public.activeMarketAllTicks[
                                       _market['symbol']] !=
@@ -305,7 +319,7 @@ class _MarketSearchState extends State<MarketSearch>
                                       ? greenlightchartColor
                                       : errorColor
                                   : secondaryTextColor,
-                          fontSize: 12,
+                          fontSize: 14,
                         ),
                       ),
                     ],

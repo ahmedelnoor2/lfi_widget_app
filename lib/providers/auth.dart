@@ -254,19 +254,7 @@ class Auth with ChangeNotifier {
       '$exApi/user/reg_email_chk_info/',
     );
 
-    var postData = json.encode({
-      'csessionid': formData['csessionid'],
-      'email': formData['email'],
-      'invitedCode': formData['invitedCode'],
-      'loginPword': formData['loginPword'],
-      'newPassword': formData['newPassword'],
-      'scene': formData['scene'],
-      'sig': formData['sig'],
-      'token': formData['token'],
-      'verificationType': formData['verificationType'],
-    });
-
-    print(postData);
+    var postData = json.encode(formData);
 
     try {
       final response = await http.post(url, body: postData, headers: headers);
@@ -294,26 +282,12 @@ class Auth with ChangeNotifier {
       '$exApi/user/reg_mobile_chk_info',
     );
 
-    var postData = json.encode({
-      'csessionid': formData['csessionid'],
-      'countryCode': formData['countryCode'],
-      'mobileNumber': formData['mobileNumber'],
-      'invitedCode': formData['invitedCode'],
-      'loginPword': formData['loginPword'],
-      'newPassword': formData['newPassword'],
-      'scene': formData['scene'],
-      'sig': formData['sig'],
-      'token': formData['token'],
-      'verificationType': formData['verificationType'],
-    });
-
-    print(postData);
+    var postData = json.encode(formData);
 
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
-      print(responseData);
       if (responseData['code'] == '0') {
         _emailVerificationToken = responseData['data']['token'];
         _loginVerificationToken = _emailVerificationToken;

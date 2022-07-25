@@ -101,7 +101,6 @@ class _ExchangeNowState extends State<ExchangeNow> {
   }
 
   Future<void> changeCoinType(netwrk) async {
-    print(netwrk);
     setState(() {
       _loadingAddress = true;
     });
@@ -183,6 +182,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
 
   @override
   Widget build(BuildContext context) {
+    width = MediaQuery.of(context).size.width;
     var dexProvider = Provider.of<DexProvider>(context, listen: true);
 
     return dexProvider.processPayment.isNotEmpty
@@ -194,6 +194,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                 Container(
                   padding: EdgeInsets.only(top: 20),
                   child: Container(
+                    width: width,
                     padding: EdgeInsets.only(
                         top: 15, bottom: 15, right: 15, left: 15),
                     decoration: BoxDecoration(

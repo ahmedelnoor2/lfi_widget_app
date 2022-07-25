@@ -45,6 +45,7 @@ class _DashboardState extends State<Dashboard> {
   @override
   void initState() {
     // checkScreenSize();
+    getBanners();
     checkSocket();
     getPublicInfo();
     getAssetsRate();
@@ -58,6 +59,11 @@ class _DashboardState extends State<Dashboard> {
       _channel.sink.close();
     }
     super.dispose();
+  }
+
+  Future<void> getBanners() async {
+    var public = Provider.of<Public>(context, listen: false);
+    await public.getBanners();
   }
 
   Future<void> checkSocket() async {
@@ -242,7 +248,7 @@ class _DashboardState extends State<Dashboard> {
                   ),
                   BuyCrypto(channel: _channel),
                   LatestListing(),
-                  TopGateway(),
+                  // TopGateway(),
                   Hotlinks(channel: _channel),
                   AssetsInfo(
                     headerSymbols: public.headerSymbols,

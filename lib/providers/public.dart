@@ -542,4 +542,36 @@ class Public with ChangeNotifier {
         .map((e) => e["symbol"] as String)
         .toList();
   }
+
+  // Banners
+  List _banners = [];
+
+  List get banners {
+    return _banners;
+  }
+
+  Future<void> getBanners() async {
+    var url = Uri.https(
+      lyoApiUrl,
+      'admin/public/get_banner',
+    );
+
+    try {
+      final response = await http.get(url, headers: headers);
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == "0") {
+        _banners = responseData['data'];
+        return notifyListeners();
+      } else {
+        _banners = [];
+        return notifyListeners();
+      }
+    } catch (error) {
+      // throw error;
+      print(error);
+      return;
+    }
+  }
 }
