@@ -42,7 +42,15 @@ class _CarousalState extends State<Carousal> {
 
   void _launchUrl(_url) async {
     final Uri url = Uri.parse(_url);
-    if (!await launchUrl(url)) {
+    try {
+      if (!await launchUrl(url)) {
+        if (_url == '/crypto_loan') {
+          snackAlert(context, SnackTypes.warning, 'Coming Soon...');
+        } else {
+          Navigator.pushNamed(context, _url);
+        }
+      }
+    } catch (e) {
       if (_url == '/crypto_loan') {
         snackAlert(context, SnackTypes.warning, 'Coming Soon...');
       } else {
