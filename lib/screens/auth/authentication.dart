@@ -23,6 +23,7 @@ class Authentication extends StatefulWidget {
 }
 
 class _AuthenticationState extends State<Authentication> {
+  bool _checkingSession = true;
   bool _authLogin = true;
   String _token = '';
   bool _verifyEmail = false;
@@ -54,6 +55,27 @@ class _AuthenticationState extends State<Authentication> {
         _verificationType = public.publicInfo['switch']['verificationType'];
       });
     }
+
+    checkCachedLogin();
+  }
+
+  Future<void> checkCachedLogin() async {
+    var auth = Provider.of<Auth>(context, listen: false);
+    var isAuth = await auth.checkLoginSession(context);
+    if (!isAuth) {
+      if (auth.loginCreds.isNotEmpty) {
+        String result = await processLogin(auth.loginCreds);
+        if (result.isNotEmpty) {
+          setState(() {
+            _token = result;
+            _verifyEmail = true;
+          });
+        }
+      }
+    }
+    setState(() {
+      _checkingSession = false;
+    });
   }
 
   Future<void> checkVersion() async {
@@ -154,14 +176,13 @@ class _AuthenticationState extends State<Authentication> {
           caseSensitive: false),
     );
 
-    print(isEmail);
-
     setState(() {
       _isMobile = !isEmail;
       _emailVerification = isEmail ? true : false;
     });
 
     var auth = Provider.of<Auth>(context, listen: false);
+    auth.setLoginCreds(value);
     String loginToken = await auth.login(context, {
       "geetest_challenge": "sys_conf_validate",
       "geetest_seccode": "sys_conf_validate",
@@ -193,7 +214,7 @@ class _AuthenticationState extends State<Authentication> {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
 
-    print('test');
+    var auth = Provider.of<Auth>(context, listen: true);
 
     return WillPopScope(
       onWillPop: () {
@@ -201,138 +222,151 @@ class _AuthenticationState extends State<Authentication> {
       },
       child: Scaffold(
         // appBar: appBar(context, null),
-        body: SingleChildScrollView(
-          padding: EdgeInsets.only(top: width * 0.08),
-          child: Container(
-            padding: EdgeInsets.only(top: width * 0.1),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.only(left: 10),
-                  height: height * 0.20,
-                  child: Row(
+        body: _checkingSession
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : SingleChildScrollView(
+                padding: EdgeInsets.only(top: width * 0.08),
+                child: Container(
+                  padding: EdgeInsets.only(top: width * 0.1),
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      IconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: const Icon(Icons.close),
+                      Container(
+                        padding: const EdgeInsets.only(left: 10),
+                        height: height * 0.20,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                auth.setLoginCreds({});
+                                Navigator.pushNamedAndRemoveUntil(
+                                  context,
+                                  '/',
+                                  (route) => false,
+                                );
+                              },
+                              icon: const Icon(Icons.close),
+                            ),
+                            Container(
+                              padding:
+                                  const EdgeInsets.only(top: 10, right: 30),
+                              child: Column(
+                                children: [
+                                  const Image(
+                                    image: AssetImage('assets/img/logo_s.png'),
+                                    width: 100,
+                                  ),
+                                  Text('v$_versionNumber'),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       Container(
-                        padding: const EdgeInsets.only(top: 10, right: 30),
-                        child: Column(
-                          children: [
-                            const Image(
-                              image: AssetImage('assets/img/logo_s.png'),
-                              width: 100,
-                            ),
-                            Text('v$_versionNumber'),
-                          ],
+                        padding: EdgeInsets.all(width * 0.08),
+                        child: _verifyEmail
+                            ? EmailVerification(
+                                token: _token,
+                                operationType: _authLogin
+                                    ? '4'
+                                    : _isMobile
+                                        ? '25'
+                                        : '1',
+                                toggleEmailVerification: () {
+                                  toggleEmailVerification();
+                                },
+                                emailVerification: _emailVerification,
+                                currentCoutnry: _countryCode,
+                                isMobile: _isMobile,
+                              )
+                            : _authLogin
+                                ? Login(
+                                    onLogin: (value, captchaController) async {
+                                    // print('--------------------');
+                                    // print(captchaController);
+
+                                    String result = await processLogin(value);
+                                    if (result.isNotEmpty) {
+                                      setState(() {
+                                        _token = result;
+                                        _verifyEmail = true;
+                                      });
+                                    } else {
+                                      captchaController.reset();
+                                    }
+                                  }, onCaptchaVerification: (value) {
+                                    setState(() {
+                                      _captchaVerification = value;
+                                    });
+                                  })
+                                : Signup(
+                                    onRegister:
+                                        (value, captchaController) async {
+                                      String result =
+                                          await processSignup(value);
+                                      if (result.isNotEmpty) {
+                                        setState(() {
+                                          _token = result;
+                                          _verifyEmail = true;
+                                        });
+                                      } else {
+                                        captchaController.reset();
+                                      }
+                                    },
+                                    onCaptchaVerification: (value) {
+                                      setState(() {
+                                        _captchaVerification = value;
+                                      });
+                                    },
+                                  ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.only(bottom: 100),
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
+                          child: _verifyEmail
+                              ? Container()
+                              : GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _authLogin = !_authLogin;
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        _authLogin
+                                            ? 'Don\'t have an account?'
+                                            : 'Already have an account?',
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.only(left: 5),
+                                        child: Text(
+                                          _authLogin ? 'Sign Up' : 'Sign In',
+                                          style: TextStyle(
+                                            color: linkColor,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                         ),
                       ),
                     ],
                   ),
                 ),
-                Container(
-                  padding: EdgeInsets.all(width * 0.08),
-                  child: _verifyEmail
-                      ? EmailVerification(
-                          token: _token,
-                          operationType: _authLogin
-                              ? '4'
-                              : _isMobile
-                                  ? '25'
-                                  : '1',
-                          toggleEmailVerification: () {
-                            toggleEmailVerification();
-                          },
-                          emailVerification: _emailVerification,
-                          currentCoutnry: _countryCode,
-                          isMobile: _isMobile,
-                        )
-                      : _authLogin
-                          ? Login(onLogin: (value, captchaController) async {
-                              // print('--------------------');
-                              // print(captchaController);
-
-                              String result = await processLogin(value);
-                              if (result.isNotEmpty) {
-                                setState(() {
-                                  _token = result;
-                                  _verifyEmail = true;
-                                });
-                              } else {
-                                captchaController.reset();
-                              }
-                            }, onCaptchaVerification: (value) {
-                              setState(() {
-                                _captchaVerification = value;
-                              });
-                            })
-                          : Signup(
-                              onRegister: (value, captchaController) async {
-                                String result = await processSignup(value);
-                                if (result.isNotEmpty) {
-                                  setState(() {
-                                    _token = result;
-                                    _verifyEmail = true;
-                                  });
-                                } else {
-                                  captchaController.reset();
-                                }
-                              },
-                              onCaptchaVerification: (value) {
-                                setState(() {
-                                  _captchaVerification = value;
-                                });
-                              },
-                            ),
-                ),
-                Container(
-                  padding: const EdgeInsets.only(bottom: 100),
-                  child: Align(
-                    alignment: Alignment.bottomCenter,
-                    child: _verifyEmail
-                        ? Container()
-                        : GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _authLogin = !_authLogin;
-                              });
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  _authLogin
-                                      ? 'Don\'t have an account?'
-                                      : 'Already have an account?',
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.only(left: 5),
-                                  child: Text(
-                                    _authLogin ? 'Sign Up' : 'Sign In',
-                                    style: TextStyle(
-                                      color: linkColor,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+              ),
       ),
     );
   }

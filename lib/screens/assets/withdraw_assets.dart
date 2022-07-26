@@ -203,7 +203,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
       });
     }
 
-    await asset.getCoinCosts(auth, _defaultCoin);
+    await asset.getCoinCosts(auth, _coinShowName);
     // await asset.getChangeAddress(context, auth, _defaultCoin);
 
     List _digitialAss = [];

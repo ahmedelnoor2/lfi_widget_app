@@ -183,7 +183,7 @@ class _EmailChangeState extends State<EmailChange> {
       'googleCode': "",
       'smsValidCode': ""
     });
-    await auth.getUserInfo();
+    await auth.getUserInfo(context);
     setState(() {
       _processing = false;
     });

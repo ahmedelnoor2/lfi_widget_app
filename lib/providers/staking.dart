@@ -42,6 +42,7 @@ class Staking with ChangeNotifier {
       } else if (responseData['code'] == 10002) {
         Navigator.pop(ctx);
         snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+        Navigator.pushNamed(ctx, '/authentication');
       } else {
         _activeStakeInfo = {};
         return notifyListeners();
@@ -93,6 +94,7 @@ class Staking with ChangeNotifier {
         _activeStakingOrder = {};
         Navigator.pop(ctx);
         snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+        Navigator.pushNamed(ctx, '/authentication');
         return notifyListeners();
       } else {
         _activeStakingOrder = {};
@@ -139,6 +141,7 @@ class Staking with ChangeNotifier {
       } else if (responseData['code'] == 10002) {
         _stakeOrderData = {};
         snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+        Navigator.pushNamed(ctx, '/authentication');
       } else {
         _stakeOrderData = {};
         snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
@@ -182,6 +185,7 @@ class Staking with ChangeNotifier {
       } else if (responseData['code'] == 10002) {
         Navigator.pop(ctx);
         snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+        Navigator.pushNamed(ctx, '/authentication');
       } else {
         Navigator.pop(ctx);
         snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');

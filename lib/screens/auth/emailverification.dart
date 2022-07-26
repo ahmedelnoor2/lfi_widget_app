@@ -196,7 +196,7 @@ class _EmailVerificationState extends State<EmailVerification> {
                     child: TextFormField(
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter ${widget.emailVerification ? 'Email' : 'SMS'} verification code';
+                          return 'Please enter ${widget.currentCoutnry.isNotEmpty ? 'SMS' : widget.emailVerification ? 'Email' : 'SMS'} verification code';
                         }
                         return null;
                       },
@@ -212,7 +212,7 @@ class _EmailVerificationState extends State<EmailVerification> {
                         ),
                         hintText: auth.googleAuth
                             ? 'Google verification code'
-                            : '${(widget.emailVerification || !widget.isMobile) ? 'Email' : 'SMS'} verification code',
+                            : '${widget.currentCoutnry.isNotEmpty ? 'SMS' : (widget.emailVerification || !widget.isMobile) ? 'Email' : 'SMS'} verification code',
                       ),
                     ),
                   ),
@@ -334,7 +334,9 @@ class _EmailVerificationState extends State<EmailVerification> {
                         // Navigator.pop(context);
                         Navigator.pushNamed(context, '/dashboard');
                       } else {
-                        widget.toggleEmailVerification();
+                        if (!auth.googleAuth) {
+                          widget.toggleEmailVerification();
+                        }
                       }
                     } else {
                       String verificationResponse =
@@ -343,7 +345,9 @@ class _EmailVerificationState extends State<EmailVerification> {
                         // Navigator.pop(context);
                         Navigator.pushNamed(context, '/dashboard');
                       } else {
-                        widget.toggleEmailVerification();
+                        if (!auth.googleAuth) {
+                          widget.toggleEmailVerification();
+                        }
                       }
                     }
                   }

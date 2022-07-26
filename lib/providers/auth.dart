@@ -44,6 +44,18 @@ class Auth with ChangeNotifier {
     return _googleAuth;
   }
 
+  // loing creds
+  Map _loginCreds = {};
+
+  Map get loginCreds {
+    return _loginCreds;
+  }
+
+  void setLoginCreds(values) {
+    _loginCreds = values;
+    notifyListeners();
+  }
+
   // Get Captcha
   Map _captchaData = {};
 
@@ -94,11 +106,17 @@ class Auth with ChangeNotifier {
     _isAuthenticated = catchedAuthToken!.isNotEmpty ? true : false;
     _loginVerificationToken = authToken;
     headers['exchange-token'] = authToken;
-    await getUserInfo();
+    await checkLoginSession(ctx);
     notifyListeners();
   }
 
-  Future<String> getUserInfo() async {
+  Future<bool> checkLoginSession(ctx) async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? catchedAuthToken = prefs.getString('authToken');
+    authToken = catchedAuthToken ?? '';
+    notifyListeners();
+    headers['exchange-token'] = authToken;
+    authToken = catchedAuthToken ?? '';
     var url = Uri.https(
       apiUrl,
       '$exApi/common/user_info',
@@ -114,6 +132,46 @@ class Auth with ChangeNotifier {
         _userInfo = responseData['data'];
         _isAuthenticated = true;
         notifyListeners();
+        return true;
+      } else if (responseData['code'] == '10002') {
+        _loginVerificationToken = '';
+        _userInfo = {};
+        _isAuthenticated = false;
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('authToken', _loginVerificationToken);
+        return false;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
+  }
+
+  Future<String> getUserInfo(ctx) async {
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/common/user_info',
+    );
+
+    var postData = json.encode({});
+
+    try {
+      final response = await http.post(url, body: postData, headers: headers);
+
+      final responseData = json.decode(response.body);
+      if (responseData['code'] == '0') {
+        _userInfo = responseData['data'];
+        _isAuthenticated = true;
+        notifyListeners();
+      } else if (responseData['code'] == '10002') {
+        _loginVerificationToken = '';
+        _userInfo = {};
+        _isAuthenticated = false;
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('authToken', _loginVerificationToken);
+        snackAlert(ctx, SnackTypes.warning, 'Session has expired');
+        Navigator.pushNamed(ctx, '/authentication');
       } else {
         _userInfo = {};
         _isAuthenticated = false;
@@ -130,7 +188,6 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> checkResponseCode(ctx, code) async {
-    print(code);
     if ('$code' == '10002') {
       _loginVerificationToken = '';
       _userInfo = {};
@@ -138,7 +195,11 @@ class Auth with ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('authToken', _loginVerificationToken);
       notifyListeners();
-      Navigator.pushNamedAndRemoveUntil(ctx, '/', (route) => false);
+      Navigator.pushNamedAndRemoveUntil(
+        ctx,
+        '/authentication',
+        (route) => false,
+      );
     }
   }
 
@@ -157,6 +218,7 @@ class Auth with ChangeNotifier {
       if (responseData['code'] == "0") {
         _loginVerificationToken = '';
         _userInfo = {};
+        _loginCreds = {};
         _isAuthenticated = false;
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('authToken', _loginVerificationToken);
@@ -175,23 +237,13 @@ class Auth with ChangeNotifier {
       '$exApi/user/login_in',
     );
 
-    var postData = json.encode({
-      'csessionid': formData['csessionid'],
-      'mobileNumber': formData['mobileNumber'],
-      'loginPword': formData['loginPword'],
-      'scene': formData['scene'],
-      'sig': formData['sig'],
-      'token': formData['token'],
-      'verificationType': formData['verificationType'],
-    });
-
-    print(postData);
+    var postData = json.encode(formData);
 
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
-      print(responseData);
+
       if (responseData['code'] == 0) {
         if (responseData['data']['googleAuth'] == '1') {
           _googleAuth = true;
