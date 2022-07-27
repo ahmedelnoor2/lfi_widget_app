@@ -40,7 +40,6 @@ import 'package:lyotrade/screens/pix_payment/pix_process_payment.dart';
 import 'package:lyotrade/screens/pix_payment/pix_transactions.dart';
 import 'package:lyotrade/screens/security/disable_account.dart';
 import 'package:lyotrade/screens/notification/notifcationmessage.dart';
-
 import 'package:lyotrade/screens/referal/referal.dart';
 import 'package:lyotrade/screens/security/email_change.dart';
 import 'package:lyotrade/screens/security/forgot/forgotpassword.dart';
@@ -250,7 +249,7 @@ class MyApp extends StatelessWidget {
               Security.routeName: (context) => const Security(),
               Phone.routeName: (context) => const Phone(),
               Password.routeName: (context) => const Password(),
-              Forgotpassword.routeName: (context) => Forgotpassword(),
+              Forgotpassword.routeName: (context) => const Forgotpassword(),
               GoogleAuth.routeName: (context) => const GoogleAuth(),
               EmailChange.routeName: (context) => const EmailChange(),
               Transactions.routeName: (context) => const Transactions(),
@@ -273,7 +272,6 @@ class MyApp extends StatelessWidget {
               BuySellTransactions.routeName: (context) =>
                   const BuySellTransactions(),
               DexSwap.routeName: (context) => const DexSwap(),
-              Referal.routeName: (context) => Referal(),
               DisableAccount.routeName: (context) => const DisableAccount(),
               PixPayment.routeName: (context) => const PixPayment(),
               PixProcessPayment.routeName: (context) =>

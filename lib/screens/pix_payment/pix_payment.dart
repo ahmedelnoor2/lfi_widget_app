@@ -662,49 +662,80 @@ class _PixPaymentState extends State<PixPayment>
                     ),
                   ],
                 ),
-                LyoButton(
-                  onPressed: (_amountBrlController.text.isEmpty ||
-                          _amountUsdtController.text.isEmpty ||
-                          _processTransaction)
-                      ? null
-                      : () async {
-                          if (_formKey.currentState!.validate()) {
-                            payments.getKycVerificationDetails({
-                              'userId': auth.userInfo['id'],
-                            });
-                            setState(() {
-                              _fieldErrors = {};
-                              _nameController.clear();
-                              _emailController.clear();
-                              _cpfController.clear();
-                              _name = '';
-                              _email = '';
-                              _cpf = '';
-                              _loading = false;
-                              _processKyc = false;
-                            });
+                Container(
+                  margin: EdgeInsets.only(bottom: 20),
+                  child: LyoButton(
+                    onPressed: (_amountBrlController.text.isEmpty ||
+                            _amountUsdtController.text.isEmpty ||
+                            _processTransaction)
+                        ? null
+                        : () async {
+                            if (_formKey.currentState!.validate()) {
+                              payments.getKycVerificationDetails({
+                                'userId': auth.userInfo['id'],
+                              });
+                              setState(() {
+                                _fieldErrors = {};
+                                _nameController.clear();
+                                _emailController.clear();
+                                _cpfController.clear();
+                                _name = '';
+                                _email = '';
+                                _cpf = '';
+                                _loading = false;
+                                _processKyc = false;
+                              });
 
-                            if (payments.pixKycClients.isNotEmpty) {
-                              if (payments.pixKycClients['activate']) {
-                                setState(() {
-                                  _processTransaction = true;
-                                });
-                                await payments.createNewPixTransaction(
-                                    context,
-                                    {
-                                      "client_id":
-                                          payments.pixKycClients['userId'],
-                                      "value": _sendUsdtAmount,
-                                      "client": payments.pixKycClients,
-                                      "userAddresses": _userAddresses,
+                              if (payments.pixKycClients.isNotEmpty) {
+                                if (payments.pixKycClients['activate']) {
+                                  setState(() {
+                                    _processTransaction = true;
+                                  });
+                                  await payments.createNewPixTransaction(
+                                      context,
+                                      {
+                                        "client_id":
+                                            payments.pixKycClients['userId'],
+                                        "value": _sendUsdtAmount,
+                                        "client": payments.pixKycClients,
+                                        "userAddresses": _userAddresses,
+                                      },
+                                      _amountBrlController.text);
+                                  setState(() {
+                                    _processTransaction = false;
+                                  });
+                                  if (payments.pixNewTransaction.isNotEmpty) {
+                                    Navigator.pushNamed(
+                                        context, '/pix_process_payment');
+                                  }
+                                } else {
+                                  showModalBottomSheet<void>(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(25.0),
+                                      ),
+                                    ),
+                                    isScrollControlled: true,
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return StatefulBuilder(
+                                        builder: (BuildContext context,
+                                            StateSetter setState) {
+                                          return GestureDetector(
+                                            onTap: () {
+                                              FocusManager.instance.primaryFocus
+                                                  ?.unfocus();
+                                            },
+                                            child: kycInformation(
+                                              context,
+                                              setState,
+                                              0.9,
+                                            ),
+                                          );
+                                        },
+                                      );
                                     },
-                                    _amountBrlController.text);
-                                setState(() {
-                                  _processTransaction = false;
-                                });
-                                if (payments.pixNewTransaction.isNotEmpty) {
-                                  Navigator.pushNamed(
-                                      context, '/pix_process_payment');
+                                  );
                                 }
                               } else {
                                 showModalBottomSheet<void>(
@@ -713,8 +744,8 @@ class _PixPaymentState extends State<PixPayment>
                                       top: Radius.circular(25.0),
                                     ),
                                   ),
-                                  isScrollControlled: true,
                                   context: context,
+                                  isScrollControlled: true,
                                   builder: (BuildContext context) {
                                     return StatefulBuilder(
                                       builder: (BuildContext context,
@@ -735,45 +766,17 @@ class _PixPaymentState extends State<PixPayment>
                                   },
                                 );
                               }
-                            } else {
-                              showModalBottomSheet<void>(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(25.0),
-                                  ),
-                                ),
-                                context: context,
-                                isScrollControlled: true,
-                                builder: (BuildContext context) {
-                                  return StatefulBuilder(
-                                    builder: (BuildContext context,
-                                        StateSetter setState) {
-                                      return GestureDetector(
-                                        onTap: () {
-                                          FocusManager.instance.primaryFocus
-                                              ?.unfocus();
-                                        },
-                                        child: kycInformation(
-                                          context,
-                                          setState,
-                                          0.9,
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                              );
                             }
-                          }
-                        },
-                  text: 'Continue',
-                  active: true,
-                  isLoading: _processTransaction,
-                  activeColor: (_amountBrlController.text.isEmpty ||
-                          _amountUsdtController.text.isEmpty)
-                      ? Color(0xff5E6292)
-                      : linkColor,
-                  activeTextColor: Colors.black,
+                          },
+                    text: 'Continue',
+                    active: true,
+                    isLoading: _processTransaction,
+                    activeColor: (_amountBrlController.text.isEmpty ||
+                            _amountUsdtController.text.isEmpty)
+                        ? Color(0xff5E6292)
+                        : linkColor,
+                    activeTextColor: Colors.black,
+                  ),
                 ),
               ],
             ),

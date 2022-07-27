@@ -93,5 +93,4 @@ var orangeBGColor = Color(0xFFFF9000);
 
 var buttoncolour = Color(0xFF5E6292);
 var selectboxcolour = Color(0xFF25284A);
-var seconadarytextcolour = Color(0xFF5E6292);
 var selecteditembordercolour = Color(0XFF01FEF5);

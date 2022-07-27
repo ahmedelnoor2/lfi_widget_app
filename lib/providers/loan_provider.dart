@@ -179,14 +179,15 @@ class LoanProvider with ChangeNotifier {
 
   var reciveramount = '';
   var senderamount = '';
+
   Future<void> getloanestimate() async {
     var url = Uri.https(loanApiUrl, loansApiestimate, {
-      'from_code': '$from_code',
-      'from_network': '$from_network',
-      'to_code': '$to_code',
-      'to_network': '$to_network',
-      'amount': '$amount',
-      'exchange': '$exchange',
+      'from_code': from_code,
+      'from_network': from_network,
+      'to_code': to_code,
+      'to_network': to_network,
+      'amount': amount,
+      'exchange': exchange,
       'ltv_percent': '$ltv_percent'
     });
 
