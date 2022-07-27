@@ -286,6 +286,7 @@ class _PixPaymentState extends State<PixPayment>
     setState(() {
       _processKyc = false;
       _loading = false;
+      _reRequestKYCAuth = false;
     });
   }
 
