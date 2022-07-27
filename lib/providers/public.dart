@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:k_chart/entity/index.dart';
+import 'package:lyotrade/screens/common/alert.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
@@ -225,6 +227,36 @@ class Public with ChangeNotifier {
   Future<void> setListingSymbol(listingSymbol) async {
     _listingSymbol = listingSymbol;
     return notifyListeners();
+  }
+
+  Future<void> checkSocket(ctx) async {
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/common/checkVisitStatus',
+    );
+
+    var postData = json.encode({});
+
+    try {
+      final response = await http.post(url, body: postData, headers: headers);
+
+      final responseData = json.decode(response.body);
+
+      print(responseData);
+    } catch (error) {
+      if ('$error'.contains('SocketException')) {
+        showAlert(
+          ctx,
+          Container(),
+          'Network Error',
+          [
+            Text('Please check your network connection.'),
+          ],
+          'Exit',
+        );
+      }
+      return;
+    }
   }
 
   // Get public info
@@ -509,5 +541,37 @@ class Public with ChangeNotifier {
     return (jsonDecode(res.body) as List<dynamic>)
         .map((e) => e["symbol"] as String)
         .toList();
+  }
+
+  // Banners
+  List _banners = [];
+
+  List get banners {
+    return _banners;
+  }
+
+  Future<void> getBanners() async {
+    var url = Uri.https(
+      lyoApiUrl,
+      'admin/public/get_banner',
+    );
+
+    try {
+      final response = await http.get(url, headers: headers);
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == "0") {
+        _banners = responseData['data'];
+        return notifyListeners();
+      } else {
+        _banners = [];
+        return notifyListeners();
+      }
+    } catch (error) {
+      // throw error;
+      print(error);
+      return;
+    }
   }
 }

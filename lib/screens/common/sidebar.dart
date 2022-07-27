@@ -150,9 +150,10 @@ class _SideBarState extends State<SideBar> {
               child: Column(
                 children: [
                   ListTile(
-                    onTap: () {
+                    onTap: () async {
                       if (auth.isAuthenticated) {
                         Navigator.pushNamed(context, '/transactions');
+                        await auth.getUserInfo(context);
                       } else {
                         Navigator.pushNamed(context, '/authentication');
                       }
@@ -191,7 +192,7 @@ class _SideBarState extends State<SideBar> {
                           });
                           await user.toggleFeeCoinOpen(
                               context, auth, val ? 1 : 0);
-                          await auth.getUserInfo();
+                          await auth.getUserInfo(context);
                         } else {
                           Navigator.pushNamed(context, '/authentication');
                         }
@@ -214,9 +215,10 @@ class _SideBarState extends State<SideBar> {
                         fontSize: 12,
                       ),
                     ),
-                    onTap: () {
+                    onTap: () async {
                       if (auth.isAuthenticated) {
                         Navigator.pushNamed(context, '/security');
+                        await auth.getUserInfo(context);
                       } else {
                         Navigator.pushNamed(context, '/authentication');
                       }

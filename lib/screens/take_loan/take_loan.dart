@@ -7,6 +7,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lyotrade/providers/loan_provider.dart';
 import 'package:lyotrade/screens/common/header.dart';
+import 'package:lyotrade/utils/ScreenControl.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 
@@ -65,7 +66,11 @@ class _TakeLoanState extends State<TakeLoan> {
   Widget build(BuildContext context) {
     var loanProvider = Provider.of<LoanProvider>(context, listen: false);
 
-    return Scaffold(
+    return WillPopScope(
+      onWillPop: () {
+        return onAndroidBackPress(context);
+      },
+      child: Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: hiddenAppBar(),
       body: Container(
@@ -85,17 +90,16 @@ class _TakeLoanState extends State<TakeLoan> {
                         },
                         icon: Icon(Icons.chevron_left),
                       ),
-                    ),
-                    Text(
-                      'Borrow Against Crypto',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                      Text(
+                        'Borrow Against Crypto',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                IconButton(
+                    ],
+                  ),
+                  IconButton(
                   onPressed: () {
                     print(loanProvider.yourloan);
                   },

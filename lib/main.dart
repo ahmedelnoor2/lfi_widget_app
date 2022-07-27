@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/dex_provider.dart';
@@ -25,12 +26,18 @@ import 'package:lyotrade/screens/buy_sell/buy_sell_crypto.dart';
 import 'package:lyotrade/screens/buy_sell/buy_sell_transactions.dart';
 import 'package:lyotrade/screens/buy_sell/common/process_payment.dart';
 import 'package:lyotrade/screens/dashboard.dart';
+import 'package:lyotrade/screens/dashboard/market_search.dart';
 import 'package:lyotrade/screens/dex_swap/dex_swap.dart';
 import 'package:lyotrade/screens/future_trade/future_trade.dart';
 import 'package:lyotrade/screens/kyc/enitityverificatrion.dart';
 import 'package:lyotrade/screens/kyc/kycscreen.dart';
 import 'package:lyotrade/screens/kyc/perosmalvarification.dart';
 import 'package:lyotrade/screens/market/market.dart';
+import 'package:lyotrade/screens/pix_payment/pix_payment.dart';
+import 'package:lyotrade/screens/pix_payment/pix_payment_details.dart';
+import 'package:lyotrade/screens/pix_payment/pix_process_payment.dart';
+import 'package:lyotrade/screens/pix_payment/pix_transactions.dart';
+import 'package:lyotrade/screens/security/disable_account.dart';
 import 'package:lyotrade/screens/notification/notifcationmessage.dart';
 import 'package:lyotrade/screens/referal/referal.dart';
 import 'package:lyotrade/screens/security/email_change.dart';
@@ -52,7 +59,9 @@ import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+      overlays: [SystemUiOverlay.top]).then((_) => runApp(const MyApp()));
+  // runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -261,6 +270,14 @@ class MyApp extends StatelessWidget {
               BuySellTransactions.routeName: (context) =>
                   const BuySellTransactions(),
               DexSwap.routeName: (context) => const DexSwap(),
+              DisableAccount.routeName: (context) => const DisableAccount(),
+              PixPayment.routeName: (context) => const PixPayment(),
+              PixProcessPayment.routeName: (context) =>
+                  const PixProcessPayment(),
+              PixTransactions.routeName: (context) => const PixTransactions(),
+              PixPaymentDetails.routeName: (context) =>
+                  const PixPaymentDetails(),
+              MarketSearch.routeName: (context) => const MarketSearch(),
             },
           );
         },

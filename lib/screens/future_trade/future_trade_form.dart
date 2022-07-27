@@ -1098,7 +1098,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               SizedBox(
-                width: auth.isAuthenticated ? null : width * 0.55,
+                width: auth.isAuthenticated ? width * 0.27 : width * 0.55,
                 child: ElevatedButton(
                   onPressed: () {
                     if (auth.isAuthenticated) {
@@ -1121,7 +1121,12 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                   style: ElevatedButton.styleFrom(
                     primary: Color(0xff26A160),
                     textStyle: TextStyle(),
-                    padding: kIsWeb ? EdgeInsets.all(18) : EdgeInsets.zero,
+                    padding: kIsWeb
+                        ? EdgeInsets.only(
+                            top: 18,
+                            bottom: 18,
+                          )
+                        : null,
                   ),
                   child: Text(
                     auth.isAuthenticated
@@ -1136,7 +1141,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
               ),
               auth.isAuthenticated
                   ? SizedBox(
-                      // width: width * 0.7,
+                      width: width * 0.27,
                       child: ElevatedButton(
                         onPressed: () {
                           if (auth.isAuthenticated) {
@@ -1157,6 +1162,12 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                         style: ElevatedButton.styleFrom(
                           primary: Color(0xffD84646),
                           textStyle: TextStyle(),
+                          padding: kIsWeb
+                              ? EdgeInsets.only(
+                                  top: 18,
+                                  bottom: 18,
+                                )
+                              : null,
                         ),
                         child: Text(
                           '${_isBuy ? 'Open Short' : 'Close Long'}',

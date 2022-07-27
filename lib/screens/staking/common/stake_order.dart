@@ -28,7 +28,7 @@ class _StakeOrderState extends State<StakeOrder> {
   List _totalAccounts = [];
   Map _currentAccount = {};
 
-  late Timer _timerSecur;
+  Timer? _timerSecur;
   int _startSecur = 90;
   bool _startTimerSecur = false;
 
@@ -41,43 +41,18 @@ class _StakeOrderState extends State<StakeOrder> {
   @override
   void dispose() async {
     _authCodeController.dispose();
+    if (_timerSecur != null) {
+      _timerSecur!.cancel();
+    }
     super.dispose();
-  }
-
-  void startTimer() {
-    setState(() {
-      _startTimerSecur = true;
-    });
-
-    sendVerificationCode();
-    const oneSecSecur = Duration(seconds: 1);
-    _timerSecur = Timer.periodic(
-      oneSecSecur,
-      (Timer timer) {
-        if (_startSecur == 0) {
-          setState(() {
-            setState(() {
-              _startTimerSecur = false;
-            });
-            _timerSecur.cancel();
-          });
-        } else {
-          setState(() {
-            _startSecur--;
-          });
-        }
-      },
-    );
   }
 
   Future<void> sendVerificationCode() async {
     var auth = Provider.of<Auth>(context, listen: false);
 
-    await auth.sendMobileValidCode(context, {
-      "operationType": 15,
-      "code": "",
-      "mobile": "",
-      "smsType": "0",
+    await auth.sendStakeMobileValidCode(context, {
+      "operationType": 101,
+      "userId": auth.userInfo['id'],
     });
   }
 
@@ -101,19 +76,33 @@ class _StakeOrderState extends State<StakeOrder> {
   }
 
   Future<void> payStakeOrder() async {
+    var auth = Provider.of<Auth>(context, listen: false);
     var staking = Provider.of<Staking>(context, listen: false);
     var public = Provider.of<Public>(context, listen: false);
 
-    await staking.payStakeOrder(
-      context,
-      {
+    var payStakeLoad = {
+      'appKey': staking.stakeOrderData["appKey"],
+      'assetType': _currentAccount['accountType'],
+      'googleCode': _authCodeController.text,
+      'orderNum': staking.stakeOrderData["orderNum"],
+      'smsAuthCode': "",
+      'userId': staking.stakeOrderData["userId"],
+    };
+
+    if (auth.userInfo['googleStatus'] == 0) {
+      payStakeLoad = {
         'appKey': staking.stakeOrderData["appKey"],
         'assetType': _currentAccount['accountType'],
-        'googleCode': _authCodeController.text,
+        'googleCode': "",
         'orderNum': staking.stakeOrderData["orderNum"],
-        'smsAuthCode': "",
+        'smsAuthCode': _authCodeController.text,
         'userId': staking.stakeOrderData["userId"],
-      },
+      };
+    }
+
+    await staking.payStakeOrder(
+      context,
+      payStakeLoad,
     );
     await public.getStakeLists();
   }
@@ -408,6 +397,30 @@ class _StakeOrderState extends State<StakeOrder> {
   }
 
   Widget _verifyAuth(context, stakeOrderData, setState) {
+    void startTimer() {
+      setState(() {
+        _startTimerSecur = true;
+      });
+
+      sendVerificationCode();
+      const oneSecSecur = Duration(seconds: 1);
+      _timerSecur = Timer.periodic(
+        oneSecSecur,
+        (Timer timer) {
+          if (_startSecur == 0) {
+            setState(() {
+              _startTimerSecur = false;
+            });
+            _timerSecur!.cancel();
+          } else {
+            setState(() {
+              _startSecur--;
+            });
+          }
+        },
+      );
+    }
+
     return Container(
       padding: EdgeInsets.all(10),
       height: height * 0.5,
