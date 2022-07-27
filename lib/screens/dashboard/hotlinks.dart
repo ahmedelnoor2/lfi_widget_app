@@ -70,7 +70,7 @@ class _HotlinksState extends State<Hotlinks> {
                   style: TextStyle(
                     fontSize: 12,
                   ),
-                )
+                ),
               ],
             ),
           ),

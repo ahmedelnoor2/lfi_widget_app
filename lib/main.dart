@@ -29,19 +29,26 @@ import 'package:lyotrade/screens/dashboard.dart';
 import 'package:lyotrade/screens/dashboard/market_search.dart';
 import 'package:lyotrade/screens/dex_swap/dex_swap.dart';
 import 'package:lyotrade/screens/future_trade/future_trade.dart';
+import 'package:lyotrade/screens/kyc/enitityverificatrion.dart';
+import 'package:lyotrade/screens/kyc/kycscreen.dart';
+import 'package:lyotrade/screens/kyc/perosmalvarification.dart';
 import 'package:lyotrade/screens/market/market.dart';
 import 'package:lyotrade/screens/pix_payment/pix_payment.dart';
 import 'package:lyotrade/screens/pix_payment/pix_payment_details.dart';
 import 'package:lyotrade/screens/pix_payment/pix_process_payment.dart';
 import 'package:lyotrade/screens/pix_payment/pix_transactions.dart';
 import 'package:lyotrade/screens/security/disable_account.dart';
+import 'package:lyotrade/screens/notification/notifcationmessage.dart';
+import 'package:lyotrade/screens/referal/referal.dart';
 import 'package:lyotrade/screens/security/email_change.dart';
+import 'package:lyotrade/screens/security/forgot/forgotpassword.dart';
 import 'package:lyotrade/screens/security/google_auth.dart';
 import 'package:lyotrade/screens/security/password.dart';
 import 'package:lyotrade/screens/security/phone.dart';
 import 'package:lyotrade/screens/security/security.dart';
 import 'package:lyotrade/screens/staking/common/stake_order.dart';
 import 'package:lyotrade/screens/staking/stake.dart';
+import 'package:lyotrade/screens/take_loan/confrim_loan.dart';
 import 'package:lyotrade/screens/take_loan/take_loan.dart';
 import 'package:lyotrade/screens/trade/kline_chart.dart';
 import 'package:lyotrade/screens/trade/margin/margin_trade_history.dart';
@@ -74,13 +81,17 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<Trading>(create: (_) => Trading()),
         ChangeNotifierProvider<FutureMarket>(create: (_) => FutureMarket()),
         ChangeNotifierProvider<Staking>(create: (_) => Staking()),
-        ChangeNotifierProvider<LoanProvider>(create: (_) => LoanProvider()),
+        ChangeNotifierProvider<LoanProvider>(
+          create: (_) => LoanProvider(),
+          lazy: true,
+        ),
         ChangeNotifierProvider<Payments>(create: (_) => Payments()),
         ChangeNotifierProvider<DexProvider>(create: (_) => DexProvider()),
       ],
       child: Consumer<Auth>(
         builder: (context, auth, _) {
           return MaterialApp(
+            debugShowCheckedModeBanner: false,
             title: 'LYOTRADE',
             theme: ThemeData(
               // This is the theme of your application.
@@ -236,6 +247,7 @@ class MyApp extends StatelessWidget {
               Security.routeName: (context) => const Security(),
               Phone.routeName: (context) => const Phone(),
               Password.routeName: (context) => const Password(),
+              Forgotpassword.routeName: (context) => Forgotpassword(),
               GoogleAuth.routeName: (context) => const GoogleAuth(),
               EmailChange.routeName: (context) => const EmailChange(),
               Transactions.routeName: (context) => const Transactions(),
@@ -244,7 +256,16 @@ class MyApp extends StatelessWidget {
               MarginAssets.routeName: (context) => const MarginAssets(),
               OtcAssets.routeName: (context) => const OtcAssets(),
               BuySellCrypto.routeName: (context) => const BuySellCrypto(),
+              Confirmloan.routeName: (context) => const Confirmloan(),
               TakeLoan.routeName: (context) => const TakeLoan(),
+              Referal.routeName: ((context) => Referal()),
+              Kycscreen.routeName: ((context) => Kycscreen()),
+              personalverification.routeName: (context) =>
+                  personalverification(),
+              EnitityVerification.routeName: ((context) =>
+                  EnitityVerification()),
+              Notificationsscreen.routeName: ((context) =>
+                  const Notificationsscreen()),
               ProcessPayment.routeName: (context) => const ProcessPayment(),
               BuySellTransactions.routeName: (context) =>
                   const BuySellTransactions(),
