@@ -42,10 +42,10 @@ class _TopGatewayState extends State<TopGateway>
     return InkWell(
       onTap: () {
         if (auth.isAuthenticated) {
-          if (auth.userInfo['realAuthType'] == 0 &&
+          if (auth.userInfo['realAuthType'] == 0 ||
               auth.userInfo['authLevel'] == 0) {
             snackAlert(context, SnackTypes.warning,
-                'Deposit limited(Please check KYC status)');
+                'Deposit limited (Please check KYC status)');
           } else {
             payments.clearKycTransactions();
             Navigator.pushNamed(context, '/pix_payment');

@@ -563,9 +563,9 @@ class Payments with ChangeNotifier {
     return _kycTransaction;
   }
 
-  void clearKycTransactions() {
+  Future<void> clearKycTransactions() async {
     _kycTransaction = {};
-    notifyListeners();
+    return notifyListeners();
   }
 
   Future<void> getKycVerificationTransaction(uuid) async {

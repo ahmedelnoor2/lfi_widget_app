@@ -133,7 +133,8 @@ Widget assetsBar(
                 child: OutlinedButton(
                   onPressed: () {
                     if (auth.userInfo['realAuthType'] != null) {
-                      if (auth.userInfo['realAuthType'] == 0) {
+                      if (auth.userInfo['realAuthType'] == 0 ||
+                          auth.userInfo['authLevel'] == 0) {
                         snackAlert(
                           context,
                           SnackTypes.warning,

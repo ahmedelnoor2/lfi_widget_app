@@ -51,6 +51,7 @@ class _PixPaymentState extends State<PixPayment>
   bool _loading = false;
   bool _processKyc = false;
   bool _processTransaction = false;
+  bool _reRequestKYCAuth = false;
   String _sendUsdtAmount = '';
   Map _userAddresses = {};
 
@@ -208,7 +209,61 @@ class _PixPaymentState extends State<PixPayment>
             top: Radius.circular(25.0),
           ),
         ),
-        // isScrollControlled: true,
+        isScrollControlled: true,
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return GestureDetector(
+                onTap: () {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                },
+                child: kycInformation(
+                  context,
+                  setState,
+                  0.9,
+                ),
+              );
+            },
+          );
+        },
+      );
+    }
+    setState(() {
+      _processKyc = false;
+      _loading = false;
+    });
+  }
+
+  Future<void> reRequestKyc() async {
+    setState(() {
+      _processKyc = true;
+      _loading = true;
+    });
+    var auth = Provider.of<Auth>(context, listen: false);
+    var payments = Provider.of<Payments>(context, listen: false);
+
+    await payments.reRequestKyc(context, {
+      'uuid': payments.pixKycClients['client_uuid'],
+      "cpf":
+          '${_cpf.substring(0, 3)}.${_cpf.substring(3, 6)}.${_cpf.substring(6, 9)}-${_cpf.substring(9, 11)}',
+    });
+
+    if (payments.newKyc.isNotEmpty) {
+      await payments.getKycVerificationDetails({
+        'userId': '${auth.userInfo['id']}',
+      });
+      await payments
+          .getKycVerificationTransaction(payments.newKyc['client_uuid']);
+      Navigator.pop(context);
+      showModalBottomSheet<void>(
+        useRootNavigator: true,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(25.0),
+          ),
+        ),
+        isScrollControlled: true,
         context: context,
         builder: (BuildContext context) {
           return StatefulBuilder(
@@ -753,40 +808,75 @@ class _PixPaymentState extends State<PixPayment>
       if (payments.kycTransaction['status'] == 'PROCESSING') {
         if (_timer == null) {
           setState(() {
-            _timer = Timer.periodic(
-              const Duration(seconds: 1),
-              (Timer timer) {
-                final nowDate = DateTime.now().toLocal();
-                var endDate = DateTime.parse(
-                        payments.kycTransaction['date_end'])
-                    .toLocal()
-                    .add(Duration(
-                        hours: int.parse(
-                            nowDate.timeZoneOffset.toString().split(":")[0])));
-                final difference = nowDate.difference(endDate).toString();
-                final hour =
-                    difference.split(':')[0].replaceAll(RegExp('-'), '');
-                final minute = difference.split(':')[1];
-                final second = difference.split(':')[2].split('.')[0];
-                payments.setAwaitingTime('0$hour:$minute:$second');
-                payments.setClientUpdateCall(payments.clientUpdateCall - 1);
-                if (payments.clientUpdateCall == 0) {
-                  payments.setClientUpdateCall(10);
-                }
-                getClientUpdate(payments);
-              },
-            );
+            if (payments.kycTransaction.isNotEmpty) {
+              if (payments.kycTransaction['date_end'] != null) {
+                _timer = Timer.periodic(
+                  const Duration(seconds: 1),
+                  (Timer timer) {
+                    final nowDate = DateTime.now().toLocal();
+                    var endDate =
+                        DateTime.parse(payments.kycTransaction['date_end'])
+                            .toLocal()
+                            .add(Duration(
+                                hours: int.parse(nowDate.timeZoneOffset
+                                    .toString()
+                                    .split(":")[0])));
+                    final difference = nowDate.difference(endDate).toString();
+                    final hour =
+                        difference.split(':')[0].replaceAll(RegExp('-'), '');
+                    final minute = difference.split(':')[1];
+                    final second = difference.split(':')[2].split('.')[0];
+                    payments.setAwaitingTime('0$hour:$minute:$second');
+                    payments.setClientUpdateCall(payments.clientUpdateCall - 1);
+                    if (payments.clientUpdateCall == 0) {
+                      payments.setClientUpdateCall(10);
+                    }
+                    getClientUpdate(payments);
+                  },
+                );
+              }
+            }
           });
         } else {
           setState(() {
             _timer!.cancel();
             _timer = null;
           });
-          if (payments.pixKycClients.isNotEmpty) {
-            payments.getKycVerificationTransaction(
-              payments.pixKycClients['client_uuid'],
-            );
-          }
+          setState(() async {
+            if (payments.pixKycClients.isNotEmpty) {
+              await payments.getKycVerificationTransaction(
+                payments.pixKycClients['client_uuid'],
+              );
+            }
+            if (payments.kycTransaction.isNotEmpty) {
+              if (payments.kycTransaction['date_end'] != null) {
+                _timer = Timer.periodic(
+                  const Duration(seconds: 1),
+                  (Timer timer) {
+                    final nowDate = DateTime.now().toLocal();
+                    var endDate =
+                        DateTime.parse(payments.kycTransaction['date_end'])
+                            .toLocal()
+                            .add(Duration(
+                                hours: int.parse(nowDate.timeZoneOffset
+                                    .toString()
+                                    .split(":")[0])));
+                    final difference = nowDate.difference(endDate).toString();
+                    final hour =
+                        difference.split(':')[0].replaceAll(RegExp('-'), '');
+                    final minute = difference.split(':')[1];
+                    final second = difference.split(':')[2].split('.')[0];
+                    payments.setAwaitingTime('0$hour:$minute:$second');
+                    payments.setClientUpdateCall(payments.clientUpdateCall - 1);
+                    if (payments.clientUpdateCall == 0) {
+                      payments.setClientUpdateCall(10);
+                    }
+                    getClientUpdate(payments);
+                  },
+                );
+              }
+            }
+          });
         }
       }
     }
@@ -895,13 +985,13 @@ class _PixPaymentState extends State<PixPayment>
                                                           'REVERSED')
                                                   ? InkWell(
                                                       onTap: () async {
-                                                        await payments
-                                                            .reRequestKyc(
-                                                                context, {
-                                                          'uuid': payments
-                                                                  .pixKycClients[
-                                                              'client_uuid']
+                                                        setState(() {
+                                                          _reRequestKYCAuth =
+                                                              true;
                                                         });
+                                                        await payments
+                                                            .clearKycTransactions();
+                                                        // reRequestKyc();
                                                       },
                                                       child: Container(
                                                         margin: EdgeInsets.only(
@@ -1090,142 +1180,162 @@ class _PixPaymentState extends State<PixPayment>
                             ),
                           ),
                         ),
-                        Container(
-                          padding: EdgeInsets.only(top: 15, bottom: 5),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text('Full Name'),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.all(15),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(
-                              style: BorderStyle.solid,
-                              width: 0.3,
-                              color: Color(0xff5E6292),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              SizedBox(
-                                width: width * 0.85,
-                                child: TextFormField(
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter name';
-                                    }
-                                    return null;
-                                  },
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _name = value;
-                                    });
-                                  },
-                                  controller: _nameController,
-                                  decoration: const InputDecoration(
-                                    contentPadding: EdgeInsets.zero,
-                                    isDense: true,
-                                    border: UnderlineInputBorder(
-                                      borderSide: BorderSide.none,
+                        _reRequestKYCAuth
+                            ? Container()
+                            : Column(
+                                children: [
+                                  Container(
+                                    padding:
+                                        EdgeInsets.only(top: 15, bottom: 5),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text('Full Name'),
+                                      ],
                                     ),
-                                    hintStyle: TextStyle(
-                                      fontSize: 14,
-                                    ),
-                                    hintText: "Enter your name",
                                   ),
-                                ),
+                                  Container(
+                                    padding: EdgeInsets.all(15),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5),
+                                      border: Border.all(
+                                        style: BorderStyle.solid,
+                                        width: 0.3,
+                                        color: Color(0xff5E6292),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        SizedBox(
+                                          width: width * 0.85,
+                                          child: TextFormField(
+                                            validator: (value) {
+                                              if (value == null ||
+                                                  value.isEmpty) {
+                                                return 'Please enter name';
+                                              }
+                                              return null;
+                                            },
+                                            onChanged: (value) {
+                                              setState(() {
+                                                _name = value;
+                                              });
+                                            },
+                                            controller: _nameController,
+                                            decoration: const InputDecoration(
+                                              contentPadding: EdgeInsets.zero,
+                                              isDense: true,
+                                              border: UnderlineInputBorder(
+                                                borderSide: BorderSide.none,
+                                              ),
+                                              hintStyle: TextStyle(
+                                                fontSize: 14,
+                                              ),
+                                              hintText: "Enter your name",
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  _fieldErrors['name'] != null
+                                      ? Container(
+                                          padding: EdgeInsets.all(5),
+                                          child: Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Text(
+                                              _fieldErrors['name'],
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: errorColor,
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      : Container(),
+                                ],
                               ),
-                            ],
-                          ),
-                        ),
-                        _fieldErrors['name'] != null
-                            ? Container(
-                                padding: EdgeInsets.all(5),
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    _fieldErrors['name'],
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: errorColor,
+                        _reRequestKYCAuth
+                            ? Container()
+                            : Column(
+                                children: [
+                                  Container(
+                                    padding:
+                                        EdgeInsets.only(top: 15, bottom: 5),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text('Email'),
+                                      ],
                                     ),
                                   ),
-                                ),
-                              )
-                            : Container(),
-                        Container(
-                          padding: EdgeInsets.only(top: 15, bottom: 5),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text('Email'),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.all(15),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(
-                              style: BorderStyle.solid,
-                              width: 0.3,
-                              color: Color(0xff5E6292),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              SizedBox(
-                                width: width * 0.85,
-                                child: TextFormField(
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter email';
-                                    }
-                                    return null;
-                                  },
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _email = value;
-                                    });
-                                  },
-                                  controller: _emailController,
-                                  decoration: const InputDecoration(
-                                    contentPadding: EdgeInsets.zero,
-                                    isDense: true,
-                                    border: UnderlineInputBorder(
-                                      borderSide: BorderSide.none,
+                                  Container(
+                                    padding: EdgeInsets.all(15),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5),
+                                      border: Border.all(
+                                        style: BorderStyle.solid,
+                                        width: 0.3,
+                                        color: Color(0xff5E6292),
+                                      ),
                                     ),
-                                    hintStyle: TextStyle(
-                                      fontSize: 14,
-                                    ),
-                                    hintText: "Enter your email",
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        _fieldErrors['email'] != null
-                            ? Container(
-                                padding: EdgeInsets.all(5),
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    _fieldErrors['email'],
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: errorColor,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        SizedBox(
+                                          width: width * 0.85,
+                                          child: TextFormField(
+                                            validator: (value) {
+                                              if (value == null ||
+                                                  value.isEmpty) {
+                                                return 'Please enter email';
+                                              }
+                                              return null;
+                                            },
+                                            onChanged: (value) {
+                                              setState(() {
+                                                _email = value;
+                                              });
+                                            },
+                                            controller: _emailController,
+                                            decoration: const InputDecoration(
+                                              contentPadding: EdgeInsets.zero,
+                                              isDense: true,
+                                              border: UnderlineInputBorder(
+                                                borderSide: BorderSide.none,
+                                              ),
+                                              hintStyle: TextStyle(
+                                                fontSize: 14,
+                                              ),
+                                              hintText: "Enter your email",
+                                            ),
+                                          ),
+                                        )
+                                      ],
                                     ),
                                   ),
-                                ),
-                              )
-                            : Container(),
+                                  _fieldErrors['email'] != null
+                                      ? Container(
+                                          padding: EdgeInsets.all(5),
+                                          child: Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Text(
+                                              _fieldErrors['email'],
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: errorColor,
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      : Container(),
+                                ],
+                              ),
                         Container(
                           padding: EdgeInsets.only(top: 15, bottom: 5),
                           child: Row(
@@ -1361,12 +1471,13 @@ class _PixPaymentState extends State<PixPayment>
                                         child: Text('Continue'),
                                       )
                                     : TextButton(
-                                        onPressed: () {
+                                        onPressed: () async {
                                           // print(payments.pixKycClients[0]['client_uuid']);
-                                          payments.reRequestKyc(context, {
-                                            'uuid': payments
-                                                .pixKycClients['client_uuid']
+                                          setState(() {
+                                            _reRequestKYCAuth = true;
                                           });
+                                          await payments.clearKycTransactions();
+                                          // reRequestKyc();
                                         },
                                         child: Text('Resend KYC verification'),
                                       ),
@@ -1408,23 +1519,25 @@ class _PixPaymentState extends State<PixPayment>
                       ],
                     )
                   : LyoButton(
-                      onPressed: (_name.isEmpty ||
-                              _email.isEmpty ||
+                      onPressed: ((_name.isEmpty || !_reRequestKYCAuth) ||
+                              (_email.isEmpty || !_reRequestKYCAuth) ||
                               _cpf.isEmpty ||
                               _loading)
                           ? null
                           : () {
-                              if (!RegExp(
-                                r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$",
-                              ).hasMatch(_email)) {
-                                setState(() {
-                                  _fieldErrors['email'] =
-                                      'Invalid email format';
-                                });
-                              } else {
-                                setState(() {
-                                  _fieldErrors.remove('email');
-                                });
+                              if (!_reRequestKYCAuth) {
+                                if (!RegExp(
+                                  r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$",
+                                ).hasMatch(_email)) {
+                                  setState(() {
+                                    _fieldErrors['email'] =
+                                        'Invalid email format';
+                                  });
+                                } else {
+                                  setState(() {
+                                    _fieldErrors.remove('email');
+                                  });
+                                }
                               }
 
                               if (_cpf.length < 11 || _cpf.length > 11) {
@@ -1442,7 +1555,11 @@ class _PixPaymentState extends State<PixPayment>
                               }
 
                               if (_fieldErrors.isEmpty) {
-                                requestKyc();
+                                if (_reRequestKYCAuth) {
+                                  reRequestKyc();
+                                } else {
+                                  requestKyc();
+                                }
                               }
                             },
                       text: 'Continue',

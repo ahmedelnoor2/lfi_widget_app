@@ -450,9 +450,10 @@ class _AssetsState extends State<Assets> {
                                   width: width * 0.28,
                                   child: ElevatedButton(
                                     onPressed: () {
-                                      if (auth.userInfo['realAuthType'] == 0) {
+                                      if (auth.userInfo['realAuthType'] == 0 ||
+                                          auth.userInfo['authLevel'] == 0) {
                                         snackAlert(context, SnackTypes.warning,
-                                            'Deposit limited(Please check KYC status)');
+                                            'Deposit limited (Please check KYC status)');
                                       } else {
                                         Navigator.pushNamed(
                                           context,
