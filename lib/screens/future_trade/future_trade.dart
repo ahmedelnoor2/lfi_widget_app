@@ -16,6 +16,7 @@ import 'package:lyotrade/screens/future_trade/future_order_book.dart';
 import 'package:lyotrade/screens/future_trade/future_trade_form.dart';
 import 'package:lyotrade/screens/trade/margin/margin_trade_form.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
+import 'package:lyotrade/utils/ScreenControl.utils.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -149,50 +150,55 @@ class _FutureTradeState extends State<FutureTrade> {
     var futureMarket = Provider.of<FutureMarket>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
 
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: hiddenAppBar(),
-      drawer: FutureMarketDrawer(
-        scaffoldKey: _scaffoldKey,
-        updateMarket: updateMarket,
+    return WillPopScope(
+      onWillPop: () {
+        return onAndroidBackPress(context);
+      },
+      child: Scaffold(
+        key: _scaffoldKey,
+        appBar: hiddenAppBar(),
+        drawer: FutureMarketDrawer(
+          scaffoldKey: _scaffoldKey,
+          updateMarket: updateMarket,
+        ),
+        body: GestureDetector(
+            onTap: () {
+              FocusManager.instance.primaryFocus?.unfocus();
+            },
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  FutureMarketHeader(scaffoldKey: _scaffoldKey),
+                  FutureHeaderDetails(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(top: 10, bottom: 10, left: 10),
+                        width: width * 0.4,
+                        child: FutureOrderBook(
+                          asks: futureMarket.asks,
+                          bids: futureMarket.bids,
+                          lastPrice: futureMarket.lastPrice,
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(right: 10),
+                        width: width * 0.58,
+                        child: FutureTradeForm(
+                          scaffoldKey: _scaffoldKey,
+                          lastPrice: futureMarket.lastPrice,
+                        ),
+                      ),
+                    ],
+                  ),
+                  FutureOpenOrders(),
+                ],
+              ),
+            )),
+        bottomNavigationBar: bottomNav(context, auth),
       ),
-      body: GestureDetector(
-          onTap: () {
-            FocusManager.instance.primaryFocus?.unfocus();
-          },
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                FutureMarketHeader(scaffoldKey: _scaffoldKey),
-                FutureHeaderDetails(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.only(top: 10, bottom: 10, left: 10),
-                      width: width * 0.4,
-                      child: FutureOrderBook(
-                        asks: futureMarket.asks,
-                        bids: futureMarket.bids,
-                        lastPrice: futureMarket.lastPrice,
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.only(right: 10),
-                      width: width * 0.58,
-                      child: FutureTradeForm(
-                        scaffoldKey: _scaffoldKey,
-                        lastPrice: futureMarket.lastPrice,
-                      ),
-                    ),
-                  ],
-                ),
-                FutureOpenOrders(),
-              ],
-            ),
-          )),
-      bottomNavigationBar: bottomNav(context, auth),
     );
   }
 }

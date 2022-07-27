@@ -21,12 +21,22 @@ getBgColor(type) {
 }
 
 snackAlert(ctx, type, message) {
+  ScaffoldMessenger.of(ctx).hideCurrentSnackBar();
   return ScaffoldMessenger.of(ctx).showSnackBar(
     SnackBar(
       backgroundColor: getBgColor(type),
       content: Text(
         '$message',
-        style: TextStyle(color: whiteTextColor),
+        style: TextStyle(
+          color: type == SnackTypes.warning ? Colors.black : whiteTextColor,
+        ),
+      ),
+      action: SnackBarAction(
+        label: 'Close',
+        textColor: type == SnackTypes.warning ? Colors.black : whiteTextColor,
+        onPressed: () {
+          // Some code to undo the change.
+        },
       ),
     ),
   );

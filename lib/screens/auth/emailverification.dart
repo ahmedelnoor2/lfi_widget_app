@@ -73,7 +73,9 @@ class _EmailVerificationState extends State<EmailVerification> {
   }
 
   Future<void> sendVerificationCode() async {
+    print(widget.token);
     print(widget.isMobile);
+
     var auth = Provider.of<Auth>(context, listen: false);
 
     if (widget.emailVerification) {
@@ -102,28 +104,37 @@ class _EmailVerificationState extends State<EmailVerification> {
     var auth = Provider.of<Auth>(context, listen: false);
 
     if (widget.operationType == '4' || widget.operationType == '25') {
-      if (widget.isMobile) {
+      if (auth.googleAuth) {
+        String emailVeri = await auth.confirmLoginCode(context, {
+          'emailCode': _emailVeirficationCode.text,
+          'token': widget.token,
+        });
+        return emailVeri;
+      } else if (widget.isMobile) {
         String mobileVeri = await auth.confirmLoginCode(context, {
           'smsCode': _emailVeirficationCode.text,
           'token': widget.token,
         });
-        print(mobileVeri);
         return mobileVeri;
       } else {
         String emailVeri = await auth.confirmLoginCode(context, {
           'emailCode': _emailVeirficationCode.text,
           'token': widget.token,
         });
-        print(emailVeri);
         return emailVeri;
       }
     } else {
-      if (widget.emailVerification) {
+      if (auth.googleAuth) {
+        String emailVeri = await auth.confirmLoginCode(context, {
+          'emailCode': _emailVeirficationCode.text,
+          'token': widget.token,
+        });
+        return emailVeri;
+      } else if (widget.emailVerification) {
         String emailVeri = await auth.confirmEmailCode(context, {
           'emailCode': _emailVeirficationCode.text,
           'token': widget.token,
         });
-        print(emailVeri);
         return emailVeri;
       } else {
         String mobileVeri = await auth.confirmMobileVerification(context, {
@@ -185,7 +196,7 @@ class _EmailVerificationState extends State<EmailVerification> {
                     child: TextFormField(
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter ${widget.emailVerification ? 'Email' : 'SMS'} verification code';
+                          return 'Please enter ${widget.currentCoutnry.isNotEmpty ? 'SMS' : widget.emailVerification ? 'Email' : 'SMS'} verification code';
                         }
                         return null;
                       },
@@ -201,7 +212,7 @@ class _EmailVerificationState extends State<EmailVerification> {
                         ),
                         hintText: auth.googleAuth
                             ? 'Google verification code'
-                            : '${(widget.emailVerification || !widget.isMobile) ? 'Email' : 'SMS'} verification code',
+                            : '${widget.currentCoutnry.isNotEmpty ? 'SMS' : (widget.emailVerification || !widget.isMobile) ? 'Email' : 'SMS'} verification code',
                       ),
                     ),
                   ),
@@ -323,7 +334,9 @@ class _EmailVerificationState extends State<EmailVerification> {
                         // Navigator.pop(context);
                         Navigator.pushNamed(context, '/dashboard');
                       } else {
-                        widget.toggleEmailVerification();
+                        if (!auth.googleAuth) {
+                          widget.toggleEmailVerification();
+                        }
                       }
                     } else {
                       String verificationResponse =
@@ -332,7 +345,9 @@ class _EmailVerificationState extends State<EmailVerification> {
                         // Navigator.pop(context);
                         Navigator.pushNamed(context, '/dashboard');
                       } else {
-                        widget.toggleEmailVerification();
+                        if (!auth.googleAuth) {
+                          widget.toggleEmailVerification();
+                        }
                       }
                     }
                   }

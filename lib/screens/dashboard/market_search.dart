@@ -1,15 +1,16 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:archive/archive.dart';
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-class MarketDrawer extends StatefulWidget {
-  const MarketDrawer({
+class MarketSearch extends StatefulWidget {
+  static const routeName = '/market_search';
+  const MarketSearch({
     Key? key,
     this.scaffoldKey,
     this.updateMarket,
@@ -19,10 +20,10 @@ class MarketDrawer extends StatefulWidget {
   final updateMarket;
 
   @override
-  State<MarketDrawer> createState() => _MarketDrawerState();
+  State<MarketSearch> createState() => _MarketSearchState();
 }
 
-class _MarketDrawerState extends State<MarketDrawer>
+class _MarketSearchState extends State<MarketSearch>
     with SingleTickerProviderStateMixin {
   TabController? _tabController;
   final TextEditingController _searchController = TextEditingController();
@@ -100,11 +101,12 @@ class _MarketDrawerState extends State<MarketDrawer>
 
     var public = Provider.of<Public>(context, listen: true);
 
-    return Drawer(
-      child: Column(
+    return Scaffold(
+      appBar: hiddenAppBar(),
+      body: Column(
         children: <Widget>[
           Container(
-            padding: const EdgeInsets.only(top: 35),
+            padding: const EdgeInsets.only(top: 5),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -131,32 +133,49 @@ class _MarketDrawerState extends State<MarketDrawer>
             ),
           ),
           Container(
-            padding: const EdgeInsets.only(
-              left: 15,
-              right: 15,
-            ),
-            child: SizedBox(
-              height: width * 0.11,
-              child: TextField(
-                onChanged: (value) async {
-                  // await asset.filterSearchResults(value);
-                  await public.filterMarketSearchResults(
-                    value,
-                    public.allMarkets[_currentMarketSort],
-                    _currentMarketSort,
-                  );
-                },
-                controller: _searchController,
-                decoration: const InputDecoration(
-                  labelText: "Search",
-                  hintText: "Search",
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(25.0),
+            padding: EdgeInsets.all(10),
+            child: Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(
+                  style: BorderStyle.solid,
+                  width: 0.3,
+                  color: Color(0xff5E6292),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(right: 8),
+                    child: Icon(Icons.search),
+                  ),
+                  SizedBox(
+                    width: width * 0.75,
+                    child: TextField(
+                      onChanged: (value) async {
+                        // await asset.filterSearchResults(value);
+                        await public.filterMarketSearchResults(
+                          value,
+                          public.allMarkets[_currentMarketSort],
+                          _currentMarketSort,
+                        );
+                      },
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.zero,
+                        isDense: true,
+                        border: UnderlineInputBorder(
+                          borderSide: BorderSide.none,
+                        ),
+                        hintStyle: TextStyle(
+                          fontSize: 14,
+                        ),
+                        hintText: "Search",
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
             ),
           ),
@@ -179,9 +198,13 @@ class _MarketDrawerState extends State<MarketDrawer>
                   ),
                 )
               : Container(),
-          SizedBox(
-            height: height * 0.76,
-            child: ListView.builder(
+          Container(
+            padding: EdgeInsets.only(top: 10),
+            height: height * 0.74,
+            child: ListView.separated(
+              separatorBuilder: (context, index) {
+                return Divider();
+              },
               shrinkWrap: true,
               itemCount: public.allSearchMarket[_currentMarketSort].isNotEmpty
                   ? public.allSearchMarket[_currentMarketSort].length
@@ -193,26 +216,71 @@ class _MarketDrawerState extends State<MarketDrawer>
                         : public.allMarkets[_currentMarketSort][index];
 
                 return ListTile(
-                  onTap: () async {
-                    await public.setActiveMarket(_market);
-                    widget.updateMarket();
-                    Navigator.pop(context);
-                  },
-                  title: Row(
+                  title: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        '${_market['showName'].split('/')[0]}',
-                        style: TextStyle(
-                          fontSize: 18,
-                        ),
+                      Row(
+                        children: [
+                          Text(
+                            '${_market['showName'].split('/')[0]}',
+                            style: TextStyle(
+                              fontSize: 18,
+                            ),
+                          ),
+                          Text(
+                            ' /${_market['showName'].split('/')[1]}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: secondaryTextColor,
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        ' /${_market['showName'].split('/')[1]}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: secondaryTextColor,
-                        ),
-                      ),
+                      Row(
+                        children: [
+                          InkWell(
+                            onTap: () async {
+                              await public.setActiveMarket(_market);
+                              Navigator.pushNamed(context, '/trade');
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.only(
+                                top: 5,
+                                bottom: 5,
+                                right: 10,
+                              ),
+                              child: Text(
+                                'Trade',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: linkColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () async {
+                              await public.setActiveMarket(_market);
+                              Navigator.pushNamed(context, '/kline_chart');
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.only(
+                                top: 5,
+                                bottom: 5,
+                                left: 10,
+                                right: 10,
+                              ),
+                              child: Text(
+                                'Info',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: linkColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
                     ],
                   ),
                   trailing: Column(
@@ -222,7 +290,7 @@ class _MarketDrawerState extends State<MarketDrawer>
                       Text(
                         '${public.activeMarketAllTicks[_market['symbol']] != null ? public.activeMarketAllTicks[_market['symbol']]['close'] : '--'}',
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: public.activeMarketAllTicks[
                                       _market['symbol']] !=
@@ -251,7 +319,7 @@ class _MarketDrawerState extends State<MarketDrawer>
                                       ? greenlightchartColor
                                       : errorColor
                                   : secondaryTextColor,
-                          fontSize: 12,
+                          fontSize: 14,
                         ),
                       ),
                     ],

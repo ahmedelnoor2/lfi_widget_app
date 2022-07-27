@@ -77,7 +77,8 @@ class _HotlinksState extends State<Hotlinks> {
           GestureDetector(
             onTap: () {
               if (auth.isAuthenticated) {
-                if (auth.userInfo['realAuthType'] == 0) {
+                if (auth.userInfo['realAuthType'] == 0 &&
+                    auth.userInfo['authLevel'] == 0) {
                   snackAlert(context, SnackTypes.warning,
                       'Deposit limited(Please check KYC status)');
                 } else {
@@ -142,7 +143,8 @@ class _HotlinksState extends State<Hotlinks> {
           GestureDetector(
             onTap: () {
               if (auth.isAuthenticated) {
-                if (auth.userInfo['realAuthType'] == 0) {
+                if (auth.userInfo['realAuthType'] == 0 &&
+                    auth.userInfo['authLevel'] == 0) {
                   snackAlert(context, SnackTypes.warning,
                       'Deposit limited(Please check KYC status)');
                 } else {

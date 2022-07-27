@@ -203,7 +203,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
       });
     }
 
-    await asset.getCoinCosts(auth, _defaultCoin);
+    await asset.getCoinCosts(auth, _coinShowName);
     // await asset.getChangeAddress(context, auth, _defaultCoin);
 
     List _digitialAss = [];
@@ -720,6 +720,9 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                         validator: (value) {
                                           if (value == null || value.isEmpty) {
                                             return 'Please enter amount';
+                                          } else if (double.parse(value) <
+                                              asset.getCost['withdraw_min']) {
+                                            return 'Minimum withdrawal amount is ${asset.getCost['withdraw_min']}';
                                           }
                                           return null;
                                         },
