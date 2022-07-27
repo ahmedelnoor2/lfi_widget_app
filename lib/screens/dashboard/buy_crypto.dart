@@ -32,9 +32,10 @@ class _BuyCryptoState extends State<BuyCrypto> {
         InkWell(
           onTap: () {
             if (auth.isAuthenticated) {
-              if (auth.userInfo['realAuthType'] == 0) {
+              if (auth.userInfo['realAuthType'] == 0 ||
+                  auth.userInfo['authLevel'] == 0) {
                 snackAlert(context, SnackTypes.warning,
-                    'Deposit limited(Please check KYC status)');
+                    'This feature is not active (Please check KYC status)');
               } else {
                 Navigator.pushNamed(context, '/buy_sell_crypto');
               }
@@ -82,9 +83,10 @@ class _BuyCryptoState extends State<BuyCrypto> {
         GestureDetector(
           onTap: () {
             if (auth.isAuthenticated) {
-              if (auth.userInfo['realAuthType'] == 0) {
+              if (auth.userInfo['realAuthType'] == 0 ||
+                  auth.userInfo['authLevel'] == 0) {
                 snackAlert(context, SnackTypes.warning,
-                    'Deposit limited(Please check KYC status)');
+                    'Deposit limited (Please check KYC status)');
               } else {
                 if (widget.channel != null) {
                   widget.channel.sink.close();

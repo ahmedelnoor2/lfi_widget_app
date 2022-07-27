@@ -365,7 +365,7 @@ class _OtcAssetsState extends State<OtcAssets> {
                           ? _smallBalancesp2plAssets.length
                           : _p2pAssets.length,
                       itemBuilder: (BuildContext context, int index) {
-                        var asset = _hideSmallBalances
+                        var assetObj = _hideSmallBalances
                             ? _smallBalancesp2plAssets[index]
                             : _p2pAssets[index];
 
@@ -387,7 +387,7 @@ class _OtcAssetsState extends State<OtcAssets> {
                                       child: CircleAvatar(
                                         radius: 15,
                                         child: Image.network(
-                                          '${public.publicInfoMarket['market']['coinList'][asset['coinSymbol']]['icon']}',
+                                          '${public.publicInfoMarket['market']['coinList'][assetObj['coinSymbol']]['icon']}',
                                         ),
                                       ),
                                     ),
@@ -396,14 +396,14 @@ class _OtcAssetsState extends State<OtcAssets> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          '${getCoinName(asset['coinSymbol'])}',
+                                          '${getCoinName(assetObj['coinSymbol'])}',
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16,
                                           ),
                                         ),
                                         Text(
-                                          '${public.publicInfoMarket['market']['coinList'][asset['coin']] != null ? public.publicInfoMarket['market']['coinList'][asset['coin']]['longName'] : getCoinName(asset['coinSymbol'])}',
+                                          '${public.publicInfoMarket['market']['coinList'][assetObj['coin']] != null ? public.publicInfoMarket['market']['coinList'][assetObj['coin']]['longName'] : getCoinName(assetObj['coinSymbol'])}',
                                           style: TextStyle(
                                             fontSize: 12,
                                             color: secondaryTextColor,
@@ -421,7 +421,7 @@ class _OtcAssetsState extends State<OtcAssets> {
                                   child: Text(
                                     _hideBalances
                                         ? _hideBalanceString
-                                        : '${double.parse('${asset['normal']}').toStringAsFixed(4)}',
+                                        : '${double.parse('${assetObj['normal']}').toStringAsFixed(4)}',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
@@ -436,7 +436,7 @@ class _OtcAssetsState extends State<OtcAssets> {
                                   child: Text(
                                     _hideBalances
                                         ? _hideBalanceString
-                                        : double.parse('${asset['lock']}')
+                                        : double.parse('${assetObj['lock']}')
                                             .toStringAsFixed(4),
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -453,9 +453,13 @@ class _OtcAssetsState extends State<OtcAssets> {
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       GestureDetector(
-                                        onTap: () {
+                                        onTap: () async {
+                                          await asset.setDefaultCoin(
+                                              '${assetObj['coinSymbol']}');
                                           Navigator.pushNamed(
-                                              context, '/transfer_assets');
+                                            context,
+                                            '/transfer_assets',
+                                          );
                                         },
                                         child: Text(
                                           'Transfer',

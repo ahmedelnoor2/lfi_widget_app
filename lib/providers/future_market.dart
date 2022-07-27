@@ -432,6 +432,7 @@ class FutureMarket with ChangeNotifier {
         snackAlert(ctx, SnackTypes.success, 'Transfer successful');
       } else if (responseData['code'] == 10002) {
         snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+        Navigator.pushNamed(ctx, '/authentication');
       } else {
         snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
       }
@@ -469,6 +470,7 @@ class FutureMarket with ChangeNotifier {
         snackAlert(ctx, SnackTypes.success, 'Transfer successful');
       } else if (responseData['code'] == 10002) {
         snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+        Navigator.pushNamed(ctx, '/authentication');
       } else {
         snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
       }
@@ -562,6 +564,7 @@ class FutureMarket with ChangeNotifier {
         snackAlert(ctx, SnackTypes.success, 'Order successfully cancelled');
       } else if (responseData['code'] == 10002) {
         snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+        Navigator.pushNamed(ctx, '/authentication');
       } else {
         snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
       }

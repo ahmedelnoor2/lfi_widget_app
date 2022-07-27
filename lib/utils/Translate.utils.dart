@@ -42,6 +42,8 @@ String getTranslate(String text) {
       return 'Swipe validation type error';
     case '参数非法':
       return 'Illegal parameter';
+    case '无效token':
+      return 'Invalid token';
     default:
       return text;
   }

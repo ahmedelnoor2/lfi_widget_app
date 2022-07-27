@@ -9,7 +9,7 @@ import 'package:lyotrade/utils/Translate.utils.dart';
 
 class Asset with ChangeNotifier {
   String _defaultCoin = 'LYO1';
-  String _defaultMarginCoin = 'LYO01';
+  String _defaultMarginCoin = 'BTC';
   Map _accountBalance = {};
   Map _p2pBalance = {};
   Map _marginBalance = {};
@@ -28,7 +28,7 @@ class Asset with ChangeNotifier {
   bool _hideBalances = false;
   final String _hideBalanceString = '******';
 
-  final List _marginAssets = [];
+  List _marginAssets = [];
   Map _selectedP2pAssets = {};
   Map _selectedMarginAssets = {};
 
@@ -42,9 +42,9 @@ class Asset with ChangeNotifier {
     return _defaultCoin;
   }
 
-  void setDefaultCoin(defCoin) {
+  Future<void> setDefaultCoin(defCoin) async {
     _defaultCoin = defCoin;
-    notifyListeners();
+    return notifyListeners();
   }
 
   Map get selectedP2pAssets {
@@ -233,6 +233,7 @@ class Asset with ChangeNotifier {
       } else if (responseData['code'] == "10002") {
         snackAlert(
             ctx, SnackTypes.warning, 'Session Expired, Please login back');
+        Navigator.pushNamed(ctx, '/authentication');
       } else {
         _accountBalance = {};
       }
@@ -306,14 +307,25 @@ class Asset with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         _marginBalance = responseData['data'];
+        _marginAssets = [];
 
         _marginBalance['leverMap'].forEach((k, v) {
-          if (k.split('/')[0] == _defaultMarginCoin) {
-            _selectedMarginAssets = {
-              'coin': k.split('/')[0],
-              'market': k,
-              'values': v,
-            };
+          if (_selectedMarginAssets.isEmpty) {
+            if (k.split('/')[0] == _defaultMarginCoin) {
+              _selectedMarginAssets = {
+                'coin': k.split('/')[0],
+                'market': k,
+                'values': v,
+              };
+            }
+          } else {
+            if (k.split('/')[0] == _selectedMarginAssets['coin']) {
+              _selectedMarginAssets = {
+                'coin': k.split('/')[0],
+                'market': k,
+                'values': v,
+              };
+            }
           }
           _marginAssets.add({
             'coin': k.split('/')[0],
@@ -700,6 +712,8 @@ class Asset with ChangeNotifier {
       toAccount: "2" 2 = P2P Account 
     */
     headers['exchange-token'] = auth.loginVerificationToken;
+    headers['exchange-client'] = 'pc';
+    headers['exchange-language'] = 'en_US';
 
     var url = Uri.https(
       apiUrl,
@@ -724,13 +738,17 @@ class Asset with ChangeNotifier {
           snackAlert(
               ctx, SnackTypes.warning, getTranslate(responseData['msg']));
         }
+        return;
       } else if (responseData['code'] == 10002) {
         snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+        return;
       } else {
         snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
+        return;
       }
     } catch (error) {
       snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
+      return;
       // throw error;
     }
   }
@@ -770,13 +788,17 @@ class Asset with ChangeNotifier {
         } else {
           snackAlert(ctx, SnackTypes.success, 'Transfer Successful');
         }
+        return;
       } else if (responseData['code'] == 10002) {
         snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+        return;
       } else {
         snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
+        return;
       }
     } catch (error) {
       snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
+      return;
       // throw error;
     }
   }
@@ -874,5 +896,17 @@ class Asset with ChangeNotifier {
       snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
       // throw error;
     }
+  }
+
+  // Transaction Details
+  Map _transactionDetails = {};
+
+  Map get transactionDetails {
+    return _transactionDetails;
+  }
+
+  Future<void> setTransactionDetails(transaction) async {
+    _transactionDetails = transaction;
+    return notifyListeners();
   }
 }

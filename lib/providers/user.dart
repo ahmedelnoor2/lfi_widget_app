@@ -164,4 +164,45 @@ class User with ChangeNotifier {
       return;
     }
   }
+
+  // Invitaion Information
+  Map _userInvitaion = {};
+
+  Map get userInvitation {
+    return _userInvitaion;
+  }
+
+  Future<void> getUserInvitaionInfo(ctx, auth) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$incrementApi/invitation/pageConfig',
+    );
+
+    var postData = json.encode({});
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == 0) {
+        _userInvitaion = responseData['data'];
+        notifyListeners();
+        return;
+      } else {
+        _userInvitaion = {};
+        notifyListeners();
+        return;
+      }
+    } catch (error) {
+      print(error);
+      return;
+    }
+  }
 }

@@ -244,12 +244,13 @@ class _DepositAssetsState extends State<DepositAssets> {
                     child: Container(
                       padding: EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(
-                            style: BorderStyle.solid,
-                            width: 0.3,
-                            color: Color(0xff5E6292),
-                          )),
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(
+                          style: BorderStyle.solid,
+                          width: 0.3,
+                          color: Color(0xff5E6292),
+                        ),
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [

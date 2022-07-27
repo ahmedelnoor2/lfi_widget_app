@@ -1,6 +1,9 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/asset.dart';
+import 'package:lyotrade/utils/Coins.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:provider/provider.dart';
 
 Widget depositList(context, width, height, allDeposits) {
   return Column(
@@ -42,7 +45,9 @@ Widget depositList(context, width, height, allDeposits) {
           itemBuilder: (BuildContext context, int index) {
             var deposit = allDeposits[index];
             return InkWell(
-              onTap: () {
+              onTap: () async {
+                var asset = Provider.of<Asset>(context, listen: false);
+                await asset.setTransactionDetails(deposit);
                 Navigator.pushNamed(context, '/transaction_details');
               },
               child: Container(
@@ -64,9 +69,9 @@ Widget depositList(context, width, height, allDeposits) {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('${deposit['symbol']}'),
+                              Text('${getCoinName(deposit['symbol'])}'),
                               Text(
-                                '${DateFormat('yyyy-mm-dd hh:mm:ss').format(DateTime.parse('${deposit['createdAt']}'))}',
+                                '${DateFormat('dd-MM-y H:mm').format(DateTime.parse(deposit['createdAt']))}',
                                 style: TextStyle(
                                     color: secondaryTextColor, fontSize: 12),
                               ),
