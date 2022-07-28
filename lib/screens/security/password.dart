@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
+import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/Country.utils.dart';
 import 'package:provider/provider.dart';
 
@@ -16,12 +17,16 @@ class Password extends StatefulWidget {
 
 class _PasswordState extends State<Password> {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _initialPasswordController =
+      TextEditingController();
   final TextEditingController _mobileNumber = TextEditingController();
   final TextEditingController _phoneVerificationCode = TextEditingController();
 
   late Timer _timer;
   int _start = 90;
   bool _startTimer = false;
+
+  bool _currentPassView = true;
 
   String _currentCoutnry = '${countries[0]['code']}';
 
@@ -99,7 +104,61 @@ class _PasswordState extends State<Password> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Text('Update Password'),
+                Container(
+                  padding: EdgeInsets.only(top: 5, bottom: 10),
+                  child: Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(
+                        style: BorderStyle.solid,
+                        width: 0.3,
+                        color: Color(0xff5E6292),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 4,
+                          child: TextFormField(
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter current password';
+                              }
+                              return null;
+                            },
+                            obscureText: _currentPassView,
+                            controller: _initialPasswordController,
+                            decoration: const InputDecoration(
+                              contentPadding: EdgeInsets.zero,
+                              isDense: true,
+                              border: UnderlineInputBorder(
+                                borderSide: BorderSide.none,
+                              ),
+                              hintStyle: TextStyle(
+                                fontSize: 14,
+                              ),
+                              hintText: "Current Password",
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                _currentPassView = !_currentPassView;
+                              });
+                            },
+                            child: _currentPassView
+                                ? Icon(Icons.visibility)
+                                : Icon(Icons.visibility_off),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

@@ -808,79 +808,86 @@ class _PixPaymentState extends State<PixPayment>
 
     var payments = Provider.of<Payments>(context, listen: true);
 
+    Future<void> startTimer() async {
+      setState(() {
+        if (payments.kycTransaction.isNotEmpty) {
+          if (payments.kycTransaction['date_end'] != null) {
+            _timer = Timer.periodic(
+              const Duration(seconds: 1),
+              (Timer timer) {
+                final nowDate = DateTime.now().toLocal();
+                var endDate = DateTime.parse(
+                        payments.kycTransaction['date_end'])
+                    .toLocal()
+                    .add(Duration(
+                        hours: int.parse(
+                            nowDate.timeZoneOffset.toString().split(":")[0])));
+                final difference = nowDate.difference(endDate).toString();
+                final hour =
+                    difference.split(':')[0].replaceAll(RegExp('-'), '');
+                final minute = difference.split(':')[1];
+                final second = difference.split(':')[2].split('.')[0];
+                payments.setAwaitingTime('0$hour:$minute:$second');
+                payments.setClientUpdateCall(payments.clientUpdateCall - 1);
+                if (payments.clientUpdateCall == 0) {
+                  payments.setClientUpdateCall(10);
+                }
+                getClientUpdate(payments);
+              },
+            );
+          }
+        }
+      });
+    }
+
+    Future<void> startPaymentTimer() async {
+      if (payments.pixKycClients.isNotEmpty) {
+        await payments.getKycVerificationTransaction(
+          payments.pixKycClients['client_uuid'],
+        );
+        if (payments.kycTransaction.isNotEmpty) {
+          if (payments.kycTransaction['date_end'] != null) {
+            setState(() {
+              _timer = Timer.periodic(
+                const Duration(seconds: 1),
+                (Timer timer) {
+                  final nowDate = DateTime.now().toLocal();
+                  var endDate =
+                      DateTime.parse(payments.kycTransaction['date_end'])
+                          .toLocal()
+                          .add(Duration(
+                              hours: int.parse(nowDate.timeZoneOffset
+                                  .toString()
+                                  .split(":")[0])));
+                  final difference = nowDate.difference(endDate).toString();
+                  final hour =
+                      difference.split(':')[0].replaceAll(RegExp('-'), '');
+                  final minute = difference.split(':')[1];
+                  final second = difference.split(':')[2].split('.')[0];
+                  payments.setAwaitingTime('0$hour:$minute:$second');
+                  payments.setClientUpdateCall(payments.clientUpdateCall - 1);
+                  if (payments.clientUpdateCall == 0) {
+                    payments.setClientUpdateCall(10);
+                  }
+                  getClientUpdate(payments);
+                },
+              );
+            });
+          }
+        }
+      }
+    }
+
     if (payments.kycTransaction.isNotEmpty) {
       if (payments.kycTransaction['status'] == 'PROCESSING') {
         if (_timer == null) {
-          setState(() {
-            if (payments.kycTransaction.isNotEmpty) {
-              if (payments.kycTransaction['date_end'] != null) {
-                _timer = Timer.periodic(
-                  const Duration(seconds: 1),
-                  (Timer timer) {
-                    final nowDate = DateTime.now().toLocal();
-                    var endDate =
-                        DateTime.parse(payments.kycTransaction['date_end'])
-                            .toLocal()
-                            .add(Duration(
-                                hours: int.parse(nowDate.timeZoneOffset
-                                    .toString()
-                                    .split(":")[0])));
-                    final difference = nowDate.difference(endDate).toString();
-                    final hour =
-                        difference.split(':')[0].replaceAll(RegExp('-'), '');
-                    final minute = difference.split(':')[1];
-                    final second = difference.split(':')[2].split('.')[0];
-                    payments.setAwaitingTime('0$hour:$minute:$second');
-                    payments.setClientUpdateCall(payments.clientUpdateCall - 1);
-                    if (payments.clientUpdateCall == 0) {
-                      payments.setClientUpdateCall(10);
-                    }
-                    getClientUpdate(payments);
-                  },
-                );
-              }
-            }
-          });
+          startTimer();
         } else {
           setState(() {
             _timer!.cancel();
             _timer = null;
           });
-          setState(() async {
-            if (payments.pixKycClients.isNotEmpty) {
-              await payments.getKycVerificationTransaction(
-                payments.pixKycClients['client_uuid'],
-              );
-            }
-            if (payments.kycTransaction.isNotEmpty) {
-              if (payments.kycTransaction['date_end'] != null) {
-                _timer = Timer.periodic(
-                  const Duration(seconds: 1),
-                  (Timer timer) {
-                    final nowDate = DateTime.now().toLocal();
-                    var endDate =
-                        DateTime.parse(payments.kycTransaction['date_end'])
-                            .toLocal()
-                            .add(Duration(
-                                hours: int.parse(nowDate.timeZoneOffset
-                                    .toString()
-                                    .split(":")[0])));
-                    final difference = nowDate.difference(endDate).toString();
-                    final hour =
-                        difference.split(':')[0].replaceAll(RegExp('-'), '');
-                    final minute = difference.split(':')[1];
-                    final second = difference.split(':')[2].split('.')[0];
-                    payments.setAwaitingTime('0$hour:$minute:$second');
-                    payments.setClientUpdateCall(payments.clientUpdateCall - 1);
-                    if (payments.clientUpdateCall == 0) {
-                      payments.setClientUpdateCall(10);
-                    }
-                    getClientUpdate(payments);
-                  },
-                );
-              }
-            }
-          });
+          startPaymentTimer();
         }
       }
     }
@@ -1522,60 +1529,64 @@ class _PixPaymentState extends State<PixPayment>
                         ),
                       ],
                     )
-                  : LyoButton(
-                      onPressed: ((_name.isEmpty || !_reRequestKYCAuth) ||
-                              (_email.isEmpty || !_reRequestKYCAuth) ||
-                              _cpf.isEmpty ||
-                              _loading)
-                          ? null
-                          : () {
-                              if (!_reRequestKYCAuth) {
-                                if (!RegExp(
-                                  r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$",
-                                ).hasMatch(_email)) {
+                  : Container(
+                      padding: EdgeInsets.only(bottom: 30),
+                      child: LyoButton(
+                        onPressed: ((_name.isEmpty) ||
+                                (_email.isEmpty) ||
+                                _cpf.isEmpty ||
+                                _loading)
+                            ? null
+                            : () {
+                                if (!_reRequestKYCAuth) {
+                                  if (!RegExp(
+                                    r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$",
+                                  ).hasMatch(_email)) {
+                                    setState(() {
+                                      _fieldErrors['email'] =
+                                          'Invalid email format';
+                                    });
+                                  } else {
+                                    setState(() {
+                                      _fieldErrors.remove('email');
+                                    });
+                                  }
+                                }
+
+                                if (_cpf.length < 11 || _cpf.length > 11) {
                                   setState(() {
-                                    _fieldErrors['email'] =
-                                        'Invalid email format';
+                                    _fieldErrors['cpf'] = 'Invalid cpf account';
+                                  });
+                                } else if (double.tryParse(_cpf) == null) {
+                                  setState(() {
+                                    _fieldErrors['cpf'] = 'Invalid cpf account';
                                   });
                                 } else {
                                   setState(() {
-                                    _fieldErrors.remove('email');
+                                    _fieldErrors.remove('cpf');
                                   });
                                 }
-                              }
 
-                              if (_cpf.length < 11 || _cpf.length > 11) {
-                                setState(() {
-                                  _fieldErrors['cpf'] = 'Invalid cpf account';
-                                });
-                              } else if (double.tryParse(_cpf) == null) {
-                                setState(() {
-                                  _fieldErrors['cpf'] = 'Invalid cpf account';
-                                });
-                              } else {
-                                setState(() {
-                                  _fieldErrors.remove('cpf');
-                                });
-                              }
-
-                              if (_fieldErrors.isEmpty) {
-                                if (_reRequestKYCAuth) {
-                                  reRequestKyc();
-                                } else {
-                                  requestKyc();
+                                print(_reRequestKYCAuth);
+                                if (_fieldErrors.isEmpty) {
+                                  if (_reRequestKYCAuth) {
+                                    reRequestKyc();
+                                  } else {
+                                    requestKyc();
+                                  }
                                 }
-                              }
-                            },
-                      text: 'Continue',
-                      active: true,
-                      isLoading: _processKyc,
-                      activeColor: (_name.isEmpty ||
-                              _email.isEmpty ||
-                              _cpf.isEmpty ||
-                              _loading)
-                          ? Color(0xff5E6292)
-                          : linkColor,
-                      activeTextColor: Colors.black,
+                              },
+                        text: 'Continue',
+                        active: true,
+                        isLoading: _processKyc,
+                        activeColor: (_name.isEmpty ||
+                                _email.isEmpty ||
+                                _cpf.isEmpty ||
+                                _loading)
+                            ? Color(0xff5E6292)
+                            : linkColor,
+                        activeTextColor: Colors.black,
+                      ),
                     ),
             ],
           ),

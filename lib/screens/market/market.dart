@@ -16,94 +16,100 @@ class Market extends StatefulWidget {
 }
 
 class _MarketState extends State<Market> {
+  final _klineView = true;
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
         return onAndroidBackPress(context);
       },
-      child: Scaffold(
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(right: 20),
-                        ),
-                        Text(
-                          'Market',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+      child: _klineView
+          ? const KlineChart()
+          : Scaffold(
+              body: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.only(right: 20),
+                              ),
+                              Text(
+                                'Market',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Image.asset(
-                      'assets/img/marketgraph.png',
-                    ),
-                    Image.asset('assets/img/marketgraph.png'),
-                  ],
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Expanded(
-                  child: DefaultTabController(
-                    length: 2,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        ButtonsTabBar(
-                          backgroundColor: selecteditembordercolour,
-                          unselectedBackgroundColor: Colors.grey[300],
-                          unselectedLabelStyle: TextStyle(color: Colors.black),
-                          labelStyle: TextStyle(
-                              color: Colors.black, fontWeight: FontWeight.bold),
-                          tabs: [
-                            Tab(
-                              height: 30,
-                              text: "Favorites",
-                            ),
-                            Tab(
-                              height: 30,
-                              text: "Exchange",
-                            ),
-                          ],
-                        ),
-                        Expanded(
-                          child: TabBarView(
+                        ],
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Image.asset(
+                            'assets/img/marketgraph.png',
+                          ),
+                          Image.asset('assets/img/marketgraph.png'),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Expanded(
+                        child: DefaultTabController(
+                          length: 2,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              MarketPage(),
-                              Center(
-                                child: Icon(Icons.directions_transit),
+                              ButtonsTabBar(
+                                backgroundColor: selecteditembordercolour,
+                                unselectedBackgroundColor: Colors.grey[300],
+                                unselectedLabelStyle:
+                                    TextStyle(color: Colors.black),
+                                labelStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold),
+                                tabs: [
+                                  Tab(
+                                    height: 30,
+                                    text: "Favorites",
+                                  ),
+                                  Tab(
+                                    height: 30,
+                                    text: "Exchange",
+                                  ),
+                                ],
+                              ),
+                              Expanded(
+                                child: TabBarView(
+                                  children: <Widget>[
+                                    MarketPage(),
+                                    Center(
+                                      child: Icon(Icons.directions_transit),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }

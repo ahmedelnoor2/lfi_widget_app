@@ -46,6 +46,7 @@ class _DashboardState extends State<Dashboard> {
   void initState() {
     // checkScreenSize();
     getBanners();
+    getNoticeInfo();
     checkSocket();
     getPublicInfo();
     getAssetsRate();
@@ -64,6 +65,11 @@ class _DashboardState extends State<Dashboard> {
   Future<void> getBanners() async {
     var public = Provider.of<Public>(context, listen: false);
     await public.getBanners();
+  }
+
+  Future<void> getNoticeInfo() async {
+    var public = Provider.of<Public>(context, listen: false);
+    await public.getNoticeInfo();
   }
 
   Future<void> checkSocket() async {

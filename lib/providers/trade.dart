@@ -148,7 +148,7 @@ class Trading with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         _transactionHistory = responseData['data']['list'];
-        
+
         return notifyListeners();
       } else {
         _transactionHistory = [];
@@ -234,6 +234,8 @@ class Trading with ChangeNotifier {
 
       final responseData = json.decode(response.body);
 
+      print(responseData);
+
       if (responseData['code'] == '0') {
         snackAlert(ctx, SnackTypes.success,
             getTranslate('Order successfully created.'));
@@ -318,6 +320,8 @@ class Trading with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
+
+      print(responseData);
 
       if (responseData['code'] == '0') {
         snackAlert(ctx, SnackTypes.success,

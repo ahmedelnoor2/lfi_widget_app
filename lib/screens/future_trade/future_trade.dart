@@ -115,6 +115,7 @@ class _FutureTradeState extends State<FutureTrade> {
     var futureMarket = Provider.of<FutureMarket>(context, listen: false);
 
     await futureMarket.getPublicInfoMarket();
+    connectWebSocket();
     await futureMarket.getPublicSpotInfoMarket();
     await futureMarket.getMarketInfo(
       context,
@@ -123,7 +124,6 @@ class _FutureTradeState extends State<FutureTrade> {
     setAvailalbePrice();
     futureMarket.getUserConfiguration(
         context, auth, futureMarket.activeMarket['id']);
-    connectWebSocket();
   }
 
   Future<void> setAvailalbePrice() async {

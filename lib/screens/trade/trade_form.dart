@@ -211,6 +211,7 @@ class _TradeFormState extends State<TradeForm> {
 
     await trading.createOrder(context, auth, formData);
     getOpenOrders();
+    setAvailalbePrice();
   }
 
   Future<void> getOpenOrders() async {
@@ -594,7 +595,9 @@ class _TradeFormState extends State<TradeForm> {
                   children: [
                     Container(
                       padding: EdgeInsets.only(right: 2),
-                      child: Text(_availableBalance),
+                      child: Text(
+                        '${double.parse(_availableBalance).toStringAsFixed(5)}',
+                      ),
                     ),
                     Container(
                       padding: EdgeInsets.only(right: 5),
@@ -668,13 +671,13 @@ class _TradeFormState extends State<TradeForm> {
                 onTap: () {
                   setState(() {
                     _currentAmountSelection = 25;
-                    if (_isBuy && (_orderType == 2)) {
+                    if (_isBuy) {
                       _totalField.text = getPriceValue(public, asset, 0.25);
                     } else {
                       _amountField.text = getAmountValue(public, asset, 0.25);
                     }
                   });
-                  if (_isBuy && (_orderType == 2)) {
+                  if (_isBuy) {
                     calculateTotal('total');
                   } else {
                     calculateTotal('amount');
@@ -716,13 +719,13 @@ class _TradeFormState extends State<TradeForm> {
                 onTap: () {
                   setState(() {
                     _currentAmountSelection = 50;
-                    if (_isBuy && (_orderType == 2)) {
+                    if (_isBuy) {
                       _totalField.text = getPriceValue(public, asset, 0.50);
                     } else {
                       _amountField.text = getAmountValue(public, asset, 0.50);
                     }
                   });
-                  if (_isBuy && (_orderType == 2)) {
+                  if (_isBuy) {
                     calculateTotal('total');
                   } else {
                     calculateTotal('amount');
@@ -764,13 +767,13 @@ class _TradeFormState extends State<TradeForm> {
                 onTap: () {
                   setState(() {
                     _currentAmountSelection = 75;
-                    if (_isBuy && (_orderType == 2)) {
+                    if (_isBuy) {
                       _totalField.text = getPriceValue(public, asset, 0.75);
                     } else {
                       _amountField.text = getAmountValue(public, asset, 0.75);
                     }
                   });
-                  if (_isBuy && (_orderType == 2)) {
+                  if (_isBuy) {
                     calculateTotal('total');
                   } else {
                     calculateTotal('amount');
@@ -812,13 +815,13 @@ class _TradeFormState extends State<TradeForm> {
                 onTap: () {
                   setState(() {
                     _currentAmountSelection = 100;
-                    if (_isBuy && (_orderType == 2)) {
+                    if (_isBuy) {
                       _totalField.text = getPriceValue(public, asset, 1);
                     } else {
                       _amountField.text = getAmountValue(public, asset, 1);
                     }
                   });
-                  if (_isBuy && (_orderType == 2)) {
+                  if (_isBuy) {
                     calculateTotal('total');
                   } else {
                     calculateTotal('amount');
