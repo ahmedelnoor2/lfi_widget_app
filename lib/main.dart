@@ -259,7 +259,7 @@ class MyApp extends StatelessWidget {
               MarginAssets.routeName: (context) => const MarginAssets(),
               OtcAssets.routeName: (context) => const OtcAssets(),
               BuySellCrypto.routeName: (context) => const BuySellCrypto(),
-              Confirmloan.routeName: (context) => const Confirmloan(),
+              ConfirmLoan.routeName: (context) => const ConfirmLoan(),
               TakeLoan.routeName: (context) => const TakeLoan(),
               Referal.routeName: ((context) => Referal()),
               Kycscreen.routeName: ((context) => Kycscreen()),

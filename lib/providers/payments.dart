@@ -449,6 +449,8 @@ class Payments with ChangeNotifier {
       '/payment_gateway/pix/kyc',
     );
 
+    print(postData);
+
     try {
       final response = await http.put(
         url,
@@ -457,6 +459,8 @@ class Payments with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
+
+      print(responseData);
 
       if (responseData['code'] == '0') {
         _newKyc = responseData['data'];

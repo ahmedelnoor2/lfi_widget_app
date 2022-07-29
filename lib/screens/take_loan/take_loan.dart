@@ -29,6 +29,8 @@ class _TakeLoanState extends State<TakeLoan> {
       TextEditingController();
   final TextEditingController _textEditingControllereciver =
       TextEditingController();
+  final TextEditingController _textEditingControllerhistory =
+      TextEditingController();
 
   List<dynamic> percentageList = [0.5, 0.7, 0.8];
 
@@ -38,6 +40,14 @@ class _TakeLoanState extends State<TakeLoan> {
     getCurrencies();
     getloanestimate();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _textEditingControllesender.dispose();
+    _textEditingControllereciver.dispose();
+    _textEditingControllerhistory.dispose();
   }
 
   Future<void> getCurrencies() async {
@@ -138,7 +148,20 @@ class _TakeLoanState extends State<TakeLoan> {
                       ],
                     ),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        showModalBottomSheet<void>(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (BuildContext context) {
+                            return StatefulBuilder(
+                              builder:
+                                  (BuildContext context, StateSetter setState) {
+                                return checkLoanHistory(context, setState);
+                              },
+                            );
+                          },
+                        );
+                      },
                       icon: Icon(Icons.history),
                     )
                   ],
@@ -159,7 +182,7 @@ class _TakeLoanState extends State<TakeLoan> {
                                 ),
                               ),
                               Container(
-                                padding: EdgeInsets.all(18),
+                                padding: EdgeInsets.all(14),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(5),
                                   border: Border.all(
@@ -277,7 +300,7 @@ class _TakeLoanState extends State<TakeLoan> {
                                 ),
                               ),
                               Container(
-                                padding: EdgeInsets.all(18),
+                                padding: EdgeInsets.all(14),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(5),
                                   border: Border.all(
@@ -559,6 +582,103 @@ class _TakeLoanState extends State<TakeLoan> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget checkLoanHistory(context, setState) {
+    var loanProvider = Provider.of<LoanProvider>(context, listen: false);
+
+    return Container(
+      padding: EdgeInsets.all(10),
+      height: height * 0.5,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Get history on your email',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(Icons.close),
+              )
+            ],
+          ),
+          Divider(),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: EdgeInsets.only(bottom: 5),
+                child: Text('Enter your Email:'),
+              ),
+              Container(
+                  child: TextField(
+                controller: _textEditingControllerhistory,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'example@domain.com',
+                ),
+                onChanged: (text) {
+                  setState(() {
+                    //  fullName = text;
+                    //you can access nameController in its scope to get
+                    // the value of text entered as shown below
+                    //fullName = nameController.text;
+                  });
+                },
+              )),
+            ],
+          ),
+          Container(
+            padding: EdgeInsets.only(top: 10),
+            child: LyoButton(
+              onPressed: () {
+                if (_textEditingControllerhistory.text.isEmpty) {
+                  Fluttertoast.showToast(
+                      msg: "Please insert email",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.CENTER,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0);
+                } else {
+                  loanProvider
+                      .getLoanHistory(_textEditingControllerhistory.text.trim())
+                      .whenComplete(() =>
+                          loanProvider.myloanhistory['status'] == 200
+                              ? Fluttertoast.showToast(
+                                  msg: "Check your Email",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.TOP,
+                                  timeInSecForIosWeb: 1,
+                                  backgroundColor: buttoncolour,
+                                  textColor: Colors.white,
+                                  fontSize: 16.0)
+                              : null);
+
+                  Navigator.of(context).pop();
+                }
+              },
+              text: 'Submit',
+              active: true,
+              isLoading: false,
+            ),
+          ),
+        ],
       ),
     );
   }

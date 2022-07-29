@@ -218,6 +218,12 @@ class LoanProvider with ChangeNotifier {
 ///////recive email for verify//
   ///
   bool isemailwidgitconverter = false;
+
+  void setIsEmailWidgetConverter(value) {
+    isemailwidgitconverter = value;
+    notifyListeners();
+  }
+
   Future<void> getemail(ctx, email) async {
     var url = Uri.https(
       apiurlemailtoken,
