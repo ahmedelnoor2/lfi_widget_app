@@ -346,9 +346,10 @@ class _ConfirmLoanState extends State<ConfirmLoan> {
                             ),
                           ),
                           Text(
-                            '${double.parse('${loanProvider.loanestimate['down_limit']}').toStringAsFixed(4)}' +
-                                    ' ${loanProvider.fromSelectedCurrency['code']}/${loanProvider.toSelectedCurrency['code']}' ??
-                                'empty',
+                            double.parse(
+                                        '${loanProvider.loanestimate['down_limit']}')
+                                    .toStringAsFixed(4) +
+                                ' ${loanProvider.fromSelectedCurrency['code']}/${loanProvider.toSelectedCurrency['code']}',
                           ),
                         ],
                       ),
