@@ -1,9 +1,12 @@
-import 'dart:ui';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:lyotrade/providers/asset.dart';
 
 import 'package:lyotrade/providers/loan_provider.dart';
+import 'package:lyotrade/screens/common/alert.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/common/widget/loading_dialog.dart';
@@ -32,6 +35,7 @@ class _ConfirmLoanState extends State<ConfirmLoan> {
   final TextEditingController _textEditingControllerhistory =
       TextEditingController();
   final TextEditingController _textotpcontrolller = TextEditingController();
+  final TextEditingController _amountController = TextEditingController();
   //  Future<void> doconfirm(loanid,reciveraddres,email) async {
   //   var loanProvider = Provider.of<LoanProvider>(context, listen: false);
   //   await loanProvider.getConfirm(loanid,reciveraddres,email);
@@ -45,6 +49,7 @@ class _ConfirmLoanState extends State<ConfirmLoan> {
     _textEditingControllerAddress.dispose();
     _textEditingControllerEmail.dispose();
     _textEditingControllerhistory.dispose();
+    _amountController.dispose();
     _textotpcontrolller.dispose();
   }
 
@@ -107,16 +112,40 @@ class _ConfirmLoanState extends State<ConfirmLoan> {
   confirmnow() async {
     var loanProvider = Provider.of<LoanProvider>(context, listen: false);
     showDialog(
-        context: context,
-        builder: (c) {
-          return LoadingDialog(message: "Checking");
-        });
-
-    await loanProvider.getConfirm(
-      loanProvider.loanid,
-      _textEditingControllerAddress.text.trim(),
-      _textEditingControllerEmail.text.trim(),
+      context: context,
+      builder: (c) {
+        return LoadingDialog(message: "Checking");
+      },
     );
+
+    await loanProvider.getCustomer2FA(context, {
+      'email': _textEditingControllerEmail.text,
+    });
+
+    Navigator.pop(context);
+    if (loanProvider.cutomer2FA.isNotEmpty) {
+      showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return twoFactorAuth(
+                context,
+                setState,
+              );
+            },
+          );
+        },
+      );
+
+      // await loanProvider.getConfirm(
+      //   context,
+      //   loanProvider.loanid,
+      //   _textEditingControllerAddress.text.trim(),
+      //   _textEditingControllerEmail.text.trim(),
+      // );
+    }
   }
 
   @override
@@ -125,6 +154,13 @@ class _ConfirmLoanState extends State<ConfirmLoan> {
     width = MediaQuery.of(context).size.width;
 
     var loanProvider = Provider.of<LoanProvider>(context, listen: true);
+    var asset = Provider.of<Asset>(context, listen: true);
+
+    if (_textEditingControllerAddress.text.isEmpty) {
+      setState(() {
+        _textEditingControllerAddress.text = asset.changeAddress['addressStr'];
+      });
+    }
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -269,8 +305,9 @@ class _ConfirmLoanState extends State<ConfirmLoan> {
                           Row(
                             children: [
                               Text(
-                                '${double.parse('${loanProvider.loanestimate['interest_amounts']['month']}').toStringAsFixed(4)}' ??
-                                    'empty',
+                                double.parse(
+                                        '${loanProvider.loanestimate['interest_amounts']['month']}')
+                                    .toStringAsFixed(4),
                               ),
                               Container(
                                 child: Text('ETH'),
@@ -325,7 +362,7 @@ class _ConfirmLoanState extends State<ConfirmLoan> {
               child: Row(
                 children: [
                   Text(
-                      'Your ${loanProvider.toSelectedCurrency['code']}-${loanProvider.fromSelectedCurrency['code']} '),
+                      'Your ${loanProvider.toSelectedCurrency['code']}-${loanProvider.toSelectedCurrency['network']} '),
                   Text('payout address'),
                 ],
               ),
@@ -342,6 +379,7 @@ class _ConfirmLoanState extends State<ConfirmLoan> {
                 ),
               ),
               child: TextField(
+                readOnly: true,
                 controller: _textEditingControllerAddress,
                 decoration: const InputDecoration(
                   contentPadding: EdgeInsets.zero,
@@ -627,6 +665,197 @@ class _ConfirmLoanState extends State<ConfirmLoan> {
               text: 'Submit',
               active: true,
               isLoading: false,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget twoFactorAuth(context, setState) {
+    height = MediaQuery.of(context).size.height;
+    width = MediaQuery.of(context).size.width;
+
+    var loanProvider = Provider.of<LoanProvider>(context, listen: false);
+
+    return Container(
+      padding: EdgeInsets.all(10),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Enable two factor authentication to continue',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(
+                  Icons.close,
+                  size: 20,
+                ),
+              )
+            ],
+          ),
+          Container(
+            padding: EdgeInsets.all(10),
+            child: Image.memory(
+              base64Decode(
+                loanProvider.cutomer2FA['data']
+                    .split(',')[1]
+                    .replaceAll("\n", ""),
+              ),
+              width: 150,
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(10),
+            child: Text(
+              'Setup key',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          InkWell(
+            onTap: () {
+              Clipboard.setData(
+                ClipboardData(
+                  text: '${loanProvider.cutomer2FA['secret']}',
+                ),
+              );
+              showAlert(
+                context,
+                Icon(Icons.copy),
+                'Copied',
+                [
+                  Text('Successfully copied.'),
+                ],
+                'Ok',
+              );
+            },
+            child: Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  style: BorderStyle.solid,
+                  width: 0.3,
+                  color: Color(0xff5E6292),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('${loanProvider.cutomer2FA['secret']}'),
+                  Icon(
+                    Icons.copy,
+                    size: 18,
+                  )
+                ],
+              ),
+            ),
+          ),
+          Divider(),
+          Container(
+            padding: EdgeInsets.only(top: 10, bottom: 5),
+            child: Text('Enter 2FA Code:'),
+          ),
+          Container(
+            padding: EdgeInsets.only(bottom: 40),
+            child: Container(
+              padding: EdgeInsets.only(top: 5, bottom: 10),
+              child: Container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  border: Border.all(
+                    style: BorderStyle.solid,
+                    width: 0.3,
+                    color: Color(0xff5E6292),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(
+                      width: width * 0.7,
+                      child: TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter code';
+                          }
+                          return null;
+                        },
+                        onChanged: (value) async {
+                          if (value.length == 6) {
+                            var verifyStatus =
+                                await loanProvider.verify2FACode(context, {
+                              "code": value,
+                              "email": _textEditingControllerEmail.text,
+                            });
+                            if (verifyStatus) {
+                              Navigator.pop(context);
+                            }
+                            // setState(() {
+                            //   loanProvider.sendOtp(
+                            //     context,
+                            //     _textEditingControllerEmail.text.toString(),
+                            //     _textotpcontrolller.text.trim(),
+                            //   );
+                            // });
+                          }
+                        },
+                        controller: _amountController,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.zero,
+                          isDense: true,
+                          border: UnderlineInputBorder(
+                            borderSide: BorderSide.none,
+                          ),
+                          hintStyle: TextStyle(
+                            fontSize: 14,
+                          ),
+                          hintText: "Enter code",
+                        ),
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.only(right: 10),
+                          child: GestureDetector(
+                            onTap: () async {
+                              ClipboardData? data = await Clipboard.getData(
+                                Clipboard.kTextPlain,
+                              );
+                              setState(() {
+                                _amountController.text = '${data!.text}';
+                              });
+                            },
+                            child: Text(
+                              'PASTE',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: linkColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ],

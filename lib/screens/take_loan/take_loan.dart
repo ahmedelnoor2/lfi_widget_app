@@ -5,7 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:lyotrade/providers/asset.dart';
+import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/loan_provider.dart';
+import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
@@ -50,9 +53,28 @@ class _TakeLoanState extends State<TakeLoan> {
     _textEditingControllerhistory.dispose();
   }
 
+  Future<void> getUserAddress(coin, network) async {
+    var auth = Provider.of<Auth>(context, listen: false);
+    var asset = Provider.of<Asset>(context, listen: false);
+    var public = Provider.of<Public>(context, listen: false);
+
+    if (public.publicInfoMarket.isNotEmpty) {
+      public.publicInfoMarket['market']['followCoinList'][coin]
+          .forEach((key, value) async {
+        if (value['tokenBase'] == network) {
+          await asset.getChangeAddress(context, auth, key);
+        }
+      });
+    }
+    await asset.getChangeAddress(context, auth, coin);
+  }
+
   Future<void> getCurrencies() async {
+    var public = Provider.of<Public>(context, listen: false);
     var loanProvider = Provider.of<LoanProvider>(context, listen: false);
-    await loanProvider.getCurrencies();
+    await loanProvider.getCurrencies(public);
+    getUserAddress(loanProvider.toSelectedCurrency['code'],
+        loanProvider.toSelectedCurrency['network']);
   }
 
   Future<void> getloanestimate() async {
@@ -97,12 +119,13 @@ class _TakeLoanState extends State<TakeLoan> {
         });
       } else {
         showDialog(
-            context: context,
-            builder: (c) {
-              return ErrorDialog(
-                message: 'Some Thing went Wrong!',
-              );
-            });
+          context: context,
+          builder: (c) {
+            return ErrorDialog(
+              message: 'Some Thing went Wrong!',
+            );
+          },
+        );
       }
     });
   }
@@ -329,6 +352,12 @@ class _TakeLoanState extends State<TakeLoan> {
                                               provider.setToSelectedCurrency(
                                                   provider
                                                       .toCurrencies[newValue]);
+                                              getUserAddress(
+                                                provider
+                                                    .toSelectedCurrency['code'],
+                                                provider.toSelectedCurrency[
+                                                    'network'],
+                                              );
                                               provider.to_code = provider
                                                   .toSelectedCurrency['code'];
                                               provider.to_network =

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:html';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -92,7 +93,7 @@ class LoanProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getCurrencies() async {
+  Future<void> getCurrencies(public) async {
     var url = Uri.https(
       loanApiUrl,
       '$loanApiVersion/assets',
@@ -131,15 +132,19 @@ class LoanProvider with ChangeNotifier {
         for (var resData in myresponsedata) {
           if ((resData['is_stable'] == true) &&
               (resData['is_loan_receive_enabled'] == true)) {
-            _toCurrencies['${resData['code']}(${resData['network']})'] =
-                resData;
-            _toCurrenciesList.add('${resData['code']}(${resData['network']})');
+            if (public.publicInfoMarket['market']['followCoinList']
+                .containsKey('${resData['code']}')) {
+              _toCurrencies['${resData['code']}(${resData['network']})'] =
+                  resData;
+              _toCurrenciesList
+                  .add('${resData['code']}(${resData['network']})');
 
-            if ('${resData['code']}(${resData['network']})' ==
-                _selectedToCurrencyCoin) {
-              _toSelectedCurrency = resData;
-              to_code = _toSelectedCurrency['code'];
-              to_network = _toSelectedCurrency['network'];
+              if ('${resData['code']}(${resData['network']})' ==
+                  _selectedToCurrencyCoin) {
+                _toSelectedCurrency = resData;
+                to_code = _toSelectedCurrency['code'];
+                to_network = _toSelectedCurrency['network'];
+              }
             }
           }
         }
@@ -374,8 +379,13 @@ class LoanProvider with ChangeNotifier {
     }
   }
 
-  var isconfirm;
-  Future<void> getConfirm(myloanid, reciveraddress, email) async {
+  bool _isConfirm = false;
+
+  bool get isConfirm {
+    return _isConfirm;
+  }
+
+  Future<void> getConfirm(ctx, myloanid, reciveraddress, email) async {
     var url = Uri.https(
       loanApiUrl,
       '$loanApiVersion/confirm_loan',
@@ -398,16 +408,104 @@ class LoanProvider with ChangeNotifier {
       final responseData = json.decode(response.body);
       print(responseData);
 
-      if (responseData['result'] == 200) {
-        isconfirm = responseData['result'];
+      if (responseData['result']) {
+        _isConfirm = responseData['result'];
         return notifyListeners();
       } else {
+        _isConfirm = false;
+        snackAlert(ctx, SnackTypes.errors, responseData['response']);
         return notifyListeners();
       }
     } catch (error) {
       print(error);
-      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      snackAlert(
+        ctx,
+        SnackTypes.errors,
+        'Failed to process, please try again.',
+      );
+      _isConfirm = false;
+      return notifyListeners();
+    }
+  }
+
+  // Get customer 2FA
+  Map _customer2FA = {};
+
+  Map get cutomer2FA {
+    return _customer2FA;
+  }
+
+  Future<void> getCustomer2FA(ctx, formData) async {
+    var url = Uri.https(
+      loanApiUrl,
+      '/customers/get_customer_2fa',
+    );
+
+    var body = jsonEncode(formData);
+    print(body);
+
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+      final responseData = json.decode(response.body);
+
+      if (responseData['status'] == 200) {
+        _customer2FA = responseData;
+        return notifyListeners();
+      } else {
+        _customer2FA = {};
+        snackAlert(ctx, SnackTypes.errors, responseData['response']);
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      snackAlert(
+        ctx,
+        SnackTypes.errors,
+        'Failed to process, please try again.',
+      );
       return;
+    }
+  }
+
+  // Verify 2FA
+  Future<bool> verify2FACode(ctx, formData) async {
+    var url = Uri.https(
+      loanApiUrl,
+      '/customers/verify_the_code',
+    );
+
+    var body = jsonEncode(formData);
+
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+      final responseData = json.decode(response.body);
+
+      if (responseData['status'] == 200) {
+        return true;
+      } else {
+        showAlert(
+          ctx,
+          Icon(Icons.error),
+          'Error',
+          [
+            Text('${responseData['response']}'),
+          ],
+          'Ok',
+        );
+        return false;
+      }
+    } catch (error) {
+      print(error);
+      showAlert(
+        ctx,
+        Icon(Icons.error),
+        'Error',
+        [
+          Text('Failed to process, please try again.'),
+        ],
+        'Ok',
+      );
+      return false;
     }
   }
 
