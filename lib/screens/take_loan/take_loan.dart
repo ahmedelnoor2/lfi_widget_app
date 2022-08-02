@@ -80,7 +80,7 @@ class _TakeLoanState extends State<TakeLoan> {
   Future<void> getloanestimate() async {
     var loanProvider = Provider.of<LoanProvider>(context, listen: false);
 
-    await loanProvider.getloanestimate().whenComplete(() {
+    await loanProvider.getloanestimate(context).whenComplete(() {
       setState(() {
         _textEditingControllereciver.text = loanProvider.reciveramount;
         _textEditingControllesender.text = loanProvider.senderamount;
@@ -245,7 +245,7 @@ class _TakeLoanState extends State<TakeLoan> {
                                                   provider.fromSelectedCurrency[
                                                       'network'];
 
-                                              provider.getloanestimate();
+                                              provider.getloanestimate(context);
                                             });
                                           },
                                           items:
@@ -286,7 +286,7 @@ class _TakeLoanState extends State<TakeLoan> {
                                             provider.amount = value;
 
                                             provider
-                                                .getloanestimate()
+                                                .getloanestimate(context)
                                                 .whenComplete(() {
                                               setState(() {
                                                 _textEditingControllereciver
@@ -368,7 +368,7 @@ class _TakeLoanState extends State<TakeLoan> {
                                                   provider.toSelectedCurrency[
                                                       'network'];
                                             });
-                                            provider.getloanestimate();
+                                            provider.getloanestimate(context);
                                           },
                                           items: provider.toCurrenciesList.map(
                                             (value) {
@@ -475,7 +475,7 @@ class _TakeLoanState extends State<TakeLoan> {
                                           loanProvider.ltv_percent =
                                               percentageList[i];
                                           loanProvider
-                                              .getloanestimate()
+                                              .getloanestimate(context)
                                               .whenComplete(() {
                                             setState(() {
                                               _textEditingControllereciver
@@ -521,7 +521,7 @@ class _TakeLoanState extends State<TakeLoan> {
                   padding: const EdgeInsets.only(
                       left: 16, right: 16, top: 8, bottom: 8),
                   child: FutureBuilder(
-                    future: loanProvider.getloanestimate(),
+                    future: loanProvider.getloanestimate(context),
                     builder: (context, dataSnapshot) {
                       if (dataSnapshot.connectionState ==
                           ConnectionState.waiting) {

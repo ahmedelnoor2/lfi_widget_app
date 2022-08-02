@@ -184,7 +184,7 @@ class LoanProvider with ChangeNotifier {
   var reciveramount = '';
   var senderamount = '';
 
-  Future<void> getloanestimate() async {
+  Future<void> getloanestimate(ctx) async {
     var url = Uri.https(loanApiUrl, loansApiestimate, {
       'from_code': from_code,
       'from_network': from_network,
@@ -202,19 +202,23 @@ class LoanProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-
-      if (responseData['result']) {
-        _loanestimate = responseData['response'];
-        senderamount = responseData['response']['amount_from'];
-        reciveramount = responseData['response']['amount_to'];
-        return notifyListeners();
+      if (responseData != null) {
+        if (responseData['result']) {
+          _loanestimate = responseData['response'];
+          senderamount = responseData['response']['amount_from'];
+          reciveramount = responseData['response']['amount_to'];
+          return notifyListeners();
+        } else {
+          _loanestimate = {};
+          return notifyListeners();
+        }
       } else {
         _loanestimate = {};
         return notifyListeners();
       }
     } catch (error) {
-      print(error);
-      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      // print(error);
+      // snackAlert(ctx, SnackTypes.errors, 'Invalid price');
       return;
     }
   }
