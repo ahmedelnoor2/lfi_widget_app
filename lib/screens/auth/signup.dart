@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -51,6 +52,7 @@ class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
 
   bool _readPassword = true;
   bool _readConfirmPassword = true;
+  
   String _sessionId = '';
 
   late TextEditingController _emailOrPhone;
@@ -125,7 +127,7 @@ class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
-
+var auth=Provider.of<Auth>(context,listen: false);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -448,14 +450,16 @@ class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
           child: LyoButton(
             text: 'Sign Up',
             active: (_enableSignup && termsAndCondition),
-            isLoading: false,
+            isLoading: auth.emailSignupLoader,
             activeColor: linkColor,
             activeTextColor: Colors.black,
             onPressed: (_enableSignup && termsAndCondition)
                 ? () {
                     if (_formKey.currentState!.validate()) {
-                      snackAlert(context, SnackTypes.warning, 'Processing...');
+                    
+                      //snackAlert(context, SnackTypes.warning, 'Processing...');
                       setState(() {
+                      
                         _enableSignup = false;
                       });
 
@@ -490,7 +494,6 @@ class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
       ],
     );
   }
-
   Widget _buildCaptchaView() {
     return WebViewX(
       key: const ValueKey('webviewx'),

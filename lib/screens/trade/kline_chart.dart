@@ -224,7 +224,6 @@ class _KlineChartState extends State<KlineChart>
       ];
     });
     var public = Provider.of<Public>(context, listen: false);
-
     public
         .fetchKlkines(_currentInterval, public.activeMarket['symbol'])
         .then((value) {
