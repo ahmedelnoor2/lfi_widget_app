@@ -66,7 +66,7 @@ class _TakeLoanState extends State<TakeLoan> {
         }
       });
     }
-    await asset.getChangeAddress(context, auth, coin);
+    // await asset.getChangeAddress(context, auth, coin);
   }
 
   Future<void> getCurrencies() async {
@@ -111,9 +111,13 @@ class _TakeLoanState extends State<TakeLoan> {
           return LoadingDialog(message: "Checking");
         });
 
+    getUserAddress(
+      loanProvider.toSelectedCurrency['code'],
+      loanProvider.toSelectedCurrency['network'],
+    );
     await loanProvider.getCreateLoan().whenComplete(() {
       if (loanProvider.result == true) {
-        loanProvider.getLoanStatus(loanProvider.loanid).whenComplete(() {
+        loanProvider.getLoanStatus(loanProvider.loanid).whenComplete(() async {
           Navigator.pop(context);
           Navigator.pushNamed(context, '/confirm_loan');
         });
@@ -363,9 +367,8 @@ class _TakeLoanState extends State<TakeLoan> {
                                               provider.to_network =
                                                   provider.toSelectedCurrency[
                                                       'network'];
-
-                                              provider.getloanestimate();
                                             });
+                                            provider.getloanestimate();
                                           },
                                           items: provider.toCurrenciesList.map(
                                             (value) {

@@ -299,7 +299,12 @@ class LoanProvider with ChangeNotifier {
     return _createloan;
   }
 
-  var loanid;
+  // Loan ID
+  String _loanid = '';
+
+  String get loanid {
+    return _loanid;
+  }
 
   bool result = false;
 
@@ -322,7 +327,7 @@ class LoanProvider with ChangeNotifier {
       if (responseData['result']) {
         result = responseData['result'];
 
-        loanid = responseData['response']['loan_id'];
+        _loanid = responseData['response']['loan_id'];
 
         _createloan = responseData['response'];
 
@@ -479,6 +484,8 @@ class LoanProvider with ChangeNotifier {
       final response = await http.post(url, headers: headers, body: body);
       final responseData = json.decode(response.body);
 
+      print(responseData);
+
       if (responseData['status'] == 200) {
         return true;
       } else {
@@ -487,7 +494,7 @@ class LoanProvider with ChangeNotifier {
           Icon(Icons.error),
           'Error',
           [
-            Text('${responseData['response']}'),
+            Text('${responseData['message']}'),
           ],
           'Ok',
         );
@@ -549,5 +556,17 @@ class LoanProvider with ChangeNotifier {
       // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
       return;
     }
+  }
+
+  // Loan details
+  Map _loanDetails = {};
+
+  Map get loanDetails {
+    return _loanDetails;
+  }
+
+  void setLoanDetails(details) {
+    _loanDetails = details;
+    notifyListeners();
   }
 }

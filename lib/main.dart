@@ -51,6 +51,7 @@ import 'package:lyotrade/screens/security/security.dart';
 import 'package:lyotrade/screens/staking/common/stake_order.dart';
 import 'package:lyotrade/screens/staking/stake.dart';
 import 'package:lyotrade/screens/take_loan/confrim_loan.dart';
+import 'package:lyotrade/screens/take_loan/process_loan.dart';
 import 'package:lyotrade/screens/take_loan/take_loan.dart';
 import 'package:lyotrade/screens/trade/kline_chart.dart';
 import 'package:lyotrade/screens/trade/margin/margin_trade_history.dart';
@@ -261,6 +262,7 @@ class MyApp extends StatelessWidget {
               BuySellCrypto.routeName: (context) => const BuySellCrypto(),
               ConfirmLoan.routeName: (context) => const ConfirmLoan(),
               TakeLoan.routeName: (context) => const TakeLoan(),
+              ProcessLoan.routeName: (context) => const ProcessLoan(),
               Referal.routeName: ((context) => Referal()),
               Kycscreen.routeName: ((context) => Kycscreen()),
               personalverification.routeName: (context) =>
