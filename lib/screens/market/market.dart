@@ -4,6 +4,7 @@ import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/bottomnav.dart';
 import 'package:lyotrade/screens/common/header.dart';
+import 'package:lyotrade/screens/common/no_data.dart';
 
 import 'package:lyotrade/screens/market/pages/favourite_page.dart';
 import 'package:lyotrade/screens/trade/kline_chart.dart';
@@ -12,6 +13,8 @@ import 'package:lyotrade/utils/Coins.utils.dart';
 import 'package:lyotrade/utils/ScreenControl.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
+
+import '../../utils/Number.utils.dart';
 
 class Market extends StatefulWidget {
   static const routeName = '/market';
@@ -22,13 +25,27 @@ class Market extends StatefulWidget {
 }
 
 class _MarketState extends State<Market> {
+  final TextEditingController _searchController = TextEditingController();
   final _klineView = true;
+  String _currentMarketSort = 'USDT';
 
   @override
   void initState() {
     getrecommendedsymbol();
 
     super.initState();
+  }
+
+  @override
+  void dispose() async {
+    super.dispose();
+    _searchController.dispose();
+  }
+
+  void updateMarketSort(value) {
+    setState(() {
+      _currentMarketSort = value;
+    });
   }
 
   Future<void> getrecommendedsymbol() async {
@@ -98,102 +115,130 @@ class _MarketState extends State<Market> {
                                   borderRadius: BorderRadius.circular(5),
                                   color: cardcolor,
                                 ),
-                                height: height * 0.2,
-                                width: width * 0.60,
-                                margin: EdgeInsets.all(10),
+                                width: 178,
+                                margin: EdgeInsets.all(5),
                                 child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Padding(
+                                    Container(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Image.network(
-                                            '${public.publicInfoMarket['market']['coinList']['${public.marketrecoomendsymbol[index].split('/')[0]}']['icon']}',
-                                            width: 25,
-                                          ),
-                                          Container(
-                                            padding: EdgeInsets.only(left: 8),
-                                            child: Text(
-                                              '${getMarketName(public.marketrecoomendsymbol[index])}',
-                                              // public.activeMarginMarket[public.marketrecoomendsymbol.replaceAll('/', '')],
-                                              style: TextStyle(),
-                                            ),
-                                          ),
-                                          Container(
-                                            padding: EdgeInsets.only(
-                                                left: width * 0.15),
-                                            child: Text(
-                                              '${(double.parse(data['rose']) * 100).toStringAsFixed(4)} %',
-                                              style:
-                                                  TextStyle(color: Colors.red),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Container(
-                                      padding:
-                                          EdgeInsets.only(top: height * 0.020),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            padding: EdgeInsets.only(left: 8),
-                                            child: Text(
-                                              '${data['close'].toString()}',
-                                              style: TextStyle(),
-                                            ),
-                                          ),
-                                          Container(
-                                            padding: EdgeInsets.only(
-                                                left: width * 0.03),
-                                            child: Text(
-                                              "\$1.8",
-                                              style: TextStyle(
-                                                  color: darkgreyColor),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Container(
-                                      padding:
-                                          EdgeInsets.only(top: height * 0.030),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            padding: EdgeInsets.only(left: 6),
-                                            child: FittedBox(
-                                              fit: BoxFit.scaleDown,
-                                              child: Text(
-                                                ' ${double.parse('${data['vol']}').toStringAsFixed(4)}',
-                                                style: TextStyle(),
+                                          Row(
+                                            children: [
+                                              Stack(
+                                                children: [
+                                                  Container(
+                                                    padding: EdgeInsets.only(
+                                                        left: 10),
+                                                    child: Image.network(
+                                                      '${public.publicInfoMarket['market']['coinList']['${public.marketrecoomendsymbol[index].split('/')[1]}']['icon']}',
+                                                      width: 16,
+                                                    ),
+                                                  ),
+                                                  Image.network(
+                                                    '${public.publicInfoMarket['market']['coinList']['${public.marketrecoomendsymbol[index].split('/')[0]}']['icon']}',
+                                                    width: 16,
+                                                  ),
+                                                ],
                                               ),
+                                              Container(
+                                                padding:
+                                                    EdgeInsets.only(left: 5),
+                                                child: Text(
+                                                  '${getMarketName(public.marketrecoomendsymbol[index])}',
+                                                  // public.activeMarginMarket[public.marketrecoomendsymbol.replaceAll('/', '')],
+                                                  style: TextStyle(),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Text(
+                                            data['rose'] != null
+                                                ? '${double.parse(data['rose']) > 0 ? '+' : ''}${(double.parse(data['rose']) * 100).toStringAsFixed(2)} %'
+                                                : '--%',
+                                            style: TextStyle(
+                                              color:
+                                                  double.parse(data['rose']) > 0
+                                                      ? greenIndicator
+                                                      : redIndicator,
+                                              fontSize: 12,
                                             ),
                                           ),
-                                          Container(
-                                            padding: EdgeInsets.only(
-                                                left: width * 0.01),
-                                            child: Text(
-                                              "\$1.8",
-                                              style: TextStyle(
-                                                  color: darkgreyColor),
-                                            ),
-                                          ),
-                                          Container(
-                                            margin: EdgeInsets.only(
-                                                left: width * 0.20),
-                                            alignment: Alignment.center,
-                                            height: 22,
-                                            width: 22,
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: darkgreyColor,
-                                            ),
-                                            child: Icon(Icons.navigate_next,
-                                                color: Colors.white, size: 22),
-                                          )
                                         ],
                                       ),
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.only(
+                                              left: 10, bottom: 5),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                '${data['close'].toString()}',
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: double.parse(
+                                                              data['rose']) >
+                                                          0
+                                                      ? greenIndicator
+                                                      : redIndicator,
+                                                ),
+                                              ),
+                                              Text(
+                                                "≈ ${getNumberFormat(context, public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()]['${public.marketrecoomendsymbol[index].split('/')[0]}'])}",
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: EdgeInsets.only(
+                                              left: 10, right: 10, bottom: 5),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Container(
+                                                child: Text(
+                                                  '24H Vol: ${getNumberString(context, double.parse('${public.activeMarketTick['vol']}'))}',
+                                                  style: TextStyle(
+                                                    color: secondaryTextColor,
+                                                    fontSize: 11,
+                                                  ),
+                                                ),
+                                              ),
+                                              Container(
+                                                alignment: Alignment.center,
+                                                height: 20,
+                                                width: 20,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: secondaryTextColor400,
+                                                ),
+                                                child: Icon(
+                                                  Icons.navigate_next,
+                                                  color: Colors.black,
+                                                  size: 20,
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
@@ -201,45 +246,107 @@ class _MarketState extends State<Market> {
                             }),
                       ),
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    padding: EdgeInsets.only(top: 5, bottom: 5),
                     child: DefaultTabController(
                       length: 2,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          ButtonsTabBar(
-                            height: 40,
-
-                            //  backgroundColor: buttoncolour,
-                            unselectedBackgroundColor: greyDarkHeaderTextColor,
-                            unselectedLabelStyle:
-                                TextStyle(color: Colors.black),
-
-                            labelStyle: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold),
-                            tabs: [
-                              Tab(
-                                icon: Icon(
-                                  Icons.star,
-                                  size: 15,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              ButtonsTabBar(
+                                height: height * 0.043,
+                                radius: 2,
+                                contentPadding:
+                                    EdgeInsets.only(left: 10, right: 10),
+                                backgroundColor: linkColor,
+                                splashColor: linkColor,
+                                unselectedBackgroundColor: Colors.transparent,
+                                unselectedLabelStyle:
+                                    TextStyle(color: secondaryTextColor),
+                                labelStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
                                 ),
-                                height: 30,
-                                text: "Favorites ",
+                                tabs: [
+                                  Tab(
+                                    text: 'Exchange',
+                                  ),
+                                  Tab(
+                                    icon: Icon(
+                                      Icons.star,
+                                      size: 12,
+                                    ),
+                                    text: "Favorites",
+                                  ),
+                                ],
                               ),
-                              Tab(
-                                height: 30,
-                                text: " Exchange ",
+                              Container(
+                                margin: EdgeInsets.only(right: 2),
+                                child: Container(
+                                  padding: EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                      style: BorderStyle.solid,
+                                      width: 0.3,
+                                      color: Color(0xff5E6292),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.only(right: 8),
+                                        child: Icon(
+                                          Icons.search,
+                                          size: 14,
+                                          color: secondaryTextColor,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: width * 0.37,
+                                        child: TextField(
+                                          onChanged: (value) async {
+                                            // await asset.filterSearchResults(value);
+                                            await public
+                                                .filterMarketSearchResults(
+                                              value,
+                                              public.allMarkets[
+                                                  _currentMarketSort],
+                                              _currentMarketSort,
+                                            );
+                                          },
+                                          controller: _searchController,
+                                          decoration: InputDecoration(
+                                            contentPadding: EdgeInsets.zero,
+                                            isDense: true,
+                                            border: UnderlineInputBorder(
+                                              borderSide: BorderSide.none,
+                                            ),
+                                            hintStyle: TextStyle(
+                                              fontSize: 14,
+                                            ),
+                                            hintText: "Search",
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ],
                           ),
                           Expanded(
                             child: TabBarView(
                               children: <Widget>[
-                                Favoritespage(),
+                                FavoritesScreen(
+                                    currentMarketSort: _currentMarketSort,
+                                    upateCurrentMarketSort: updateMarketSort),
                                 Center(
-                                  child: Icon(Icons.directions_transit),
+                                  child: noData('No Favorites'),
                                 ),
                               ],
                             ),
