@@ -42,6 +42,7 @@ class _Login extends State<Login> {
   static final AliyunCaptchaController _captchaController =
       AliyunCaptchaController();
   bool _enableLogin = true;
+
   final _formLoginKey = GlobalKey<FormState>();
 
   final String mobileNumber = '';
@@ -127,7 +128,7 @@ class _Login extends State<Login> {
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
-
+    var auth = Provider.of<Auth>(context, listen: false);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -236,14 +237,11 @@ class _Login extends State<Login> {
           child: LyoButton(
             text: 'Login',
             active: (_enableLogin || kIsWeb),
-            isLoading: false,
+            isLoading: auth.isLoginloader,
             activeColor: linkColor,
             activeTextColor: Colors.black,
             onPressed: () {
               if (_formLoginKey.currentState!.validate()) {
-                // If the form is valid, display a snackbar. In the real world,
-                // you'd often call a server or save the information in a database.
-                snackAlert(context, SnackTypes.warning, 'Processing...');
                 setState(() {
                   _enableLogin = false;
                 });

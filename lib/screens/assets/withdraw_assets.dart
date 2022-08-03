@@ -345,6 +345,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
     }
   }
 
+
   Future<void> processWithdrawAmount() async {
     setState(() {
       _validateEmailProcess = false;

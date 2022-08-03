@@ -1,13 +1,18 @@
+import 'dart:convert';
+
+import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
+
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/referral.dart';
 
 import 'package:lyotrade/screens/common/header.dart';
 
-import 'package:lyotrade/screens/referal/pages/commision_record.dart';
-import 'package:lyotrade/screens/referal/pages/position_statistics.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
+
+import '../common/snackalert.dart';
+import '../common/types.dart';
 
 class Referal extends StatefulWidget {
   static const routeName = '/referal_screen';
@@ -15,377 +20,474 @@ class Referal extends StatefulWidget {
   State<StatefulWidget> createState() => _ReferalState();
 }
 
-class _ReferalState extends State<Referal> with SingleTickerProviderStateMixin {
-  TabController? _tabController;
-
-  var currenttabindex = 0;
-//TextEditingController generalcontroller = TextEditingController();
-  var _pages = [
-    CommisonPage(),
-    Postionpage(),
-  ];
-
+class _ReferalState extends State<Referal> {
+  
+  
   @override
   void initState() {
+    
     super.initState();
-
-    _tabController = new TabController(
-      vsync: this,
-      length: 2,
-      initialIndex: 0,
-    );
+    getreferalinivationdat();
   }
-
-// Step 1.
-  String dropdownValue = 'USDT';
-  String dropdownValue1 = 'UID';
-  String labelText = 'UID';
-
-  @override
-  Widget build(BuildContext context) {
+  Image? _qrCode;
+  
+  Future<void> getreferalinivationdat() async {
     var auth = Provider.of<Auth>(context, listen: false);
     var referalprovider = Provider.of<ReferralProvider>(context, listen: false);
-   
 
-    final _size = MediaQuery.of(context).size;
+    await referalprovider.getreferralInvitation(context, auth);
+    loadQrCode();
+  }
+
+  Future<void> loadQrCode() async {
+    var referalprovider = Provider.of<ReferralProvider>(context, listen: false);
+    setState(() {
+      _qrCode = Image.memory(
+        base64Decode(
+          referalprovider.referralinvitationdata['inviteQECode']
+              .split(',')[1]
+              .replaceAll("\n", ""),
+        ),
+      );
+    });
+  }
+
+@override
+  Widget build(BuildContext context) {
+    var auth = Provider.of<Auth>(context, listen: false);
+    var referalprovider = Provider.of<ReferralProvider>(context, listen: true);
+  
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
+
     return Scaffold(
       appBar: hiddenAppBar(),
-      body: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
+      body: SingleChildScrollView(
+        child:referalprovider.isrefdataloagin?SizedBox(
+       height: MediaQuery.of(context).size.height / 1.3,
+       child: Center(
+           child: CircularProgressIndicator(),
+            ),
+        ): Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.only(right: 20),
+                      child: IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(Icons.chevron_left),
+                      ),
+                    ),
+                    Text(
+                      'Referral',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: (() {
+                        Navigator.pushNamed(context, '/LeaderBoard_screen');
+                      }),
+                      child: Container(
+                          width: width * 0.1,
+                          padding: EdgeInsets.only(right: width * 0.02),
+                          child: Image.asset('assets/img/ref2.png')),
+                    ),
+                    GestureDetector(
+                      onTap: (() {
+                        Navigator.pushNamed(context, '/Refralinvitation_screen');
+                      }),
+                      child: Container(
+                          width: width * 0.1,
+                          padding: EdgeInsets.only(right: width * 0.02),
+                          child: Image.asset('assets/img/invitation.png')),
+                    ),
+                  ],
+                )
+              ],
+            ),
+            Divider(thickness: 1, height: 1),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: selectboxcolour,
+                  image: DecorationImage(
+                      image: AssetImage(
+                        "assets/img/referral.png",
+                      ),
+                      // fit: BoxFit.contain,
+                      alignment: Alignment.bottomRight),
+                ),
+                //  width: width * 100,
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Top Referrer Bonus(USDT) ',
+                        style:
+                            TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
+                      ),
+                      Text(
+                          referalprovider
+                              .referralinvitationdata['topReferrerRewardAmount']
+                              .toString(),
+                          style: TextStyle(
+                              fontSize: 22, fontWeight: FontWeight.w500)),
+                      Container(
+                        padding: EdgeInsets.only(
+                            left: 0, top: height * 0.02, right: width * 0.3),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Friends',
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400)),
+                                Text(
+                                    referalprovider.referralinvitationdata[
+                                            'invitationUserCount']
+                                        .toString(),
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500)),
+                              ],
+                            ),
+                            Container(
+                              padding: EdgeInsets.only(left: width * 0.2),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Rewards(USDT)',
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w400)),
+                                  Text(
+                                      referalprovider.referralinvitationdata[
+                                              'invitationRewardUsdtSum']
+                                          .toString(),
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500)),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ]),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 16),
+              child: Row(
                 children: [
+                  Image.asset('assets/img/ref-icon1.png'),
                   Container(
-                    padding: EdgeInsets.only(right: 20),
-                    child: IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: Icon(Icons.chevron_left),
-                    ),
-                  ),
-                  Text(
-                    'Referral',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    padding: EdgeInsets.only(left: 8),
+                    child: Text('How to get rebate income?',
+                        style:
+                            TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
                   ),
                 ],
               ),
-            ],
-          ),
-          Divider(thickness: 1, height: 1),
-          SizedBox(
-            height: 20,
-          ),
-          FutureBuilder(
-              future: referalprovider.getreferral(auth),
-              builder: (context, dataSnapshot) {
-                if (dataSnapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                 } else {
-                  if (dataSnapshot.error != null) {
-                    return Center(
-                      child: Text('An error occured'),
-                    );
-                  } else {
-                    return Consumer<ReferralProvider>(
-                        builder: (context, refData, child) => Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.44,
-                                  height: 62,
-                                  color: selectboxcolour,
-                                  child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            'Total invitees',
-                                            style: TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.w500),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 8, right: 8),
-                                          child: Text(
-                                              refData.referraldata['count']
-                                                  .toString(),
-                                              style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w500)),
-                                        ),
-                                      ]),
-                                ),
-                                Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.44,
-                                  height: 62,
-                                  color: selectboxcolour,
-                                  child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            'Total income',
-                                            style: TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.w500),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 8, right: 8),
-                                          child: Text(
-                                              refData.referraldata[
-                                                          'allBonusAmount']
-                                                      .toString() +
-                                                  " " +
-                                                  refData.referraldata[
-                                                          'allBonusCoin']
-                                                      .toString(),
-                                              style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w500)),
-                                        ),
-                                      ]),
-                                ),
-                              ],
-                            ));
-                  }
-                }
-              }),
-          SizedBox(
-            height: 20,
-          ),
-          Container(
-            child: Expanded(
+            ),
+            Container(
+              margin: EdgeInsets.only(top: 8, left: 16),
               child: Column(
-                children: [
-                  PreferredSize(
-                    preferredSize: Size.fromHeight(40),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: TabBar(
-                        onTap: (value) {
-                          setState(() {
-                            currenttabindex = value;
-                          });
-                        },
-                        isScrollable: true,
-                        controller: _tabController,
-                        labelColor: whiteTextColor,
-                        indicatorColor: selecteditembordercolour,
-                        unselectedLabelColor: Colors.grey,
-                        indicatorSize: TabBarIndicatorSize.tab,
-                        indicatorWeight: 1.0,
-                        indicatorPadding:
-                            EdgeInsets.symmetric(horizontal: 70.0),
-                        labelStyle: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: _size.width / 28.0,
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Row(
+                    children: [
+                      Container(
+                        alignment: Alignment.center,
+                        height: height * 0.04,
+                        width: width * 0.1,
+                        decoration: BoxDecoration(
+                          color: selectboxcolour,
+                          shape: BoxShape.circle,
                         ),
-                        unselectedLabelStyle: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: _size.width / 28.0,
+                        child: Text(
+                          '1',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 16),
                         ),
-                        tabs: [
-                          Container(
-                            width: _size.width * .4,
-                            child: Tab(
-                              text: 'Commission record',
-                            ),
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Send invitation',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 14),
                           ),
-                          Container(
-                            width: _size.width * .4,
-                            child: Tab(
-                              text: 'Position statistics',
-                            ),
+                          Text(
+                            'Friends complete registration and trade',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 10),
                           ),
                         ],
                       ),
+                    ],
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(left: 20),
+                    child: DottedLine(
+                      direction: Axis.vertical,
+                      lineLength: height * 0.04,
+                      lineThickness: 1.0,
+                      dashLength: 2.0,
+                      dashColor: Colors.black,
+                      dashGapLength: 4.0,
+                      dashGapColor: darkgreyColor,
+                      dashGapRadius: 0.0,
                     ),
                   ),
-                  Divider(thickness: 1, height: 1),
-                  _buildTopBar(context),
-                  Expanded(
-                    child: TabBarView(
-                      controller: _tabController,
-                      children: _pages.map((Widget tab) {
-                        return tab;
-                      }).toList(),
+                  Row(
+                    children: [
+                      Container(
+                        alignment: Alignment.center,
+                        height: height * 0.04,
+                        width: width * 0.1,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle, color: selectboxcolour),
+                        child: Text(
+                          '2',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Friends complete registration and trade',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 14),
+                          ),
+                          Text(
+                            'They hiy the road',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 10),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(left: 20),
+                    child: DottedLine(
+                      direction: Axis.vertical,
+                      lineLength: height * 0.04,
+                      lineThickness: 1.0,
+                      dashLength: 2.0,
+                      dashColor: Colors.black,
+                      dashRadius: 0.0,
+                      dashGapLength: 4.0,
+                      dashGapColor: darkgreyColor,
+                      dashGapRadius: 0.0,
                     ),
+                  ),
+                  Row(
+                    children: [
+                      Container(
+                        alignment: Alignment.center,
+                        height: height * 0.04,
+                        width: width * 0.1,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle, color: selectboxcolour),
+                        child: Text(
+                          '3',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Get rebate income',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 14),
+                          ),
+                          Text(
+                            'You make savings!',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 10),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTopBar(context) {
-    var auth = Provider.of<Auth>(context, listen: false);
-    var referalprovider = Provider.of<ReferralProvider>(context, listen: false);
-
-    return Container(
-      padding: EdgeInsets.fromLTRB(6.0, 8.0, 6.0, 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 2,
-            child: Container(
-              height: 30,
-              padding: EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+            Container(
+              padding: EdgeInsets.all(5),
               decoration: BoxDecoration(
-                  color: selectboxcolour,
-                  borderRadius: BorderRadius.circular(5)),
-              child: DropdownButton<String>(
-                underline: SizedBox(),
-                value: referalprovider.coinName,
-                items: <String>['LYO', 'USDT', 'HT', 'DASH', 'XRP']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(
-                      value,
-                      style: TextStyle(fontSize: 10),
-                    ),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    if (currenttabindex == 0) {
-                      referalprovider.coinName = newValue!;
-                      referalprovider.getreferral(auth);
-                    }
-
-                    if (currenttabindex == 1) {
-                      referalprovider.pcoinName = newValue!;
-                      referalprovider.getpositionreferral(auth);
-                    }
-                  });
-                },
+                border: Border.all(
+                  style: BorderStyle.solid,
+                  width: 0.3,
+                  color: Color(0xff5E6292),
+                ),
               ),
+              width: width * 0.30,
+              height: width * 0.30,
+              child: (referalprovider.referralinvitationdata['inviteQECode'] !=
+                          null &&
+                      _qrCode != null)
+                  ? _qrCode
+                  : const CircularProgressIndicator.adaptive(),
             ),
-          ),
-          SizedBox(
-            width: 5,
-          ),
-          Expanded(
-            flex: 2,
-            child: Container(
-              height: 30,
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-              decoration: BoxDecoration(
-                  color: selectboxcolour,
-                  borderRadius: BorderRadius.circular(5)),
-              child: DropdownButton<String>(
-                underline: SizedBox(),
-                value: dropdownValue1,
-                items: <String>[
-                  'UID',
-                  'Phone Number',
-                  'Email',
-                ].map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(
-                      value,
-                      style: TextStyle(fontSize: 10),
-                    ),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    if (newValue == 'UID') {
-                      dropdownValue1 = newValue!;
-                      if (currenttabindex == 0) {
-                        referalprovider.keyborad = '1';
-                        referalprovider.getreferral(auth);
-                      }
-                      if (currenttabindex == 1) {
-                        referalprovider.pkeyborad = '1';
-                        referalprovider.getpositionreferral(auth);
-                      }
-                    }
-                    if (newValue == 'Phone Number') {
-                      dropdownValue1 = newValue!;
-                      if (currenttabindex == 0) {
-                        referalprovider.keyborad = '2';
-                        referalprovider.getreferral(auth);
-                      }
-                      if (currenttabindex == 1) {
-                        referalprovider.pkeyborad = '2';
-                        referalprovider.getpositionreferral(auth);
-                      }
-
-                      labelText = 'Phone Number';
-                    }
-                    if (newValue == 'Email') {
-                      dropdownValue1 = newValue!;
-                      if (currenttabindex == 0) {
-                        referalprovider.keyborad = '3';
-                        referalprovider.getreferral(auth);
-                      }
-                      if (currenttabindex == 1) {
-                        referalprovider.pkeyborad = '3';
-                        referalprovider.getpositionreferral(auth);
-                      }
-
-                      labelText = 'Email';
-                    }
-                  });
+            Container(
+              padding:
+                  const EdgeInsets.only(left: 16, right: 16, top: 5, bottom: 5),
+              width: MediaQuery.of(context).size.width * 90,
+              child: InkWell(
+                onTap: () {
+                  snackAlert(context, SnackTypes.success, 'Copied');
                 },
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Container(
-              padding: const EdgeInsets.only(
-                left: 15,
-                right: 15,
-              ),
-              child: SizedBox(
-                height: MediaQuery.of(context).size.width * 0.09,
-                child: TextField(
-                  onChanged: (value) {
-                    referalprovider.keyword = value;
-                    print(referalprovider.keyword);
-                    referalprovider.getreferral(auth);
-                  },
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(5.0),
+                child: Container(
+                  height: height * 0.06,
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: invitationcodecolour,
+                  ),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: width * 0.6,
+                        child: Text(
+                          'Invitation code',
+                        ),
                       ),
-                    ),
+                      SizedBox(
+                        width: width * 0.2,
+                        child: Text(
+                          'QZAELQVZ',
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          snackAlert(context, SnackTypes.success, 'Copied');
+                        },
+                        child: Image.asset(
+                          'assets/img/copy.png',
+                          width: 18,
+                        ),
+                      )
+                    ],
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+            Container(
+              padding:
+                  const EdgeInsets.only(left: 16, right: 16, top: 5, bottom: 5),
+              width: MediaQuery.of(context).size.width * 90,
+              child: InkWell(
+                onTap: () {
+                  snackAlert(context, SnackTypes.success, 'Copied');
+                },
+                child: Container(
+                  height: height * 0.06,
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: invitationcodecolour,
+                  ),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: width * 0.4,
+                        child: Text(
+                          referalprovider.referralinvitationdata['inviteCode'].toString(),
+                          style: TextStyle(fontSize: 14),
+                        ),
+                      ),
+                      SizedBox(
+                        width: width * 0.4,
+                        child: Text(
+                         referalprovider.referralinvitationdata['inviteUrl'].toString() ,
+                          style: TextStyle(fontSize: 14),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          snackAlert(context, SnackTypes.success, 'Copied');
+                        },
+                        child: Image.asset(
+                          'assets/img/copy.png',
+                          width: 18,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.only(top: height * 0.03),
+              padding: const EdgeInsets.only(left: 16, right: 16),
+              width: MediaQuery.of(context).size.width * 90,
+              height: 32,
+              child: ElevatedButton(
+                child: Text(
+                  'Invite Friends',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500),
+                ),
+                style: ElevatedButton.styleFrom(
+                  primary: selecteditembordercolour,
+                  textStyle: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                  ),
+                ),
+                onPressed: () {
+               showModalBottomSheet<void>(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return StatefulBuilder(
+                              builder:
+                                  (BuildContext context, StateSetter setState) {
+                                return Container(
+
+                                  child: Text('hi bottom sheet'),
+                                );
+                              },
+                            );
+                          },
+                        );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

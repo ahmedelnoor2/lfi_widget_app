@@ -37,7 +37,7 @@ class _EmailVerificationState extends State<EmailVerification> {
   late Timer _timer;
   int _start = 90;
   bool _startTimer = false;
-
+ 
   @override
   void initState() {
     super.initState();
@@ -99,6 +99,8 @@ class _EmailVerificationState extends State<EmailVerification> {
       });
     }
   }
+
+  
 
   Future<String> confirmEmailVeriCode(context) async {
     var auth = Provider.of<Auth>(context, listen: false);
@@ -317,7 +319,7 @@ class _EmailVerificationState extends State<EmailVerification> {
               child: LyoButton(
                 text: 'Verify',
                 active: true,
-                isLoading: false,
+                isLoading:auth.isverifyloader,
                 activeColor: linkColor,
                 activeTextColor: Colors.black,
                 onPressed: () async {
@@ -325,6 +327,7 @@ class _EmailVerificationState extends State<EmailVerification> {
                     _timer.cancel();
                   }
                   if (_formEmailVeriKey.currentState!.validate()) {
+                   
                     // If the form is valid, display a snackbar. In the real world,
                     // you'd often call a server or save the information in a database.
                     if (widget.emailVerification) {

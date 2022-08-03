@@ -14,7 +14,11 @@ class Public with ChangeNotifier {
     'Content-type': 'application/json;charset=utf-8',
     'Accept': 'application/json',
   };
-
+ Map<String, String> headers1 = {
+    'Content-type': 'application/json;charset=utf-8',
+    'Accept': 'application/json',
+    'exchange-token':'c5fa97c1140aafea1ef1e84b67503d5e0db18d0ca0ff4819a0ca3f24722407df'
+  };
   Map _rate = {};
   Map _publicInfoMarket = {};
   Map _allMarkets = {};
@@ -566,6 +570,44 @@ class Public with ChangeNotifier {
         return notifyListeners();
       } else {
         _banners = [];
+        return notifyListeners();
+      }
+    } catch (error) {
+      // throw error;
+      print(error);
+      return;
+    }
+  }
+  
+  List _marketrecommendedsymbol = [];
+
+  List get marketrecoomendsymbol {
+    return _marketrecommendedsymbol;
+  }
+  
+  bool isrecommended=true;
+  
+  Future<void> getrecomendedsybol(auth) async {
+
+    var url = Uri.https(
+      apiUrl,
+       '$exApi/common/market_recommend_symbol',
+    );
+    try {
+      final response = await http.post(url, headers: headers1);
+      print(response.statusCode);
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == "0") {
+
+        var data = responseData['data'];
+        _marketrecommendedsymbol = data['recommendSymbol'].split(',');
+        print(_marketrecommendedsymbol);
+        isrecommended=false;
+        return notifyListeners();
+      } else {
+        _banners = [];
+        isrecommended=false;
         return notifyListeners();
       }
     } catch (error) {

@@ -231,6 +231,7 @@ class Auth with ChangeNotifier {
     }
   }
 
+bool isLoginloader=false;
   Future<String> login(ctx, formData) async {
     var url = Uri.https(
       apiUrl,
@@ -238,12 +239,12 @@ class Auth with ChangeNotifier {
     );
 
     var postData = json.encode(formData);
-
+  isLoginloader=true;
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
-
+     isLoginloader=false;
       if (responseData['code'] == 0) {
         if (responseData['data']['googleAuth'] == '1') {
           _googleAuth = true;
@@ -252,8 +253,12 @@ class Auth with ChangeNotifier {
         }
         _loginVerificationToken = responseData['data']['token'];
         notifyListeners();
+       
         return _loginVerificationToken;
       } else {
+        
+        isLoginloader=false;
+        notifyListeners();
         snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
 
@@ -263,7 +268,7 @@ class Auth with ChangeNotifier {
       // throw error;
     }
   }
-
+bool isverifyloader=false;
   Future<String> confirmLoginCode(ctx, formData) async {
     var url = Uri.https(
       apiUrl,
@@ -278,17 +283,21 @@ class Auth with ChangeNotifier {
         'token': formData['token'],
       });
     }
-
+   isverifyloader=true;
+   notifyListeners();
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
-
+ isverifyloader=false;
+  notifyListeners();
       if (responseData['code'] == 0) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('authToken', _loginVerificationToken);
         snackAlert(ctx, SnackTypes.success, 'Login Success');
-      } else {
+      } else { 
+ isverifyloader=false;
+        notifyListeners();
         snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
 
@@ -299,7 +308,7 @@ class Auth with ChangeNotifier {
       // throw error;
     }
   }
-
+bool emailSignupLoader=false;
   Future<String> checkEmailRegistration(ctx, formData) async {
     var url = Uri.https(
       apiUrl,
@@ -307,16 +316,20 @@ class Auth with ChangeNotifier {
     );
 
     var postData = json.encode(formData);
-
+emailSignupLoader=true;
+notifyListeners();
     try {
       final response = await http.post(url, body: postData, headers: headers);
-
+ emailSignupLoader=false;
+notifyListeners();
       final responseData = json.decode(response.body);
       if (responseData['code'] == '0') {
         _emailVerificationToken = responseData['data']['token'];
         _loginVerificationToken = _emailVerificationToken;
         return _emailVerificationToken;
       } else {
+emailSignupLoader=false;
+notifyListeners();
         snackAlert(ctx, SnackTypes.errors, responseData['msg']);
       }
 
@@ -335,16 +348,20 @@ class Auth with ChangeNotifier {
     );
 
     var postData = json.encode(formData);
-
+emailSignupLoader=true;
+notifyListeners();
     try {
       final response = await http.post(url, body: postData, headers: headers);
-
+emailSignupLoader=false;
+notifyListeners();
       final responseData = json.decode(response.body);
       if (responseData['code'] == '0') {
         _emailVerificationToken = responseData['data']['token'];
         _loginVerificationToken = _emailVerificationToken;
         return _emailVerificationToken;
       } else {
+        emailSignupLoader=false;
+         notifyListeners();
         snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
 

@@ -66,7 +66,7 @@ class _SearchBarState extends State<SearchBar>
     width = MediaQuery.of(context).size.width;
 
     var _currentRoute = ModalRoute.of(context)!.settings.name;
-
+    var auth = Provider.of<Auth>(context, listen: false);
     return Container(
       padding: EdgeInsets.only(
         bottom: 10,
@@ -172,7 +172,12 @@ class _SearchBarState extends State<SearchBar>
                   padding: EdgeInsets.only(left: 10),
                   child: GestureDetector(
                     onTap: () {
-                      snackAlert(context, SnackTypes.warning, 'Coming Soon...');
+                     if (auth.isAuthenticated) {
+                        //  snackAlert(context, SnackTypes.warning, 'Coming Soon...');
+                        Navigator.pushNamed(context, '/notification_screen');
+                      } else {
+                        Navigator.pushNamed(context, '/authentication');
+                      }
                     },
                     child: Image.asset(
                       'assets/img/notification.png',

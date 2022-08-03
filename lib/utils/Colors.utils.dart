@@ -85,7 +85,9 @@ var greyTextColor1 = Color(0xFF919190); //
 var backArrowColor = Color(0xFF141414); //
 var dottedBorderColor = Color(0xFF9c9c9c); //
 var darkgreyColor = Color(0xFF6d6d6d); //
-
+var selecteditembordercolour=Color(0XFF01FEF5);
+var tileseletedcoloue=Color(0XFF024274D);
+var bottomsheetcolor=Color(0XFF0272946);
 // Icon Colors
 var orangeBGColor = Color(0xFFFF9000);
 
@@ -93,4 +95,14 @@ var orangeBGColor = Color(0xFFFF9000);
 
 var buttoncolour = Color(0xFF5E6292);
 var selectboxcolour = Color(0xFF25284A);
+
+var seconadarytextcolour = Color(0xFF5E6292);
+var bottombuttoncolour=Color(0XFF01D2042);
+
+var invitationcodecolour=Color(0XFF292B4B);
+var listcolor=Color(0xFF2B2E54);
+var listselectcolor=Color(0xFF484D87);
+var listcolorinner=Color(0xFF3B3F72);
+var neturalcolor=Color(0xFFF6F9FC);
+var cardcolor=Color(0xFF292C51);
 var selecteditembordercolour = Color(0XFF01FEF5);

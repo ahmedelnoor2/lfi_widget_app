@@ -1,110 +1,314 @@
+import 'dart:convert';
+import 'package:archive/archive.dart';
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/screens/common/header.dart';
+import 'package:lyotrade/utils/AppConstant.utils.dart';
+import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:provider/provider.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
-class FavouritePage extends StatefulWidget {
+class Favoritespage extends StatefulWidget {
+
+  const Favoritespage({
+    Key? key,
+    this.scaffoldKey,
+    this.updateMarket,
+  }) : super(key: key);
+
+  final scaffoldKey;
+  final updateMarket;
+
   @override
-  State<StatefulWidget> createState() => _FavouritePageState();
+  State<Favoritespage> createState() => _FavoritespageState();
 }
 
-class _FavouritePageState extends State<FavouritePage> {
+class _FavoritespageState extends State<Favoritespage>
+    with SingleTickerProviderStateMixin {
+  TabController? _tabController;
+  final TextEditingController _searchController = TextEditingController();
+
+  var _channel;
+  String _currentMarketSort = 'USDT';
+
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: ListView.builder(
-        itemCount: 10,
-        itemBuilder: (context, index) {
-          return _buildFavouriteCard(context);
-        },
-      ),
-    );
+  void initState() {
+    connectWebSocket();
+    super.initState();
   }
 
-  Widget _buildFavouriteCard(context) {
-    final _size = MediaQuery.of(context).size;
-    return Container(
-      padding: EdgeInsets.fromLTRB(6.0, 8.0, 6.0, 8.0),
-      child: Row(
-        children: [
+  @override
+  void dispose() async {
+    if (_channel != null) {
+      _channel.sink.close();
+    }
+    super.dispose();
+  }
+
+  Future<void> connectWebSocket() async {
+    var public = Provider.of<Public>(context, listen: false);
+
+    _tabController = TabController(
+      length: public.publicInfoMarket['market']['marketSort'].length,
+      vsync: this,
+    );
+
+    _channel = WebSocketChannel.connect(
+      Uri.parse('${public.publicInfoMarket["market"]["wsUrl"]}'),
+    );
+
+    for (int j = 0;
+        j < public.publicInfoMarket['market']['marketSort'].length;
+        j++) {
+      String cMarketSort = public.publicInfoMarket['market']['marketSort'][j];
+      for (int i = 0; i < public.allMarkets[cMarketSort].length; i++) {
+        _channel.sink.add(jsonEncode({
+          "event": "sub",
+          "params": {
+            "channel":
+                "market_${public.allMarkets[cMarketSort][i]['symbol']}_ticker",
+            "cb_id": public.allMarkets[cMarketSort][i]['symbol'],
+          }
+        }));
+      }
+    }
+
+    _channel.stream.listen((message) {
+      extractStreamData(message, public);
+    });
+  }
+
+  void extractStreamData(streamData, public) async {
+    if (streamData != null) {
+      // var inflated = zlib.decode(streamData as List<int>);
+      var inflated =
+          GZipDecoder().decodeBytes(streamData as List<int>, verify: false);
+      var data = utf8.decode(inflated);
+      if (json.decode(data)['channel'] != null) {
+        var marketData = json.decode(data);
+        public.setActiveMarketAllTicks(
+          marketData['tick'],
+          marketData['channel'],
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    width = MediaQuery.of(context).size.width;
+    height = MediaQuery.of(context).size.height;
+
+    var public = Provider.of<Public>(context, listen: true);
+
+   // print(public.activeMarketAllTicks);
+
+    return Scaffold(
+      
+      appBar: hiddenAppBar(),
+      body: Column(
+        children: <Widget>[
+         
+          // Container(
+          //   padding: EdgeInsets.all(10),
+          //   child: Container(
+          //     padding: EdgeInsets.all(12),
+          //     decoration: BoxDecoration(
+          //       borderRadius: BorderRadius.circular(5),
+          //       border: Border.all(
+          //         style: BorderStyle.solid,
+          //         width: 0.3,
+          //         color: Color(0xff5E6292),
+          //       ),
+          //     ),
+          //     child: Row(
+          //       children: [
+          //         // Container(
+          //         //   padding: EdgeInsets.only(right: 8),
+          //         //   child: Icon(Icons.search),
+          //         // ),
+          //         // SizedBox(
+          //         //   width: width * 0.50,
+          //         //   child: TextField(
+          //         //     onChanged: (value) async {
+          //         //       // await asset.filterSearchResults(value);
+          //         //       await public.filterMarketSearchResults(
+          //         //         value,
+          //         //         public.allMarkets[_currentMarketSort],
+          //         //         _currentMarketSort,
+          //         //       );
+          //         //     },
+          //         //     controller: _searchController,
+          //         //     decoration: InputDecoration(
+          //         //       contentPadding: EdgeInsets.zero,
+          //         //       isDense: true,
+          //         //       border: UnderlineInputBorder(
+          //         //         borderSide: BorderSide.none,
+          //         //       ),
+          //         //       hintStyle: TextStyle(
+          //         //         fontSize: 14,
+          //         //       ),
+          //         //       hintText: "Search",
+          //         //     ),
+          //         //   ),
+          //         // ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
+          _tabController != null
+              ? SizedBox(
+                  height: 40,
+                  child: TabBar(
+                    indicatorSize: TabBarIndicatorSize.label,
+             
+                    onTap: (value) {
+                      setState(() {
+                        _currentMarketSort = public.publicInfoMarket['market']
+                            ['marketSort'][value];
+                      });
+                    },
+                    controller: _tabController,
+                    tabs: public.publicInfoMarket['market']['marketSort']
+                        .map<Widget>(
+                          (mname) => Tab(text: '$mname'),
+                        )
+                        .toList(),
+                  ),
+                )
+              : Container(),
           Expanded(
-            flex: 2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                RichText(
-                  text: TextSpan(
+            child: ListView.separated(
+              
+              separatorBuilder: (context, index) {
+                return Divider();
+              },
+              shrinkWrap: true,
+              itemCount: public.allSearchMarket[_currentMarketSort].isNotEmpty
+                  ? public.allSearchMarket[_currentMarketSort].length
+                  : public.allMarkets[_currentMarketSort].length,
+              itemBuilder: (context, index) {
+                var _market =
+                    public.allSearchMarket[_currentMarketSort].isNotEmpty
+                        ? public.allSearchMarket[_currentMarketSort][index]
+                        : public.allMarkets[_currentMarketSort][index];
+          
+                return ListTile(
+                  title: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TextSpan(
-                        text: 'Layo/',
+                      Row(
+                        children: [
+                          Text(
+                            '${_market['showName'].split('/')[0]}',
+                            style: TextStyle(
+                              fontSize: 18,
+                            ),
+                          ),
+                          Text(
+                            ' /${_market['showName'].split('/')[1]}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: secondaryTextColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          InkWell(
+                            onTap: () async {
+                              await public.setActiveMarket(_market);
+                              Navigator.pushNamed(context, '/trade');
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.only(
+                                top: 5,
+                                bottom: 5,
+                                right: 10,
+                              ),
+                              child: Text(
+                                'Trade',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: linkColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () async {
+                              await public.setActiveMarket(_market);
+                              Navigator.pushNamed(context, '/kline_chart');
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.only(
+                                top: 5,
+                                bottom: 5,
+                                left: 10,
+                                right: 10,
+                              ),
+                              child: Text(
+                                'Info',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: linkColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                  trailing: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '${public.activeMarketAllTicks[_market['symbol']] != null ? public.activeMarketAllTicks[_market['symbol']]['close'] : '--'}',
                         style: TextStyle(
-                          fontSize: _size.width / 26.0,
-                          color: Colors.white,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
+                          color: public.activeMarketAllTicks[
+                                      _market['symbol']] !=
+                                  null
+                              ? (((double.parse('${public.activeMarketAllTicks[_market['symbol']]['open']}') -
+                                              double.parse(
+                                                  '${public.activeMarketAllTicks[_market['symbol']]['close']}')) /
+                                          double.parse(
+                                              '${public.activeMarketAllTicks[_market['symbol']]['open']}')) >
+                                      0)
+                                  ? greenlightchartColor
+                                  : errorColor
+                              : Colors.white,
                         ),
                       ),
-                      TextSpan(
-                        text: 'USDT',
+                      Text(
+                        '${public.activeMarketAllTicks[_market['symbol']] != null ? (double.parse(public.activeMarketAllTicks[_market['symbol']]['rose']) * 100).toStringAsFixed(2) : '--'}%',
                         style: TextStyle(
-                          fontSize: _size.width / 40.0,
-                          color: Colors.grey.shade200,
-                          fontWeight: FontWeight.w400,
+                          color:
+                              public.activeMarketAllTicks[_market['symbol']] !=
+                                      null
+                                  ? double.parse(public.activeMarketAllTicks[
+                                                  _market['symbol']]['rose'] ??
+                                              '0') >
+                                          0
+                                      ? greenlightchartColor
+                                      : errorColor
+                                  : secondaryTextColor,
+                          fontSize: 14,
                         ),
                       ),
                     ],
                   ),
-                ),
-                SizedBox(
-                  height: 2.5,
-                ),
-                Text(
-                  'Vol 635.66M',
-                  style: TextStyle(
-                    fontSize: _size.width / 40.0,
-                    color: Colors.grey.shade400,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '0.000000031',
-                  style: TextStyle(
-                    fontSize: _size.width / 28.0,
-                    color: Colors.grey.shade300,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Container(
-                  padding: EdgeInsets.fromLTRB(16.0, 12.0, 8.0, 12.0),
-                  decoration: BoxDecoration(
-                    color: Color(0xFF00FF80).withOpacity(.15),
-                    borderRadius: BorderRadius.circular(4.0),
-                  ),
-                  child: Text(
-                    '+3.33%',
-                    style: TextStyle(
-                      fontSize: _size.width / 30.0,
-                      color: Color(0xFF00FF80),
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
-              ],
+                );
+              },
             ),
           ),
         ],
       ),
     );
+    ;
   }
 }

@@ -5,6 +5,7 @@ import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/dex_provider.dart';
 import 'package:lyotrade/providers/future_market.dart';
 import 'package:lyotrade/providers/loan_provider.dart';
+import 'package:lyotrade/providers/notification_provider.dart';
 import 'package:lyotrade/providers/payments.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/referral.dart';
@@ -39,6 +40,8 @@ import 'package:lyotrade/screens/pix_payment/pix_payment.dart';
 import 'package:lyotrade/screens/pix_payment/pix_payment_details.dart';
 import 'package:lyotrade/screens/pix_payment/pix_process_payment.dart';
 import 'package:lyotrade/screens/pix_payment/pix_transactions.dart';
+import 'package:lyotrade/screens/referal/pages/leader_board.dart';
+import 'package:lyotrade/screens/referal/referal_onvitationdetail.dart';
 import 'package:lyotrade/screens/security/disable_account.dart';
 import 'package:lyotrade/screens/notification/notifcationmessage.dart';
 import 'package:lyotrade/screens/referal/referal.dart';
@@ -77,6 +80,7 @@ class MyApp extends StatelessWidget {
 
     return MultiProvider(
       providers: [
+          
         ChangeNotifierProvider<Auth>(create: (_) => Auth()),
         ChangeNotifierProvider<Public>(create: (_) => Public()),
         ChangeNotifierProvider<Asset>(create: (_) => Asset()),
@@ -87,10 +91,12 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<LoanProvider>(
           create: (_) => LoanProvider(),
         ),
+        ChangeNotifierProvider< ReferralProvider>(create:  (_)=> ReferralProvider()),
         ChangeNotifierProvider<Payments>(create: (_) => Payments()),
         ChangeNotifierProvider<DexProvider>(create: (_) => DexProvider()),
         ChangeNotifierProvider<ReferralProvider>(
             create: (_) => ReferralProvider()),
+        ChangeNotifierProvider<Notificationprovider>(create:(_)=> Notificationprovider())
       ],
       child: Consumer<Auth>(
         builder: (context, auth, _) {
@@ -283,6 +289,8 @@ class MyApp extends StatelessWidget {
               PixPaymentDetails.routeName: (context) =>
                   const PixPaymentDetails(),
               MarketSearch.routeName: (context) => const MarketSearch(),
+               Refralinvitation.routeName:(context) => const Refralinvitation(),
+              LeaderBoard.routeName:(context) =>  LeaderBoard(),
               AnnouncementDetails.routeName: (context) =>
                   const AnnouncementDetails(),
             },
