@@ -109,6 +109,14 @@ class _MarketState extends State<Market> {
                                   .toLowerCase();
                               var data =
                                   public.activeMarketAllTicks[marketSymbol];
+                              var rose = '0.00';
+                              if (data != null) {
+                                rose ='${data['rose'] ?? '0.00'}';
+                              }
+                              var close = '0.00';
+                              if (data != null) {
+                                close ='${data['close'] ?? '0.00'}';
+                              }
                               //  print(data);
                               return Container(
                                 decoration: BoxDecoration(
@@ -158,12 +166,12 @@ class _MarketState extends State<Market> {
                                             ],
                                           ),
                                           Text(
-                                            data['rose'] != null
-                                                ? '${double.parse(data['rose']) > 0 ? '+' : ''}${(double.parse(data['rose']) * 100).toStringAsFixed(2)} %'
+                                            public.activeMarketAllTicks.isNotEmpty
+                                                ? '${double.parse(rose) > 0 ? '+' : ''}${(double.parse(rose) * 100).toStringAsFixed(2)} %'
                                                 : '--%',
                                             style: TextStyle(
                                               color:
-                                                  double.parse(data['rose']) > 0
+                                                  public.activeMarketAllTicks.isEmpty ? secondaryTextColor :double.parse(rose) > 0
                                                       ? greenIndicator
                                                       : redIndicator,
                                               fontSize: 12,
@@ -185,12 +193,12 @@ class _MarketState extends State<Market> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                '${data['close'].toString()}',
+                                                public.activeMarketAllTicks.isNotEmpty ? '${close.toString()}' : '--',
                                                 style: TextStyle(
                                                   fontSize: 20,
                                                   fontWeight: FontWeight.bold,
-                                                  color: double.parse(
-                                                              data['rose']) >
+                                                  color: public.activeMarketAllTicks.isEmpty ? secondaryTextColor : double.parse(
+                                                              rose) >
                                                           0
                                                       ? greenIndicator
                                                       : redIndicator,
@@ -214,7 +222,7 @@ class _MarketState extends State<Market> {
                                             children: [
                                               Container(
                                                 child: Text(
-                                                  '24H Vol: ${getNumberString(context, double.parse('${public.activeMarketTick['vol']}'))}',
+                                                  '24H Vol: ${public.activeMarketTick.isNotEmpty? getNumberString(context, double.parse('${public.activeMarketTick['vol']}')):'--'}',
                                                   style: TextStyle(
                                                     color: secondaryTextColor,
                                                     fontSize: 11,
