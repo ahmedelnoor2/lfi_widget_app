@@ -78,123 +78,128 @@ class _MarketState extends State<Market> {
                 SizedBox(
                   height: 20,
                 ),
-           public.isrecommended?CircularProgressIndicator():SizedBox(
-                  height: height * 0.2,
-                  child: ListView.builder(
-                      itemCount: public.marketrecoomendsymbol.length,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) {
-                        var marketSymbol = public.marketrecoomendsymbol[index]
-                            .replaceAll('/', '')
-                            .toLowerCase();
-                        var data = public.activeMarketAllTicks[marketSymbol];
-                        //  print(data);
-                        return Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            color: cardcolor,
-                          ),
-                          height: height * 0.2,
-                          width: width * 0.60,
-                          margin: EdgeInsets.all(10),
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
+                public.isrecommended
+                    ? CircularProgressIndicator()
+                    : SizedBox(
+                        height: height * 0.2,
+                        child: ListView.builder(
+                            itemCount: public.marketrecoomendsymbol.length,
+                            scrollDirection: Axis.horizontal,
+                            itemBuilder: (context, index) {
+                              var marketSymbol = public
+                                  .marketrecoomendsymbol[index]
+                                  .replaceAll('/', '')
+                                  .toLowerCase();
+                              var data =
+                                  public.activeMarketAllTicks[marketSymbol];
+                              //  print(data);
+                              return Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: cardcolor,
+                                ),
+                                height: height * 0.2,
+                                width: width * 0.60,
+                                margin: EdgeInsets.all(10),
+                                child: Column(
                                   children: [
-                                    Image.network(
-                                      '${public.publicInfoMarket['market']['coinList']['${public.marketrecoomendsymbol[index].split('/')[0]}']['icon']}',
-                                      width: 25,
-                                    ),
-
-                                    Container(
-                                      padding: EdgeInsets.only(left: 8),
-                                      child: Text(
-                                        '${getMarketName(public.marketrecoomendsymbol[index])}',
-                                        // public.activeMarginMarket[public.marketrecoomendsymbol.replaceAll('/', '')],
-                                        style: TextStyle(),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        children: [
+                                          Image.network(
+                                            '${public.publicInfoMarket['market']['coinList']['${public.marketrecoomendsymbol[index].split('/')[0]}']['icon']}',
+                                            width: 25,
+                                          ),
+                                          Container(
+                                            padding: EdgeInsets.only(left: 8),
+                                            child: Text(
+                                              '${getMarketName(public.marketrecoomendsymbol[index])}',
+                                              // public.activeMarginMarket[public.marketrecoomendsymbol.replaceAll('/', '')],
+                                              style: TextStyle(),
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: EdgeInsets.only(
+                                                left: width * 0.15),
+                                            child: Text(
+                                              '${(double.parse(data['rose']) * 100).toStringAsFixed(4)} %',
+                                              style:
+                                                  TextStyle(color: Colors.red),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                     Container(
                                       padding:
-                                          EdgeInsets.only(left: width * 0.15),
-                                      child: Text(
-                                        '${(double.parse(data['rose'])* 100).toStringAsFixed(4)} %',
-                                       
-                        
-                                        style: TextStyle(color: Colors.red),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.only(top: height * 0.020),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.only(left: 8),
-                                      child: Text(
-                                        '${data['close'].toString()}',
-                                        style: TextStyle(),
-                                      ),
-                                    ),
-                                    Container(
-                                      padding:
-                                          EdgeInsets.only(left: width * 0.03),
-                                      child: Text(
-                                        "\$1.8",
-                                        style: TextStyle(color: darkgreyColor),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.only(top: height * 0.030),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.only(left: 6),
-                                      child: FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text(
-                                         ' ${double.parse('${data['vol']}').toStringAsFixed(4)}',
-                                          
-                                          style: TextStyle(),
-                                        ),
+                                          EdgeInsets.only(top: height * 0.020),
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.only(left: 8),
+                                            child: Text(
+                                              '${data['close'].toString()}',
+                                              style: TextStyle(),
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: EdgeInsets.only(
+                                                left: width * 0.03),
+                                            child: Text(
+                                              "\$1.8",
+                                              style: TextStyle(
+                                                  color: darkgreyColor),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                     Container(
                                       padding:
-                                          EdgeInsets.only(left: width * 0.01),
-                                      child: Text(
-                                        "\$1.8",
-                                        style: TextStyle(color: darkgreyColor),
+                                          EdgeInsets.only(top: height * 0.030),
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.only(left: 6),
+                                            child: FittedBox(
+                                              fit: BoxFit.scaleDown,
+                                              child: Text(
+                                                ' ${double.parse('${data['vol']}').toStringAsFixed(4)}',
+                                                style: TextStyle(),
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: EdgeInsets.only(
+                                                left: width * 0.01),
+                                            child: Text(
+                                              "\$1.8",
+                                              style: TextStyle(
+                                                  color: darkgreyColor),
+                                            ),
+                                          ),
+                                          Container(
+                                            margin: EdgeInsets.only(
+                                                left: width * 0.20),
+                                            alignment: Alignment.center,
+                                            height: 22,
+                                            width: 22,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: darkgreyColor,
+                                            ),
+                                            child: Icon(Icons.navigate_next,
+                                                color: Colors.white, size: 22),
+                                          )
+                                        ],
                                       ),
                                     ),
-                                    Container(
-                                      margin:
-                                          EdgeInsets.only(left: width * 0.20),
-                                      alignment: Alignment.center,
-                                      height: 22,
-                                      width: 22,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: darkgreyColor,
-                                      ),
-                                      child: Icon(Icons.navigate_next,
-                                          color: Colors.white, size: 22),
-                                    )
                                   ],
                                 ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }),
-                ),
+                              );
+                            }),
+                      ),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -244,7 +249,7 @@ class _MarketState extends State<Market> {
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
           ),
         ),
