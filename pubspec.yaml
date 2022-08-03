@@ -63,6 +63,8 @@ dependencies:
   uuid: ^3.0.6
   package_info_plus: ^1.4.2
   mailto: ^2.0.0
+  dotted_line: ^3.1.0
+  flutter_slidable: ^2.0.0
  
 
 dev_dependencies:
