@@ -207,76 +207,91 @@ class _ExchangeNowState extends State<ExchangeNow> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        InkWell(
-                          onTap: () {
-                            showModalBottomSheet<void>(
-                              isScrollControlled: true,
-                              context: context,
-                              builder: (BuildContext context) {
-                                return StatefulBuilder(
-                                  builder: (BuildContext context,
-                                      StateSetter setState) {
-                                    return selectCoins(
-                                      context,
-                                      'from',
-                                      dexProvider,
-                                      setState,
-                                    );
-                                  },
-                                );
-                              },
-                            );
-                          },
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: EdgeInsets.only(right: 10),
-                                child: dexProvider.fromActiveCurrency.isNotEmpty
-                                    ? SvgPicture.network(
-                                        '${dexProvider.fromActiveCurrency['image']}',
-                                        width: 35,
-                                      )
-                                    : Container(),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
+                        Expanded(
+                          flex: 3,
+                          child: InkWell(
+                            onTap: () {
+                              showModalBottomSheet<void>(
+                                isScrollControlled: true,
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return StatefulBuilder(
+                                    builder: (BuildContext context,
+                                        StateSetter setState) {
+                                      return selectCoins(
+                                        context,
+                                        'from',
+                                        dexProvider,
+                                        setState,
+                                      );
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: Container(
+                                    padding: EdgeInsets.only(right: 10),
+                                    child: dexProvider
+                                            .fromActiveCurrency.isNotEmpty
+                                        ? SvgPicture.network(
+                                            '${dexProvider.fromActiveCurrency['image']}',
+                                            width: 35,
+                                          )
+                                        : Container(),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 5,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Container(
-                                        padding: EdgeInsets.only(right: 10),
-                                        child: Text(
-                                          dexProvider
-                                                  .fromActiveCurrency.isNotEmpty
-                                              ? dexProvider
-                                                  .fromActiveCurrency['ticker']
-                                                  .toUpperCase()
-                                              : '--',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
+                                      Row(
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.only(right: 10),
+                                            child: Text(
+                                              dexProvider.fromActiveCurrency
+                                                      .isNotEmpty
+                                                  ? dexProvider
+                                                      .fromActiveCurrency[
+                                                          'ticker']
+                                                      .toUpperCase()
+                                                  : '--',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
                                           ),
+                                          Icon(Icons.keyboard_arrow_down),
+                                        ],
+                                      ),
+                                      Text(
+                                        dexProvider
+                                                .fromActiveCurrency.isNotEmpty
+                                            ? dexProvider
+                                                .fromActiveCurrency['name']
+                                            : '--',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.normal,
                                         ),
                                       ),
-                                      Icon(Icons.keyboard_arrow_down),
                                     ],
                                   ),
-                                  Text(
-                                    dexProvider.fromActiveCurrency.isNotEmpty
-                                        ? dexProvider.fromActiveCurrency['name']
-                                        : '--',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.normal,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        SizedBox(
-                          width: width * 0.4,
+                        Expanded(
+                          flex: 1,
+                          // width: width * 0.4,
                           child: TextFormField(
                             textAlign: TextAlign.end,
                             controller: _fromAmountController,
