@@ -259,9 +259,9 @@ class _Login extends State<Login> {
             alignment: Alignment.bottomCenter,
             child: GestureDetector(
               onTap: () {
-                 Navigator.pushNamed(context, '/forgotForgotpassword');
+                snackAlert(context, SnackTypes.warning, 'Coming Soon...');
+                // Navigator.pushNamed(context, '/forgotForgotpassword');
                 // _callPlatformIndependentJsMethod();
-               
               },
               child: Text(
                 'Forgot password?',
