@@ -28,6 +28,7 @@ import 'package:lyotrade/screens/buy_sell/buy_sell_crypto.dart';
 import 'package:lyotrade/screens/buy_sell/buy_sell_transactions.dart';
 import 'package:lyotrade/screens/buy_sell/common/process_payment.dart';
 import 'package:lyotrade/screens/dashboard.dart';
+import 'package:lyotrade/screens/dashboard/announcement/announcement_details.dart';
 import 'package:lyotrade/screens/dashboard/market_search.dart';
 import 'package:lyotrade/screens/dex_swap/dex_swap.dart';
 import 'package:lyotrade/screens/future_trade/future_trade.dart';
@@ -43,7 +44,6 @@ import 'package:lyotrade/screens/referal/pages/leader_board.dart';
 import 'package:lyotrade/screens/referal/referal_onvitationdetail.dart';
 import 'package:lyotrade/screens/security/disable_account.dart';
 import 'package:lyotrade/screens/notification/notifcationmessage.dart';
-
 import 'package:lyotrade/screens/referal/referal.dart';
 import 'package:lyotrade/screens/security/email_change.dart';
 import 'package:lyotrade/screens/security/forgot/forgotpassword.dart';
@@ -54,6 +54,7 @@ import 'package:lyotrade/screens/security/security.dart';
 import 'package:lyotrade/screens/staking/common/stake_order.dart';
 import 'package:lyotrade/screens/staking/stake.dart';
 import 'package:lyotrade/screens/take_loan/confrim_loan.dart';
+import 'package:lyotrade/screens/take_loan/process_loan.dart';
 import 'package:lyotrade/screens/take_loan/take_loan.dart';
 import 'package:lyotrade/screens/trade/kline_chart.dart';
 import 'package:lyotrade/screens/trade/margin/margin_trade_history.dart';
@@ -256,7 +257,7 @@ class MyApp extends StatelessWidget {
               Security.routeName: (context) => const Security(),
               Phone.routeName: (context) => const Phone(),
               Password.routeName: (context) => const Password(),
-              Forgotpassword.routeName: (context) => Forgotpassword(),
+              Forgotpassword.routeName: (context) => const Forgotpassword(),
               GoogleAuth.routeName: (context) => const GoogleAuth(),
               EmailChange.routeName: (context) => const EmailChange(),
               Transactions.routeName: (context) => const Transactions(),
@@ -265,8 +266,9 @@ class MyApp extends StatelessWidget {
               MarginAssets.routeName: (context) => const MarginAssets(),
               OtcAssets.routeName: (context) => const OtcAssets(),
               BuySellCrypto.routeName: (context) => const BuySellCrypto(),
-              Confirmloan.routeName: (context) => const Confirmloan(),
+              ConfirmLoan.routeName: (context) => const ConfirmLoan(),
               TakeLoan.routeName: (context) => const TakeLoan(),
+              ProcessLoan.routeName: (context) => const ProcessLoan(),
               Referal.routeName: ((context) => Referal()),
               Kycscreen.routeName: ((context) => Kycscreen()),
               personalverification.routeName: (context) =>
@@ -279,7 +281,6 @@ class MyApp extends StatelessWidget {
               BuySellTransactions.routeName: (context) =>
                   const BuySellTransactions(),
               DexSwap.routeName: (context) => const DexSwap(),
-              Referal.routeName: (context) => Referal(),
               DisableAccount.routeName: (context) => const DisableAccount(),
               PixPayment.routeName: (context) => const PixPayment(),
               PixProcessPayment.routeName: (context) =>
@@ -290,7 +291,8 @@ class MyApp extends StatelessWidget {
               MarketSearch.routeName: (context) => const MarketSearch(),
                Refralinvitation.routeName:(context) => const Refralinvitation(),
               LeaderBoard.routeName:(context) =>  LeaderBoard(),
-              
+              AnnouncementDetails.routeName: (context) =>
+                  const AnnouncementDetails(),
             },
           );
         },

@@ -95,9 +95,8 @@ var orangeBGColor = Color(0xFFFF9000);
 
 var buttoncolour = Color(0xFF5E6292);
 var selectboxcolour = Color(0xFF25284A);
+
 var seconadarytextcolour = Color(0xFF5E6292);
-
-
 var bottombuttoncolour=Color(0XFF01D2042);
 
 var invitationcodecolour=Color(0XFF292B4B);
@@ -106,3 +105,4 @@ var listselectcolor=Color(0xFF484D87);
 var listcolorinner=Color(0xFF3B3F72);
 var neturalcolor=Color(0xFFF6F9FC);
 var cardcolor=Color(0xFF292C51);
+var selecteditembordercolour = Color(0XFF01FEF5);

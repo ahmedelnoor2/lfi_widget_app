@@ -85,8 +85,8 @@ class _SecurityState extends State<Security> {
                       'Ok',
                     );
                   } else {
-                    // Navigator.pushNamed(context, '/password');
-                    snackAlert(context, SnackTypes.warning, 'Coming Soon...');
+                    Navigator.pushNamed(context, '/password');
+                    // snackAlert(context, SnackTypes.warning, 'Coming Soon...');
                   }
                 },
                 child: const Text('Change'),

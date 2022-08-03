@@ -22,6 +22,8 @@ class Market extends StatefulWidget {
 }
 
 class _MarketState extends State<Market> {
+  final _klineView = true;
+
   @override
   void initState() {
     getrecommendedsymbol();
@@ -242,7 +244,7 @@ class _MarketState extends State<Market> {
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
           ),
         ),

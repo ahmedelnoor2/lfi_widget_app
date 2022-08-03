@@ -584,7 +584,9 @@ class Public with ChangeNotifier {
   List get marketrecoomendsymbol {
     return _marketrecommendedsymbol;
   }
-bool isrecommended=true;
+  
+  bool isrecommended=true;
+  
   Future<void> getrecomendedsybol(auth) async {
 
     var url = Uri.https(
@@ -613,5 +615,59 @@ bool isrecommended=true;
       print(error);
       return;
     }
+  }
+
+  // Notice Info
+  List _noticeInfo = [
+    {
+      "title": "LYO Credit is not lited on Coingecko",
+    }
+  ];
+
+  List get noticeInfo {
+    return _noticeInfo;
+  }
+
+  Future<void> getNoticeInfo() async {
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/notice/notice_info_list',
+    );
+
+    var postParams = jsonEncode({"keyword": "", "page": 1, "pageSize": 9});
+
+    try {
+      final response = await http.post(url, body: postParams, headers: headers);
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _noticeInfo = responseData['data']['noticeInfoList'];
+        return notifyListeners();
+      } else {
+        _noticeInfo = [
+          {
+            "title": "LYO Credit is not lited on Coingecko",
+          }
+        ];
+        return notifyListeners();
+      }
+    } catch (error) {
+      // throw error;
+      print(error);
+      return;
+    }
+  }
+
+  // Selected announcement
+  Map _selectedAnnouncement = {};
+
+  Map get selectedAnnouncement {
+    return _selectedAnnouncement;
+  }
+
+  void setSelectedAnnouncement(value) {
+    _selectedAnnouncement = value;
+    return notifyListeners();
   }
 }

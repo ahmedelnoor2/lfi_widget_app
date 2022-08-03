@@ -258,7 +258,7 @@ class _SideBarState extends State<SideBar> {
             ),
             auth.userInfo.isNotEmpty
                 ? Container(
-                    padding: EdgeInsets.only(right: 10, left: 10),
+                    padding: EdgeInsets.only(right: 10, left: 10, top: 5),
                     child: LyoButton(
                       onPressed: _processLogout
                           ? null
