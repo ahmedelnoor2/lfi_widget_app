@@ -92,7 +92,7 @@ class LoanProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getCurrencies() async {
+  Future<void> getCurrencies(public) async {
     var url = Uri.https(
       loanApiUrl,
       '$loanApiVersion/assets',
@@ -131,15 +131,19 @@ class LoanProvider with ChangeNotifier {
         for (var resData in myresponsedata) {
           if ((resData['is_stable'] == true) &&
               (resData['is_loan_receive_enabled'] == true)) {
-            _toCurrencies['${resData['code']}(${resData['network']})'] =
-                resData;
-            _toCurrenciesList.add('${resData['code']}(${resData['network']})');
+            if (public.publicInfoMarket['market']['followCoinList']
+                .containsKey('${resData['code']}')) {
+              _toCurrencies['${resData['code']}(${resData['network']})'] =
+                  resData;
+              _toCurrenciesList
+                  .add('${resData['code']}(${resData['network']})');
 
-            if ('${resData['code']}(${resData['network']})' ==
-                _selectedToCurrencyCoin) {
-              _toSelectedCurrency = resData;
-              to_code = _toSelectedCurrency['code'];
-              to_network = _toSelectedCurrency['network'];
+              if ('${resData['code']}(${resData['network']})' ==
+                  _selectedToCurrencyCoin) {
+                _toSelectedCurrency = resData;
+                to_code = _toSelectedCurrency['code'];
+                to_network = _toSelectedCurrency['network'];
+              }
             }
           }
         }
@@ -179,14 +183,15 @@ class LoanProvider with ChangeNotifier {
 
   var reciveramount = '';
   var senderamount = '';
-  Future<void> getloanestimate() async {
+
+  Future<void> getloanestimate(ctx) async {
     var url = Uri.https(loanApiUrl, loansApiestimate, {
-      'from_code': '$from_code',
-      'from_network': '$from_network',
-      'to_code': '$to_code',
-      'to_network': '$to_network',
-      'amount': '$amount',
-      'exchange': '$exchange',
+      'from_code': from_code,
+      'from_network': from_network,
+      'to_code': to_code,
+      'to_network': to_network,
+      'amount': amount,
+      'exchange': exchange,
       'ltv_percent': '$ltv_percent'
     });
 
@@ -197,19 +202,23 @@ class LoanProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-
-      if (responseData['result']) {
-        _loanestimate = responseData['response'];
-        senderamount = responseData['response']['amount_from'];
-        reciveramount = responseData['response']['amount_to'];
-        return notifyListeners();
+      if (responseData != null) {
+        if (responseData['result']) {
+          _loanestimate = responseData['response'];
+          senderamount = responseData['response']['amount_from'];
+          reciveramount = responseData['response']['amount_to'];
+          return notifyListeners();
+        } else {
+          _loanestimate = {};
+          return notifyListeners();
+        }
       } else {
         _loanestimate = {};
         return notifyListeners();
       }
     } catch (error) {
-      print(error);
-      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      // print(error);
+      // snackAlert(ctx, SnackTypes.errors, 'Invalid price');
       return;
     }
   }
@@ -217,6 +226,12 @@ class LoanProvider with ChangeNotifier {
 ///////recive email for verify//
   ///
   bool isemailwidgitconverter = false;
+
+  void setIsEmailWidgetConverter(value) {
+    isemailwidgitconverter = value;
+    notifyListeners();
+  }
+
   Future<void> getemail(ctx, email) async {
     var url = Uri.https(
       apiurlemailtoken,
@@ -288,7 +303,12 @@ class LoanProvider with ChangeNotifier {
     return _createloan;
   }
 
-  var loanid;
+  // Loan ID
+  String _loanid = '';
+
+  String get loanid {
+    return _loanid;
+  }
 
   bool result = false;
 
@@ -311,7 +331,7 @@ class LoanProvider with ChangeNotifier {
       if (responseData['result']) {
         result = responseData['result'];
 
-        loanid = responseData['response']['loan_id'];
+        _loanid = responseData['response']['loan_id'];
 
         _createloan = responseData['response'];
 
@@ -367,8 +387,13 @@ class LoanProvider with ChangeNotifier {
     }
   }
 
-  var isconfirm;
-  Future<void> getConfirm(myloanid, reciveraddress, email) async {
+  bool _isConfirm = false;
+
+  bool get isConfirm {
+    return _isConfirm;
+  }
+
+  Future<void> getConfirm(ctx, myloanid, reciveraddress, email) async {
     var url = Uri.https(
       loanApiUrl,
       '$loanApiVersion/confirm_loan',
@@ -391,16 +416,106 @@ class LoanProvider with ChangeNotifier {
       final responseData = json.decode(response.body);
       print(responseData);
 
-      if (responseData['result'] == 200) {
-        isconfirm = responseData['result'];
+      if (responseData['result']) {
+        _isConfirm = responseData['result'];
         return notifyListeners();
       } else {
+        _isConfirm = false;
+        snackAlert(ctx, SnackTypes.errors, responseData['response']);
         return notifyListeners();
       }
     } catch (error) {
       print(error);
-      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      snackAlert(
+        ctx,
+        SnackTypes.errors,
+        'Failed to process, please try again.',
+      );
+      _isConfirm = false;
+      return notifyListeners();
+    }
+  }
+
+  // Get customer 2FA
+  Map _customer2FA = {};
+
+  Map get cutomer2FA {
+    return _customer2FA;
+  }
+
+  Future<void> getCustomer2FA(ctx, formData) async {
+    var url = Uri.https(
+      loanApiUrl,
+      '/customers/get_customer_2fa',
+    );
+
+    var body = jsonEncode(formData);
+    print(body);
+
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+      final responseData = json.decode(response.body);
+
+      if (responseData['status'] == 200) {
+        _customer2FA = responseData;
+        return notifyListeners();
+      } else {
+        _customer2FA = {};
+        snackAlert(ctx, SnackTypes.errors, responseData['response']);
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      snackAlert(
+        ctx,
+        SnackTypes.errors,
+        'Failed to process, please try again.',
+      );
       return;
+    }
+  }
+
+  // Verify 2FA
+  Future<bool> verify2FACode(ctx, formData) async {
+    var url = Uri.https(
+      loanApiUrl,
+      '/customers/verify_the_code',
+    );
+
+    var body = jsonEncode(formData);
+
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+      final responseData = json.decode(response.body);
+
+      print(responseData);
+
+      if (responseData['status'] == 200) {
+        return true;
+      } else {
+        showAlert(
+          ctx,
+          Icon(Icons.error),
+          'Error',
+          [
+            Text('${responseData['message']}'),
+          ],
+          'Ok',
+        );
+        return false;
+      }
+    } catch (error) {
+      print(error);
+      showAlert(
+        ctx,
+        Icon(Icons.error),
+        'Error',
+        [
+          Text('Failed to process, please try again.'),
+        ],
+        'Ok',
+      );
+      return false;
     }
   }
 
@@ -445,5 +560,17 @@ class LoanProvider with ChangeNotifier {
       // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
       return;
     }
+  }
+
+  // Loan details
+  Map _loanDetails = {};
+
+  Map get loanDetails {
+    return _loanDetails;
+  }
+
+  void setLoanDetails(details) {
+    _loanDetails = details;
+    notifyListeners();
   }
 }

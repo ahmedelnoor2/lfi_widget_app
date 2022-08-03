@@ -44,6 +44,8 @@ String getTranslate(String text) {
       return 'Illegal parameter';
     case '无效token':
       return 'Invalid token';
+    case '数量小于最小值':
+      return 'Quantity is less than minimum';
     default:
       return text;
   }

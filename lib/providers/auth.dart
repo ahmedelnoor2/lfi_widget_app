@@ -454,8 +454,6 @@ class Auth with ChangeNotifier {
 
       final responseData = json.decode(response.body);
 
-      print(responseData);
-
       if (responseData['code'] == '0') {
         snackAlert(
             ctx, SnackTypes.success, 'Verification code sent to your mobile.');
@@ -630,6 +628,36 @@ class Auth with ChangeNotifier {
       }
 
       return responseData['code'];
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server Error!');
+      return;
+      // throw error;
+    }
+  }
+
+  // Update password
+  Future<void> updatePassword(ctx, formData) async {
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/user/password_update',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(url, body: postData, headers: headers);
+
+      final responseData = json.decode(response.body);
+      if (responseData['code'] == '0') {
+        snackAlert(
+            ctx, SnackTypes.success, 'Password is successfully updated.');
+        Navigator.pop(ctx);
+        return;
+      } else {
+        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+      }
+
+      return;
     } catch (error) {
       snackAlert(ctx, SnackTypes.errors, 'Server Error!');
       return;

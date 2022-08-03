@@ -34,7 +34,6 @@ class _PixPaymentState extends State<PixPayment>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   final _formKey = GlobalKey<FormState>();
-  final _formAdditinalInformationKey = GlobalKey<FormState>();
   final TextEditingController _amountBrlController = TextEditingController();
   final TextEditingController _amountUsdtController = TextEditingController();
 
@@ -245,6 +244,7 @@ class _PixPaymentState extends State<PixPayment>
 
     await payments.reRequestKyc(context, {
       'uuid': payments.pixKycClients['client_uuid'],
+      'userId': '${auth.userInfo['id']}',
       "cpf":
           '${_cpf.substring(0, 3)}.${_cpf.substring(3, 6)}.${_cpf.substring(6, 9)}-${_cpf.substring(9, 11)}',
     });
@@ -662,49 +662,80 @@ class _PixPaymentState extends State<PixPayment>
                     ),
                   ],
                 ),
-                LyoButton(
-                  onPressed: (_amountBrlController.text.isEmpty ||
-                          _amountUsdtController.text.isEmpty ||
-                          _processTransaction)
-                      ? null
-                      : () async {
-                          if (_formKey.currentState!.validate()) {
-                            payments.getKycVerificationDetails({
-                              'userId': auth.userInfo['id'],
-                            });
-                            setState(() {
-                              _fieldErrors = {};
-                              _nameController.clear();
-                              _emailController.clear();
-                              _cpfController.clear();
-                              _name = '';
-                              _email = '';
-                              _cpf = '';
-                              _loading = false;
-                              _processKyc = false;
-                            });
+                Container(
+                  margin: EdgeInsets.only(bottom: 20),
+                  child: LyoButton(
+                    onPressed: (_amountBrlController.text.isEmpty ||
+                            _amountUsdtController.text.isEmpty ||
+                            _processTransaction)
+                        ? null
+                        : () async {
+                            if (_formKey.currentState!.validate()) {
+                              await payments.getKycVerificationDetails({
+                                'userId': auth.userInfo['id'],
+                              });
+                              setState(() {
+                                _fieldErrors = {};
+                                _nameController.clear();
+                                _emailController.clear();
+                                _cpfController.clear();
+                                _name = '';
+                                _email = '';
+                                _cpf = '';
+                                _loading = false;
+                                _processKyc = false;
+                              });
 
-                            if (payments.pixKycClients.isNotEmpty) {
-                              if (payments.pixKycClients['activate']) {
-                                setState(() {
-                                  _processTransaction = true;
-                                });
-                                await payments.createNewPixTransaction(
-                                    context,
-                                    {
-                                      "client_id":
-                                          payments.pixKycClients['userId'],
-                                      "value": _sendUsdtAmount,
-                                      "client": payments.pixKycClients,
-                                      "userAddresses": _userAddresses,
+                              if (payments.pixKycClients.isNotEmpty) {
+                                if (payments.pixKycClients['activate']) {
+                                  setState(() {
+                                    _processTransaction = true;
+                                  });
+                                  await payments.createNewPixTransaction(
+                                      context,
+                                      {
+                                        "client_id":
+                                            payments.pixKycClients['userId'],
+                                        "value": _sendUsdtAmount,
+                                        "client": payments.pixKycClients,
+                                        "userAddresses": _userAddresses,
+                                      },
+                                      _amountBrlController.text);
+                                  setState(() {
+                                    _processTransaction = false;
+                                  });
+                                  if (payments.pixNewTransaction.isNotEmpty) {
+                                    Navigator.pushNamed(
+                                        context, '/pix_process_payment');
+                                  }
+                                } else {
+                                  showModalBottomSheet<void>(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(25.0),
+                                      ),
+                                    ),
+                                    isScrollControlled: true,
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return StatefulBuilder(
+                                        builder: (BuildContext context,
+                                            StateSetter setState) {
+                                          return GestureDetector(
+                                            onTap: () {
+                                              FocusManager.instance.primaryFocus
+                                                  ?.unfocus();
+                                            },
+                                            child: kycInformation(
+                                              context,
+                                              setState,
+                                              0.9,
+                                            ),
+                                          );
+                                        },
+                                      );
                                     },
-                                    _amountBrlController.text);
-                                setState(() {
-                                  _processTransaction = false;
-                                });
-                                if (payments.pixNewTransaction.isNotEmpty) {
-                                  Navigator.pushNamed(
-                                      context, '/pix_process_payment');
+                                  );
                                 }
                               } else {
                                 showModalBottomSheet<void>(
@@ -713,8 +744,8 @@ class _PixPaymentState extends State<PixPayment>
                                       top: Radius.circular(25.0),
                                     ),
                                   ),
-                                  isScrollControlled: true,
                                   context: context,
+                                  isScrollControlled: true,
                                   builder: (BuildContext context) {
                                     return StatefulBuilder(
                                       builder: (BuildContext context,
@@ -735,45 +766,17 @@ class _PixPaymentState extends State<PixPayment>
                                   },
                                 );
                               }
-                            } else {
-                              showModalBottomSheet<void>(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(25.0),
-                                  ),
-                                ),
-                                context: context,
-                                isScrollControlled: true,
-                                builder: (BuildContext context) {
-                                  return StatefulBuilder(
-                                    builder: (BuildContext context,
-                                        StateSetter setState) {
-                                      return GestureDetector(
-                                        onTap: () {
-                                          FocusManager.instance.primaryFocus
-                                              ?.unfocus();
-                                        },
-                                        child: kycInformation(
-                                          context,
-                                          setState,
-                                          0.9,
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                              );
                             }
-                          }
-                        },
-                  text: 'Continue',
-                  active: true,
-                  isLoading: _processTransaction,
-                  activeColor: (_amountBrlController.text.isEmpty ||
-                          _amountUsdtController.text.isEmpty)
-                      ? Color(0xff5E6292)
-                      : linkColor,
-                  activeTextColor: Colors.black,
+                          },
+                    text: 'Continue',
+                    active: true,
+                    isLoading: _processTransaction,
+                    activeColor: (_amountBrlController.text.isEmpty ||
+                            _amountUsdtController.text.isEmpty)
+                        ? Color(0xff5E6292)
+                        : linkColor,
+                    activeTextColor: Colors.black,
+                  ),
                 ),
               ],
             ),
@@ -814,24 +817,6 @@ class _PixPaymentState extends State<PixPayment>
                 _timer = Timer.periodic(
                   const Duration(seconds: 1),
                   (Timer timer) {
-                    final nowDate = DateTime.now().toLocal();
-                    var endDate =
-                        DateTime.parse(payments.kycTransaction['date_end'])
-                            .toLocal()
-                            .add(Duration(
-                                hours: int.parse(nowDate.timeZoneOffset
-                                    .toString()
-                                    .split(":")[0])));
-                    final difference = nowDate.difference(endDate).toString();
-                    final hour =
-                        difference.split(':')[0].replaceAll(RegExp('-'), '');
-                    final minute = difference.split(':')[1];
-                    final second = difference.split(':')[2].split('.')[0];
-                    payments.setAwaitingTime('0$hour:$minute:$second');
-                    payments.setClientUpdateCall(payments.clientUpdateCall - 1);
-                    if (payments.clientUpdateCall == 0) {
-                      payments.setClientUpdateCall(10);
-                    }
                     getClientUpdate(payments);
                   },
                 );
@@ -842,41 +827,6 @@ class _PixPaymentState extends State<PixPayment>
           setState(() {
             _timer!.cancel();
             _timer = null;
-          });
-          setState(() async {
-            if (payments.pixKycClients.isNotEmpty) {
-              await payments.getKycVerificationTransaction(
-                payments.pixKycClients['client_uuid'],
-              );
-            }
-            if (payments.kycTransaction.isNotEmpty) {
-              if (payments.kycTransaction['date_end'] != null) {
-                _timer = Timer.periodic(
-                  const Duration(seconds: 1),
-                  (Timer timer) {
-                    final nowDate = DateTime.now().toLocal();
-                    var endDate =
-                        DateTime.parse(payments.kycTransaction['date_end'])
-                            .toLocal()
-                            .add(Duration(
-                                hours: int.parse(nowDate.timeZoneOffset
-                                    .toString()
-                                    .split(":")[0])));
-                    final difference = nowDate.difference(endDate).toString();
-                    final hour =
-                        difference.split(':')[0].replaceAll(RegExp('-'), '');
-                    final minute = difference.split(':')[1];
-                    final second = difference.split(':')[2].split('.')[0];
-                    payments.setAwaitingTime('0$hour:$minute:$second');
-                    payments.setClientUpdateCall(payments.clientUpdateCall - 1);
-                    if (payments.clientUpdateCall == 0) {
-                      payments.setClientUpdateCall(10);
-                    }
-                    getClientUpdate(payments);
-                  },
-                );
-              }
-            }
           });
         }
       }
@@ -889,272 +839,21 @@ class _PixPaymentState extends State<PixPayment>
       child: Container(
         padding: EdgeInsets.only(right: 10, left: 10),
         height: height * 0.9,
-        child: Form(
-          key: _formAdditinalInformationKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              (payments.kycTransaction.isNotEmpty)
-                  ? Container(
-                      padding: EdgeInsets.only(bottom: 30),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'KYC Verification',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              IconButton(
-                                onPressed: () {
-                                  FocusManager.instance.primaryFocus?.unfocus();
-                                  if (_timer != null) {
-                                    _timer!.cancel();
-                                  }
-                                  Navigator.pop(context);
-                                },
-                                icon: Icon(
-                                  Icons.close,
-                                  size: 20,
-                                ),
-                              )
-                            ],
-                          ),
-                          Divider(),
-                          Container(
-                            child: Text(
-                              'The QR code with 5 Dollar deposit is used to verify your CPF account. Once Approved, you will be redirect to next screen for transferring payments for deposit.',
-                              style: TextStyle(
-                                color: secondaryTextColor,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            padding: EdgeInsets.all(10),
-                            child: payments.kycTransaction.isNotEmpty
-                                ? payments.kycTransaction['status'] ==
-                                        'ACCEPTED'
-                                    ? Align(
-                                        alignment: Alignment.center,
-                                        child: Image.asset(
-                                          'assets/img/approved.png',
-                                          width: 50,
-                                        ),
-                                      )
-                                    : Stack(
-                                        children: [
-                                          Image.asset(
-                                            'assets/img/qr_scan.png',
-                                            width: 150,
-                                          ),
-                                          Container(
-                                            padding: EdgeInsets.only(
-                                                top: 9, left: 10),
-                                            child: payments
-                                                    .kycTransaction.isNotEmpty
-                                                ? QrImage(
-                                                    data: utf8.decode(
-                                                      base64.decode(payments
-                                                                      .kycTransaction[
-                                                                  'qr_code'] !=
-                                                              null
-                                                          ? payments
-                                                                  .kycTransaction[
-                                                              'qr_code']
-                                                          : ''),
-                                                    ),
-                                                    version: QrVersions.auto,
-                                                    backgroundColor:
-                                                        Colors.white,
-                                                    size: 130.0,
-                                                  )
-                                                : Container(),
-                                          ),
-                                          payments.kycTransaction.isNotEmpty
-                                              ? (payments.kycTransaction[
-                                                              'status'] ==
-                                                          'CHARGEBACK' ||
-                                                      payments.kycTransaction[
-                                                              'status'] ==
-                                                          'REVERSED')
-                                                  ? InkWell(
-                                                      onTap: () async {
-                                                        setState(() {
-                                                          _reRequestKYCAuth =
-                                                              true;
-                                                        });
-                                                        await payments
-                                                            .clearKycTransactions();
-                                                        // reRequestKyc();
-                                                      },
-                                                      child: Container(
-                                                        margin: EdgeInsets.only(
-                                                            top: 5, left: 5),
-                                                        height: 140,
-                                                        width: 140,
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          color: Color.fromARGB(
-                                                              207, 94, 98, 146),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(5),
-                                                          border: Border.all(
-                                                            style: BorderStyle
-                                                                .solid,
-                                                            width: 0.3,
-                                                            color: Color(
-                                                                0xff5E6292),
-                                                          ),
-                                                        ),
-                                                        child: Align(
-                                                          alignment:
-                                                              Alignment.center,
-                                                          child: Icon(
-                                                            Icons.refresh,
-                                                            size: 50,
-                                                          ),
-                                                        ),
-                                                      ))
-                                                  : Container(
-                                                      margin: EdgeInsets.only(
-                                                          top: 5, left: 5),
-                                                      height: 140,
-                                                      width: 140,
-                                                    )
-                                              : Container(
-                                                  margin: EdgeInsets.only(
-                                                      top: 5, left: 5),
-                                                  height: 140,
-                                                  width: 140,
-                                                ),
-                                        ],
-                                      )
-                                : Container(),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              Clipboard.setData(
-                                ClipboardData(
-                                  text:
-                                      '${payments.kycTransaction['qr_code'] != null ? payments.kycTransaction['qr_code'] : ''}',
-                                ),
-                              );
-                              showAlert(
-                                context,
-                                Icon(Icons.copy),
-                                'Copied',
-                                [Text('QR Code copied!')],
-                                'Ok',
-                              );
-                            },
-                            child: Container(
-                              padding: EdgeInsets.all(10),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.only(right: 10),
-                                    child: Text('PIX QR Code'),
-                                  ),
-                                  Icon(
-                                    Icons.copy,
-                                    size: 18,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Container(
-                            padding: EdgeInsets.only(top: 10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Column(
-                                  children: [
-                                    Text('Status'),
-                                    Container(
-                                      padding: EdgeInsets.all(5),
-                                      child: Text(
-                                        '${payments.kycTransaction['status']}',
-                                        style: TextStyle(
-                                          color: payments.kycTransaction[
-                                                      'status'] ==
-                                                  'ACCEPTED'
-                                              ? successColor
-                                              : warningColor,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  children: [
-                                    Text('Countdown'),
-                                    Container(
-                                      padding: EdgeInsets.all(5),
-                                      child: Text(
-                                        payments.kycTransaction['status'] ==
-                                                'PROCESSING'
-                                            ? payments.awaitingTime
-                                            : payments.kycTransaction[
-                                                        'status'] ==
-                                                    'ACCEPTED'
-                                                ? 'KYC Verified'
-                                                : '0 h 00 min 00 sec',
-                                        style: TextStyle(
-                                          color: linkColor,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            padding: EdgeInsets.only(top: 20),
-                            child: Column(
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.only(top: 5),
-                                  child: Text(
-                                    '${payments.pixKycClients['name_client']}',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  child: Text(
-                                      '${payments.pixKycClients['email_client']}'),
-                                ),
-                                Container(
-                                  child: Text(
-                                      '${payments.pixKycClients['cpf_client']}'),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : Column(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            (payments.kycTransaction.isNotEmpty && !_reRequestKYCAuth)
+                ? Container(
+                    padding: EdgeInsets.only(bottom: 30),
+                    child: Column(
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Text(
-                              'Additional Information',
+                              'KYC Verification',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -1162,6 +861,10 @@ class _PixPaymentState extends State<PixPayment>
                             ),
                             IconButton(
                               onPressed: () {
+                                FocusManager.instance.primaryFocus?.unfocus();
+                                if (_timer != null) {
+                                  _timer!.cancel();
+                                }
                                 Navigator.pop(context);
                               },
                               icon: Icon(
@@ -1174,354 +877,601 @@ class _PixPaymentState extends State<PixPayment>
                         Divider(),
                         Container(
                           child: Text(
-                            'Please input your own CPF to proceed with the transactions. Any other CPF will cause the deposit to fail.',
+                            'The QR code with 5 Dollar deposit is used to verify your CPF account. Once Approved, you will be redirect to next screen for transferring payments for deposit.',
                             style: TextStyle(
                               color: secondaryTextColor,
                               fontSize: 12,
                             ),
                           ),
                         ),
-                        _reRequestKYCAuth
-                            ? Container()
-                            : Column(
-                                children: [
-                                  Container(
-                                    padding:
-                                        EdgeInsets.only(top: 15, bottom: 5),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text('Full Name'),
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.all(15),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(5),
-                                      border: Border.all(
-                                        style: BorderStyle.solid,
-                                        width: 0.3,
-                                        color: Color(0xff5E6292),
+                        Container(
+                          padding: EdgeInsets.all(10),
+                          child: payments.kycTransaction.isNotEmpty
+                              ? payments.kycTransaction['status'] == 'ACCEPTED'
+                                  ? Align(
+                                      alignment: Alignment.center,
+                                      child: Image.asset(
+                                        'assets/img/approved.png',
+                                        width: 50,
                                       ),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                    )
+                                  : Stack(
                                       children: [
-                                        SizedBox(
-                                          width: width * 0.85,
-                                          child: TextFormField(
-                                            validator: (value) {
-                                              if (value == null ||
-                                                  value.isEmpty) {
-                                                return 'Please enter name';
-                                              }
-                                              return null;
-                                            },
-                                            onChanged: (value) {
-                                              setState(() {
-                                                _name = value;
-                                              });
-                                            },
-                                            controller: _nameController,
-                                            decoration: const InputDecoration(
-                                              contentPadding: EdgeInsets.zero,
-                                              isDense: true,
-                                              border: UnderlineInputBorder(
-                                                borderSide: BorderSide.none,
-                                              ),
-                                              hintStyle: TextStyle(
-                                                fontSize: 14,
-                                              ),
-                                              hintText: "Enter your name",
-                                            ),
-                                          ),
+                                        Image.asset(
+                                          'assets/img/qr_scan.png',
+                                          width: 150,
                                         ),
+                                        Container(
+                                          padding:
+                                              EdgeInsets.only(top: 9, left: 10),
+                                          child: payments
+                                                  .kycTransaction.isNotEmpty
+                                              ? QrImage(
+                                                  data: utf8.decode(
+                                                    base64.decode(payments
+                                                                    .kycTransaction[
+                                                                'qr_code'] !=
+                                                            null
+                                                        ? payments
+                                                                .kycTransaction[
+                                                            'qr_code']
+                                                        : ''),
+                                                  ),
+                                                  version: QrVersions.auto,
+                                                  backgroundColor: Colors.white,
+                                                  size: 130.0,
+                                                )
+                                              : Container(),
+                                        ),
+                                        payments.kycTransaction.isNotEmpty
+                                            ? (payments.kycTransaction[
+                                                            'status'] ==
+                                                        'CHARGEBACK' ||
+                                                    payments.kycTransaction[
+                                                            'status'] ==
+                                                        'REVERSED')
+                                                ? InkWell(
+                                                    onTap: () async {
+                                                      setState(() {
+                                                        _reRequestKYCAuth =
+                                                            true;
+                                                      });
+                                                      await payments
+                                                          .clearKycTransactions();
+                                                      // reRequestKyc();
+                                                    },
+                                                    child: Container(
+                                                      margin: EdgeInsets.only(
+                                                          top: 5, left: 5),
+                                                      height: 140,
+                                                      width: 140,
+                                                      decoration: BoxDecoration(
+                                                        color: Color.fromARGB(
+                                                            207, 94, 98, 146),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(5),
+                                                        border: Border.all(
+                                                          style:
+                                                              BorderStyle.solid,
+                                                          width: 0.3,
+                                                          color:
+                                                              Color(0xff5E6292),
+                                                        ),
+                                                      ),
+                                                      child: Align(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        child: Icon(
+                                                          Icons.refresh,
+                                                          size: 50,
+                                                        ),
+                                                      ),
+                                                    ))
+                                                : Container(
+                                                    margin: EdgeInsets.only(
+                                                        top: 5, left: 5),
+                                                    height: 140,
+                                                    width: 140,
+                                                  )
+                                            : Container(
+                                                margin: EdgeInsets.only(
+                                                    top: 5, left: 5),
+                                                height: 140,
+                                                width: 140,
+                                              ),
                                       ],
-                                    ),
-                                  ),
-                                  _fieldErrors['name'] != null
-                                      ? Container(
-                                          padding: EdgeInsets.all(5),
-                                          child: Align(
-                                            alignment: Alignment.centerLeft,
-                                            child: Text(
-                                              _fieldErrors['name'],
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: errorColor,
-                                              ),
-                                            ),
-                                          ),
-                                        )
-                                      : Container(),
-                                ],
-                              ),
-                        _reRequestKYCAuth
-                            ? Container()
-                            : Column(
-                                children: [
-                                  Container(
-                                    padding:
-                                        EdgeInsets.only(top: 15, bottom: 5),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text('Email'),
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.all(15),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(5),
-                                      border: Border.all(
-                                        style: BorderStyle.solid,
-                                        width: 0.3,
-                                        color: Color(0xff5E6292),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        SizedBox(
-                                          width: width * 0.85,
-                                          child: TextFormField(
-                                            validator: (value) {
-                                              if (value == null ||
-                                                  value.isEmpty) {
-                                                return 'Please enter email';
-                                              }
-                                              return null;
-                                            },
-                                            onChanged: (value) {
-                                              setState(() {
-                                                _email = value;
-                                              });
-                                            },
-                                            controller: _emailController,
-                                            decoration: const InputDecoration(
-                                              contentPadding: EdgeInsets.zero,
-                                              isDense: true,
-                                              border: UnderlineInputBorder(
-                                                borderSide: BorderSide.none,
-                                              ),
-                                              hintStyle: TextStyle(
-                                                fontSize: 14,
-                                              ),
-                                              hintText: "Enter your email",
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  _fieldErrors['email'] != null
-                                      ? Container(
-                                          padding: EdgeInsets.all(5),
-                                          child: Align(
-                                            alignment: Alignment.centerLeft,
-                                            child: Text(
-                                              _fieldErrors['email'],
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: errorColor,
-                                              ),
-                                            ),
-                                          ),
-                                        )
-                                      : Container(),
-                                ],
-                              ),
-                        Container(
-                          padding: EdgeInsets.only(top: 15, bottom: 5),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text('CPF'),
-                            ],
-                          ),
+                                    )
+                              : Container(),
                         ),
-                        Container(
-                          padding: EdgeInsets.all(15),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(
-                              style: BorderStyle.solid,
-                              width: 0.3,
-                              color: Color(0xff5E6292),
+                        InkWell(
+                          onTap: () {
+                            Clipboard.setData(
+                              ClipboardData(
+                                text:
+                                    '${payments.kycTransaction['qr_code'] != null ? payments.kycTransaction['qr_code'] : ''}',
+                              ),
+                            );
+                            showAlert(
+                              context,
+                              Icon(Icons.copy),
+                              'Copied',
+                              [Text('QR Code copied!')],
+                              'Ok',
+                            );
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.only(right: 10),
+                                  child: Text('PIX QR Code'),
+                                ),
+                                Icon(
+                                  Icons.copy,
+                                  size: 18,
+                                ),
+                              ],
                             ),
                           ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(top: 10),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              SizedBox(
-                                width: width * 0.85,
-                                child: TextFormField(
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter CPF account number';
-                                    }
-                                    return null;
-                                  },
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _cpf = value;
-                                    });
-                                  },
-                                  keyboardType:
-                                      const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                                  controller: _cpfController,
-                                  decoration: const InputDecoration(
-                                    contentPadding: EdgeInsets.zero,
-                                    isDense: true,
-                                    border: UnderlineInputBorder(
-                                      borderSide: BorderSide.none,
+                              Column(
+                                children: [
+                                  Text('Status'),
+                                  Container(
+                                    padding: EdgeInsets.all(5),
+                                    child: Text(
+                                      '${payments.kycTransaction['status']}',
+                                      style: TextStyle(
+                                        color:
+                                            payments.kycTransaction['status'] ==
+                                                    'ACCEPTED'
+                                                ? successColor
+                                                : warningColor,
+                                      ),
                                     ),
-                                    hintStyle: TextStyle(
-                                      fontSize: 14,
-                                    ),
-                                    hintText: "Enter 11 digits of your CPF",
                                   ),
-                                ),
-                              )
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Text('Countdown'),
+                                  Container(
+                                    padding: EdgeInsets.all(5),
+                                    child: Text(
+                                      'KYC Transaction',
+                                      style: TextStyle(
+                                        color: linkColor,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
                         ),
-                        _fieldErrors['cpf'] != null
-                            ? Container(
-                                padding: EdgeInsets.all(5),
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    _fieldErrors['cpf'],
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: errorColor,
-                                    ),
+                        Container(
+                          padding: EdgeInsets.only(top: 20),
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.only(top: 5),
+                                child: Text(
+                                  '${payments.pixKycClients['name_client']}',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              )
-                            : Container(),
+                              ),
+                              Container(
+                                child: Text(
+                                    '${payments.pixKycClients['email_client']}'),
+                              ),
+                              Container(
+                                child: Text(
+                                    '${payments.pixKycClients['cpf_client']}'),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(40),
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                _reRequestKYCAuth = true;
+                              });
+                            },
+                            child: Text(
+                              'Update CPF',
+                              style: TextStyle(color: linkColor),
+                            ),
+                          ),
+                        )
                       ],
                     ),
-              payments.kycTransaction.isNotEmpty
-                  ? Column(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(
-                            bottom: 10,
+                  )
+                : Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Additional Information',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: payments.kycTransaction['status'] ==
-                                    'PROCESSING'
-                                ? Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                          IconButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: Icon(
+                              Icons.close,
+                              size: 20,
+                            ),
+                          )
+                        ],
+                      ),
+                      Divider(),
+                      Container(
+                        child: Text(
+                          'Please input your own CPF to proceed with the transactions. Any other CPF will cause the deposit to fail.',
+                          style: TextStyle(
+                            color: secondaryTextColor,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                      _reRequestKYCAuth
+                          ? Container()
+                          : Column(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.only(top: 15, bottom: 5),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Container(
-                                        padding: EdgeInsets.only(right: 10),
-                                        child: Icon(
-                                          Icons.timer,
-                                          color: warningColor,
-                                        ),
-                                      ),
-                                      Text(
-                                        'Awaiting payment',
-                                        style: TextStyle(
-                                          color: warningColor,
+                                      Text('Full Name'),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.all(15),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                      style: BorderStyle.solid,
+                                      width: 0.3,
+                                      color: Color(0xff5E6292),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      SizedBox(
+                                        width: width * 0.85,
+                                        child: TextFormField(
+                                          validator: (value) {
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return 'Please enter name';
+                                            }
+                                            return null;
+                                          },
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _name = value;
+                                            });
+                                          },
+                                          controller: _nameController,
+                                          decoration: const InputDecoration(
+                                            contentPadding: EdgeInsets.zero,
+                                            isDense: true,
+                                            border: UnderlineInputBorder(
+                                              borderSide: BorderSide.none,
+                                            ),
+                                            hintStyle: TextStyle(
+                                              fontSize: 14,
+                                            ),
+                                            hintText: "Enter your name",
+                                          ),
                                         ),
                                       ),
                                     ],
-                                  )
-                                : payments.kycTransaction['status'] ==
-                                        'ACCEPTED'
-                                    ? TextButton(
-                                        onPressed: () async {
-                                          Navigator.pop(context);
-                                          setState(() {
-                                            _processTransaction = true;
-                                          });
-                                          await payments
-                                              .createNewPixTransaction(
-                                            context,
-                                            {
-                                              "client_id": payments
-                                                  .pixKycClients['userId'],
-                                              "value": _sendUsdtAmount,
-                                              "client": payments.pixKycClients,
-                                              "userAddresses": _userAddresses,
-                                            },
-                                            _amountBrlController.text,
-                                          );
-                                          setState(() {
-                                            _processTransaction = false;
-                                          });
-                                          if (payments
-                                              .pixNewTransaction.isNotEmpty) {
-                                            Navigator.pushNamed(context,
-                                                '/pix_process_payment');
-                                          }
-                                        },
-                                        child: Text('Continue'),
+                                  ),
+                                ),
+                                _fieldErrors['name'] != null
+                                    ? Container(
+                                        padding: EdgeInsets.all(5),
+                                        child: Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            _fieldErrors['name'],
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: errorColor,
+                                            ),
+                                          ),
+                                        ),
                                       )
-                                    : TextButton(
-                                        onPressed: () async {
-                                          // print(payments.pixKycClients[0]['client_uuid']);
-                                          setState(() {
-                                            _reRequestKYCAuth = true;
-                                          });
-                                          await payments.clearKycTransactions();
-                                          // reRequestKyc();
-                                        },
-                                        child: Text('Resend KYC verification'),
-                                      ),
-                          ),
-                        ),
-                        Container(
-                          width: width,
-                          padding: EdgeInsets.all(10),
-                          margin: EdgeInsets.only(bottom: 50),
-                          decoration: BoxDecoration(
-                            color: Color(0xff1E2144),
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(
-                              style: BorderStyle.solid,
-                              width: 0.3,
-                              color: Color(0xff1E2144),
+                                    : Container(),
+                              ],
                             ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.only(right: 10),
-                                child: Icon(
-                                  Icons.info,
-                                  size: 15,
-                                  color: secondaryTextColor,
+                      _reRequestKYCAuth
+                          ? Container()
+                          : Column(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.only(top: 15, bottom: 5),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text('Email'),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                'Please scan the code to pay to verify your CPF',
-                                style: TextStyle(
-                                  color: secondaryTextColor,
+                                Container(
+                                  padding: EdgeInsets.all(15),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                      style: BorderStyle.solid,
+                                      width: 0.3,
+                                      color: Color(0xff5E6292),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      SizedBox(
+                                        width: width * 0.85,
+                                        child: TextFormField(
+                                          validator: (value) {
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return 'Please enter email';
+                                            }
+                                            return null;
+                                          },
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _email = value;
+                                            });
+                                          },
+                                          controller: _emailController,
+                                          decoration: const InputDecoration(
+                                            contentPadding: EdgeInsets.zero,
+                                            isDense: true,
+                                            border: UnderlineInputBorder(
+                                              borderSide: BorderSide.none,
+                                            ),
+                                            hintStyle: TextStyle(
+                                              fontSize: 14,
+                                            ),
+                                            hintText: "Enter your email",
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                                _fieldErrors['email'] != null
+                                    ? Container(
+                                        padding: EdgeInsets.all(5),
+                                        child: Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            _fieldErrors['email'],
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: errorColor,
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    : Container(),
+                              ],
+                            ),
+                      Container(
+                        padding: EdgeInsets.only(top: 15, bottom: 5),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('CPF'),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(15),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(
+                            style: BorderStyle.solid,
+                            width: 0.3,
+                            color: Color(0xff5E6292),
                           ),
                         ),
-                      ],
-                    )
-                  : LyoButton(
-                      onPressed: ((_name.isEmpty || !_reRequestKYCAuth) ||
-                              (_email.isEmpty || !_reRequestKYCAuth) ||
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              width: width * 0.85,
+                              child: TextFormField(
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter CPF account number';
+                                  }
+                                  return null;
+                                },
+                                onChanged: (value) {
+                                  setState(() {
+                                    _cpf = value;
+                                  });
+                                },
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                  decimal: true,
+                                ),
+                                controller: _cpfController,
+                                decoration: const InputDecoration(
+                                  contentPadding: EdgeInsets.zero,
+                                  isDense: true,
+                                  border: UnderlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  hintStyle: TextStyle(
+                                    fontSize: 14,
+                                  ),
+                                  hintText: "Enter 11 digits of your CPF",
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      _fieldErrors['cpf'] != null
+                          ? Container(
+                              padding: EdgeInsets.all(5),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  _fieldErrors['cpf'],
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: errorColor,
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Container(),
+                    ],
+                  ),
+            (payments.kycTransaction.isNotEmpty && !_reRequestKYCAuth)
+                ? Column(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(
+                          bottom: 10,
+                        ),
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: payments.kycTransaction['status'] ==
+                                  'PROCESSING'
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.only(right: 10),
+                                      child: Icon(
+                                        Icons.timer,
+                                        color: warningColor,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Awaiting payment',
+                                      style: TextStyle(
+                                        color: warningColor,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : payments.kycTransaction['status'] == 'ACCEPTED'
+                                  ? TextButton(
+                                      onPressed: () async {
+                                        Navigator.pop(context);
+                                        setState(() {
+                                          _processTransaction = true;
+                                        });
+                                        await payments.createNewPixTransaction(
+                                          context,
+                                          {
+                                            "client_id": payments
+                                                .pixKycClients['userId'],
+                                            "value": _sendUsdtAmount,
+                                            "client": payments.pixKycClients,
+                                            "userAddresses": _userAddresses,
+                                          },
+                                          _amountBrlController.text,
+                                        );
+                                        setState(() {
+                                          _processTransaction = false;
+                                        });
+                                        if (payments
+                                            .pixNewTransaction.isNotEmpty) {
+                                          Navigator.pushNamed(
+                                              context, '/pix_process_payment');
+                                        }
+                                      },
+                                      child: Text('Continue'),
+                                    )
+                                  : TextButton(
+                                      onPressed: () async {
+                                        // print(payments.pixKycClients[0]['client_uuid']);
+                                        setState(() {
+                                          _reRequestKYCAuth = true;
+                                        });
+                                        await payments.clearKycTransactions();
+                                        // reRequestKyc();
+                                      },
+                                      child: Text('Resend KYC verification'),
+                                    ),
+                        ),
+                      ),
+                      Container(
+                        width: width,
+                        padding: EdgeInsets.all(10),
+                        margin: EdgeInsets.only(bottom: 50),
+                        decoration: BoxDecoration(
+                          color: Color(0xff1E2144),
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(
+                            style: BorderStyle.solid,
+                            width: 0.3,
+                            color: Color(0xff1E2144),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.only(right: 10),
+                              child: Icon(
+                                Icons.info,
+                                size: 15,
+                                color: secondaryTextColor,
+                              ),
+                            ),
+                            Text(
+                              'Please scan the code to pay to verify your CPF',
+                              style: TextStyle(
+                                color: secondaryTextColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
+                : Container(
+                    padding: EdgeInsets.only(bottom: 30),
+                    child: LyoButton(
+                      onPressed: ((_name.isEmpty && !_reRequestKYCAuth) ||
+                              (_email.isEmpty && !_reRequestKYCAuth) ||
                               _cpf.isEmpty ||
                               _loading)
                           ? null
@@ -1555,6 +1505,7 @@ class _PixPaymentState extends State<PixPayment>
                                 });
                               }
 
+                              print(_reRequestKYCAuth);
                               if (_fieldErrors.isEmpty) {
                                 if (_reRequestKYCAuth) {
                                   reRequestKyc();
@@ -1566,16 +1517,16 @@ class _PixPaymentState extends State<PixPayment>
                       text: 'Continue',
                       active: true,
                       isLoading: _processKyc,
-                      activeColor: (_name.isEmpty ||
-                              _email.isEmpty ||
+                      activeColor: ((_name.isEmpty && !_reRequestKYCAuth) ||
+                              (_email.isEmpty && !_reRequestKYCAuth) ||
                               _cpf.isEmpty ||
                               _loading)
                           ? Color(0xff5E6292)
                           : linkColor,
                       activeTextColor: Colors.black,
                     ),
-            ],
-          ),
+                  ),
+          ],
         ),
       ),
     );

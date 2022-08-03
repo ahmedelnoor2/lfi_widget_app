@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:lyotrade/providers/payments.dart';
 import 'package:lyotrade/screens/common/header.dart';
+import 'package:lyotrade/screens/common/no_data.dart';
 import 'package:lyotrade/screens/pix_payment/pix_payment_details.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
@@ -80,64 +81,72 @@ class _PixTransactionsState extends State<PixTransactions>
                 ),
               ],
             ),
-            SizedBox(
-              height: height * 0.85,
-              child: ListView.separated(
-                separatorBuilder: (context, index) {
-                  return Divider();
-                },
-                padding: EdgeInsets.zero,
-                itemCount: payments.allPixTransactions.length,
-                itemBuilder: (BuildContext context, int index) {
-                  var transaction = allTransactions[index];
-                  return ListTile(
-                    onTap: () async {
-                      payments.decryptPixQR(
-                        {"qr_code": transaction['qr_code']},
-                      );
-                      await payments.setSelectedTransaction(transaction);
-                      Navigator.pushNamed(context, PixPaymentDetails.routeName);
-                    },
-                    title: const Text(
-                      'BRL',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+            allTransactions.length <= 0
+                ? Center(
+                    child: SizedBox(
+                      height: height * 0.85,
+                      child: noData('No Transactions'),
                     ),
-                    subtitle: Text(
-                      DateFormat('dd-MM-y H:mm').format(
-                        DateTime.parse('${transaction['date_end']}'),
-                      ),
-                    ),
-                    trailing: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Text(
-                          '${transaction['value']}',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                  )
+                : SizedBox(
+                    height: height * 0.85,
+                    child: ListView.separated(
+                      separatorBuilder: (context, index) {
+                        return Divider();
+                      },
+                      padding: EdgeInsets.zero,
+                      itemCount: payments.allPixTransactions.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        var transaction = allTransactions[index];
+                        return ListTile(
+                          onTap: () async {
+                            payments.decryptPixQR(
+                              {"qr_code": transaction['qr_code']},
+                            );
+                            await payments.setSelectedTransaction(transaction);
+                            Navigator.pushNamed(
+                                context, PixPaymentDetails.routeName);
+                          },
+                          title: const Text(
+                            'BRL',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        Text(
-                          '${transaction['status']}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: transaction['status'] == 'ACCEPTED'
-                                ? successColor
-                                : transaction['status'] == 'PROCESSING'
-                                    ? warningColor
-                                    : errorColor,
+                          subtitle: Text(
+                            DateFormat('dd-MM-y H:mm').format(
+                              DateTime.parse('${transaction['date_end']}'),
+                            ),
                           ),
-                        ),
-                      ],
+                          trailing: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Text(
+                                '${transaction['value']}',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                '${transaction['status']}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: transaction['status'] == 'ACCEPTED'
+                                      ? successColor
+                                      : transaction['status'] == 'PROCESSING'
+                                          ? warningColor
+                                          : errorColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
-            ),
+                  ),
           ],
         ),
       ),
