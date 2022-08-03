@@ -33,18 +33,6 @@ class _LeaderBoardState extends State<LeaderBoard> {
     await referalprovider.getrewards(context, auth);
   }
 
-  // List<Map<String, dynamic>> titles = [
-  //   {
-  //     'id': '1',
-  //     'title': 'ID 24071392',
-  //     'trial': '53.36 USDT',
-
-  //   },
-  //   {'id': '2', 'title': 'ID 24071392', 'trial': '53.36 USDT'},
-  //   {'id': '3', 'title': 'ID 24071392', 'trial': '53.36 USDT'},
-  //   {'id': '4', 'title': 'ID 24071392', 'trial': '53.36 USDT'}
-  // ];
-
   @override
   Widget build(BuildContext context) {
     var auth = Provider.of<Auth>(context, listen: false);
@@ -56,108 +44,126 @@ class _LeaderBoardState extends State<LeaderBoard> {
 
     return Scaffold(
       appBar: hiddenAppBar(),
-      body: Column(children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.only(right: 10),
-                  child: IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: Icon(Icons.chevron_left),
+      body: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(right: 10),
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: Icon(Icons.chevron_left),
+                    ),
                   ),
-                ),
+                  Text(
+                    'List of reward rankings',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Divider(),
+          Container(
+            padding: EdgeInsets.all(20),
+            child: Row(
+              children: [
                 Text(
-                  'List of reward rankings',
+                  'Reward rankings are updated hourly',
                   style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                    color: secondaryTextColor,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
             ),
-          ],
-        ),
-        Container(
-          padding: EdgeInsets.all(20),
-          child: Row(
-            children: [
-              Text(
-                'Reward rankings are updated hourly',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: secondaryTextColor,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
           ),
-        ),
-        Expanded(
+          Expanded(
             child: Container(
-          padding: EdgeInsets.only(left: 20, right: 20),
-          child: referalprovider.isrewards
-              ? SizedBox(
-                  height: MediaQuery.of(context).size.height / 1.3,
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                )
-              : ListView.builder(
-                  itemCount: referalprovider.rewardlist.length,
-                  itemBuilder: (context, index) {
-                  
-
-                    return referalprovider.rewardlist.isEmpty? Center(child: noData('No Rewards')):Container(
-                      decoration: BoxDecoration(
-                          color: listcolor,
-                          borderRadius: BorderRadius.all(Radius.circular(5))),
-                      height: height * 0.11,
-                      margin: EdgeInsets.only(
-                          top: height * 0.01, bottom: height * 0.01),
-                      alignment: Alignment.center,
-                      child: ListTile(
-                        leading: ClipOval(
-                          child: Container(
-                              color: listselectcolor,
-                              height: 40,
-                              width: 40,
-                              child: Container(
-                                padding: EdgeInsets.all(5),
-                                child: CircleAvatar(
-                                    backgroundColor: listcolorinner,
-                                    child: Text(
-                                     index.toString(),
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w700,
-                                          color: neturalcolor),
-                                    )),
-                              )),
-                        ),
-                        title: Text(
-                          referalprovider.rewardlist[index]['rewardUid']
-                              .toString(),
-                          style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.w500),
-                        ),
-                        trailing: Text(
-                          referalprovider.rewardlist[index]
-                                  ['totalConversionRewardAmount']
-                              .toString(),
-                          style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.w500),
-                        ),
+              padding: EdgeInsets.only(left: 20, right: 20),
+              child: referalprovider.isrewards
+                  ? SizedBox(
+                      height: MediaQuery.of(context).size.height / 1.3,
+                      child: Center(
+                        child: CircularProgressIndicator(),
                       ),
-                    );
-                  },
-                ),
-        ))
-      ]),
+                    )
+                  : ListView.builder(
+                      itemCount: referalprovider.rewardlist.length,
+                      itemBuilder: (context, ind) {
+                        var index = ind + 1;
+                        return referalprovider.rewardlist.isEmpty
+                            ? Center(child: noData('No Rewards'))
+                            : Container(
+                                padding: EdgeInsets.all(2),
+                                margin: EdgeInsets.only(bottom: 5),
+                                decoration: BoxDecoration(
+                                  color: listcolor,
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(5),
+                                  ),
+                                ),
+                                alignment: Alignment.center,
+                                child: ListTile(
+                                  leading: ClipOval(
+                                    child: Container(
+                                      color: clipCircle[
+                                              'out_${index.toString()}'] ??
+                                          listselectcolor,
+                                      height: 40,
+                                      width: 40,
+                                      child: Container(
+                                        padding: EdgeInsets.all(4),
+                                        child: CircleAvatar(
+                                          backgroundColor: clipCircle[
+                                                  'in_${index.toString()}'] ??
+                                              listcolorinner,
+                                          child: Text(
+                                            index.toString(),
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w700,
+                                              color: neturalcolor,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  title: Text(
+                                    referalprovider.rewardlist[ind]['rewardUid']
+                                        .toString(),
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  trailing: Text(
+                                    referalprovider.rewardlist[ind]
+                                            ['totalConversionRewardAmount']
+                                        .toString(),
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              );
+                      },
+                    ),
+            ),
+          )
+        ],
+      ),
     );
   }
 }

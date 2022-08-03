@@ -94,7 +94,7 @@ var orangeBGColor = Color(0xFFFF9000);
 //button colour
 
 var buttoncolour = Color(0xFF5E6292);
-var selectboxcolour = Color(0xFF25284A);
+var selectboxcolour = Color(0xFF383C6F);
 
 var seconadarytextcolour = Color(0xFF5E6292);
 var bottombuttoncolour = Color(0XFF01D2042);
@@ -105,3 +105,13 @@ var listselectcolor = Color(0xFF484D87);
 var listcolorinner = Color(0xFF3B3F72);
 var neturalcolor = Color(0xFFF6F9FC);
 var cardcolor = Color(0xFF292C51);
+
+// Referral
+var clipCircle = {
+  'in_1': Color(0xffF6B708),
+  'out_1': Color(0xffFBF317),
+  'in_2': Color(0xffD87C5D),
+  'out_2': Color(0xffF5BA95),
+  'in_3': Color(0xff9DA8B0),
+  'out_3': Color(0xffE5E5E5),
+};

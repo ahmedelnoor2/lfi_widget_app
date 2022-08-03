@@ -8,28 +8,29 @@ import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-class Favoritespage extends StatefulWidget {
-
-  const Favoritespage({
+class FavoritesScreen extends StatefulWidget {
+  const FavoritesScreen({
     Key? key,
     this.scaffoldKey,
     this.updateMarket,
+    this.currentMarketSort,
+    this.upateCurrentMarketSort,
   }) : super(key: key);
 
   final scaffoldKey;
   final updateMarket;
+  final currentMarketSort;
+  final upateCurrentMarketSort;
 
   @override
-  State<Favoritespage> createState() => _FavoritespageState();
+  State<FavoritesScreen> createState() => _FavoritesScreenState();
 }
 
-class _FavoritespageState extends State<Favoritespage>
+class _FavoritesScreenState extends State<FavoritesScreen>
     with SingleTickerProviderStateMixin {
   TabController? _tabController;
-  final TextEditingController _searchController = TextEditingController();
 
   var _channel;
-  String _currentMarketSort = 'USDT';
 
   @override
   void initState() {
@@ -101,99 +102,57 @@ class _FavoritespageState extends State<Favoritespage>
 
     var public = Provider.of<Public>(context, listen: true);
 
-   // print(public.activeMarketAllTicks);
+    // print(public.activeMarketAllTicks);
 
     return Scaffold(
-      
       appBar: hiddenAppBar(),
       body: Column(
         children: <Widget>[
-         
-          // Container(
-          //   padding: EdgeInsets.all(10),
-          //   child: Container(
-          //     padding: EdgeInsets.all(12),
-          //     decoration: BoxDecoration(
-          //       borderRadius: BorderRadius.circular(5),
-          //       border: Border.all(
-          //         style: BorderStyle.solid,
-          //         width: 0.3,
-          //         color: Color(0xff5E6292),
-          //       ),
-          //     ),
-          //     child: Row(
-          //       children: [
-          //         // Container(
-          //         //   padding: EdgeInsets.only(right: 8),
-          //         //   child: Icon(Icons.search),
-          //         // ),
-          //         // SizedBox(
-          //         //   width: width * 0.50,
-          //         //   child: TextField(
-          //         //     onChanged: (value) async {
-          //         //       // await asset.filterSearchResults(value);
-          //         //       await public.filterMarketSearchResults(
-          //         //         value,
-          //         //         public.allMarkets[_currentMarketSort],
-          //         //         _currentMarketSort,
-          //         //       );
-          //         //     },
-          //         //     controller: _searchController,
-          //         //     decoration: InputDecoration(
-          //         //       contentPadding: EdgeInsets.zero,
-          //         //       isDense: true,
-          //         //       border: UnderlineInputBorder(
-          //         //         borderSide: BorderSide.none,
-          //         //       ),
-          //         //       hintStyle: TextStyle(
-          //         //         fontSize: 14,
-          //         //       ),
-          //         //       hintText: "Search",
-          //         //     ),
-          //         //   ),
-          //         // ),
-          //       ],
-          //     ),
-          //   ),
-          // ),
           _tabController != null
-              ? SizedBox(
+              ? Container(
                   height: 40,
-                  child: TabBar(
-                    indicatorSize: TabBarIndicatorSize.label,
-             
-                    onTap: (value) {
-                      setState(() {
-                        _currentMarketSort = public.publicInfoMarket['market']
-                            ['marketSort'][value];
-                      });
-                    },
-                    controller: _tabController,
-                    tabs: public.publicInfoMarket['market']['marketSort']
-                        .map<Widget>(
-                          (mname) => Tab(text: '$mname'),
-                        )
-                        .toList(),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: TabBar(
+                      indicatorSize: TabBarIndicatorSize.label,
+                      isScrollable: true,
+                      onTap: (value) {
+                        widget.upateCurrentMarketSort(public
+                            .publicInfoMarket['market']['marketSort'][value]);
+                      },
+                      controller: _tabController,
+                      tabs: public.publicInfoMarket['market']['marketSort']
+                          .map<Widget>(
+                            (mname) => Tab(text: '$mname'),
+                          )
+                          .toList(),
+                    ),
                   ),
                 )
               : Container(),
           Expanded(
             child: ListView.separated(
-              
               separatorBuilder: (context, index) {
                 return Divider();
               },
               shrinkWrap: true,
-              itemCount: public.allSearchMarket[_currentMarketSort].isNotEmpty
-                  ? public.allSearchMarket[_currentMarketSort].length
-                  : public.allMarkets[_currentMarketSort].length,
+              itemCount:
+                  public.allSearchMarket[widget.currentMarketSort].isNotEmpty
+                      ? public.allSearchMarket[widget.currentMarketSort].length
+                      : public.allMarkets[widget.currentMarketSort].length,
               itemBuilder: (context, index) {
-                var _market =
-                    public.allSearchMarket[_currentMarketSort].isNotEmpty
-                        ? public.allSearchMarket[_currentMarketSort][index]
-                        : public.allMarkets[_currentMarketSort][index];
-          
+                var _market = public
+                        .allSearchMarket[widget.currentMarketSort].isNotEmpty
+                    ? public.allSearchMarket[widget.currentMarketSort][index]
+                    : public.allMarkets[widget.currentMarketSort][index];
+
                 return ListTile(
+                  leading: Icon(
+                    Icons.star,
+                    size: 20,
+                    color: seconadarytextcolour,
+                  ),
+                  minLeadingWidth: 5,
                   title: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

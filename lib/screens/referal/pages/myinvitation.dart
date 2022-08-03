@@ -30,6 +30,8 @@ class _MyinvitationState extends State<Myinvitation> {
     var auth = Provider.of<Auth>(context, listen: false);
     var referalprovider = Provider.of<ReferralProvider>(context, listen: true);
 
+    print(referalprovider.invitationlist.isEmpty);
+
     return Column(
       children: [
         Container(
@@ -38,7 +40,7 @@ class _MyinvitationState extends State<Myinvitation> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Friend’s user ID',
+                'Friend\'s user ID',
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
@@ -64,55 +66,67 @@ class _MyinvitationState extends State<Myinvitation> {
                     child: CircularProgressIndicator(),
                   ),
                 )
-              : ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: referalprovider.invitationlist.length,
-                  itemBuilder: (context, index) {
-                    return referalprovider.invitationlist.isEmpty? Center(child: noData('No Invitation')): Padding(
-                      padding: const EdgeInsets.only(
-                          left: 16, right: 16, top: 8, bottom: 8),
-                      child: Column(children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              referalprovider.invitationlist[index]
-                                      ['levelZeroRegisterUid']
-                                  .toString(),
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
+              : referalprovider.invitationlist.isEmpty
+                  ? Center(child: noData('No Invitation'))
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: referalprovider.invitationlist.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.only(
+                              left: 16, right: 16, top: 8, bottom: 8),
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.only(bottom: 10),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      referalprovider.invitationlist[index]
+                                              ['levelZeroRegisterUid']
+                                          .toString(),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    Column(
+                                      children: [
+                                        Text(
+                                          DateFormat('yyy-mm-dd hh:mm:ss')
+                                              .format(DateTime
+                                                  .fromMicrosecondsSinceEpoch(
+                                                      referalprovider
+                                                                  .invitationlist[
+                                                              index]
+                                                          ['registerTime'])),
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w400,
+                                            color: natuaraldark,
+                                          ),
+                                        ),
+                                        Text(
+                                          referalprovider.invitationlist[index]
+                                                  ['email']
+                                              .toString(),
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ),
                               ),
-                            ),
-                            Column(
-                              children: [
-                                Text(
-                                  DateFormat('yyy-mm-dd hh:mm:ss').format(DateTime.fromMicrosecondsSinceEpoch(referalprovider.invitationlist[index]['registerTime'])),
-                                  
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w400,
-                                    color: natuaraldark,
-                                  ),
-                                ),
-                                Text(
-                                  referalprovider.invitationlist[index]['email']
-                                      .toString(),
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
-                            )
-                          ],
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                      ]),
-                    );
-                  }),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
         ),
       ],
     );
