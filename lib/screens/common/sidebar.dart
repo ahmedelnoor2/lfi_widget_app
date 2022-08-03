@@ -119,8 +119,15 @@ class _SideBarState extends State<SideBar> {
                 ),
               ),
             ),
-            const Card(
+            Card(
               child: ListTile(
+                onTap: () {
+                  if (auth.isAuthenticated) {
+                    Navigator.pushNamed(context, '/referal_screen');
+                  } else {
+                    Navigator.pushNamed(context, '/authentication');
+                  }
+                },
                 title: Text('Referral Program'),
                 subtitle: Text(
                   'Refer friends and get rewards',
