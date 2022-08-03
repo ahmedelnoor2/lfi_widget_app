@@ -1,10 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/security/forgot/forgotemailform.dart';
 
 import 'package:lyotrade/utils/Colors.utils.dart';
-
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'forgotlphoneform.dart';
 
@@ -18,14 +17,16 @@ class Forgotpassword extends StatefulWidget {
 
 class _ForgotpasswordState extends State<Forgotpassword>
     with SingleTickerProviderStateMixin {
+  String _versionNumber = '0.0';
   TabController? _tabController;
   final _formKey = GlobalKey<FormState>();
 
-  var _pages = [Forgotphoneform(),Forgotemailform()];
+  var _pages = [Forgotemailform(),Forgotphoneform(),];
 
   @override
   void initState() {
     super.initState();
+    checkVersion();
     _tabController = new TabController(
       vsync: this,
       length: 2,
@@ -33,70 +34,130 @@ class _ForgotpasswordState extends State<Forgotpassword>
     );
   }
 
+  Future<void> checkVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      _versionNumber = packageInfo.version;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
     final _size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: appBar(context, null),
-      body: Column(
-        children: [
-          Container(
-            child: Expanded(
-              child: Column(
+      body: Container(
+        padding: EdgeInsets.only(top: width * 0.2),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.only(left: 10),
+              height: height * 0.20,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  PreferredSize(
-                    preferredSize: Size.fromHeight(40),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: TabBar(
-                        isScrollable: true,
-                        controller: _tabController,
-                        labelColor: whiteTextColor,
-                        indicatorColor: selecteditembordercolour,
-                        unselectedLabelColor: Colors.grey,
-                        indicatorSize: TabBarIndicatorSize.tab,
-                        indicatorWeight: 1.0,
-                        labelStyle: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: _size.width / 28.0,
-                        ),
-                        unselectedLabelStyle: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: _size.width / 28.0,
-                        ),
-                        tabs: [
-                          Container(
-                            width: _size.width * .4,
-                            child: Tab(
-                              text: 'Phone Number',
-                            ),
-                          ),
-                          Container(
-                            width: _size.width * .4,
-                            child: Tab(
-                              text: 'Email Address',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.maybePop(context);
+                    },
+                    icon: const Icon(Icons.close),
                   ),
-                  Divider(thickness: 1, height: 1),
-                  Expanded(
-                    child: TabBarView(
-                      controller: _tabController,
-                      children: _pages.map((
-                        Widget tab,
-                      ) {
-                        return tab;
-                      }).toList(),
+                  Container(
+                    padding: const EdgeInsets.only(top: 10, right: 30),
+                    child: Column(
+                      children: [
+                        const Image(
+                          image: AssetImage('assets/img/logo_s.png'),
+                          width: 100,
+                        ),
+                        Text('v$_versionNumber'),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+            Container(
+              child: Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.only(bottom: width * 0.03),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding:
+                                EdgeInsets.only(bottom: 0, left: width * 0.05),
+                            child: const Text(
+                              'Reset password',
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding:
+                                EdgeInsets.only(bottom: 0, left: width * 0.05),
+                            child: Text(
+                              'It is forbidden to withdraw coins within 48\nhours after resetting the login password',
+                              style: TextStyle(
+                                color: secondaryTextColor,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    TabBar(
+                      onTap: (index) {
+                        setState(() {});
+                      },
+                      indicator: UnderlineTabIndicator(
+                        borderSide: BorderSide(
+                          width: 2,
+                          color: linkColor,
+                        ),
+                        insets:  EdgeInsets.only(
+                           left: width*0.05, right: 25, bottom: 4),
+                      ),
+                      isScrollable: true,
+                      labelPadding: EdgeInsets.only(left: width*0.05, right: 0),
+                      tabs: const [
+                        Padding(
+                          padding: EdgeInsets.only(right: 25),
+                          child: Tab(text: 'Email'),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(right: 25),
+                          child: Tab(text: 'Mobile Phone'),
+                        ),
+                      ],
+                      controller: _tabController,
+                    ),
+                   
+                    Expanded(
+                      child: TabBarView(
+                        controller: _tabController,
+                        children: _pages.map((
+                          Widget tab,
+                        ) {
+                          return tab;
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
