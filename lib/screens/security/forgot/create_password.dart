@@ -29,6 +29,9 @@ class _CreatepasswordState extends State<Createpassword>
   final TextEditingController _loginpasswordcontroller =
       TextEditingController();
 
+  bool _newPassSecure = true;
+  bool _confirmPassSecure = true;
+
   @override
   void initState() {
     super.initState();
@@ -56,7 +59,7 @@ class _CreatepasswordState extends State<Createpassword>
     var auth = Provider.of<Auth>(context, listen: true);
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
-    final _size = MediaQuery.of(context).size;
+
     return Scaffold(
       body: Container(
         padding: EdgeInsets.only(top: width * 0.2),
@@ -71,7 +74,12 @@ class _CreatepasswordState extends State<Createpassword>
                 children: [
                   IconButton(
                     onPressed: () {
-                      Navigator.maybePop(context);
+                      auth.setForgotStepOne({});
+                      auth.setEmailValidResponse({});
+                      auth.setSmsValidResponse({});
+                      auth.setResetResponseStepTwo({});
+                      Navigator.pop(context);
+                      Navigator.pop(context);
                     },
                     icon: const Icon(Icons.close),
                   ),
@@ -143,9 +151,26 @@ class _CreatepasswordState extends State<Createpassword>
                                     }
                                     return null;
                                   },
-                                  decoration: const InputDecoration(
+                                  obscureText: _newPassSecure,
+                                  decoration: InputDecoration(
                                     // border: OutlineInputBorder(),
                                     labelText: 'New password',
+                                    suffix: InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          _newPassSecure = !_newPassSecure;
+                                        });
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.only(
+                                          right: 10,
+                                          left: 10,
+                                        ),
+                                        child: _newPassSecure
+                                            ? Icon(Icons.visibility)
+                                            : Icon(Icons.visibility_off),
+                                      ),
+                                    ),
                                   ),
                                 ),
                                 TextFormField(
@@ -155,9 +180,27 @@ class _CreatepasswordState extends State<Createpassword>
                                     }
                                     return null;
                                   },
-                                  decoration: const InputDecoration(
+                                  obscureText: _confirmPassSecure,
+                                  decoration: InputDecoration(
                                     // border: OutlineInputBorder(),
                                     labelText: 'Confirm password',
+                                    suffix: InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          _confirmPassSecure =
+                                              !_confirmPassSecure;
+                                        });
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.only(
+                                          right: 10,
+                                          left: 10,
+                                        ),
+                                        child: _confirmPassSecure
+                                            ? Icon(Icons.visibility)
+                                            : Icon(Icons.visibility_off),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],

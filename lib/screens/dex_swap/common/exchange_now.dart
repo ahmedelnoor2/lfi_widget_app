@@ -36,7 +36,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
     // setState(() {
     //   _fromAmountController.text = '1';
     // });
-    getCoinAddress(_defaultCoin);
+    getDigitalBalance();
     super.initState();
   }
 
@@ -45,6 +45,16 @@ class _ExchangeNowState extends State<ExchangeNow> {
     _fromAmountController.dispose();
     _toAddressController.dispose();
     super.dispose();
+  }
+
+  Future<void> getDigitalBalance() async {
+    setState(() {
+      _loadingAddress = true;
+    });
+    var auth = Provider.of<Auth>(context, listen: false);
+    var asset = Provider.of<Asset>(context, listen: false);
+    await asset.getAccountBalance(context, auth, "");
+    getCoinAddress(_defaultCoin);
   }
 
   Future<void> getCoinAddress(netwrkType) async {
@@ -185,6 +195,8 @@ class _ExchangeNowState extends State<ExchangeNow> {
     width = MediaQuery.of(context).size.width;
     var dexProvider = Provider.of<DexProvider>(context, listen: true);
 
+    print(dexProvider.allCurrencies[0]);
+
     return dexProvider.processPayment.isNotEmpty
         ? sendingWidget(context, dexProvider)
         : Container(
@@ -207,82 +219,101 @@ class _ExchangeNowState extends State<ExchangeNow> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        InkWell(
-                          onTap: () {
-                            showModalBottomSheet<void>(
-                              isScrollControlled: true,
-                              context: context,
-                              builder: (BuildContext context) {
-                                return StatefulBuilder(
-                                  builder: (BuildContext context,
-                                      StateSetter setState) {
-                                    return selectCoins(
-                                      context,
-                                      'from',
-                                      dexProvider,
-                                      setState,
-                                    );
-                                  },
-                                );
-                              },
-                            );
-                          },
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: EdgeInsets.only(right: 10),
-                                child: dexProvider.fromActiveCurrency.isNotEmpty
-                                    ? SvgPicture.network(
-                                        '${dexProvider.fromActiveCurrency['image']}',
-                                        width: 35,
-                                      )
-                                    : Container(),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
+                        Expanded(
+                          flex: 3,
+                          child: InkWell(
+                            onTap: () {
+                              showModalBottomSheet<void>(
+                                isScrollControlled: true,
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return StatefulBuilder(
+                                    builder: (BuildContext context,
+                                        StateSetter setState) {
+                                      return selectCoins(
+                                        context,
+                                        'from',
+                                        dexProvider,
+                                        setState,
+                                      );
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: Container(
+                                    padding: EdgeInsets.only(right: 10),
+                                    child: dexProvider
+                                            .fromActiveCurrency.isNotEmpty
+                                        ? SvgPicture.network(
+                                            '${dexProvider.fromActiveCurrency['image']}',
+                                            width: 35,
+                                          )
+                                        : Container(),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 5,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Container(
-                                        padding: EdgeInsets.only(right: 10),
-                                        child: Text(
-                                          dexProvider
-                                                  .fromActiveCurrency.isNotEmpty
-                                              ? dexProvider
-                                                  .fromActiveCurrency['ticker']
-                                                  .toUpperCase()
-                                              : '--',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
+                                      Row(
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.only(right: 10),
+                                            child: Text(
+                                              dexProvider.fromActiveCurrency
+                                                      .isNotEmpty
+                                                  ? dexProvider
+                                                      .fromActiveCurrency[
+                                                          'ticker']
+                                                      .toUpperCase()
+                                                  : '--',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
                                           ),
+                                          Icon(Icons.keyboard_arrow_down),
+                                        ],
+                                      ),
+                                      Text(
+                                        dexProvider
+                                                .fromActiveCurrency.isNotEmpty
+                                            ? dexProvider
+                                                .fromActiveCurrency['name']
+                                            : '--',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.normal,
                                         ),
                                       ),
-                                      Icon(Icons.keyboard_arrow_down),
                                     ],
                                   ),
-                                  Text(
-                                    dexProvider.fromActiveCurrency.isNotEmpty
-                                        ? dexProvider.fromActiveCurrency['name']
-                                        : '--',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.normal,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        SizedBox(
-                          width: width * 0.4,
+                        Expanded(
+                          flex: 1,
+                          // width: width * 0.4,
                           child: TextFormField(
                             textAlign: TextAlign.end,
                             controller: _fromAmountController,
                             onChanged: (value) async {
                               if (value.isNotEmpty) {
-                                if (double.parse(value) > 0) {
+                                if (double.parse(value) > 0 &&
+                                    (double.parse(value) >=
+                                        double.parse(_loadingExchnageRate
+                                            ? '--'
+                                            : '${dexProvider.minimumValue['minAmount']}'))) {
                                   estimateRates();
                                 }
                               }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:k_chart/flutter_k_chart.dart';
 import 'package:lyotrade/providers/auth.dart';
@@ -20,10 +22,45 @@ class _ForgotphoneformState extends State<Forgotphoneform> {
   final GlobalKey<FormState> _formLoginKey = GlobalKey<FormState>();
   final TextEditingController _phonecontroller = TextEditingController();
   final TextEditingController _smscontroller = TextEditingController();
-  @override
+
+  late Timer _timer;
+  int _start = 90;
+  bool _startTimer = false;
+
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _phonecontroller.dispose();
+    _smscontroller.dispose();
+
+    super.dispose();
+  }
+
+  void startTimer() {
+    setState(() {
+      _startTimer = true;
+    });
+    smsValidCode();
+    const oneSec = Duration(seconds: 1);
+    _timer = Timer.periodic(
+      oneSec,
+      (Timer timer) {
+        if (_start == 0) {
+          setState(() {
+            _startTimer = false;
+            _timer.cancel();
+          });
+        } else {
+          setState(() {
+            _start--;
+          });
+        }
+      },
+    );
   }
 
   Future<void> forgotPasswordStepOne() async {
@@ -57,6 +94,7 @@ class _ForgotphoneformState extends State<Forgotphoneform> {
       'smsCode': _smscontroller.text,
       'token': auth.forgotStepOne['data']['token'],
     });
+    _timer.cancel();
   }
 
   Widget build(BuildContext context) {
@@ -101,14 +139,23 @@ class _ForgotphoneformState extends State<Forgotphoneform> {
                               // border: OutlineInputBorder(),
                               labelText: 'Mobile verification code',
                               suffixIcon: GestureDetector(
-                                onTap: () async {
-                                  smsValidCode();
-                                },
+                                onTap: _startTimer
+                                    ? null
+                                    : () {
+                                        setState(() {
+                                          _start = 90;
+                                        });
+                                        startTimer();
+                                      },
                                 child: Container(
                                   child: Text(
-                                    'Click to send',
+                                    _startTimer
+                                        ? '${_start}s Get it again'
+                                        : 'Click to send',
                                     style: TextStyle(
-                                      color: selecteditembordercolour,
+                                      color: _startTimer
+                                          ? secondaryTextColor
+                                          : linkColor,
                                     ),
                                   ),
                                   margin: const EdgeInsets.all(15.0),

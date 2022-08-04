@@ -46,6 +46,8 @@ String getTranslate(String text) {
       return 'Invalid token';
     case '数量小于最小值':
       return 'Quantity is less than minimum';
+    case '邮件发送失败':
+      return 'Email sending failed';
     default:
       return text;
   }
