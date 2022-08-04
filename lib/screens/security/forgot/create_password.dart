@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/screens/common/header.dart';
+import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/screens/security/forgot/forgotemailform.dart';
 
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:provider/provider.dart';
 
 import 'forgotlphoneform.dart';
 
@@ -23,6 +26,9 @@ class _CreatepasswordState extends State<Createpassword>
 
   final _formLoginKey = GlobalKey<FormState>();
 
+  final TextEditingController _loginpasswordcontroller =
+      TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -36,8 +42,18 @@ class _CreatepasswordState extends State<Createpassword>
     });
   }
 
+  Future<void> resetPasswordStepThree() async {
+    var auth = Provider.of<Auth>(context, listen: false);
+
+    await auth.resetForgotPasswordStepThree(context, {
+      'loginPword': _loginpasswordcontroller.text,
+      'token': auth.forgotStepOne['data']['token'],
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    var auth = Provider.of<Auth>(context, listen: true);
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     final _size = MediaQuery.of(context).size;
@@ -114,12 +130,13 @@ class _CreatepasswordState extends State<Createpassword>
                         child: Column(
                       children: [
                         Form(
-                          key:_formLoginKey,
+                          key: _formLoginKey,
                           child: Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Column(
                               children: [
                                 TextFormField(
+                                  controller: _loginpasswordcontroller,
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
                                       return 'Please enter New password';
@@ -150,25 +167,15 @@ class _CreatepasswordState extends State<Createpassword>
                         Container(
                           padding: EdgeInsets.only(top: height * 0.03),
                           width: width * 0.93,
-                          child: ElevatedButton(
-                            child: const Text(
-                              "Submit",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              primary: selectboxcolour,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 50, vertical: 10),
-                            ),
+                          child: LyoButton(
+                            text: 'Next',
+                            active: true,
+                            isLoading: auth.isforgotloader,
+                            activeColor: linkColor,
+                            activeTextColor: Colors.black,
                             onPressed: () {
                               if (_formLoginKey.currentState!.validate()) {
-                                // If the form is valid, display a snackbar. In the real world,
-                                // you'd often call a server or save the information in a database.
-                                snackAlert(context, SnackTypes.warning,
-                                    'Processing...');
+                                resetPasswordStepThree();
                               } else {
                                 snackAlert(context, SnackTypes.warning,
                                     'Please enter password');

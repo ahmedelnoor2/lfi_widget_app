@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:lyotrade/screens/common/alert.dart';
@@ -231,7 +232,7 @@ class Auth with ChangeNotifier {
     }
   }
 
-bool isLoginloader=false;
+  bool isLoginloader = false;
   Future<String> login(ctx, formData) async {
     var url = Uri.https(
       apiUrl,
@@ -239,12 +240,12 @@ bool isLoginloader=false;
     );
 
     var postData = json.encode(formData);
-  isLoginloader=true;
+    isLoginloader = true;
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
-     isLoginloader=false;
+      isLoginloader = false;
       if (responseData['code'] == 0) {
         if (responseData['data']['googleAuth'] == '1') {
           _googleAuth = true;
@@ -253,11 +254,10 @@ bool isLoginloader=false;
         }
         _loginVerificationToken = responseData['data']['token'];
         notifyListeners();
-       
+
         return _loginVerificationToken;
       } else {
-        
-        isLoginloader=false;
+        isLoginloader = false;
         notifyListeners();
         snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
@@ -268,7 +268,8 @@ bool isLoginloader=false;
       // throw error;
     }
   }
-bool isverifyloader=false;
+
+  bool isverifyloader = false;
   Future<String> confirmLoginCode(ctx, formData) async {
     var url = Uri.https(
       apiUrl,
@@ -283,20 +284,20 @@ bool isverifyloader=false;
         'token': formData['token'],
       });
     }
-   isverifyloader=true;
-   notifyListeners();
+    isverifyloader = true;
+    notifyListeners();
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
- isverifyloader=false;
-  notifyListeners();
+      isverifyloader = false;
+      notifyListeners();
       if (responseData['code'] == 0) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('authToken', _loginVerificationToken);
         snackAlert(ctx, SnackTypes.success, 'Login Success');
-      } else { 
- isverifyloader=false;
+      } else {
+        isverifyloader = false;
         notifyListeners();
         snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
@@ -308,7 +309,8 @@ bool isverifyloader=false;
       // throw error;
     }
   }
-bool emailSignupLoader=false;
+
+  bool emailSignupLoader = false;
   Future<String> checkEmailRegistration(ctx, formData) async {
     var url = Uri.https(
       apiUrl,
@@ -316,20 +318,20 @@ bool emailSignupLoader=false;
     );
 
     var postData = json.encode(formData);
-emailSignupLoader=true;
-notifyListeners();
+    emailSignupLoader = true;
+    notifyListeners();
     try {
       final response = await http.post(url, body: postData, headers: headers);
- emailSignupLoader=false;
-notifyListeners();
+      emailSignupLoader = false;
+      notifyListeners();
       final responseData = json.decode(response.body);
       if (responseData['code'] == '0') {
         _emailVerificationToken = responseData['data']['token'];
         _loginVerificationToken = _emailVerificationToken;
         return _emailVerificationToken;
       } else {
-emailSignupLoader=false;
-notifyListeners();
+        emailSignupLoader = false;
+        notifyListeners();
         snackAlert(ctx, SnackTypes.errors, responseData['msg']);
       }
 
@@ -348,20 +350,20 @@ notifyListeners();
     );
 
     var postData = json.encode(formData);
-emailSignupLoader=true;
-notifyListeners();
+    emailSignupLoader = true;
+    notifyListeners();
     try {
       final response = await http.post(url, body: postData, headers: headers);
-emailSignupLoader=false;
-notifyListeners();
+      emailSignupLoader = false;
+      notifyListeners();
       final responseData = json.decode(response.body);
       if (responseData['code'] == '0') {
         _emailVerificationToken = responseData['data']['token'];
         _loginVerificationToken = _emailVerificationToken;
         return _emailVerificationToken;
       } else {
-        emailSignupLoader=false;
-         notifyListeners();
+        emailSignupLoader = false;
+        notifyListeners();
         snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
 
@@ -669,6 +671,234 @@ notifyListeners();
         snackAlert(
             ctx, SnackTypes.success, 'Password is successfully updated.');
         Navigator.pop(ctx);
+        return;
+      } else {
+        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+      }
+
+      return;
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server Error!');
+      return;
+      // throw error;
+    }
+  }
+
+  // .<--...forgot  password..................-->//
+
+  bool isforgotloader = false;
+  Map _forgotStepOne = {};
+
+  Map get forgotStepOne {
+    return _forgotStepOne;
+  }
+
+  Future<void> forgotPasswordStepOne(ctx, formData) async {
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/v4/user/reset_password_step_one',
+    );
+    isforgotloader = true;
+    notifyListeners();
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(url, body: postData, headers: headers);
+
+      print(response.statusCode);
+
+      print(response.body);
+
+      final responseData = json.decode(response.body);
+      if (responseData['code'] == '0') {
+        _forgotStepOne = responseData;
+        snackAlert(ctx, SnackTypes.success, responseData['msg']);
+        isforgotloader = false;
+
+        notifyListeners();
+
+        return;
+      } else {
+        isforgotloader = false;
+        notifyListeners();
+        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+      }
+
+      return;
+    } catch (error) {
+      isforgotloader = false;
+      notifyListeners();
+      snackAlert(ctx, SnackTypes.errors, 'Server Error!');
+      return;
+      // throw error;
+    }
+  }
+
+  ///sms Valid code
+  ///
+  Map _smsValidredponse = {};
+
+  Map get smsValidredponse {
+    return _smsValidredponse;
+  }
+
+  Future<void> smsValidCode(ctx, formData) async {
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/v4/common/smsValidCode',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(url, body: postData, headers: headers);
+
+      final responseData = json.decode(response.body);
+      if (responseData['code'] == '0') {
+        _smsValidredponse = responseData;
+        snackAlert(ctx, SnackTypes.success, responseData['msg']);
+        
+        notifyListeners();
+
+        
+        return;
+      } else {
+        
+        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+      }
+
+      return;
+    } catch (error) {
+      isforgotloader = false;
+
+      notifyListeners();
+      snackAlert(ctx, SnackTypes.errors, 'Server Error!');
+      return;
+      // throw error;
+    }
+  }
+
+  ////phon forgot password step 2 //
+  Map _resetResponseStepTwo = {};
+
+  Map get resetResponseStepTwo {
+    return _resetResponseStepTwo;
+  }
+
+  Future<void> resetForgotPasswordStepTwo(ctx, formData) async {
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/v4/user/reset_password_step_two',
+    );
+
+    var postData = json.encode(formData);
+
+    isforgotloader = true;
+    notifyListeners();
+    try {
+      final response = await http.post(url, body: postData, headers: headers);
+
+      final responseData = json.decode(response.body);
+      if (responseData['code'] == '0') {
+        _resetResponseStepTwo = responseData;
+        snackAlert(ctx, SnackTypes.success, responseData['msg']);
+        isforgotloader = false;
+        notifyListeners();
+
+        print(_resetResponseStepTwo);
+        return;
+      } else {
+        isforgotloader = false;
+
+        notifyListeners();
+        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+      }
+
+      return;
+    } catch (error) {
+      isforgotloader = false;
+
+      notifyListeners();
+      snackAlert(ctx, SnackTypes.errors, 'Server Error!');
+      return;
+      // throw error;
+    }
+  }
+
+//////forgot password step 3
+  Map _resetResponseStepThree = {};
+
+  Map get resetResponseStepThree {
+    return _resetResponseStepTwo;
+  }
+
+  Future<void> resetForgotPasswordStepThree(ctx, formData) async {
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/user/reset_password_step_three',
+    );
+    var postData = json.encode(formData);
+
+    isforgotloader = true;
+
+    notifyListeners();
+    try {
+      final response = await http.post(url, body: postData, headers: headers);
+
+      final responseData = json.decode(response.body);
+      if (responseData['code'] == '0') {
+        isforgotloader = false;
+        notifyListeners();
+        _resetResponseStepThree = responseData;
+        snackAlert(ctx, SnackTypes.success, 'SucessFully Reset Password');
+        Navigator.pop(ctx);
+        Navigator.pop(ctx);
+
+        notifyListeners();
+        return;
+      } else {
+        isforgotloader = false;
+
+        notifyListeners();
+        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+      }
+
+      return;
+    } catch (error) {
+      isforgotloader = false;
+
+      notifyListeners();
+      snackAlert(ctx, SnackTypes.errors, 'Server Error!');
+      return;
+      // throw error;
+    }
+  }
+
+  ///forgot password with email//
+  Map _emailValidredponse = {};
+
+  Map get emailValidredponse {
+    return _emailValidredponse;
+  }
+
+  Future<void> emailValidCode(ctx, formData) async {
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/v4/common/emailValidCode',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(url, body: postData, headers: headers);
+
+      final responseData = json.decode(response.body);
+      if (responseData['code'] == '0') {
+        _emailValidredponse = responseData;
+        snackAlert(ctx, SnackTypes.success, responseData['msg']);
+
+        notifyListeners();
+
         return;
       } else {
         snackAlert(ctx, SnackTypes.errors, responseData['msg']);
