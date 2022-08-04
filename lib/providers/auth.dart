@@ -693,6 +693,11 @@ class Auth with ChangeNotifier {
     return _forgotStepOne;
   }
 
+  void setForgotStepOne(value) {
+    _forgotStepOne = value;
+    return notifyListeners();
+  }
+
   Future<void> forgotPasswordStepOne(ctx, formData) async {
     var url = Uri.https(
       apiUrl,
@@ -705,23 +710,17 @@ class Auth with ChangeNotifier {
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
-      print(response.statusCode);
-
-      print(response.body);
-
       final responseData = json.decode(response.body);
       if (responseData['code'] == '0') {
         _forgotStepOne = responseData;
-        snackAlert(ctx, SnackTypes.success, responseData['msg']);
+        snackAlert(ctx, SnackTypes.success, 'Please enter verification code');
         isforgotloader = false;
-
         notifyListeners();
-
         return;
       } else {
         isforgotloader = false;
         notifyListeners();
-        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
 
       return;
@@ -742,6 +741,11 @@ class Auth with ChangeNotifier {
     return _smsValidredponse;
   }
 
+  void setSmsValidResponse(value) {
+    _smsValidredponse = value;
+    notifyListeners();
+  }
+
   Future<void> smsValidCode(ctx, formData) async {
     var url = Uri.https(
       apiUrl,
@@ -756,15 +760,13 @@ class Auth with ChangeNotifier {
       final responseData = json.decode(response.body);
       if (responseData['code'] == '0') {
         _smsValidredponse = responseData;
-        snackAlert(ctx, SnackTypes.success, responseData['msg']);
-        
+        snackAlert(ctx, SnackTypes.success, 'SMS sent to your phone');
+
         notifyListeners();
 
-        
         return;
       } else {
-        
-        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
 
       return;
@@ -785,6 +787,11 @@ class Auth with ChangeNotifier {
     return _resetResponseStepTwo;
   }
 
+  void setResetResponseStepTwo(value) {
+    _resetResponseStepTwo = value;
+    notifyListeners();
+  }
+
   Future<void> resetForgotPasswordStepTwo(ctx, formData) async {
     var url = Uri.https(
       apiUrl,
@@ -801,7 +808,7 @@ class Auth with ChangeNotifier {
       final responseData = json.decode(response.body);
       if (responseData['code'] == '0') {
         _resetResponseStepTwo = responseData;
-        snackAlert(ctx, SnackTypes.success, responseData['msg']);
+        snackAlert(ctx, SnackTypes.success, 'Verification Successfull');
         isforgotloader = false;
         notifyListeners();
 
@@ -811,7 +818,7 @@ class Auth with ChangeNotifier {
         isforgotloader = false;
 
         notifyListeners();
-        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
 
       return;
@@ -829,7 +836,12 @@ class Auth with ChangeNotifier {
   Map _resetResponseStepThree = {};
 
   Map get resetResponseStepThree {
-    return _resetResponseStepTwo;
+    return _resetResponseStepThree;
+  }
+
+  void setResetResponseStepThree(value) {
+    _resetResponseStepThree = value;
+    notifyListeners();
   }
 
   Future<void> resetForgotPasswordStepThree(ctx, formData) async {
@@ -849,8 +861,11 @@ class Auth with ChangeNotifier {
       if (responseData['code'] == '0') {
         isforgotloader = false;
         notifyListeners();
-        _resetResponseStepThree = responseData;
-        snackAlert(ctx, SnackTypes.success, 'SucessFully Reset Password');
+        _forgotStepOne = {};
+        _emailValidredponse = {};
+        _smsValidredponse = {};
+        _resetResponseStepTwo = {};
+        snackAlert(ctx, SnackTypes.success, 'Sucessfully reseted password');
         Navigator.pop(ctx);
         Navigator.pop(ctx);
 
@@ -860,7 +875,7 @@ class Auth with ChangeNotifier {
         isforgotloader = false;
 
         notifyListeners();
-        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
 
       return;
@@ -874,11 +889,16 @@ class Auth with ChangeNotifier {
     }
   }
 
-  ///forgot password with email//
+  // Forgot password with email
   Map _emailValidredponse = {};
 
   Map get emailValidredponse {
     return _emailValidredponse;
+  }
+
+  void setEmailValidResponse(value) {
+    _emailValidredponse = value;
+    notifyListeners();
   }
 
   Future<void> emailValidCode(ctx, formData) async {
@@ -895,13 +915,12 @@ class Auth with ChangeNotifier {
       final responseData = json.decode(response.body);
       if (responseData['code'] == '0') {
         _emailValidredponse = responseData;
-        snackAlert(ctx, SnackTypes.success, responseData['msg']);
-
+        snackAlert(
+            ctx, SnackTypes.success, 'Verifcation code sent successfully');
         notifyListeners();
-
         return;
       } else {
-        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
 
       return;

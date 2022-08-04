@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/security/forgot/forgotemailform.dart';
 
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:provider/provider.dart';
 
 import 'forgotlphoneform.dart';
 
@@ -21,7 +23,10 @@ class _ForgotpasswordState extends State<Forgotpassword>
   TabController? _tabController;
   final _formKey = GlobalKey<FormState>();
 
-  var _pages = [Forgotemailform(),Forgotphoneform(),];
+  var _pages = [
+    Forgotemailform(),
+    Forgotphoneform(),
+  ];
 
   @override
   void initState() {
@@ -45,7 +50,9 @@ class _ForgotpasswordState extends State<Forgotpassword>
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
-    final _size = MediaQuery.of(context).size;
+
+    var auth = Provider.of<Auth>(context, listen: true);
+
     return Scaffold(
       body: Container(
         padding: EdgeInsets.only(top: width * 0.2),
@@ -60,7 +67,10 @@ class _ForgotpasswordState extends State<Forgotpassword>
                 children: [
                   IconButton(
                     onPressed: () {
-                      Navigator.maybePop(context);
+                      auth.setForgotStepOne({});
+                      auth.setEmailValidResponse({});
+                      auth.setSmsValidResponse({});
+                      Navigator.pop(context);
                     },
                     icon: const Icon(Icons.close),
                   ),
@@ -124,11 +134,12 @@ class _ForgotpasswordState extends State<Forgotpassword>
                           width: 2,
                           color: linkColor,
                         ),
-                        insets:  EdgeInsets.only(
-                           left: width*0.05, right: 25, bottom: 4),
+                        insets: EdgeInsets.only(
+                            left: width * 0.05, right: 25, bottom: 4),
                       ),
                       isScrollable: true,
-                      labelPadding: EdgeInsets.only(left: width*0.05, right: 0),
+                      labelPadding:
+                          EdgeInsets.only(left: width * 0.05, right: 0),
                       tabs: const [
                         Padding(
                           padding: EdgeInsets.only(right: 25),
@@ -141,7 +152,6 @@ class _ForgotpasswordState extends State<Forgotpassword>
                       ],
                       controller: _tabController,
                     ),
-                   
                     Expanded(
                       child: TabBarView(
                         controller: _tabController,

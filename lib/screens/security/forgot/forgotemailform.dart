@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
@@ -20,6 +22,46 @@ class _ForgotemailformState extends State<Forgotemailform> {
 
   final TextEditingController _emailcontroller = TextEditingController();
   final TextEditingController _smscontroller = TextEditingController();
+
+  late Timer _timer;
+  int _start = 90;
+  bool _startTimer = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _emailcontroller.dispose();
+    _smscontroller.dispose();
+
+    super.dispose();
+  }
+
+  void startTimer() {
+    setState(() {
+      _startTimer = true;
+    });
+    emailValidCode();
+    const oneSec = Duration(seconds: 1);
+    _timer = Timer.periodic(
+      oneSec,
+      (Timer timer) {
+        if (_start == 0) {
+          setState(() {
+            _startTimer = false;
+            _timer.cancel();
+          });
+        } else {
+          setState(() {
+            _start--;
+          });
+        }
+      },
+    );
+  }
 
   Future<void> forgotPasswordStepOne() async {
     var auth = Provider.of<Auth>(context, listen: false);
@@ -51,6 +93,7 @@ class _ForgotemailformState extends State<Forgotemailform> {
       'emailCode': _smscontroller.text,
       'token': auth.forgotStepOne['data']['token'],
     });
+    _timer.cancel();
   }
 
   @override
@@ -95,14 +138,23 @@ class _ForgotemailformState extends State<Forgotemailform> {
                               // border: OutlineInputBorder(),
                               labelText: 'Email verification code',
                               suffixIcon: GestureDetector(
-                                onTap: () async {
-                                  emailValidCode();
-                                },
+                                onTap: _startTimer
+                                    ? null
+                                    : () {
+                                        setState(() {
+                                          _start = 90;
+                                        });
+                                        startTimer();
+                                      },
                                 child: Container(
                                   child: Text(
-                                    'Click to send',
+                                    _startTimer
+                                        ? '${_start}s Get it again'
+                                        : 'Click to send',
                                     style: TextStyle(
-                                      color: selecteditembordercolour,
+                                      color: _startTimer
+                                          ? secondaryTextColor
+                                          : linkColor,
                                     ),
                                   ),
                                   margin: const EdgeInsets.all(15.0),
