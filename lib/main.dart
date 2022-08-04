@@ -46,6 +46,7 @@ import 'package:lyotrade/screens/security/disable_account.dart';
 import 'package:lyotrade/screens/notification/notifcationmessage.dart';
 import 'package:lyotrade/screens/referal/referal.dart';
 import 'package:lyotrade/screens/security/email_change.dart';
+import 'package:lyotrade/screens/security/forgot/create_password.dart';
 import 'package:lyotrade/screens/security/forgot/forgotpassword.dart';
 import 'package:lyotrade/screens/security/google_auth.dart';
 import 'package:lyotrade/screens/security/password.dart';
@@ -293,6 +294,8 @@ class MyApp extends StatelessWidget {
               LeaderBoard.routeName:(context) =>  LeaderBoard(),
               AnnouncementDetails.routeName: (context) =>
                   const AnnouncementDetails(),
+                 Createpassword.routeName: (context) =>
+                  const Createpassword(),
             },
           );
         },

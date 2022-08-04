@@ -36,7 +36,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
     // setState(() {
     //   _fromAmountController.text = '1';
     // });
-    getCoinAddress(_defaultCoin);
+    getDigitalBalance();
     super.initState();
   }
 
@@ -45,6 +45,16 @@ class _ExchangeNowState extends State<ExchangeNow> {
     _fromAmountController.dispose();
     _toAddressController.dispose();
     super.dispose();
+  }
+
+  Future<void> getDigitalBalance() async {
+    setState(() {
+      _loadingAddress = true;
+    });
+    var auth = Provider.of<Auth>(context, listen: false);
+    var asset = Provider.of<Asset>(context, listen: false);
+    await asset.getAccountBalance(context, auth, "");
+    getCoinAddress(_defaultCoin);
   }
 
   Future<void> getCoinAddress(netwrkType) async {
@@ -185,6 +195,8 @@ class _ExchangeNowState extends State<ExchangeNow> {
     width = MediaQuery.of(context).size.width;
     var dexProvider = Provider.of<DexProvider>(context, listen: true);
 
+    print(dexProvider.allCurrencies[0]);
+
     return dexProvider.processPayment.isNotEmpty
         ? sendingWidget(context, dexProvider)
         : Container(
@@ -297,7 +309,11 @@ class _ExchangeNowState extends State<ExchangeNow> {
                             controller: _fromAmountController,
                             onChanged: (value) async {
                               if (value.isNotEmpty) {
-                                if (double.parse(value) > 0) {
+                                if (double.parse(value) > 0 &&
+                                    (double.parse(value) >=
+                                        double.parse(_loadingExchnageRate
+                                            ? '--'
+                                            : '${dexProvider.minimumValue['minAmount']}'))) {
                                   estimateRates();
                                 }
                               }
