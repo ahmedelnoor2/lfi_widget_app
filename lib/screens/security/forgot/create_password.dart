@@ -28,10 +28,11 @@ class _CreatepasswordState extends State<Createpassword>
 
   final TextEditingController _loginpasswordcontroller =
       TextEditingController();
-
+final TextEditingController _confirmpasswordcontroller =
+      TextEditingController();
   bool _newPassSecure = true;
   bool _confirmPassSecure = true;
-
+  
   @override
   void initState() {
     super.initState();
@@ -180,6 +181,7 @@ class _CreatepasswordState extends State<Createpassword>
                                     }
                                     return null;
                                   },
+                                  controller:  _confirmpasswordcontroller,
                                   obscureText: _confirmPassSecure,
                                   decoration: InputDecoration(
                                     // border: OutlineInputBorder(),
@@ -218,7 +220,16 @@ class _CreatepasswordState extends State<Createpassword>
                             activeTextColor: Colors.black,
                             onPressed: () {
                               if (_formLoginKey.currentState!.validate()) {
-                                resetPasswordStepThree();
+                                if(_loginpasswordcontroller.text==_confirmpasswordcontroller.text){
+                                 resetPasswordStepThree();
+
+                                }
+                                else{
+
+                                  snackAlert(context, SnackTypes.warning,
+                                    'New Password/Confirm Password should be Same');
+                                }
+                                
                               } else {
                                 snackAlert(context, SnackTypes.warning,
                                     'Please enter password');

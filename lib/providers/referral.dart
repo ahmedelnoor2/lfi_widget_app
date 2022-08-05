@@ -53,7 +53,7 @@ class ReferralProvider with ChangeNotifier {
         return notifyListeners();
       }
     } catch (error) {
-      print(error);
+      
       snackAlert(context, SnackTypes.errors, 'Server Error Try Again');
       return;
     }
@@ -165,8 +165,7 @@ class ReferralProvider with ChangeNotifier {
       isinvitationrewards = false;
       if (responseData['code'] == 0) {
         _myinvitationrewardslist = responseData['data']['rewardList'];
-
-        return notifyListeners();
+         print(_myinvitationrewardslist);
       } else {
         snackAlert(
             context, SnackTypes.warning, getTranslate(responseData['msg']));

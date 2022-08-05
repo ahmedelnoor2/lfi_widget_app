@@ -33,12 +33,12 @@ class _MyrewardsState extends State<Myrewards> {
     return Column(
       children: [
         Container(
-          padding: EdgeInsets.only(top: 30, left: 16, right: 16, bottom: 8),
+          padding: EdgeInsets.only(top: 30, left: 16, right: 45, bottom: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Friend\'s user ID',
+                'Registerred Account',
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
@@ -46,7 +46,7 @@ class _MyrewardsState extends State<Myrewards> {
                 ),
               ),
               Text(
-                'Registerred Account',
+                'USDTValuation',
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
@@ -64,7 +64,7 @@ class _MyrewardsState extends State<Myrewards> {
                     child: CircularProgressIndicator(),
                   ),
                 )
-              : referalprovider.invitationlist.isEmpty
+              : referalprovider.myinvitationrewardslist.isEmpty
                   ? Center(child: noData('No Rewards'))
                   : ListView.builder(
                       shrinkWrap: true,
@@ -81,38 +81,58 @@ class _MyrewardsState extends State<Myrewards> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      referalprovider
-                                          .myinvitationrewardslist[index]
-                                              ['rewardUid']
-                                          .toString(),
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
                                     Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          DateFormat('yyy-mm-dd hh:mm:ss').format(
-                                              DateTime.fromMicrosecondsSinceEpoch(
-                                                  referalprovider
-                                                          .myinvitationrewardslist[
-                                                      index]['sendTime'])),
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w400,
-                                            color: natuaraldark,
-                                          ),
-                                        ),
                                         Text(
                                           referalprovider
                                               .myinvitationrewardslist[index]
                                                   ['userAccountNum']
                                               .toString(),
                                           style: TextStyle(
-                                            fontSize: 14,
                                             fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: EdgeInsets.only(top: 5),
+                                          child: Text(
+                                            '${double.parse(referalprovider.myinvitationrewardslist[index]['rewardAmount']).toStringAsPrecision(8)}' +
+                                                " " +
+                                                '${referalprovider.myinvitationrewardslist[index]['rewardCoinSymbol']}',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      
+                                      children: [
+                                        Text(
+                                            '${double.parse(referalprovider.myinvitationrewardslist[index]['conversionAmount']).toStringAsPrecision(3)}' +
+                                                ' USDT',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            )),
+                                        Container(
+                                          padding: EdgeInsets.only(top: 5),
+                                          child: Text(
+                                            DateFormat('yyy-mm-dd hh:mm:ss').format(
+                                                DateTime.fromMicrosecondsSinceEpoch(
+                                                    referalprovider
+                                                            .myinvitationrewardslist[
+                                                        index]['sendTime'])),
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: seconadarytextcolour,
+                                              fontWeight: FontWeight.w500,
+                                            ),
                                           ),
                                         ),
                                       ],

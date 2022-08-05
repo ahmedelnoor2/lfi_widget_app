@@ -35,7 +35,7 @@ class _MyinvitationState extends State<Myinvitation> {
     return Column(
       children: [
         Container(
-          padding: EdgeInsets.only(top: 30, left: 16, right: 16, bottom: 8),
+          padding: EdgeInsets.only(top: 30, left: 16, right: 45, bottom: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -93,30 +93,38 @@ class _MyinvitationState extends State<Myinvitation> {
                                       ),
                                     ),
                                     Column(
+                                      crossAxisAlignment: CrossAxisAlignment.end,
                                       children: [
-                                        Text(
+                                     
+                                        Container(
+                                          width:150,
+                                          child: Text(
+                                            referalprovider.invitationlist[index]
+                                                    ['email']
+                                                .toString(),
+                                            style: TextStyle(
+                                            
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                          ),
+                                        ),
+                                           Container(
+                                            width: 150,
+                                             child: Text(
                                           DateFormat('yyy-mm-dd hh:mm:ss')
-                                              .format(DateTime
-                                                  .fromMicrosecondsSinceEpoch(
-                                                      referalprovider
-                                                                  .invitationlist[
-                                                              index]
-                                                          ['registerTime'])),
+                                                .format(DateTime
+                                                    .fromMicrosecondsSinceEpoch(
+                                                        referalprovider
+                                                                    .invitationlist[
+                                                                index]
+                                                            ['registerTime'])),
                                           style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w400,
-                                            color: natuaraldark,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w400,
+                                              color: seconadarytextcolour,
                                           ),
                                         ),
-                                        Text(
-                                          referalprovider.invitationlist[index]
-                                                  ['email']
-                                              .toString(),
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                        ),
+                                           )
                                       ],
                                     )
                                   ],

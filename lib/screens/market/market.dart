@@ -6,7 +6,8 @@ import 'package:lyotrade/screens/common/bottomnav.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/no_data.dart';
 
-import 'package:lyotrade/screens/market/pages/favourite_page.dart';
+import 'package:lyotrade/screens/market/pages/exchange.dart';
+import 'package:lyotrade/screens/market/pages/favourite.dart';
 import 'package:lyotrade/screens/trade/kline_chart.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Coins.utils.dart';
@@ -60,6 +61,7 @@ class _MarketState extends State<Market> {
 
     var public = Provider.of<Public>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
+    print(public.allMarkets[0]);
 
     ///print(public.getrecomendedsybol());
     return WillPopScope(
@@ -111,11 +113,15 @@ class _MarketState extends State<Market> {
                                   public.activeMarketAllTicks[marketSymbol];
                               var rose = '0.00';
                               if (data != null) {
-                                rose ='${data['rose'] ?? '0.00'}';
+                                rose = '${data['rose'] ?? '0.00'}';
                               }
                               var close = '0.00';
                               if (data != null) {
-                                close ='${data['close'] ?? '0.00'}';
+                                close = '${data['close'] ?? '0.00'}';
+                              }
+                              var vol = '0.00';
+                              if (data != null) {
+                                vol = '${data['vol'] ?? '0.00'}';
                               }
                               //  print(data);
                               return Container(
@@ -166,12 +172,15 @@ class _MarketState extends State<Market> {
                                             ],
                                           ),
                                           Text(
-                                            public.activeMarketAllTicks.isNotEmpty
+                                            public.activeMarketAllTicks
+                                                    .isNotEmpty
                                                 ? '${double.parse(rose) > 0 ? '+' : ''}${(double.parse(rose) * 100).toStringAsFixed(2)} %'
                                                 : '--%',
                                             style: TextStyle(
-                                              color:
-                                                  public.activeMarketAllTicks.isEmpty ? secondaryTextColor :double.parse(rose) > 0
+                                              color: public.activeMarketAllTicks
+                                                      .isEmpty
+                                                  ? secondaryTextColor
+                                                  : double.parse(rose) > 0
                                                       ? greenIndicator
                                                       : redIndicator,
                                               fontSize: 12,
@@ -193,15 +202,20 @@ class _MarketState extends State<Market> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                public.activeMarketAllTicks.isNotEmpty ? '${close.toString()}' : '--',
+                                                public.activeMarketAllTicks
+                                                        .isNotEmpty
+                                                    ? '${close.toString()}'
+                                                    : '--',
                                                 style: TextStyle(
                                                   fontSize: 20,
                                                   fontWeight: FontWeight.bold,
-                                                  color: public.activeMarketAllTicks.isEmpty ? secondaryTextColor : double.parse(
-                                                              rose) >
-                                                          0
-                                                      ? greenIndicator
-                                                      : redIndicator,
+                                                  color: public
+                                                          .activeMarketAllTicks
+                                                          .isEmpty
+                                                      ? secondaryTextColor
+                                                      : double.parse(rose) > 0
+                                                          ? greenIndicator
+                                                          : redIndicator,
                                                 ),
                                               ),
                                               Text(
@@ -222,7 +236,7 @@ class _MarketState extends State<Market> {
                                             children: [
                                               Container(
                                                 child: Text(
-                                                  '24H Vol: ${public.activeMarketTick.isNotEmpty? getNumberString(context, double.parse('${public.activeMarketTick['vol']}')):'--'}',
+                                                  '24H Vol: ${public.activeMarketAllTicks.isNotEmpty ? getNumberString(context, double.parse('${vol}')) : '--'}',
                                                   style: TextStyle(
                                                     color: secondaryTextColor,
                                                     fontSize: 11,
@@ -350,12 +364,10 @@ class _MarketState extends State<Market> {
                           Expanded(
                             child: TabBarView(
                               children: <Widget>[
-                                FavoritesScreen(
+                                ExchangeScreen(
                                     currentMarketSort: _currentMarketSort,
                                     upateCurrentMarketSort: updateMarketSort),
-                                Center(
-                                  child: noData('No Favorites'),
-                                ),
+                                FavoritesScreen(),
                               ],
                             ),
                           ),

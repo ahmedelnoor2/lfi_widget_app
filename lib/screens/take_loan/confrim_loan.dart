@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lyotrade/providers/asset.dart';
+import 'package:lyotrade/providers/auth.dart';
 
 import 'package:lyotrade/providers/loan_provider.dart';
 import 'package:lyotrade/screens/common/alert.dart';
@@ -178,13 +179,17 @@ class _ConfirmLoanState extends State<ConfirmLoan> {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
 
+    var auth = Provider.of<Auth>(context, listen: true);
     var loanProvider = Provider.of<LoanProvider>(context, listen: true);
     var asset = Provider.of<Asset>(context, listen: true);
 
-    if (_textEditingControllerAddress.text.isEmpty) {
-      setState(() {
-        _textEditingControllerAddress.text = asset.changeAddress['addressStr'];
-      });
+    if (auth.isAuthenticated) {
+      if (_textEditingControllerAddress.text.isEmpty) {
+        setState(() {
+          _textEditingControllerAddress.text =
+              asset.changeAddress['addressStr'];
+        });
+      }
     }
 
     return Scaffold(
@@ -404,23 +409,53 @@ class _ConfirmLoanState extends State<ConfirmLoan> {
                   color: Color(0xff5E6292),
                 ),
               ),
-              child: TextField(
-                readOnly: true,
-                controller: _textEditingControllerAddress,
-                decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.zero,
-                  isDense: true,
-                  border: UnderlineInputBorder(
-                    borderSide: BorderSide.none,
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 7,
+                    child: TextField(
+                      readOnly: auth.isAuthenticated,
+                      controller: _textEditingControllerAddress,
+                      decoration: const InputDecoration(
+                        contentPadding: EdgeInsets.zero,
+                        isDense: true,
+                        border: UnderlineInputBorder(
+                          borderSide: BorderSide.none,
+                        ),
+                        hintStyle: TextStyle(
+                          fontSize: 14,
+                        ),
+                        hintText: "Enter address",
+                      ),
+                      onChanged: (text) {
+                        setState(() {});
+                      },
+                    ),
                   ),
-                  hintStyle: TextStyle(
-                    fontSize: 14,
-                  ),
-                  hintText: "Enter address",
-                ),
-                onChanged: (text) {
-                  setState(() {});
-                },
+                  auth.isAuthenticated
+                      ? Container()
+                      : Expanded(
+                          flex: 1,
+                          child: InkWell(
+                            onTap: () async {
+                              ClipboardData? data = await Clipboard.getData(
+                                Clipboard.kTextPlain,
+                              );
+                              setState(() {
+                                _textEditingControllerAddress.text =
+                                    '${data!.text}';
+                              });
+                            },
+                            child: Text(
+                              'Paste',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: linkColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                ],
               ),
             ),
             Container(
@@ -620,96 +655,103 @@ class _ConfirmLoanState extends State<ConfirmLoan> {
   Widget checkLoanHistory(context, setState) {
     var loanProvider = Provider.of<LoanProvider>(context, listen: false);
 
-    return Container(
-      padding: EdgeInsets.all(10),
-      height: height * 0.5,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Get history on your email',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: Icon(Icons.close),
-              )
-            ],
-          ),
-          Divider(),
-          Column(
+    return SizedBox(
+      height: height * 0.9,
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        appBar: hiddenAppBar(),
+        body: Container(
+          padding: EdgeInsets.all(10),
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                padding: EdgeInsets.only(bottom: 5),
-                child: Text('Enter your Email:'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Get history on your email',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(Icons.close),
+                  )
+                ],
+              ),
+              Divider(),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(bottom: 5),
+                    child: Text('Enter your Email:'),
+                  ),
+                  Container(
+                      child: TextField(
+                    controller: _textEditingControllerhistory,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'example@domain.com',
+                    ),
+                    onChanged: (text) {
+                      setState(() {
+                        //  fullName = text;
+                        //you can access nameController in its scope to get
+                        // the value of text entered as shown below
+                        //fullName = nameController.text;
+                      });
+                    },
+                  )),
+                ],
               ),
               Container(
-                  child: TextField(
-                controller: _textEditingControllerhistory,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'example@domain.com',
+                padding: EdgeInsets.only(top: 10),
+                child: LyoButton(
+                  onPressed: () {
+                    if (_textEditingControllerhistory.text.isEmpty) {
+                      Fluttertoast.showToast(
+                          msg: "Please insert email",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.CENTER,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.red,
+                          textColor: Colors.white,
+                          fontSize: 16.0);
+                    } else {
+                      loanProvider
+                          .getLoanHistory(
+                              _textEditingControllerhistory.text.trim())
+                          .whenComplete(() =>
+                              loanProvider.myloanhistory['status'] == 200
+                                  ? Fluttertoast.showToast(
+                                      msg: "Check your Email",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.TOP,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: buttoncolour,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0)
+                                  : null);
+
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  text: 'Submit',
+                  active: true,
+                  isLoading: false,
                 ),
-                onChanged: (text) {
-                  setState(() {
-                    //  fullName = text;
-                    //you can access nameController in its scope to get
-                    // the value of text entered as shown below
-                    //fullName = nameController.text;
-                  });
-                },
-              )),
+              ),
             ],
           ),
-          Container(
-            padding: EdgeInsets.only(top: 10),
-            child: LyoButton(
-              onPressed: () {
-                if (_textEditingControllerhistory.text.isEmpty) {
-                  Fluttertoast.showToast(
-                      msg: "Please insert email",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.CENTER,
-                      timeInSecForIosWeb: 1,
-                      backgroundColor: Colors.red,
-                      textColor: Colors.white,
-                      fontSize: 16.0);
-                } else {
-                  loanProvider
-                      .getLoanHistory(_textEditingControllerhistory.text.trim())
-                      .whenComplete(() =>
-                          loanProvider.myloanhistory['status'] == 200
-                              ? Fluttertoast.showToast(
-                                  msg: "Check your Email",
-                                  toastLength: Toast.LENGTH_SHORT,
-                                  gravity: ToastGravity.TOP,
-                                  timeInSecForIosWeb: 1,
-                                  backgroundColor: buttoncolour,
-                                  textColor: Colors.white,
-                                  fontSize: 16.0)
-                              : null);
-
-                  Navigator.of(context).pop();
-                }
-              },
-              text: 'Submit',
-              active: true,
-              isLoading: false,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
