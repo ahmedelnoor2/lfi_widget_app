@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/header.dart';
+import 'package:lyotrade/screens/common/no_data.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
@@ -46,109 +47,112 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       body: Column(
         children: <Widget>[
           Expanded(
-            child: ListView.separated(
-              separatorBuilder: (context, index) {
-                return Divider();
-              },
-              shrinkWrap: true,
-              itemCount:public.favMarketList.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  leading: Icon(
-                    Icons.star,
-                    size: 20,
-                    color: seconadarytextcolour,
-                  ),
-                  minLeadingWidth: 5,
-                  title: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            'lyo',
-                            // '${_market['showName'].split('/')[0]}',
-                            style: TextStyle(
-                              fontSize: 18,
-                            ),
-                          ),
-                          Text(
-                            'market',
-                            //  ' /${_market['showName'].split('/')[1]}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: secondaryTextColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          InkWell(
-                            onTap: () async {
-                              Navigator.pushNamed(context, '/trade');
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.only(
-                                top: 5,
-                                bottom: 5,
-                                right: 10,
-                              ),
-                              child: Text(
-                                'Trade',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: linkColor,
-                                ),
-                              ),
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () async {
-                              // await public.setActiveMarket(_market);
-                              Navigator.pushNamed(context, '/kline_chart');
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.only(
-                                top: 5,
-                                bottom: 5,
-                                left: 10,
-                                right: 10,
-                              ),
-                              child: Text(
-                                'Info',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: linkColor,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                  trailing: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red,
+            child: public.favMarketList.isEmpty
+                ? noData('No Favorites')
+                : ListView.separated(
+                    separatorBuilder: (context, index) {
+                      return Divider();
+                    },
+                    shrinkWrap: true,
+                    itemCount: public.favMarketList.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        leading: Icon(
+                          Icons.star,
+                          size: 20,
+                          color: seconadarytextcolour,
                         ),
-                      ),
-                      Text(
-                        '',
-                        style: TextStyle(),
-                      ),
-                    ],
+                        minLeadingWidth: 5,
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  'lyo',
+                                  // '${_market['showName'].split('/')[0]}',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                  ),
+                                ),
+                                Text(
+                                  'market',
+                                  //  ' /${_market['showName'].split('/')[1]}',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: secondaryTextColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                InkWell(
+                                  onTap: () async {
+                                    Navigator.pushNamed(context, '/trade');
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.only(
+                                      top: 5,
+                                      bottom: 5,
+                                      right: 10,
+                                    ),
+                                    child: Text(
+                                      'Trade',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: linkColor,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                InkWell(
+                                  onTap: () async {
+                                    // await public.setActiveMarket(_market);
+                                    Navigator.pushNamed(
+                                        context, '/kline_chart');
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.only(
+                                      top: 5,
+                                      bottom: 5,
+                                      left: 10,
+                                      right: 10,
+                                    ),
+                                    child: Text(
+                                      'Info',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: linkColor,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                        trailing: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              '',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red,
+                              ),
+                            ),
+                            Text(
+                              '',
+                              style: TextStyle(),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
           ),
         ],
       ),

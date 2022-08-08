@@ -122,28 +122,40 @@ class _NotificationsscreenState extends State<Notificationsscreen>
                   Row(
                     children: <Widget>[
                       Checkbox(
-                          activeColor: greyDarkTextColor,
-                          value: _isselected,
-                          onChanged: (value) {
-                            setState(() {
-                              _isselected = value ?? false;
-                              if (_isselected == true) {
-                                notificationProvider.userMessageList
-                                    .map((e) => notificationProvider
-                                        .selectedItems
-                                        .add(e))
-                                    .toList();
-                              } else {
-                                notificationProvider.userMessageList
-                                    .map((e) => notificationProvider
-                                        .selectedItems
-                                        .remove(e))
-                                    .toList();
-                              }
-                            });
-                          }),
+                        activeColor: greyDarkTextColor,
+                        value: _isselected,
+                        onChanged: (value) {
+                          setState(() {
+                            _isselected = value ?? false;
+                            if (_isselected == true) {
+                              notificationProvider.userMessageList
+                                  .map((e) =>
+                                      notificationProvider.selectedItems.add(e))
+                                  .toList();
+                            } else {
+                              notificationProvider.userMessageList
+                                  .map((e) => notificationProvider.selectedItems
+                                      .remove(e))
+                                  .toList();
+                            }
+                          });
+                        },
+                      ),
                       Text("Select All"),
                     ],
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(right: 10),
+                    child: InkWell(
+                      onTap: () async {
+                        await notificationProvider.markAllAsRead(context, auth);
+                        getnotification();
+                      },
+                      child: Text(
+                        'Mark all as read',
+                        style: TextStyle(color: linkColor),
+                      ),
+                    ),
                   ),
                   // Container(
                   //   height: 35,
@@ -207,31 +219,40 @@ class _NotificationsscreenState extends State<Notificationsscreen>
                                   key: const ValueKey(0),
 
                                   // The start action pane is the one at the left or the top side.
-                                  startActionPane: ActionPane(
-                                    // A motion is a widget used to control how the pane animates.
-                                    motion: const ScrollMotion(),
+                                  // startActionPane: ActionPane(
+                                  //   // A motion is a widget used to control how the pane animates.
+                                  //   motion: const ScrollMotion(),
+                                  //   extentRatio: 0.2,
+                                  //   // A pane can dismiss the Slidable.
+                                  //   // dismissible: DismissiblePane(onDismissed: () {}),
 
-                                    // A pane can dismiss the Slidable.
-                                    // dismissible: DismissiblePane(onDismissed: () {}),
-
-                                    // All actions are defined in the children parameter.
-                                    children: const [
-                                      // A SlidableAction can have an icon and/or a label.
-                                      // SlidableAction(
-                                      //   // An action can be bigger than the others.
-                                      //   flex: 2,
-
-                                      //   onPressed: deleteitem,
-                                      //   backgroundColor: Color(0xFF7BC043),
-                                      //   foregroundColor: Colors.white,
-                                      //   icon: Icons.read_more,
-                                      //   label: 'Read',
-                                      // ),
-                                    ],
-                                  ),
+                                  //   // All actions are defined in the children parameter.
+                                  //   children: [
+                                  //     // A SlidableAction can have an icon and/or a label.
+                                  //     SlidableAction(
+                                  //       // An action can be bigger than the others.
+                                  //       flex: 2,
+                                  //       autoClose: true,
+                                  //       onPressed: (value) {
+                                  //         print('object');
+                                  //       },
+                                  //       backgroundColor: item['status'] == 2
+                                  //           ? successColor
+                                  //           : seconadarytextcolour,
+                                  //       foregroundColor: Colors.white,
+                                  //       icon: item['status'] == 2
+                                  //           ? Icons.email
+                                  //           : Icons.drafts,
+                                  //       label: item['status'] == 2
+                                  //           ? 'Unread'
+                                  //           : 'Read',
+                                  //     ),
+                                  //   ],
+                                  // ),
 
                                   // The end action pane is the one at the right or the bottom side.
                                   endActionPane: ActionPane(
+                                    extentRatio: 0.2,
                                     motion: ScrollMotion(),
                                     children: [
                                       SlidableAction(
@@ -312,9 +333,14 @@ class _NotificationsscreenState extends State<Notificationsscreen>
                                                               index]
                                                           ['messageContent'][0],
                                                       style: TextStyle(
-                                                          fontSize: 18,
-                                                          fontWeight:
-                                                              FontWeight.bold),
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: item['status'] ==
+                                                                2
+                                                            ? seconadarytextcolour
+                                                            : Colors.white,
+                                                      ),
                                                     )),
                                         ),
                                         title: Text(
@@ -322,7 +348,12 @@ class _NotificationsscreenState extends State<Notificationsscreen>
                                               .userMessageList[index]
                                                   ['messageContent']
                                               .toString(),
-                                          style: TextStyle(fontSize: 12),
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: item['status'] == 2
+                                                ? secondaryTextColor
+                                                : Colors.white,
+                                          ),
                                         ),
                                         // subtitle: Text(
                                         //     notificationProvider.userMessageList[index]

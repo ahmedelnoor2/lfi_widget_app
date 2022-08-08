@@ -20,7 +20,7 @@ class _MyrewardsState extends State<Myrewards> {
 
   Future<void> getMyinvitationRewards() async {
     var auth = Provider.of<Auth>(context, listen: false);
-    var referalprovider = Provider.of<ReferralProvider>(context, listen:false);
+    var referalprovider = Provider.of<ReferralProvider>(context, listen: false);
 
     await referalprovider.getMyInvitationRewards(context, auth);
   }
@@ -33,7 +33,7 @@ class _MyrewardsState extends State<Myrewards> {
     return Column(
       children: [
         Container(
-          padding: EdgeInsets.only(top: 30, left: 16, right: 45, bottom: 8),
+          padding: EdgeInsets.only(top: 30, left: 16, right: 15, bottom: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -70,6 +70,9 @@ class _MyrewardsState extends State<Myrewards> {
                       shrinkWrap: true,
                       itemCount: referalprovider.myinvitationrewardslist.length,
                       itemBuilder: (context, index) {
+                        var emailText = referalprovider
+                            .myinvitationrewardslist[index]['userAccountNum']
+                            .toString();
                         return Padding(
                           padding: const EdgeInsets.only(
                               left: 16, right: 16, top: 8, bottom: 8),
@@ -88,10 +91,9 @@ class _MyrewardsState extends State<Myrewards> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          referalprovider
-                                              .myinvitationrewardslist[index]
-                                                  ['userAccountNum']
-                                              .toString(),
+                                          emailText.length > 30
+                                              ? '${emailText.substring(0, 15)}.....${emailText.substring(emailText.length - 10, emailText.length)}'
+                                              : emailText,
                                           style: TextStyle(
                                             fontWeight: FontWeight.w400,
                                           ),
@@ -110,8 +112,8 @@ class _MyrewardsState extends State<Myrewards> {
                                       ],
                                     ),
                                     Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
                                       children: [
                                         Text(
                                             '${double.parse(referalprovider.myinvitationrewardslist[index]['conversionAmount']).toStringAsPrecision(3)}' +
@@ -123,11 +125,12 @@ class _MyrewardsState extends State<Myrewards> {
                                         Container(
                                           padding: EdgeInsets.only(top: 5),
                                           child: Text(
-                                            DateFormat('yyy-mm-dd hh:mm:ss').format(
-                                                DateTime.fromMicrosecondsSinceEpoch(
-                                                    referalprovider
-                                                            .myinvitationrewardslist[
-                                                        index]['sendTime'])),
+                                            DateFormat('yyy-mm-dd hh:mm:ss')
+                                                .format(DateTime
+                                                    .fromMicrosecondsSinceEpoch(
+                                                        referalprovider
+                                                                .myinvitationrewardslist[
+                                                            index]['sendTime'])),
                                             style: TextStyle(
                                               fontSize: 12,
                                               color: seconadarytextcolour,

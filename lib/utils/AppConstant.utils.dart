@@ -12,11 +12,10 @@ var loanApiUrl = 'staging.api.crypto-loan.lyotrade.com';
 var paymentsApi = 'payments.lyotrade.com';
 var apiurlemailtoken = 'api.dash.lyotrade.com';
 var changeNowApi = 'https://content-api.changenow.io';
-var referralinvitation ='/fe-increment-api/invitation';
+var referralinvitation = '/fe-increment-api/invitation';
 //var referralbaseurl = 'https://www.lyotrade.com';
 var referral = '/fe-ex-api/agentV2';
-var baseurlmesg = 'www.lyotrade.com';
-var mesg = '/fe-ex-api/message';
+
 var exApi = kIsWeb ? '/api/fe-ex-api' : '/fe-ex-api';
 var lyoPubApi = '/api';
 var fePubApi = kIsWeb ? '/api' : '/';
@@ -26,7 +25,7 @@ var loanApiVersion = '/loans';
 var loansApiestimate = '/loans/estimate';
 var loanhistory = '/mstloan';
 var getemailverifytoken = '/customers';
-var getfavmarkert='/admin';
+var getfavmarkert = '/admin';
 var incrementApi = kIsWeb ? '/api/fe-increment-api' : '/fe-increment-api';
 var openApiUrl = 'openapi.lyotrade.com';
 

@@ -5,6 +5,7 @@ import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:http/http.dart' as http;
+import 'package:lyotrade/utils/Translate.utils.dart';
 
 class Notificationprovider extends ChangeNotifier {
   Map<String, String> headers = {
@@ -75,8 +76,8 @@ class Notificationprovider extends ChangeNotifier {
     headers['exchange-token'] = auth.loginVerificationToken;
 
     var url = Uri.https(
-      baseurlmesg,
-      '$mesg/user_message',
+      apiUrl,
+      '$exApi/message/user_message',
     );
 
     var data = postData;
@@ -88,10 +89,14 @@ class Notificationprovider extends ChangeNotifier {
 
       final responseData = json.decode(response.body);
 
-      if (responseData['msg'] == 'success') {
+      if (responseData['code'] == '0') {
         userMessageList = responseData['data']['userMessageList'];
         isLoading = false;
         return notifyListeners();
+      } else if (responseData['code'] == '10002') {
+        snackAlert(ctx, SnackTypes.warning, 'Session Expired');
+        Navigator.pop(ctx);
+        auth.logout(ctx);
       } else {
         return notifyListeners();
       }
@@ -107,8 +112,8 @@ class Notificationprovider extends ChangeNotifier {
     headers['exchange-token'] = auth.loginVerificationToken;
 
     var url = Uri.https(
-      baseurlmesg,
-      '$mesg/message_del',
+      apiUrl,
+      '$exApi/message/message_del',
     );
     print(url);
 
@@ -129,6 +134,36 @@ class Notificationprovider extends ChangeNotifier {
         return notifyListeners();
       } else {
         return notifyListeners();
+      }
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Failed to Delete Please try again.');
+      return;
+    }
+  }
+
+  Future<void> markAllAsRead(ctx, auth) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/message/message_update_status',
+    );
+
+    var data = {"id": 0};
+
+    var body = jsonEncode(data);
+    try {
+      isdeleteloading = true;
+      final response = await http.post(url, headers: headers, body: body);
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        snackAlert(ctx, SnackTypes.success, 'All notifications mark as read');
+        return;
+      } else {
+        snackAlert(ctx, SnackTypes.errors,
+            getTranslate(responseData['msg'].toString()));
+        return;
       }
     } catch (error) {
       snackAlert(ctx, SnackTypes.errors, 'Failed to Delete Please try again.');

@@ -35,7 +35,7 @@ class _MyinvitationState extends State<Myinvitation> {
     return Column(
       children: [
         Container(
-          padding: EdgeInsets.only(top: 30, left: 16, right: 45, bottom: 8),
+          padding: EdgeInsets.only(top: 30, left: 16, right: 15, bottom: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -48,7 +48,7 @@ class _MyinvitationState extends State<Myinvitation> {
                 ),
               ),
               Text(
-                'Registerred Account',
+                'Date',
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
@@ -72,6 +72,9 @@ class _MyinvitationState extends State<Myinvitation> {
                       shrinkWrap: true,
                       itemCount: referalprovider.invitationlist.length,
                       itemBuilder: (context, index) {
+                        var emailText = referalprovider.invitationlist[index]
+                                ['email']
+                            .toString();
                         return Padding(
                           padding: const EdgeInsets.only(
                               left: 16, right: 16, top: 8, bottom: 8),
@@ -83,48 +86,54 @@ class _MyinvitationState extends State<Myinvitation> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      referalprovider.invitationlist[index]
-                                              ['levelZeroRegisterUid']
-                                          .toString(),
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
                                     Column(
-                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                     
+                                        Text(
+                                          referalprovider.invitationlist[index]
+                                                  ['levelZeroRegisterUid']
+                                              .toString(),
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
                                         Container(
-                                          width:150,
+                                          padding: EdgeInsets.only(top: 5),
                                           child: Text(
-                                            referalprovider.invitationlist[index]
-                                                    ['email']
-                                                .toString(),
+                                            emailText.length > 30
+                                                ? '${emailText.substring(0, 15)}.....${emailText.substring(emailText.length - 10, emailText.length)}'
+                                                : emailText,
                                             style: TextStyle(
-                                            
                                               fontWeight: FontWeight.w400,
+                                              color: secondaryTextColor,
                                             ),
                                           ),
                                         ),
-                                           Container(
-                                            width: 150,
-                                             child: Text(
-                                          DateFormat('yyy-mm-dd hh:mm:ss')
+                                      ],
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        Container(
+                                          // width: 150,
+                                          child: Text(
+                                            DateFormat('yyy-mm-dd hh:mm:ss')
                                                 .format(DateTime
                                                     .fromMicrosecondsSinceEpoch(
                                                         referalprovider
                                                                     .invitationlist[
                                                                 index]
                                                             ['registerTime'])),
-                                          style: TextStyle(
-                                              fontSize: 12,
+                                            style: TextStyle(
+                                              fontSize: 14,
                                               fontWeight: FontWeight.w400,
                                               color: seconadarytextcolour,
+                                            ),
                                           ),
-                                        ),
-                                           )
+                                        )
                                       ],
                                     )
                                   ],

@@ -687,23 +687,20 @@ class Public with ChangeNotifier {
 
   bool isfavloading = true;
   Future<void> getFavMarketList(ctx, formData) async {
-    var url = Uri.https(
-      lyoApiUrl,
-      '$getfavmarkert/favorite-market'
-    );
+    var url = Uri.https(lyoApiUrl, '$getfavmarkert/favorite-market');
     var postData = json.encode(formData);
-   
+
     try {
       final response = await http.post(url, body: postData, headers: headers);
-    
+
       final responseData = json.decode(response.body);
       if (responseData['code'] == '0') {
         _favMarketList = responseData['data'];
-       
+
         notifyListeners();
         return;
       } else {
-        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
+        // snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
 
       return;
