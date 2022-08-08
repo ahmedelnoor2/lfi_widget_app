@@ -117,12 +117,13 @@ class _HotlinksState extends State<Hotlinks> {
           ),
           GestureDetector(
             onTap: () {
-              if (auth.isAuthenticated) {
-                //  snackAlert(context, SnackTypes.warning, 'Coming Soon...');
-                Navigator.pushNamed(context, '/crypto_loan');
-              } else {
-                Navigator.pushNamed(context, '/authentication');
-              }
+              Navigator.pushNamed(context, '/crypto_loan');
+              // if (auth.isAuthenticated) {
+              //   //  snackAlert(context, SnackTypes.warning, 'Coming Soon...');
+              //   Navigator.pushNamed(context, '/crypto_loan');
+              // } else {
+              //   Navigator.pushNamed(context, '/authentication');
+              // }
             },
             child: Column(
               children: [

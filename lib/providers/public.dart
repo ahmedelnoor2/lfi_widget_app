@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:k_chart/entity/index.dart';
@@ -8,16 +8,18 @@ import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:k_chart/entity/k_line_entity.dart';
+import 'package:lyotrade/utils/Translate.utils.dart';
 
 class Public with ChangeNotifier {
   Map<String, String> headers = {
     'Content-type': 'application/json;charset=utf-8',
     'Accept': 'application/json',
   };
- Map<String, String> headers1 = {
+  Map<String, String> headers1 = {
     'Content-type': 'application/json;charset=utf-8',
     'Accept': 'application/json',
-    'exchange-token':'c5fa97c1140aafea1ef1e84b67503d5e0db18d0ca0ff4819a0ca3f24722407df'
+    'exchange-token':
+        'c5fa97c1140aafea1ef1e84b67503d5e0db18d0ca0ff4819a0ca3f24722407df'
   };
   Map _rate = {};
   Map _publicInfoMarket = {};
@@ -578,20 +580,19 @@ class Public with ChangeNotifier {
       return;
     }
   }
-  
+
   List _marketrecommendedsymbol = [];
 
   List get marketrecoomendsymbol {
     return _marketrecommendedsymbol;
   }
-  
-  bool isrecommended=true;
-  
-  Future<void> getrecomendedsybol(auth) async {
 
+  bool isrecommended = true;
+
+  Future<void> getrecomendedsybol(auth) async {
     var url = Uri.https(
       apiUrl,
-       '$exApi/common/market_recommend_symbol',
+      '$exApi/common/market_recommend_symbol',
     );
     try {
       final response = await http.post(url, headers: headers1);
@@ -599,15 +600,14 @@ class Public with ChangeNotifier {
       final responseData = json.decode(response.body);
 
       if (responseData['code'] == "0") {
-
         var data = responseData['data'];
         _marketrecommendedsymbol = data['recommendSymbol'].split(',');
         print(_marketrecommendedsymbol);
-        isrecommended=false;
+        isrecommended = false;
         return notifyListeners();
       } else {
         _banners = [];
-        isrecommended=false;
+        isrecommended = false;
         return notifyListeners();
       }
     } catch (error) {
@@ -669,5 +669,48 @@ class Public with ChangeNotifier {
   void setSelectedAnnouncement(value) {
     _selectedAnnouncement = value;
     return notifyListeners();
+  }
+
+  /////get favourit market//.........
+
+  List _favMarketList = [];
+
+  List get favMarketList {
+    return _favMarketList;
+  }
+
+  List<dynamic> _selectedItems = [];
+
+  List get selectedItems {
+    return _selectedItems;
+  }
+
+  bool isfavloading = true;
+  Future<void> getFavMarketList(ctx, formData) async {
+    var url = Uri.https(
+      lyoApiUrl,
+      '$getfavmarkert/favorite-market'
+    );
+    var postData = json.encode(formData);
+   
+    try {
+      final response = await http.post(url, body: postData, headers: headers);
+    
+      final responseData = json.decode(response.body);
+      if (responseData['code'] == '0') {
+        _favMarketList = responseData['data'];
+       
+        notifyListeners();
+        return;
+      } else {
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
+      }
+
+      return;
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server Error!');
+      return;
+      // throw error;
+    }
   }
 }

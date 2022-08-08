@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
-import 'package:lyotrade/screens/common/header.dart';
+
 import 'package:lyotrade/screens/security/forgot/forgotemailform.dart';
 
 import 'package:lyotrade/utils/Colors.utils.dart';
@@ -54,119 +54,124 @@ class _ForgotpasswordState extends State<Forgotpassword>
     var auth = Provider.of<Auth>(context, listen: true);
 
     return Scaffold(
-      body: Container(
-        padding: EdgeInsets.only(top: width * 0.2),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.only(left: 10),
-              height: height * 0.20,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      auth.setForgotStepOne({});
-                      auth.setEmailValidResponse({});
-                      auth.setSmsValidResponse({});
-                      Navigator.pop(context);
-                    },
-                    icon: const Icon(Icons.close),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.only(top: 10, right: 30),
-                    child: Column(
-                      children: [
-                        const Image(
-                          image: AssetImage('assets/img/logo_s.png'),
-                          width: 100,
-                        ),
-                        Text('v$_versionNumber'),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              child: Expanded(
-                child: Column(
+      resizeToAvoidBottomInset:true ,
+      body: SingleChildScrollView(
+        
+        child: Container(
+          height: height,
+          padding: EdgeInsets.only(top: width * 0.2),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.only(left: 10),
+                height: height * 0.20,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: EdgeInsets.only(bottom: width * 0.03),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding:
-                                EdgeInsets.only(bottom: 0, left: width * 0.05),
-                            child: const Text(
-                              'Reset password',
-                              style: TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            padding:
-                                EdgeInsets.only(bottom: 0, left: width * 0.05),
-                            child: Text(
-                              'It is forbidden to withdraw coins within 48\nhours after resetting the login password',
-                              style: TextStyle(
-                                color: secondaryTextColor,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    TabBar(
-                      onTap: (index) {
-                        setState(() {});
+                    IconButton(
+                      onPressed: () {
+                        auth.setForgotStepOne({});
+                        auth.setEmailValidResponse({});
+                        auth.setSmsValidResponse({});
+                        Navigator.pop(context);
                       },
-                      indicator: UnderlineTabIndicator(
-                        borderSide: BorderSide(
-                          width: 2,
-                          color: linkColor,
-                        ),
-                        insets: EdgeInsets.only(
-                            left: width * 0.05, right: 25, bottom: 4),
-                      ),
-                      isScrollable: true,
-                      labelPadding:
-                          EdgeInsets.only(left: width * 0.05, right: 0),
-                      tabs: const [
-                        Padding(
-                          padding: EdgeInsets.only(right: 25),
-                          child: Tab(text: 'Email'),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(right: 25),
-                          child: Tab(text: 'Mobile Phone'),
-                        ),
-                      ],
-                      controller: _tabController,
+                      icon: const Icon(Icons.close),
                     ),
-                    Expanded(
-                      child: TabBarView(
-                        controller: _tabController,
-                        children: _pages.map((
-                          Widget tab,
-                        ) {
-                          return tab;
-                        }).toList(),
+                    Container(
+                      padding: const EdgeInsets.only(top: 10, right: 30),
+                      child: Column(
+                        children: [
+                          const Image(
+                            image: AssetImage('assets/img/logo_s.png'),
+                            width: 100,
+                          ),
+                          Text('v$_versionNumber'),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-          ],
+              Container(
+                child: Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(bottom: width * 0.03),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding:
+                                  EdgeInsets.only(bottom: 0, left: width * 0.05),
+                              child: const Text(
+                                'Reset password',
+                                style: TextStyle(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding:
+                                  EdgeInsets.only(bottom: 0, left: width * 0.05),
+                              child: Text(
+                                'It is forbidden to withdraw coins within 48\nhours after resetting the login password',
+                                style: TextStyle(
+                                  color: secondaryTextColor,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      TabBar(
+                        onTap: (index) {
+                          setState(() {});
+                        },
+                        indicator: UnderlineTabIndicator(
+                          borderSide: BorderSide(
+                            width: 2,
+                            color: linkColor,
+                          ),
+                          insets: EdgeInsets.only(
+                              left: width * 0.05, right: 25, bottom: 4),
+                        ),
+                        isScrollable: true,
+                        labelPadding:
+                            EdgeInsets.only(left: width * 0.05, right: 0),
+                        tabs: const [
+                          Padding(
+                            padding: EdgeInsets.only(right: 25),
+                            child: Tab(text: 'Email'),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(right: 25),
+                            child: Tab(text: 'Mobile Phone'),
+                          ),
+                        ],
+                        controller: _tabController,
+                      ),
+                      Expanded(
+                        child: TabBarView(
+                          controller: _tabController,
+                          children: _pages.map((
+                            Widget tab,
+                          ) {
+                            return tab;
+                          }).toList(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

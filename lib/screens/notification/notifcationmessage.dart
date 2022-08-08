@@ -13,6 +13,7 @@ import 'package:lyotrade/screens/common/snackalert.dart';
 
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../common/types.dart';
 
@@ -31,6 +32,12 @@ class _NotificationsscreenState extends State<Notificationsscreen>
   bool _isselected = false;
 
   String _messageType = '0';
+  var pagesized = 15;
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
+
+  GlobalKey _contentKey = GlobalKey();
+  GlobalKey _refresherKey = GlobalKey();
 
   @override
   void initState() {
@@ -44,7 +51,7 @@ class _NotificationsscreenState extends State<Notificationsscreen>
     var auth = Provider.of<Auth>(context, listen: false);
     await notificationProvider.getnotification(context, auth, {
       "page": "1",
-      "pageSize": "10",
+      "pageSize": "$pagesized",
       "messageType": _messageType,
     });
   }
@@ -155,161 +162,194 @@ class _NotificationsscreenState extends State<Notificationsscreen>
                     ? Center(
                         child: noData('No messages'),
                       )
-                    : ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: notificationProvider.userMessageList.length,
-                        itemBuilder: (context, index) {
-                          var item =
-                              notificationProvider.userMessageList[index];
-                          return Column(
-                            children: [
-                              Slidable(
-                                enabled: true,
-                                // Specify a key if the Slidable is dismissible.
-                                key: const ValueKey(0),
+                    : SmartRefresher(
+                        key: _refresherKey,
+                        controller: _refreshController,
+                        enablePullDown: false,
+                        enablePullUp: true,
+                        physics: BouncingScrollPhysics(),
+                        footer: ClassicFooter(
+                          loadStyle: LoadStyle.ShowWhenLoading,
+                          completeDuration: Duration(milliseconds: 500),
+                        ),
+                        onLoading: (() async {
+                          setState(() {
+                            pagesized += 10;
+                          });
+                          return Future.delayed(
+                            Duration(seconds: 2),
+                            () async {
+                              await notificationProvider
+                                  .getnotification(context, auth, {
+                                "page": "1",
+                                "pageSize": "$pagesized",
+                                "messageType": _messageType,
+                              });
 
-                                // The start action pane is the one at the left or the top side.
-                                startActionPane: ActionPane(
-                                  // A motion is a widget used to control how the pane animates.
-                                  motion: const ScrollMotion(),
+                              if (mounted) setState(() {});
+                              _refreshController.loadFailed();
+                            },
+                          );
+                        }),
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount:
+                              notificationProvider.userMessageList.length,
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            var item =
+                                notificationProvider.userMessageList[index];
+                            return Column(
+                              children: [
+                                Slidable(
+                                  enabled: true,
+                                  // Specify a key if the Slidable is dismissible.
+                                  key: const ValueKey(0),
 
-                                  // A pane can dismiss the Slidable.
-                                  // dismissible: DismissiblePane(onDismissed: () {}),
+                                  // The start action pane is the one at the left or the top side.
+                                  startActionPane: ActionPane(
+                                    // A motion is a widget used to control how the pane animates.
+                                    motion: const ScrollMotion(),
 
-                                  // All actions are defined in the children parameter.
-                                  children: const [
-                                    // A SlidableAction can have an icon and/or a label.
-                                    // SlidableAction(
-                                    //   // An action can be bigger than the others.
-                                    //   flex: 2,
+                                    // A pane can dismiss the Slidable.
+                                    // dismissible: DismissiblePane(onDismissed: () {}),
 
-                                    //   onPressed: deleteitem,
-                                    //   backgroundColor: Color(0xFF7BC043),
-                                    //   foregroundColor: Colors.white,
-                                    //   icon: Icons.read_more,
-                                    //   label: 'Read',
-                                    // ),
-                                  ],
-                                ),
+                                    // All actions are defined in the children parameter.
+                                    children: const [
+                                      // A SlidableAction can have an icon and/or a label.
+                                      // SlidableAction(
+                                      //   // An action can be bigger than the others.
+                                      //   flex: 2,
 
-                                // The end action pane is the one at the right or the bottom side.
-                                endActionPane: ActionPane(
-                                  motion: ScrollMotion(),
-                                  children: [
-                                    SlidableAction(
-                                      onPressed: (c) async {
-                                        notificationProvider
-                                            .deletebyidnotification(
-                                                context, auth, item['id'])
-                                            .whenComplete(() {
-                                          setState(() {
-                                            notificationProvider
-                                                .getnotification(
-                                                    context, auth, {
-                                              "page": "1",
-                                              "pageSize": "10",
-                                              "messageType": _messageType,
+                                      //   onPressed: deleteitem,
+                                      //   backgroundColor: Color(0xFF7BC043),
+                                      //   foregroundColor: Colors.white,
+                                      //   icon: Icons.read_more,
+                                      //   label: 'Read',
+                                      // ),
+                                    ],
+                                  ),
+
+                                  // The end action pane is the one at the right or the bottom side.
+                                  endActionPane: ActionPane(
+                                    motion: ScrollMotion(),
+                                    children: [
+                                      SlidableAction(
+                                        onPressed: (c) async {
+                                          notificationProvider
+                                              .deletebyidnotification(
+                                                  context, auth, item['id'])
+                                              .whenComplete(() {
+                                            setState(() {
+                                              notificationProvider
+                                                  .getnotification(
+                                                      context, auth, {
+                                                "page": "1",
+                                                "pageSize": "10",
+                                                "messageType": _messageType,
+                                              });
                                             });
                                           });
-                                        });
-                                      },
-                                      backgroundColor: Color(0xFFFE4A49),
-                                      foregroundColor: Colors.white,
-                                      icon: Icons.delete,
-                                      label: 'Delete',
-                                    ),
-                                  ],
-                                ),
+                                        },
+                                        backgroundColor: Color(0xFFFE4A49),
+                                        foregroundColor: Colors.white,
+                                        icon: Icons.delete,
+                                        label: 'Delete',
+                                      ),
+                                    ],
+                                  ),
 
-                                // The child of the Slidable is what the user sees when the
-                                // component is not dragged.
-                                child: Container(
-                                  padding: const EdgeInsets.only(bottom: 2),
+                                  // The child of the Slidable is what the user sees when the
+                                  // component is not dragged.
                                   child: Container(
-                                    color: (notificationProvider.selectedItems
-                                            .contains(item))
-                                        ? tileseletedcoloue
-                                        : Colors.transparent,
-                                    child: ListTile(
-                                      onTap: () {
-                                        if (notificationProvider.selectedItems
-                                            .contains(item)) {
-                                          notificationProvider.selectedItems
-                                              .removeWhere(
-                                                  (val) => val == item);
-                                          notificationProvider
-                                              .notifyListeners();
-                                        }
-                                      },
-                                      onLongPress: () {
-                                        if (!notificationProvider.selectedItems
-                                            .contains(item)) {
-                                          notificationProvider.selectedItems
-                                              .add(item);
-                                          notificationProvider
-                                              .notifyListeners();
-                                        }
-                                      },
-                                      leading: Container(
-                                        width: 40,
-                                        height: 40,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: selectboxcolour,
+                                    padding: const EdgeInsets.only(bottom: 2),
+                                    child: Container(
+                                      color: (notificationProvider.selectedItems
+                                              .contains(item))
+                                          ? tileseletedcoloue
+                                          : Colors.transparent,
+                                      child: ListTile(
+                                        onTap: () {
+                                          if (notificationProvider.selectedItems
+                                              .contains(item)) {
+                                            notificationProvider.selectedItems
+                                                .removeWhere(
+                                                    (val) => val == item);
+                                            notificationProvider
+                                                .notifyListeners();
+                                          }
+                                        },
+                                        onLongPress: () {
+                                          if (!notificationProvider
+                                              .selectedItems
+                                              .contains(item)) {
+                                            notificationProvider.selectedItems
+                                                .add(item);
+                                            notificationProvider
+                                                .notifyListeners();
+                                          }
+                                        },
+                                        leading: Container(
+                                          width: 40,
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: selectboxcolour,
+                                          ),
+                                          child: Align(
+                                              alignment: Alignment.center,
+                                              child: notificationProvider
+                                                      .selectedItems
+                                                      .contains(item)
+                                                  ? Image.asset(
+                                                      'assets/img/select.png',
+                                                      width: 20,
+                                                      fit: BoxFit.fill,
+                                                    )
+                                                  : Text(
+                                                      notificationProvider
+                                                                  .userMessageList[
+                                                              index]
+                                                          ['messageContent'][0],
+                                                      style: TextStyle(
+                                                          fontSize: 18,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    )),
                                         ),
-                                        child: Align(
-                                            alignment: Alignment.center,
-                                            child: notificationProvider
-                                                    .selectedItems
-                                                    .contains(item)
-                                                ? Image.asset(
-                                                    'assets/img/select.png',
-                                                    width: 20,
-                                                    fit: BoxFit.fill,
-                                                  )
-                                                : Text(
-                                                    notificationProvider
-                                                                .userMessageList[
-                                                            index]
-                                                        ['messageContent'][0],
-                                                    style: TextStyle(
-                                                        fontSize: 18,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  )),
+                                        title: Text(
+                                          notificationProvider
+                                              .userMessageList[index]
+                                                  ['messageContent']
+                                              .toString(),
+                                          style: TextStyle(fontSize: 12),
+                                        ),
+                                        // subtitle: Text(
+                                        //     notificationProvider.userMessageList[index]
+                                        //             ['ctime']
+                                        //         .toString(),
+                                        // style:
+                                        //     TextStyle(fontSize: 10, color: natuaraldark)),
+                                        trailing: Text(
+                                            '${DateFormat('yMMMMd').format(DateTime.fromMillisecondsSinceEpoch(notificationProvider.userMessageList[index]['ctime']))}',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: secondaryTextColor,
+                                            )),
+                                        // trailing: Text(
+                                        //     notificationProvider.userMessageList[index]
+                                        //             ['ctime']
+                                        //         .toString(),
+                                        //     style: TextStyle(
+                                        //         fontSize: 10, color: natuaraldark)),
                                       ),
-                                      title: Text(
-                                        notificationProvider
-                                            .userMessageList[index]
-                                                ['messageContent']
-                                            .toString(),
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                      // subtitle: Text(
-                                      //     notificationProvider.userMessageList[index]
-                                      //             ['ctime']
-                                      //         .toString(),
-                                      // style:
-                                      //     TextStyle(fontSize: 10, color: natuaraldark)),
-                                      trailing: Text(
-                                          '${DateFormat('yMMMMd').format(DateTime.fromMillisecondsSinceEpoch(notificationProvider.userMessageList[index]['ctime']))}',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: secondaryTextColor,
-                                          )),
-                                      // trailing: Text(
-                                      //     notificationProvider.userMessageList[index]
-                                      //             ['ctime']
-                                      //         .toString(),
-                                      //     style: TextStyle(
-                                      //         fontSize: 10, color: natuaraldark)),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          );
-                        },
+                              ],
+                            );
+                          },
+                        ),
                       ),
               ),
       ])),

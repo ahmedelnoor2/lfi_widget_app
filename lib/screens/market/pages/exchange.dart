@@ -8,8 +8,8 @@ import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-class FavoritesScreen extends StatefulWidget {
-  const FavoritesScreen({
+class ExchangeScreen extends StatefulWidget {
+  const ExchangeScreen({
     Key? key,
     this.scaffoldKey,
     this.updateMarket,
@@ -23,10 +23,10 @@ class FavoritesScreen extends StatefulWidget {
   final upateCurrentMarketSort;
 
   @override
-  State<FavoritesScreen> createState() => _FavoritesScreenState();
+  State<ExchangeScreen> createState() => _ExchangeScreenState();
 }
 
-class _FavoritesScreenState extends State<FavoritesScreen>
+class _ExchangeScreenState extends State<ExchangeScreen>
     with SingleTickerProviderStateMixin {
   TabController? _tabController;
 
