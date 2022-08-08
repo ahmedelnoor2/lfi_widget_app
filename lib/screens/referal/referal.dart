@@ -282,15 +282,11 @@ class _ReferalState extends State<Referal> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Send invitation',
+                                  ' Send invitation',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(fontSize: 14),
                                 ),
-                                Text(
-                                  'Friends complete registration and trade',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(fontSize: 10),
-                                ),
+                               
                               ],
                             ),
                           ],
@@ -328,15 +324,15 @@ class _ReferalState extends State<Referal> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Friends complete registration and trade',
+                                  ' Friends complete registration and trade',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(fontSize: 14),
                                 ),
-                                Text(
-                                  'They hit the road',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(fontSize: 10),
-                                ),
+                                // Text(
+                                //   'They hit the road',
+                                //   textAlign: TextAlign.center,
+                                //   style: TextStyle(fontSize: 10),
+                                // ),
                               ],
                             ),
                           ],
@@ -375,15 +371,15 @@ class _ReferalState extends State<Referal> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Get rebate income',
+                                  ' Get rebate income',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(fontSize: 14),
                                 ),
-                                Text(
-                                  'You make savings!',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(fontSize: 10),
-                                ),
+                                // Text(
+                                //   'You make savings!',
+                                //   textAlign: TextAlign.center,
+                                //   style: TextStyle(fontSize: 10),
+                                // ),
                               ],
                             ),
                           ],
@@ -565,21 +561,37 @@ Future _buildBottomSheet(BuildContext context) {
       context: context,
       builder: (builder) {
         return Container(
-          padding: EdgeInsets.only(top: 20),
+          
           color: bottombuttoncolour,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                InkWell(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+               Container(
+             
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+
+                  InkWell(
                   onTap: () async {
                     Navigator.pop(context);
                   },
-                  child: Text('Reward distribution condition:',
-                      style: TextStyle(color: linkColor)),
+                  child:Icon(Icons.cancel,color: linkColor,size: 30,),
+                     
                 ),
-                Container(
+              ],),
+            ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Reward distribution condition:',
+                          style: TextStyle(color: linkColor)),
+
+                 Container(
                   padding: EdgeInsets.only(top: 15),
                   child: Text(
                       'Friends who complete the following tasks within 30 days after registration, you can get the corresponding inviter rewards',
@@ -610,61 +622,62 @@ Future _buildBottomSheet(BuildContext context) {
                     ],
                   ),
                 ),
-               Expanded(
-                 child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Inviter Reward Amount:',
-                                style: TextStyle(color: linkColor)),
-                            Container(
-                              padding: EdgeInsets.only(top: 8),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.star_border_outlined,
-                                      size: 14, color: linkColor),
-                                  Text('Inviter Reward Amount',
-                                      style: TextStyle(
-                                          color: seconadarytextcolour,
-                                          fontSize: 12)),
-                                  Text(' 2 LYO',
-                                      style: TextStyle(color: orangeBGColor))
-                                ],
+                Container(
+                  padding: EdgeInsets.only(top: 20),
+                  child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Inviter Reward Amount:',
+                                  style: TextStyle(color: linkColor)),
+                              Container(
+                                padding: EdgeInsets.only(top: 0),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.star_border_outlined,
+                                        size: 14, color: linkColor),
+                                    Text('Inviter Reward Amount',
+                                        style: TextStyle(
+                                            color: seconadarytextcolour,
+                                            )),
+                                    Text(' 2 LYO',
+                                        style: TextStyle(color: orangeBGColor))
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                            ],
+                          ),
+                        ]),
+                ),
+            
+                Container(
+                  padding: EdgeInsets.only(top: 15),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Registrant Reward Amount:',
+                          style: TextStyle(
+                            color: linkColor,
+                          )),
+                      Container(
+                        padding: EdgeInsets.only(top: 6),
+                        child: Row(
                           children: [
-                            Text('Registrant Reward Amount:',
+                            Icon(Icons.star_border_outlined,
+                                size: 14, color: linkColor),
+                            Text('Registrant Reward Amount',
                                 style: TextStyle(
-                                  color: linkColor,
-                                )),
-                            Container(
-                              padding: EdgeInsets.only(top: 6),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.star_border_outlined,
-                                      size: 14, color: linkColor),
-                                  Text('Registrant Reward Amount',
-                                      style: TextStyle(
-                                          color: seconadarytextcolour,
-                                          fontSize: 12)),
-                                  Text(' 5 LYO',
-                                      style: TextStyle(color: orangeBGColor))
-                                ],
-                              ),
-                            ),
+                                    color: seconadarytextcolour,)),
+                            Text(' 5 LYO', style: TextStyle(color: orangeBGColor))
                           ],
                         ),
-                      ],
-                    ),
-               ),
-              
+                      ),
+                    ],
+                  ),
+                ),
                 Container(
                   padding: EdgeInsets.only(top: 15),
                   child: Column(
@@ -673,7 +686,7 @@ Future _buildBottomSheet(BuildContext context) {
                       Text('Reward Distribution Method:',
                           style: TextStyle(color: linkColor)),
                       Container(
-                        padding: EdgeInsets.only(top: 4, bottom: 40),
+                        padding: EdgeInsets.only(top: 4, bottom: 10),
                         child: Row(
                           children: [
                             Icon(Icons.star_border_outlined,
@@ -686,16 +699,13 @@ Future _buildBottomSheet(BuildContext context) {
                     ],
                   ),
                 ),
-                LyoButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  text: 'Cancel',
-                  active: true,
-                  isLoading: false,
+           
+                  ],
                 ),
-              ],
-            ),
+              ),
+            
+             
+            ],
           ),
         );
       });

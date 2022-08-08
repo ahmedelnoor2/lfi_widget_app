@@ -44,6 +44,8 @@ class _ConfirmLoanState extends State<ConfirmLoan> {
   // }
 
   final _formKey = GlobalKey<FormState>();
+  final GlobalKey<ScaffoldState> _scaffoldkey=GlobalKey<ScaffoldState>();
+  
 
   @override
   void initState() {
@@ -193,6 +195,7 @@ class _ConfirmLoanState extends State<ConfirmLoan> {
     }
 
     return Scaffold(
+      key: _scaffoldkey,
       resizeToAvoidBottomInset: true,
       appBar: hiddenAppBar(),
       body: SingleChildScrollView(
@@ -225,20 +228,7 @@ class _ConfirmLoanState extends State<ConfirmLoan> {
                     ],
                   ),
                   InkWell(
-                    onTap: () {
-                      showModalBottomSheet<void>(
-                        context: context,
-                        isScrollControlled: true,
-                        builder: (BuildContext context) {
-                          return StatefulBuilder(
-                            builder:
-                                (BuildContext context, StateSetter setState) {
-                              return checkLoanHistory(context, setState);
-                            },
-                          );
-                        },
-                      );
-                    },
+                    onTap: () => this._scaffoldkey.currentState?.showBottomSheet((context) => checkLoanHistory(context, setState)),
                     child: Container(
                       padding: EdgeInsets.only(right: 5, left: 15),
                       child: Icon(Icons.menu),
@@ -655,12 +645,8 @@ class _ConfirmLoanState extends State<ConfirmLoan> {
   Widget checkLoanHistory(context, setState) {
     var loanProvider = Provider.of<LoanProvider>(context, listen: false);
 
-    return SizedBox(
-      height: height * 0.9,
-      child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        appBar: hiddenAppBar(),
-        body: Container(
+    return  Container(
+      height: 300,
           padding: EdgeInsets.all(10),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -751,9 +737,8 @@ class _ConfirmLoanState extends State<ConfirmLoan> {
               ),
             ],
           ),
-        ),
-      ),
-    );
+        );
+     
   }
 
   Widget twoFactorAuth(context, setState) {
