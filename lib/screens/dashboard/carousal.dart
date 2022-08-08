@@ -77,49 +77,51 @@ class _CarousalState extends State<Carousal> {
       margin: const EdgeInsets.only(bottom: 5),
       child: CarouselSlider(
         options: CarouselOptions(
-          height: height * 0.15,
+          height: 110,
           viewportFraction: 1,
           enableInfiniteScroll: true,
           enlargeCenterPage: true,
           autoPlay: true,
         ),
-        items: sliders.map((slider) {
-          // var slider = _sliderFrames[i];
-          return Builder(
-            builder: (BuildContext context) {
-              return InkWell(
-                onTap: () {
-                  _launchUrl(
-                    '${slider['link']}',
-                  );
-                },
-                child: Container(
-                  width: width,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      style: BorderStyle.solid,
-                      width: 0.3,
-                      color: Color(0xff5E6292),
+        items: sliders.map(
+          (slider) {
+            // var slider = _sliderFrames[i];
+            return Builder(
+              builder: (BuildContext context) {
+                return InkWell(
+                  onTap: () {
+                    _launchUrl(
+                      '${slider['link']}',
+                    );
+                  },
+                  child: Container(
+                    width: width,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        style: BorderStyle.solid,
+                        width: 0.3,
+                        color: Color(0xff5E6292),
+                      ),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: public.banners.isEmpty
+                          ? Image.asset(
+                              'assets/img/${slider['file']['link']}',
+                              fit: BoxFit.fill,
+                            )
+                          : Image.network(
+                              '${slider['file']['link']}',
+                              fit: BoxFit.fill,
+                            ),
                     ),
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: public.banners.isEmpty
-                        ? Image.asset(
-                            'assets/img/${slider['file']['link']}',
-                            fit: BoxFit.fill,
-                          )
-                        : Image.network(
-                            '${slider['file']['link']}',
-                            fit: BoxFit.fill,
-                          ),
-                  ),
-                ),
-              );
-            },
-          );
-        }).toList(),
+                );
+              },
+            );
+          },
+        ).toList(),
       ),
     );
   }
