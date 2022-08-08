@@ -773,7 +773,7 @@ class _AllStakeState extends State<AllStake> {
                                     child: GestureDetector(
                                       onTap: () async {
                                         _amountController.text =
-                                            '${double.parse(staking.activeStakeInfo['balance']).toStringAsFixed(2)}';
+                                            '${staking.activeStakeInfo['balance'].split('.')[0]}.${staking.activeStakeInfo['balance'].split('.')[1].lenght >= 2 ? staking.activeStakeInfo['balance'].split('.')[1].substring(0, 2) : staking.activeStakeInfo['balance'].split('.')[1]}';
                                         double.parse('${stake['gainRate']}');
                                         setState(() {
                                           if (_amountController
