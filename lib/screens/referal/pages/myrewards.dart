@@ -13,7 +13,7 @@ class Myrewards extends StatefulWidget {
 }
 
 class _MyrewardsState extends State<Myrewards> {
-    RefreshController _refreshController =
+  RefreshController _refreshController =
       RefreshController(initialRefresh: false);
 
   GlobalKey _contentKey = GlobalKey();
@@ -29,7 +29,8 @@ class _MyrewardsState extends State<Myrewards> {
     var auth = Provider.of<Auth>(context, listen: false);
     var referalprovider = Provider.of<ReferralProvider>(context, listen: false);
 
-    await referalprovider.getMyInvitationRewards(context, auth,{"page": "1", "pageSize": "$pagesized"});
+    await referalprovider.getMyInvitationRewards(
+        context, auth, {"page": "1", "pageSize": "$pagesized"});
   }
 
   @override
@@ -73,34 +74,36 @@ class _MyrewardsState extends State<Myrewards> {
                 )
               : referalprovider.myinvitationrewardslist.isEmpty
                   ? Center(child: noData('No Rewards'))
-                  : SmartRefresher
-                  (
-                           key: _refresherKey,
-                        controller: _refreshController,
-                        enablePullDown: false,
-                        enablePullUp: true,
-                        physics: const BouncingScrollPhysics(),
-                        footer: ClassicFooter(
-                          loadStyle: LoadStyle.ShowWhenLoading,
-                          completeDuration: Duration(milliseconds: 500),
-                        ),
-                        onLoading: (() async {
-                          setState(() {
+                  : SmartRefresher(
+                      key: _refresherKey,
+                      controller: _refreshController,
+                      enablePullDown: false,
+                      enablePullUp: true,
+                      physics: const BouncingScrollPhysics(),
+                      footer: ClassicFooter(
+                        loadStyle: LoadStyle.ShowWhenLoading,
+                        completeDuration: Duration(milliseconds: 500),
+                      ),
+                      onLoading: (() async {
+                        setState(() {
                           pagesized += 10;
-                          });
-                          return Future.delayed(
-                            Duration(seconds: 2),
-                            () async {
-                              await referalprovider.getMyInvitationRewards(context, auth,{"page": "1", "pageSize": "$pagesized"});
+                        });
+                        return Future.delayed(
+                          Duration(seconds: 2),
+                          () async {
+                            await referalprovider.getMyInvitationRewards(
+                                context,
+                                auth,
+                                {"page": "1", "pageSize": "$pagesized"});
 
-                              if (mounted) setState(() {});
-                              _refreshController.loadFailed();
-                            },
-                          );
-                        }),
-                    child: ListView.builder(
+                            if (mounted) setState(() {});
+                          },
+                        );
+                      }),
+                      child: ListView.builder(
                         shrinkWrap: true,
-                        itemCount: referalprovider.myinvitationrewardslist.length,
+                        itemCount:
+                            referalprovider.myinvitationrewardslist.length,
                         itemBuilder: (context, index) {
                           var emailText = referalprovider
                               .myinvitationrewardslist[index]['userAccountNum']
@@ -180,7 +183,7 @@ class _MyrewardsState extends State<Myrewards> {
                           );
                         },
                       ),
-                  ),
+                    ),
         ),
       ],
     );

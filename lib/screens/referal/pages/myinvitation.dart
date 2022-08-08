@@ -13,13 +13,12 @@ class Myinvitation extends StatefulWidget {
 }
 
 class _MyinvitationState extends State<Myinvitation> {
-  
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
 
   GlobalKey _contentKey = GlobalKey();
   GlobalKey _refresherKey = GlobalKey();
-  var pagesized=10;
+  var pagesized = 10;
   @override
   void initState() {
     getMyinvitation();
@@ -30,14 +29,14 @@ class _MyinvitationState extends State<Myinvitation> {
     var auth = Provider.of<Auth>(context, listen: false);
     var referalprovider = Provider.of<ReferralProvider>(context, listen: false);
 
-    await referalprovider.getmyInvitation(context, auth,{"page": "1", "pageSize": "$pagesized"});
+    await referalprovider.getmyInvitation(
+        context, auth, {"page": "1", "pageSize": "$pagesized"});
   }
 
   @override
   Widget build(BuildContext context) {
     var auth = Provider.of<Auth>(context, listen: false);
     var referalprovider = Provider.of<ReferralProvider>(context, listen: true);
-
 
     return Column(
       children: [
@@ -76,30 +75,30 @@ class _MyinvitationState extends State<Myinvitation> {
               : referalprovider.invitationlist.isEmpty
                   ? Center(child: noData('No Invitation'))
                   : SmartRefresher(
-                        key: _refresherKey,
-                        controller: _refreshController,
-                        enablePullDown: false,
-                        enablePullUp: true,
-                        physics: const BouncingScrollPhysics(),
-                        footer: ClassicFooter(
-                          loadStyle: LoadStyle.ShowWhenLoading,
-                          completeDuration: Duration(milliseconds: 500),
-                        ),
-                        onLoading: (() async {
-                          setState(() {
+                      key: _refresherKey,
+                      controller: _refreshController,
+                      enablePullDown: false,
+                      enablePullUp: true,
+                      physics: const BouncingScrollPhysics(),
+                      footer: ClassicFooter(
+                        loadStyle: LoadStyle.ShowWhenLoading,
+                        completeDuration: Duration(milliseconds: 500),
+                      ),
+                      onLoading: (() async {
+                        setState(() {
                           pagesized += 10;
-                          });
-                          return Future.delayed(
-                            Duration(seconds: 2),
-                            () async {
-                              await referalprovider.getmyInvitation(context, auth,{"page": "1", "pageSize": "$pagesized"});
+                        });
+                        return Future.delayed(
+                          Duration(seconds: 2),
+                          () async {
+                            await referalprovider.getmyInvitation(context, auth,
+                                {"page": "1", "pageSize": "$pagesized"});
 
-                              if (mounted) setState(() {});
-                              _refreshController.loadFailed();
-                            },
-                          );
-                        }),
-                    child: ListView.builder(
+                            if (mounted) setState(() {});
+                          },
+                        );
+                      }),
+                      child: ListView.builder(
                         shrinkWrap: true,
                         itemCount: referalprovider.invitationlist.length,
                         itemBuilder: (context, index) {
@@ -122,7 +121,8 @@ class _MyinvitationState extends State<Myinvitation> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            referalprovider.invitationlist[index]
+                                            referalprovider
+                                                .invitationlist[index]
                                                     ['levelZeroRegisterUid']
                                                 .toString(),
                                             style: TextStyle(
@@ -156,8 +156,8 @@ class _MyinvitationState extends State<Myinvitation> {
                                                       .fromMicrosecondsSinceEpoch(
                                                           referalprovider
                                                                       .invitationlist[
-                                                                  index]
-                                                              ['registerTime'])),
+                                                                  index][
+                                                              'registerTime'])),
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w400,
@@ -175,7 +175,7 @@ class _MyinvitationState extends State<Myinvitation> {
                           );
                         },
                       ),
-                  ),
+                    ),
         ),
       ],
     );
