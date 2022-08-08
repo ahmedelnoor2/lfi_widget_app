@@ -30,8 +30,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     var auth = Provider.of<Auth>(context, listen: false);
 
     await public.getFavMarketList(context, {
-      'token': auth.authToken,
-      'userId': auth.userInfo['id'],
+      'token': "${auth.loginVerificationToken}",
+      'userId': "${auth.userInfo['id']}",
     });
   }
 
@@ -39,6 +39,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
+    var public = Provider.of<Public>(context, listen: false);
 
     return Scaffold(
       appBar: hiddenAppBar(),
@@ -50,7 +51,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 return Divider();
               },
               shrinkWrap: true,
-              itemCount: 4,
+              itemCount:public.favMarketList.length,
               itemBuilder: (context, index) {
                 return ListTile(
                   leading: Icon(

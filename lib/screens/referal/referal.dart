@@ -610,61 +610,61 @@ Future _buildBottomSheet(BuildContext context) {
                     ],
                   ),
                 ),
-                Container(
-                  padding: EdgeInsets.only(top: 15),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Inviter Reward Amount:',
-                              style: TextStyle(color: linkColor)),
-                          Container(
-                            padding: EdgeInsets.only(top: 8),
-                            child: Row(
-                              children: [
-                                Icon(Icons.star_border_outlined,
-                                    size: 14, color: linkColor),
-                                Text('Inviter Reward Amount',
-                                    style: TextStyle(
-                                        color: seconadarytextcolour,
-                                        fontSize: 12)),
-                                Text(' 2 LYO',
-                                    style: TextStyle(color: orangeBGColor))
-                              ],
+               Expanded(
+                 child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Inviter Reward Amount:',
+                                style: TextStyle(color: linkColor)),
+                            Container(
+                              padding: EdgeInsets.only(top: 8),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.star_border_outlined,
+                                      size: 14, color: linkColor),
+                                  Text('Inviter Reward Amount',
+                                      style: TextStyle(
+                                          color: seconadarytextcolour,
+                                          fontSize: 12)),
+                                  Text(' 2 LYO',
+                                      style: TextStyle(color: orangeBGColor))
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Registrant Reward Amount:',
-                              style: TextStyle(
-                                color: linkColor,
-                              )),
-                          Container(
-                            padding: EdgeInsets.only(top: 6),
-                            child: Row(
-                              children: [
-                                Icon(Icons.star_border_outlined,
-                                    size: 14, color: linkColor),
-                                Text('Registrant Reward Amount',
-                                    style: TextStyle(
-                                        color: seconadarytextcolour,
-                                        fontSize: 12)),
-                                Text(' 5 LYO',
-                                    style: TextStyle(color: orangeBGColor))
-                              ],
+                          ],
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Registrant Reward Amount:',
+                                style: TextStyle(
+                                  color: linkColor,
+                                )),
+                            Container(
+                              padding: EdgeInsets.only(top: 6),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.star_border_outlined,
+                                      size: 14, color: linkColor),
+                                  Text('Registrant Reward Amount',
+                                      style: TextStyle(
+                                          color: seconadarytextcolour,
+                                          fontSize: 12)),
+                                  Text(' 5 LYO',
+                                      style: TextStyle(color: orangeBGColor))
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+                          ],
+                        ),
+                      ],
+                    ),
+               ),
+              
                 Container(
                   padding: EdgeInsets.only(top: 15),
                   child: Column(

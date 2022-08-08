@@ -20,7 +20,7 @@ class _MyrewardsState extends State<Myrewards> {
 
   Future<void> getMyinvitationRewards() async {
     var auth = Provider.of<Auth>(context, listen: false);
-    var referalprovider = Provider.of<ReferralProvider>(context, listen: false);
+    var referalprovider = Provider.of<ReferralProvider>(context, listen:false);
 
     await referalprovider.getMyInvitationRewards(context, auth);
   }

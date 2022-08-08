@@ -880,7 +880,7 @@ class _ConfirmLoanState extends State<ConfirmLoan> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     SizedBox(
-                      width: width * 0.7,
+                      width: width * 0.6,
                       child: TextFormField(
                         validator: (value) {
                           if (value == null || value.isEmpty) {

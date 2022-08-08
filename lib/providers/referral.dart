@@ -146,6 +146,7 @@ class ReferralProvider with ChangeNotifier {
   }
 
   bool isinvitationrewards = true;
+  
 
   Future<void> getMyInvitationRewards(context, auth) async {
     headers['exchange-token'] = auth.loginVerificationToken;
@@ -155,24 +156,29 @@ class ReferralProvider with ChangeNotifier {
       '$referralinvitation/myInvitationRewards',
     );
     var data = {"page": "1", "pageSize": "10"};
-
     var body = jsonEncode(data);
     isinvitationrewards = true;
     try {
       final response = await http.post(url, headers: headers, body: body);
       final responseData = json.decode(response.body);
 
-      isinvitationrewards = false;
+      print(responseData);
       if (responseData['code'] == 0) {
         _myinvitationrewardslist = responseData['data']['rewardList'];
-         print(_myinvitationrewardslist);
+        isinvitationrewards = false;
+        notifyListeners();
+         
       } else {
+        bool isinvitationrewards = false;
         snackAlert(
             context, SnackTypes.warning, getTranslate(responseData['msg']));
         return notifyListeners();
       }
     } catch (error) {
       snackAlert(context, SnackTypes.errors, ' Server Error Try Again');
+      isinvitationrewards = false;
+      notifyListeners();
+         
       return;
     }
   }

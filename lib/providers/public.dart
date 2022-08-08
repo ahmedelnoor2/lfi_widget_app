@@ -691,20 +691,15 @@ class Public with ChangeNotifier {
       lyoApiUrl,
       '$getfavmarkert/favorite-market'
     );
-
     var postData = json.encode(formData);
-   print(postData);
+   
     try {
-      final response = await http.post(url, body: postData);
-      print(response.statusCode);
-
-      print(response.body);
-
+      final response = await http.post(url, body: postData, headers: headers);
+    
       final responseData = json.decode(response.body);
       if (responseData['code'] == '0') {
-      //  _favMarketList = responseData['data'];
-        snackAlert(
-            ctx, SnackTypes.success, 'Successfully Added');
+        _favMarketList = responseData['data'];
+       
         notifyListeners();
         return;
       } else {
