@@ -773,7 +773,31 @@ class _AllStakeState extends State<AllStake> {
                                     child: GestureDetector(
                                       onTap: () async {
                                         _amountController.text =
-                                            staking.activeStakeInfo['balance'];
+                                            '${double.parse(staking.activeStakeInfo['balance']).toStringAsFixed(2)}';
+                                        double.parse('${stake['gainRate']}');
+                                        setState(() {
+                                          if (_amountController
+                                              .text.isNotEmpty) {
+                                            setState(() {
+                                              _prospectiveEarnings = (((((720 /
+                                                                      360) *
+                                                                  double.parse(
+                                                                      '${stake['gainRate']}')) /
+                                                              100) *
+                                                          double.parse(
+                                                              _amountController
+                                                                  .text)) +
+                                                      double.parse(
+                                                          _amountController
+                                                              .text))
+                                                  .toStringAsFixed(4);
+                                            });
+                                          } else {
+                                            setState(() {
+                                              _prospectiveEarnings = "0";
+                                            });
+                                          }
+                                        });
                                       },
                                       child: Text(
                                         'ALL',
