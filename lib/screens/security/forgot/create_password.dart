@@ -180,7 +180,7 @@ class _CreatepasswordState extends State<Createpassword>
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please enter Confirm password';
-                                      } else if (value != _newPassSecure) {
+                                      } else if (value != _loginpasswordcontroller.text) {
                                         return 'Password missmatch';
                                       }
                                       return null;
