@@ -107,16 +107,16 @@ class ReferralProvider with ChangeNotifier {
 
   bool isinvitation = true;
 
-  Future<void> getmyInvitation(context, auth) async {
+  Future<void> getmyInvitation(context, auth,formdata) async {
     headers['exchange-token'] = auth.loginVerificationToken;
 
     var url = Uri.https(
       apiUrl,
       '$referralinvitation/myInvitations',
     );
-    var data = {"page": "1", "pageSize": "10"};
+    
 
-    var body = jsonEncode(data);
+    var body = jsonEncode(formdata);
     isinvitation = true;
     try {
       final response = await http.post(url, headers: headers, body: body);
@@ -147,16 +147,16 @@ class ReferralProvider with ChangeNotifier {
 
   bool isinvitationrewards = true;
   
-
-  Future<void> getMyInvitationRewards(context, auth) async {
+   
+  Future<void> getMyInvitationRewards(context, auth,formdata) async {
     headers['exchange-token'] = auth.loginVerificationToken;
 
     var url = Uri.https(
       apiUrl,
       '$referralinvitation/myInvitationRewards',
     );
-    var data = {"page": "1", "pageSize": "10"};
-    var body = jsonEncode(data);
+    
+    var body = jsonEncode(formdata);
     isinvitationrewards = true;
     try {
       final response = await http.post(url, headers: headers, body: body);
@@ -165,6 +165,7 @@ class ReferralProvider with ChangeNotifier {
       print(responseData);
       if (responseData['code'] == 0) {
         _myinvitationrewardslist = responseData['data']['rewardList'];
+       
         isinvitationrewards = false;
         notifyListeners();
          
