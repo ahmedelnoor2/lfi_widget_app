@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/auth.dart';
 
 import 'package:lyotrade/screens/common/header.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 
 import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:provider/provider.dart';
 
 class Kycscreen extends StatefulWidget {
-  static const routeName = '/Kycscreen_screen';
+  static const routeName = '/kyc_screen';
   @override
   State<StatefulWidget> createState() => _KycscreenState();
 }
@@ -13,8 +17,36 @@ class Kycscreen extends StatefulWidget {
 class _KycscreenState extends State<Kycscreen>
     with SingleTickerProviderStateMixin {
   @override
+  void initState() {
+    super.initState();
+    checkUserSession();
+  }
+
+  @override
+  void dispose() async {
+    super.dispose();
+  }
+
+  Future<void> checkUserSession() async {
+    var auth = Provider.of<Auth>(context, listen: false);
+
+    var checkAuth = await auth.checkLoginSession(context);
+    if (!checkAuth) {
+      Navigator.pop(context);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final _size = MediaQuery.of(context).size;
+    final width = MediaQuery.of(context).size.width;
+
+    var auth = Provider.of<Auth>(context, listen: true);
+
+    var _isVerified =
+        (auth.userInfo['realAuthType'] == 0 || auth.userInfo['authLevel'] == 0)
+            ? false
+            : true;
+
     return Scaffold(
         appBar: hiddenAppBar(),
         body: Column(children: [
@@ -43,79 +75,85 @@ class _KycscreenState extends State<Kycscreen>
               ),
             ],
           ),
-          Divider(thickness: 1, height: 1),
-          SizedBox(
-            height: 20,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child:
-                Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-              GestureDetector(
-                onTap: (() {
-                  Navigator.pushNamed(context, '/personalverification');
-                }),
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 62,
-                  color: selectboxcolour,
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+          Divider(),
+          Container(
+            padding: const EdgeInsets.all(5),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Card(
+                  child: ListTile(
+                    leading: Image.asset(
+                      'assets/img/personal_verfication.png',
+                      height: width * 0.1,
+                    ),
+                    title: Text('Personal Verification'),
+                    subtitle: Text(
+                      auth.userInfo['sumsubLevelName'].isEmpty
+                          ? 'Complete your KYC'
+                          : 'Your verification level: ${auth.userInfo['sumsubLevelName']}',
+                      style: TextStyle(
+                        fontSize: 12,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pushNamed(context, '/personalverification');
+                    },
+                    trailing: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            'Personal Verification',
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.w500),
+                        Icon(
+                          _isVerified ? Icons.how_to_reg : Icons.person,
+                          color: _isVerified ? successColor : warningColor,
+                        ),
+                        Text(
+                          _isVerified ? 'Verified' : 'Unverified',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: _isVerified ? successColor : warningColor,
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8, right: 8),
-                          child: Text('Complete your KYC..',
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: natuaraldark)),
-                        ),
-                      ]),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              GestureDetector(
-                onTap: (() {
-                  Navigator.pushNamed(context, '/entityverification');
-                }),
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 62,
-                  color: selectboxcolour,
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                Card(
+                  child: ListTile(
+                    leading: Image.asset(
+                      'assets/img/entitiy_verfication.png',
+                      height: width * 0.1,
+                    ),
+                    title: Text('Entity Verification'),
+                    subtitle: Text(
+                      'Complete your KYC',
+                      style: TextStyle(
+                        fontSize: 12,
+                      ),
+                    ),
+                    onTap: () {
+                      snackAlert(context, SnackTypes.warning, 'Coming soon...');
+                      // Navigator.pushNamed(context, '/entityverification');
+                    },
+                    trailing: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            'Entity Verification',
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.w500),
+                        Icon(
+                          Icons.assured_workload,
+                          color: secondaryTextColor,
+                        ),
+                        Text(
+                          'Unverified',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: secondaryTextColor,
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8, right: 8),
-                          child: Text('Complete your KYC..',
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: natuaraldark)),
-                        ),
-                      ]),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ]),
+              ],
+            ),
           )
         ]));
   }

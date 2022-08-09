@@ -930,4 +930,39 @@ class Auth with ChangeNotifier {
       // throw error;
     }
   }
+
+  // Personal KYC tier
+  Map _personalKycTiers = {};
+
+  Map get personalKycTiers {
+    return _personalKycTiers;
+  }
+
+  Future<void> getPersonalKycTiers(ctx, formData) async {
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/sumsub/v2/get_level_list',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(url, body: postData, headers: headers);
+
+      final responseData = json.decode(response.body);
+      print(responseData);
+      if (responseData['code'] == '0') {
+        _personalKycTiers = responseData['data'];
+        return notifyListeners();
+      } else {
+        _personalKycTiers = {};
+        notifyListeners();
+      }
+
+      return notifyListeners();
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server Error!');
+      return notifyListeners();
+    }
+  }
 }

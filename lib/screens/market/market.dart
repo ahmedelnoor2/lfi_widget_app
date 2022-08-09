@@ -33,7 +33,6 @@ class _MarketState extends State<Market> {
   @override
   void initState() {
     getrecommendedsymbol();
-
     super.initState();
   }
 
@@ -61,7 +60,6 @@ class _MarketState extends State<Market> {
 
     var public = Provider.of<Public>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
-    print(public.allMarkets[0]);
 
     ///print(public.getrecomendedsybol());
     return WillPopScope(

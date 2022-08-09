@@ -4,6 +4,8 @@ import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/user.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
@@ -109,7 +111,7 @@ class _SideBarState extends State<SideBar> {
                               style: const TextStyle(fontSize: 20),
                             ),
                             subtitle: Text(
-                              'Account Status: ${auth.userInfo['accountStatus'] == 0 ? 'Normal' : '-'}',
+                              'Account Status: ${auth.userInfo.isNotEmpty ? auth.userInfo['accountStatus'] : '-'}',
                             ),
                             trailing: const Icon(
                               Icons.chevron_right,
@@ -150,7 +152,11 @@ class _SideBarState extends State<SideBar> {
                   ),
                 ),
                 onTap: () {
-                  Navigator.pushNamed(context, '/Kycscreen_screen');
+                  if (auth.isAuthenticated) {
+                    Navigator.pushNamed(context, '/kyc_screen');
+                  } else {
+                    Navigator.pushNamed(context, '/authentication');
+                  }
                 },
                 trailing: Icon(Icons.verified_user),
               ),
