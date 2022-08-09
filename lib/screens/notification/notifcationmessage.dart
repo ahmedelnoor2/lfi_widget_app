@@ -199,7 +199,7 @@ class _NotificationsscreenState extends State<Notificationsscreen>
                               });
 
                               if (mounted) setState(() {});
-                              _refreshController.loadFailed();
+                              _refreshController.loadComplete();
                             },
                           );
                         }),

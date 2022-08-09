@@ -94,7 +94,10 @@ class _MyinvitationState extends State<Myinvitation> {
                             await referalprovider.getmyInvitation(context, auth,
                                 {"page": "1", "pageSize": "$pagesized"});
 
-                            if (mounted) setState(() {});
+                            if (mounted)
+                              setState(() {
+                                _refreshController.loadComplete();
+                              });
                           },
                         );
                       }),

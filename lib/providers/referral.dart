@@ -35,25 +35,20 @@ class ReferralProvider with ChangeNotifier {
 
     try {
       final response = await http.post(url, headers: headers);
-      print(response.statusCode);
 
       final responseData = json.decode(response.body);
 
       isrefdataloagin = false;
       if (responseData['code'] == 0) {
         _referralinvitationdata = responseData['data'];
-       
-        print(referralinvitationdata);
 
         return notifyListeners();
       } else {
-
-         snackAlert(
-              context, SnackTypes.warning, getTranslate(responseData['msg']));
+        snackAlert(
+            context, SnackTypes.warning, getTranslate(responseData['msg']));
         return notifyListeners();
       }
     } catch (error) {
-      
       snackAlert(context, SnackTypes.errors, 'Server Error Try Again');
       return;
     }
@@ -88,8 +83,8 @@ class ReferralProvider with ChangeNotifier {
 
         return notifyListeners();
       } else {
-         snackAlert(
-              context, SnackTypes.warning, getTranslate(responseData['msg']));
+        snackAlert(
+            context, SnackTypes.warning, getTranslate(responseData['msg']));
         return notifyListeners();
       }
     } catch (error) {
@@ -107,14 +102,13 @@ class ReferralProvider with ChangeNotifier {
 
   bool isinvitation = true;
 
-  Future<void> getmyInvitation(context, auth,formdata) async {
+  Future<void> getmyInvitation(context, auth, formdata) async {
     headers['exchange-token'] = auth.loginVerificationToken;
 
     var url = Uri.https(
       apiUrl,
       '$referralinvitation/myInvitations',
     );
-    
 
     var body = jsonEncode(formdata);
     isinvitation = true;
@@ -129,7 +123,7 @@ class ReferralProvider with ChangeNotifier {
         return notifyListeners();
       } else {
         snackAlert(
-              context, SnackTypes.warning, getTranslate(responseData['msg']));
+            context, SnackTypes.warning, getTranslate(responseData['msg']));
         return notifyListeners();
       }
     } catch (error) {
@@ -146,29 +140,26 @@ class ReferralProvider with ChangeNotifier {
   }
 
   bool isinvitationrewards = true;
-  
-   
-  Future<void> getMyInvitationRewards(context, auth,formdata) async {
+
+  Future<void> getMyInvitationRewards(context, auth, formdata) async {
     headers['exchange-token'] = auth.loginVerificationToken;
 
     var url = Uri.https(
       apiUrl,
       '$referralinvitation/myInvitationRewards',
     );
-    
+
     var body = jsonEncode(formdata);
     isinvitationrewards = true;
     try {
       final response = await http.post(url, headers: headers, body: body);
       final responseData = json.decode(response.body);
 
-      print(responseData);
       if (responseData['code'] == 0) {
         _myinvitationrewardslist = responseData['data']['rewardList'];
-       
+
         isinvitationrewards = false;
         notifyListeners();
-         
       } else {
         bool isinvitationrewards = false;
         snackAlert(
@@ -179,7 +170,7 @@ class ReferralProvider with ChangeNotifier {
       snackAlert(context, SnackTypes.errors, ' Server Error Try Again');
       isinvitationrewards = false;
       notifyListeners();
-         
+
       return;
     }
   }

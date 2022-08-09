@@ -96,7 +96,10 @@ class _MyrewardsState extends State<Myrewards> {
                                 auth,
                                 {"page": "1", "pageSize": "$pagesized"});
 
-                            if (mounted) setState(() {});
+                            if (mounted)
+                              setState(() {
+                                _refreshController.loadComplete();
+                              });
                           },
                         );
                       }),
