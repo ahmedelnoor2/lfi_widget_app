@@ -1,10 +1,14 @@
 import 'dart:convert';
 import 'package:archive/archive.dart';
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/header.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:lyotrade/utils/Translate.utils.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -35,7 +39,9 @@ class _ExchangeScreenState extends State<ExchangeScreen>
   @override
   void initState() {
     connectWebSocket();
+
     super.initState();
+    getFavouriteMarket();
   }
 
   @override
@@ -95,14 +101,35 @@ class _ExchangeScreenState extends State<ExchangeScreen>
     }
   }
 
+  // Future<void> insertFavouriteMarket() async {
+  //   var public = Provider.of<Public>(context, listen: false);
+  //   var auth = Provider.of<Auth>(context, listen: false);
+
+  //   await public.insertFavMarketList(context, {
+  //     'token': "${auth.loginVerificationToken}",
+  //     'userId': "${auth.userInfo['id']}",
+  //     "marketName": "USDT5",
+  //     "marketDetails": {}
+  //   });
+  // }
+
+  Future<void> getFavouriteMarket() async {
+    var public = Provider.of<Public>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
+
+    await public.getFavMarketList(context, {
+      'token': "${auth.loginVerificationToken}",
+      'userId': "${auth.userInfo['id']}",
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
 
     var public = Provider.of<Public>(context, listen: true);
-
-    // print(public.activeMarketAllTicks);
+    var auth = Provider.of<Auth>(context, listen: true);
 
     return Scaffold(
       appBar: hiddenAppBar(),
@@ -147,10 +174,45 @@ class _ExchangeScreenState extends State<ExchangeScreen>
                     : public.allMarkets[widget.currentMarketSort][index];
 
                 return ListTile(
-                  leading: Icon(
-                    Icons.star,
-                    size: 20,
-                    color: seconadarytextcolour,
+                  leading: InkWell(
+                    
+                    onTap: (() async {
+                      if (public.favMarketNameList
+                          .contains(_market['symbol'])) {
+                        await public.deleteFavMarket(context, {
+                          'token': "${auth.loginVerificationToken}",
+                          'userId': "${auth.userInfo['id']}",
+                          "marketName": "${_market['symbol']}",
+                        }).whenComplete(() async {
+                          await public.getFavMarketList(context, {
+                            'token': "${auth.loginVerificationToken}",
+                            'userId': "${auth.userInfo['id']}",
+                          });
+                        });
+                      } else {
+                        await public.createFavMarket(context, {
+                          'token': "${auth.loginVerificationToken}",
+                          'userId': "${auth.userInfo['id']}",
+                          "marketName": "${_market['symbol']}",
+                          "marketDetails":
+                              _market
+                        }).whenComplete(() async => {
+                              await public.getFavMarketList(context, {
+                                'token': "${auth.loginVerificationToken}",
+                                'userId': "${auth.userInfo['id']}",
+                              })
+                            });
+                      }
+                    }),
+                    child: Icon(
+                      Icons.star,
+                      size: 20,
+                      color: public.favMarketNameList.isNotEmpty
+                          ? public.favMarketNameList.contains(_market['symbol'])
+                              ? linkColor
+                              : secondaryTextColor
+                          : secondaryTextColor,
+                    ),
                   ),
                   minLeadingWidth: 5,
                   title: Column(
