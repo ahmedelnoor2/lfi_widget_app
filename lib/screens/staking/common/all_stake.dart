@@ -25,6 +25,7 @@ class _AllStakeState extends State<AllStake> {
   bool _isAgree = false;
   String _activeStakeId = '';
   String _prospectiveEarnings = "0";
+  bool _isProcess = false;
 
   @override
   void initState() {
@@ -773,7 +774,7 @@ class _AllStakeState extends State<AllStake> {
                                     child: GestureDetector(
                                       onTap: () async {
                                         _amountController.text =
-                                            '${staking.activeStakeInfo['balance'].split('.')[0]}.${staking.activeStakeInfo['balance'].split('.')[1].lenght >= 2 ? staking.activeStakeInfo['balance'].split('.')[1].substring(0, 2) : staking.activeStakeInfo['balance'].split('.')[1]}';
+                                            '${staking.activeStakeInfo['balance'].split('.')[0]}.${staking.activeStakeInfo['balance'].split('.')[1].length >= 2 ? staking.activeStakeInfo['balance'].split('.')[1].substring(0, 2) : staking.activeStakeInfo['balance'].split('.')[1]}';
                                         double.parse('${stake['gainRate']}');
                                         setState(() {
                                           if (_amountController
@@ -895,8 +896,8 @@ class _AllStakeState extends State<AllStake> {
                         ),
                       ),
                       LyoButton(
-                        onPressed: _isAgree
-                            ? () {
+                        onPressed: (_isAgree || _isProcess)
+                            ? () async {
                                 if (_formStakeKey.currentState!.validate()) {
                                   if (double.parse(_amountController.text) <=
                                       0) {
@@ -908,19 +909,26 @@ class _AllStakeState extends State<AllStake> {
                                       'Ok',
                                     );
                                   } else {
-                                    staking.createStakingOrder(context, auth, {
+                                    setState(() {
+                                      _isProcess = true;
+                                    });
+                                    await staking
+                                        .createStakingOrder(context, auth, {
                                       'projectId': _activeStakeId,
                                       'amount':
                                           double.parse(_amountController.text),
                                       'returnUrl':
                                           'https://www.lyotrade.com/en_US/freeStaking/$_activeStakeId',
                                     });
+                                    setState(() {
+                                      _isProcess = false;
+                                    });
                                   }
                                 }
                               }
                             : null,
                         text: 'Agree to PoS',
-                        isLoading: false,
+                        isLoading: _isProcess,
                         active: true,
                         activeColor: linkColor,
                         activeTextColor: Colors.black,
