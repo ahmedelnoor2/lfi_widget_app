@@ -441,9 +441,9 @@ class Asset with ChangeNotifier {
         snackAlert(ctx, SnackTypes.errors, responseData['msg']);
         auth.checkResponseCode(ctx, responseData['code']);
       }
-      notifyListeners();
+      return notifyListeners();
     } catch (error) {
-      notifyListeners();
+      return notifyListeners();
       // throw error;
     }
   }

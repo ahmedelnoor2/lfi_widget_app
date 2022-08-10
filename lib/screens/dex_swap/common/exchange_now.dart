@@ -81,7 +81,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
         setState(() {
           _allNetworks.add(v);
           _defaultCoin = netwrkType;
-          _defaultNetwork = k;
+          // _defaultNetwork = k;
         });
       });
     } else {
@@ -94,9 +94,15 @@ class _ExchangeNowState extends State<ExchangeNow> {
             '${public.publicInfoMarket['market']['coinList'][netwrkType]['name']}';
       });
     }
+
     await asset.getChangeAddress(context, auth, _defaultNetwork);
     setState(() {
       _toAddressController.text = asset.changeAddress['addressStr'];
+    });
+    print(asset.changeAddress);
+    dexProvider.validateAddress(context, auth, {
+      'currency': dexProvider.toActiveCurrency['ticker'],
+      'address': asset.changeAddress['addressStr'],
     });
 
     List _digitialAss = [];
@@ -181,6 +187,10 @@ class _ExchangeNowState extends State<ExchangeNow> {
         _getAddressCoins[dexProvider.toActiveCurrency['ticker']]);
     setState(() {
       _toAddressController.text = asset.changeAddress['addressStr'];
+    });
+    dexProvider.validateAddress(context, auth, {
+      'currency': dexProvider.toActiveCurrency['ticker'],
+      'address': asset.changeAddress['addressStr'],
     });
 
     estimateRates();
@@ -645,7 +655,6 @@ class _ExchangeNowState extends State<ExchangeNow> {
                           onTap: () async {
                             if (type == 'from') {
                               dexProvider.setFromActiveCurrency(currency);
-
                               estimateRates();
                             } else {
                               dexProvider.setToActiveCurrency(currency);
@@ -658,6 +667,11 @@ class _ExchangeNowState extends State<ExchangeNow> {
                                   auth,
                                   _getAddressCoins[
                                       dexProvider.toActiveCurrency['ticker']]);
+                              dexProvider.validateAddress(context, auth, {
+                                'currency':
+                                    dexProvider.toActiveCurrency['ticker'],
+                                'address': asset.changeAddress['addressStr'],
+                              });
                             }
                             setState(() {
                               _toAddressController.text =
