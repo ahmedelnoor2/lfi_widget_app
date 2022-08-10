@@ -10,7 +10,6 @@ import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
-import 'package:lyotrade/utils/Translate.utils.dart';
 import 'package:provider/provider.dart';
 
 class ExchangeNow extends StatefulWidget {
@@ -28,10 +27,11 @@ class _ExchangeNowState extends State<ExchangeNow> {
   bool _acceptTermsAndConditions = false;
   bool _processSwap = false;
   bool _loadingAddress = false;
-  String _defaultNetwork = 'TRC20';
+  String _defaultNetwork = 'TUSDT';
   String _defaultCoin = 'USDT';
   List _allNetworks = [];
-  bool _enLang = false;
+  List _allAvailableCurrency = [];
+  Map _getAddressCoins = {};
 
   @override
   void initState() {
@@ -49,14 +49,6 @@ class _ExchangeNowState extends State<ExchangeNow> {
     super.dispose();
   }
 
-  String getPortugeseTrans(value) {
-    if (_enLang) {
-      return value;
-    } else {
-      return getPortugeseTranslate(value);
-    }
-  }
-
   Future<void> getDigitalBalance() async {
     setState(() {
       _loadingAddress = true;
@@ -65,11 +57,12 @@ class _ExchangeNowState extends State<ExchangeNow> {
     var asset = Provider.of<Asset>(context, listen: false);
     await asset.getAccountBalance(context, auth, "");
     getCoinAddress(_defaultCoin);
+    estimateRates();
   }
 
   Future<void> getCoinAddress(netwrkType) async {
     var dexProvider = Provider.of<DexProvider>(context, listen: false);
-    print(dexProvider.fromActiveCurrency);
+
     setState(() {
       _loadingAddress = true;
       _defaultCoin = netwrkType;
@@ -77,7 +70,6 @@ class _ExchangeNowState extends State<ExchangeNow> {
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
     var public = Provider.of<Public>(context, listen: false);
-
     if (public.publicInfoMarket['market']['followCoinList'][netwrkType] !=
         null) {
       setState(() {
@@ -89,7 +81,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
         setState(() {
           _allNetworks.add(v);
           _defaultCoin = netwrkType;
-          _defaultNetwork = '${v['mainChainName']}';
+          _defaultNetwork = k;
         });
       });
     } else {
@@ -99,13 +91,43 @@ class _ExchangeNowState extends State<ExchangeNow> {
             .add(public.publicInfoMarket['market']['coinList'][netwrkType]);
         _defaultCoin = netwrkType;
         _defaultNetwork =
-            '${public.publicInfoMarket['market']['coinList'][netwrkType]['mainChainName']}';
+            '${public.publicInfoMarket['market']['coinList'][netwrkType]['name']}';
       });
     }
     await asset.getChangeAddress(context, auth, _defaultNetwork);
+    setState(() {
+      _toAddressController.text = asset.changeAddress['addressStr'];
+    });
 
     List _digitialAss = [];
     asset.accountBalance['allCoinMap'].forEach((k, v) {
+      if (v['withdrawOpen'] == 1) {
+        var aCoin = public.publicInfoMarket['market']['followCoinList'][k];
+        if (aCoin != null) {
+          aCoin.forEach((aKey, aVal) {
+            // print('${aVal['mainChainSymbol']}${aVal['mainChainName']}'.toLowerCase());
+            if (aVal['mainChainSymbol'] == aVal['mainChainName']) {
+              _allAvailableCurrency
+                  .add('${aVal['mainChainSymbol']}'.toLowerCase());
+              _getAddressCoins['${aVal['mainChainSymbol']}'.toLowerCase()] =
+                  aKey;
+            } else {
+              _allAvailableCurrency.add(
+                  '${aVal['mainChainSymbol']}${aVal['mainChainName']}'
+                      .toLowerCase());
+              _getAddressCoins[
+                  '${aVal['mainChainSymbol']}${aVal['mainChainName']}'
+                      .toLowerCase()] = aKey;
+            }
+          });
+        } else {
+          _allAvailableCurrency.add(k.toLowerCase());
+          _getAddressCoins[k.toLowerCase()] = k;
+        }
+        // setState(() {
+        //   _allAvailableCurrency.add(k);
+        // });
+      }
       if (v['depositOpen'] == 1) {
         _digitialAss.add({
           'coin': k,
@@ -118,22 +140,6 @@ class _ExchangeNowState extends State<ExchangeNow> {
       _loadingAddress = false;
     });
     asset.setDigAssets(_digitialAss);
-  }
-
-  Future<void> changeCoinType(netwrk) async {
-    setState(() {
-      _loadingAddress = true;
-    });
-    var auth = Provider.of<Auth>(context, listen: false);
-    var asset = Provider.of<Asset>(context, listen: false);
-
-    setState(() {
-      _defaultNetwork = netwrk['mainChainName'];
-    });
-    await asset.getChangeAddress(context, auth, netwrk['showName']);
-    setState(() {
-      _loadingAddress = false;
-    });
   }
 
   Future<void> estimateRates() async {
@@ -162,9 +168,21 @@ class _ExchangeNowState extends State<ExchangeNow> {
   }
 
   Future<void> togglePairs() async {
+    var auth = Provider.of<Auth>(context, listen: false);
+    var asset = Provider.of<Asset>(context, listen: false);
     var dexProvider = Provider.of<DexProvider>(context, listen: false);
     HapticFeedback.selectionClick();
-    dexProvider.swapFromAndTo();
+    await dexProvider.swapFromAndTo();
+    setState(() {
+      _defaultNetwork =
+          _getAddressCoins[dexProvider.toActiveCurrency['ticker']];
+    });
+    await asset.getChangeAddress(context, auth,
+        _getAddressCoins[dexProvider.toActiveCurrency['ticker']]);
+    setState(() {
+      _toAddressController.text = asset.changeAddress['addressStr'];
+    });
+
     estimateRates();
   }
 
@@ -204,6 +222,8 @@ class _ExchangeNowState extends State<ExchangeNow> {
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     var dexProvider = Provider.of<DexProvider>(context, listen: true);
+    var asset = Provider.of<Asset>(context, listen: true);
+    var auth = Provider.of<Auth>(context, listen: true);
 
     return dexProvider.processPayment.isNotEmpty
         ? sendingWidget(context, dexProvider)
@@ -243,6 +263,8 @@ class _ExchangeNowState extends State<ExchangeNow> {
                                         'from',
                                         dexProvider,
                                         setState,
+                                        auth,
+                                        asset,
                                       );
                                     },
                                   );
@@ -327,7 +349,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                               }
                             },
                             style: const TextStyle(fontSize: 20),
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               contentPadding: EdgeInsets.zero,
                               isDense: true,
                               border: UnderlineInputBorder(
@@ -336,7 +358,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                               hintStyle: TextStyle(
                                 fontSize: 15,
                               ),
-                              hintText: getPortugeseTrans("From Amount"),
+                              hintText: "From Amount",
                             ),
                           ),
                         ),
@@ -347,7 +369,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: Text(
-                    '${getPortugeseTrans('Min amount required')}: ${_loadingExchnageRate ? '--' : dexProvider.minimumValue['minAmount']} ${dexProvider.fromActiveCurrency.isNotEmpty ? dexProvider.fromActiveCurrency['ticker'].toUpperCase() : '--'}',
+                    'Min amount required: ${_loadingExchnageRate ? '--' : dexProvider.minimumValue['minAmount']} ${dexProvider.fromActiveCurrency.isNotEmpty ? dexProvider.fromActiveCurrency['ticker'].toUpperCase() : '--'}',
                     style: TextStyle(color: warningColor),
                   ),
                 ),
@@ -377,6 +399,8 @@ class _ExchangeNowState extends State<ExchangeNow> {
                               'to',
                               dexProvider,
                               setState,
+                              auth,
+                              asset,
                             );
                           },
                         );
@@ -473,7 +497,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                             ),
                           ),
                           Text(
-                            '${getPortugeseTrans('Exchange rate')} (${getPortugeseTrans('expected')})',
+                            'Exchange rate (expected)',
                             style: TextStyle(fontSize: 12),
                           ),
                         ],
@@ -504,6 +528,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                                   return swapCoins(
                                     context,
                                     setState,
+                                    asset,
                                   );
                                 },
                               );
@@ -545,7 +570,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                                 width: 25,
                               )
                             : Text(
-                                getPortugeseTrans('SWAP Now'),
+                                'SWAP Now',
                                 style: TextStyle(
                                   fontSize: 20,
                                   color: (_loadingExchnageRate)
@@ -562,7 +587,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
           );
   }
 
-  Widget selectCoins(context, type, dexProvider, setState) {
+  Widget selectCoins(context, type, dexProvider, setState, auth, asset) {
     var allCurrencies = dexProvider.allCurrencies;
 
     return Scaffold(
@@ -596,7 +621,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                           ),
                         ),
                         Text(
-                          getPortugeseTrans('Select Coin'),
+                          'Select Coin',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -610,19 +635,34 @@ class _ExchangeNowState extends State<ExchangeNow> {
               ),
               Column(
                 children: allCurrencies.map<Widget>((currency) {
-                  return (currency['ticker'] ==
-                              dexProvider.fromActiveCurrency['ticker'] ||
-                          currency['ticker'] ==
-                              dexProvider.toActiveCurrency['ticker'])
+                  return ((currency['ticker'] ==
+                                  dexProvider.fromActiveCurrency['ticker'] ||
+                              currency['ticker'] ==
+                                  dexProvider.toActiveCurrency['ticker']) ||
+                          (!_allAvailableCurrency.contains(currency['ticker'])))
                       ? Container()
                       : ListTile(
-                          onTap: () {
+                          onTap: () async {
                             if (type == 'from') {
                               dexProvider.setFromActiveCurrency(currency);
+
                               estimateRates();
                             } else {
                               dexProvider.setToActiveCurrency(currency);
+                              setState(() {
+                                _defaultNetwork = _getAddressCoins[
+                                    dexProvider.toActiveCurrency['ticker']];
+                              });
+                              await asset.getChangeAddress(
+                                  context,
+                                  auth,
+                                  _getAddressCoins[
+                                      dexProvider.toActiveCurrency['ticker']]);
                             }
+                            setState(() {
+                              _toAddressController.text =
+                                  asset.changeAddress['addressStr'];
+                            });
                             Navigator.pop(context);
                           },
                           leading: CircleAvatar(
@@ -645,7 +685,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
     );
   }
 
-  Widget swapCoins(context, setState) {
+  Widget swapCoins(context, setState, asset) {
     var auth = Provider.of<Auth>(context, listen: false);
     var dexProvider = Provider.of<DexProvider>(context, listen: true);
 
@@ -680,7 +720,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                           ),
                         ),
                         Text(
-                          getPortugeseTrans('Swap Coins'),
+                          'Swap Coins',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -693,60 +733,17 @@ class _ExchangeNowState extends State<ExchangeNow> {
                 ),
               ),
               Text(
-                '${getPortugeseTrans('Please be carefule not to provide a smart contract as your')} ${dexProvider.toActiveCurrency['ticker'].toUpperCase()}',
+                'Please be carefule not to provide a smart contract as your ${dexProvider.toActiveCurrency['ticker'].toUpperCase()}',
                 style: TextStyle(
                   fontSize: 14,
                   color: warningColor,
                 ),
               ),
-              // Container(
-              //   padding: EdgeInsets.only(bottom: 10),
-              //   height: 45,
-              //   child: ListView.builder(
-              //       scrollDirection: Axis.horizontal,
-              //       itemCount: _allNetworks.length,
-              //       itemBuilder: (BuildContext context, int index) {
-              //         var network = _allNetworks[index];
-              //         return GestureDetector(
-              //           onTap: () {
-              //             setState(() {
-              //               _defaultNetwork = network['mainChainName'];
-              //             });
-              //             changeCoinType(network);
-              //           },
-              //           child: Container(
-              //             padding: EdgeInsets.only(right: 10),
-              //             child: Container(
-              //               decoration: BoxDecoration(
-              //                 color:
-              //                     (network['mainChainName'] == _defaultNetwork)
-              //                         ? Color(0xff01FEF5)
-              //                         : Color(0xff5E6292),
-              //                 borderRadius: BorderRadius.circular(5),
-              //               ),
-              //               child: Container(
-              //                 width: 62,
-              //                 child: Align(
-              //                   alignment: Alignment.center,
-              //                   child: Text(
-              //                     "${network['mainChainName']}",
-              //                     style: TextStyle(
-              //                       color: Colors.black,
-              //                       fontWeight: FontWeight.w600,
-              //                     ),
-              //                   ),
-              //                 ),
-              //               ),
-              //             ),
-              //           ),
-              //         );
-              //       }),
-              // ),
               Container(
                 padding: EdgeInsets.only(top: 20),
                 width: width,
                 child: Text(
-                    '${getPortugeseTrans('Enter the recipient\'s address')} (${dexProvider.toActiveCurrency['ticker'].toUpperCase()})'),
+                    'Enter the recipient\'s address (${dexProvider.toActiveCurrency['ticker'].toUpperCase()})'),
               ),
               Container(
                 padding: EdgeInsets.only(top: 15, bottom: 15),
@@ -766,10 +763,10 @@ class _ExchangeNowState extends State<ExchangeNow> {
                       SizedBox(
                         width: width * 0.69,
                         child: TextFormField(
+                          enabled: false,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return getPortugeseTrans(
-                                  'Please enter wallet address');
+                              return 'Please enter wallet address';
                             }
                             return null;
                           },
@@ -783,7 +780,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                             }
                           },
                           controller: _toAddressController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             contentPadding: EdgeInsets.zero,
                             isDense: true,
                             border: UnderlineInputBorder(
@@ -792,8 +789,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                             hintStyle: TextStyle(
                               fontSize: 14,
                             ),
-                            hintText:
-                                getPortugeseTrans("Scan or paste the address"),
+                            hintText: "Scan or paste the address",
                           ),
                         ),
                       ),
@@ -803,17 +799,16 @@ class _ExchangeNowState extends State<ExchangeNow> {
                             padding: EdgeInsets.only(right: 10),
                             child: GestureDetector(
                               onTap: () async {
-                                ClipboardData? data = await Clipboard.getData(
-                                    Clipboard.kTextPlain);
-                                _toAddressController.text = '${data!.text}';
-                                dexProvider.validateAddress(context, auth, {
-                                  'currency':
-                                      dexProvider.toActiveCurrency['ticker'],
-                                  'address': data.text,
-                                });
+                                Clipboard.setData(
+                                  ClipboardData(
+                                    text: _toAddressController.text,
+                                  ),
+                                );
+                                snackAlert(
+                                    context, SnackTypes.success, 'Copied');
                               },
                               child: Text(
-                                getPortugeseTrans('Paste'),
+                                'Copy',
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: linkColor,
@@ -847,9 +842,11 @@ class _ExchangeNowState extends State<ExchangeNow> {
                     Checkbox(
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       value: _acceptTermsAndConditions,
-                      onChanged: (bool? value) {
+                      onChanged: (newValue) {
+                        print(newValue);
                         setState(() {
-                          _acceptTermsAndConditions = value!;
+                          _acceptTermsAndConditions =
+                              !_acceptTermsAndConditions;
                         });
                       },
                     ),
@@ -858,8 +855,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                       child: Wrap(
                         children: [
                           Text(
-                            getPortugeseTrans(
-                                'I have read and agree to Terms of Use and Privacy Policy'),
+                            'I have read and agree to Terms of Use and Privacy Policy',
                             style: TextStyle(
                               fontSize: 12,
                             ),
@@ -882,7 +878,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                     ),
                   ),
                   Text(
-                    getPortugeseTrans('Estimated Time'),
+                    'Estimated Time',
                     style: TextStyle(
                       fontSize: 14,
                     ),
@@ -895,7 +891,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                   Container(
                     padding: EdgeInsets.only(top: 15),
                     child: Text(
-                      getPortugeseTrans('10-60 minutes'),
+                      '10-60 minutes',
                       style: TextStyle(
                         fontSize: 20,
                       ),
@@ -949,7 +945,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                               width: 25,
                             )
                           : Text(
-                              getPortugeseTrans('Process'),
+                              'Process',
                               style: TextStyle(
                                 fontSize: 20,
                                 color: (!_acceptTermsAndConditions ||
@@ -979,13 +975,13 @@ class _ExchangeNowState extends State<ExchangeNow> {
           Container(
             padding: EdgeInsets.only(bottom: 20),
             child: Text(
-              getPortugeseTrans('Sending'),
+              'Sending',
               style: TextStyle(fontSize: 20),
             ),
           ),
           Container(
             padding: EdgeInsets.only(bottom: 10),
-            child: Text(getPortugeseTrans('Waiting')),
+            child: Text('Waiting'),
           ),
           Row(
             children: [
@@ -1009,7 +1005,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
           ),
           Container(
             padding: EdgeInsets.only(top: 10, bottom: 10),
-            child: Text(getPortugeseTrans('Address')),
+            child: Text('Address'),
           ),
           Container(
             padding: EdgeInsets.only(top: 15, bottom: 15, right: 15, left: 15),
@@ -1035,8 +1031,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                         text: dexProvider.processPayment['payinAddress'],
                       ),
                     );
-                    snackAlert(context, SnackTypes.success,
-                        getPortugeseTrans('Copied'));
+                    snackAlert(context, SnackTypes.success, 'Copied');
                   },
                   child: Image.asset(
                     'assets/img/copy.png',
@@ -1076,7 +1071,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
           ),
           Container(
             padding: EdgeInsets.only(bottom: 10),
-            child: Text(getPortugeseTrans('Receive')),
+            child: Text('Receive'),
           ),
           Row(
             children: [
@@ -1100,7 +1095,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
           ),
           Container(
             padding: EdgeInsets.only(top: 10, bottom: 10),
-            child: Text(getPortugeseTrans('Address')),
+            child: Text('Address'),
           ),
           Container(
             padding: EdgeInsets.only(top: 15, bottom: 15, right: 15, left: 15),
@@ -1126,8 +1121,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                         text: dexProvider.processPayment['payoutAddress'],
                       ),
                     );
-                    snackAlert(context, SnackTypes.success,
-                        getPortugeseTrans('Copied'));
+                    snackAlert(context, SnackTypes.success, 'Copied');
                   },
                   child: Image.asset(
                     'assets/img/copy.png',

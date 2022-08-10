@@ -18,6 +18,7 @@ import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:lyotrade/utils/Translate.utils.dart';
 import 'package:provider/provider.dart';
 
 import 'package:qr_flutter/qr_flutter.dart';
@@ -53,6 +54,7 @@ class _PixPaymentState extends State<PixPayment>
   bool _reRequestKYCAuth = false;
   String _sendUsdtAmount = '';
   Map _userAddresses = {};
+  bool _enLang = false;
 
   String _transactionType = 'bank_transfer';
 
@@ -94,6 +96,14 @@ class _PixPaymentState extends State<PixPayment>
           });
         });
       }
+    }
+  }
+
+  String getPortugeseTrans(value) {
+    if (_enLang) {
+      return value;
+    } else {
+      return getPortugeseTranslate(value);
     }
   }
 

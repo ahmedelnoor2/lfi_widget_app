@@ -37,7 +37,7 @@ class DexProvider with ChangeNotifier {
     return notifyListeners();
   }
 
-  void swapFromAndTo() {
+  Future<void> swapFromAndTo() async {
     var _newFromActiveCurrency = _toActiveCurrency;
     var _newToActiveCurrecy = _fromActiveCurrency;
 

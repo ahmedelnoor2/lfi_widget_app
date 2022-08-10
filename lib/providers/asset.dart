@@ -431,7 +431,7 @@ class Asset with ChangeNotifier {
         body: postData,
         headers: headers,
       );
-
+      print(response.statusCode);
       final responseData = json.decode(response.body);
 
       if (responseData['code'] == '0') {
