@@ -52,3 +52,56 @@ String getTranslate(String text) {
       return text;
   }
 }
+
+String getPortugeseTranslate(String text) {
+  switch (text) {
+    case 'Exchange Now':
+      return 'Trocar agora';
+    case 'Fixed Rate':
+      return 'Taxa fixa';
+    case 'From Amount':
+      return 'Do Montante';
+    case 'Min amount required':
+      return 'Quantidade mínima necessária';
+    case 'Exchange rate':
+      return 'Taxa de câmbio';
+    case 'expected':
+      return 'esperado';
+    case 'SWAP Now':
+      return 'SWAP Agora';
+    case 'Select Coin':
+      return 'Selecione Moeda';
+    case 'Swap Coins':
+      return 'Moedas de troca';
+    case 'Please be carefule not to provide a smart contract as your':
+      return 'Por favor, tenha cuidado para não fornecer um contrato inteligente como seu';
+    case 'Enter the recipient\'s address':
+      return 'Digite o endereço do destinatário';
+    case 'Please enter wallet address':
+      return 'Por favor, digite o endereço da carteira';
+    case 'Scan or paste the address':
+      return 'Digitalizar ou colar o endereço';
+    case 'Paste':
+      return 'Colar';
+    case 'I have read and agree to Terms of Use and Privacy Policy':
+      return 'Eu li e concordo com os Termos de Uso e Política de Privacidade';
+    case 'Estimated Time':
+      return 'Tempo estimado';
+    case '10-60 minutes':
+      return '10-60 minutos';
+    case 'Process':
+      return 'Processo';
+    case 'Sending':
+      return 'Enviando';
+    case 'Waiting':
+      return 'Aguardando';
+    case 'Address':
+      return 'Endereço';
+    case 'Copied':
+      return 'Copiado';
+    case 'Receive':
+      return 'Receba';
+    default:
+      return text;
+  }
+}

@@ -10,6 +10,7 @@ import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:lyotrade/utils/Translate.utils.dart';
 import 'package:provider/provider.dart';
 
 class ExchangeNow extends StatefulWidget {
@@ -30,6 +31,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
   String _defaultNetwork = 'TRC20';
   String _defaultCoin = 'USDT';
   List _allNetworks = [];
+  bool _enLang = false;
 
   @override
   void initState() {
@@ -45,6 +47,14 @@ class _ExchangeNowState extends State<ExchangeNow> {
     _fromAmountController.dispose();
     _toAddressController.dispose();
     super.dispose();
+  }
+
+  String getPortugeseTrans(value) {
+    if (_enLang) {
+      return value;
+    } else {
+      return getPortugeseTranslate(value);
+    }
   }
 
   Future<void> getDigitalBalance() async {
@@ -195,8 +205,6 @@ class _ExchangeNowState extends State<ExchangeNow> {
     width = MediaQuery.of(context).size.width;
     var dexProvider = Provider.of<DexProvider>(context, listen: true);
 
-    print(dexProvider.allCurrencies[0]);
-
     return dexProvider.processPayment.isNotEmpty
         ? sendingWidget(context, dexProvider)
         : Container(
@@ -319,7 +327,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                               }
                             },
                             style: const TextStyle(fontSize: 20),
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               contentPadding: EdgeInsets.zero,
                               isDense: true,
                               border: UnderlineInputBorder(
@@ -328,7 +336,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                               hintStyle: TextStyle(
                                 fontSize: 15,
                               ),
-                              hintText: "From Amount",
+                              hintText: getPortugeseTrans("From Amount"),
                             ),
                           ),
                         ),
@@ -339,7 +347,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: Text(
-                    'Min amount required: ${_loadingExchnageRate ? '--' : dexProvider.minimumValue['minAmount']} ${dexProvider.fromActiveCurrency.isNotEmpty ? dexProvider.fromActiveCurrency['ticker'].toUpperCase() : '--'}',
+                    '${getPortugeseTrans('Min amount required')}: ${_loadingExchnageRate ? '--' : dexProvider.minimumValue['minAmount']} ${dexProvider.fromActiveCurrency.isNotEmpty ? dexProvider.fromActiveCurrency['ticker'].toUpperCase() : '--'}',
                     style: TextStyle(color: warningColor),
                   ),
                 ),
@@ -465,7 +473,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                             ),
                           ),
                           Text(
-                            'Exchange rate (expected)',
+                            '${getPortugeseTrans('Exchange rate')} (${getPortugeseTrans('expected')})',
                             style: TextStyle(fontSize: 12),
                           ),
                         ],
@@ -537,7 +545,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                                 width: 25,
                               )
                             : Text(
-                                'SWAP Now',
+                                getPortugeseTrans('SWAP Now'),
                                 style: TextStyle(
                                   fontSize: 20,
                                   color: (_loadingExchnageRate)
@@ -588,7 +596,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                           ),
                         ),
                         Text(
-                          'Select Coin',
+                          getPortugeseTrans('Select Coin'),
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -672,7 +680,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                           ),
                         ),
                         Text(
-                          'Swap Coins',
+                          getPortugeseTrans('Swap Coins'),
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -685,7 +693,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                 ),
               ),
               Text(
-                'Please be carefule not to provide a smart contract as your ${dexProvider.toActiveCurrency['ticker'].toUpperCase()}',
+                '${getPortugeseTrans('Please be carefule not to provide a smart contract as your')} ${dexProvider.toActiveCurrency['ticker'].toUpperCase()}',
                 style: TextStyle(
                   fontSize: 14,
                   color: warningColor,
@@ -738,7 +746,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                 padding: EdgeInsets.only(top: 20),
                 width: width,
                 child: Text(
-                    'Enter the recipient\'s address (${dexProvider.toActiveCurrency['ticker'].toUpperCase()})'),
+                    '${getPortugeseTrans('Enter the recipient\'s address')} (${dexProvider.toActiveCurrency['ticker'].toUpperCase()})'),
               ),
               Container(
                 padding: EdgeInsets.only(top: 15, bottom: 15),
@@ -760,7 +768,8 @@ class _ExchangeNowState extends State<ExchangeNow> {
                         child: TextFormField(
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter wallet address';
+                              return getPortugeseTrans(
+                                  'Please enter wallet address');
                             }
                             return null;
                           },
@@ -774,7 +783,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                             }
                           },
                           controller: _toAddressController,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             contentPadding: EdgeInsets.zero,
                             isDense: true,
                             border: UnderlineInputBorder(
@@ -783,7 +792,8 @@ class _ExchangeNowState extends State<ExchangeNow> {
                             hintStyle: TextStyle(
                               fontSize: 14,
                             ),
-                            hintText: "Scan or paste the address",
+                            hintText:
+                                getPortugeseTrans("Scan or paste the address"),
                           ),
                         ),
                       ),
@@ -803,7 +813,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                                 });
                               },
                               child: Text(
-                                'Paste',
+                                getPortugeseTrans('Paste'),
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: linkColor,
@@ -848,7 +858,8 @@ class _ExchangeNowState extends State<ExchangeNow> {
                       child: Wrap(
                         children: [
                           Text(
-                            'I have read and agree to Terms of Use and Privacy Policy',
+                            getPortugeseTrans(
+                                'I have read and agree to Terms of Use and Privacy Policy'),
                             style: TextStyle(
                               fontSize: 12,
                             ),
@@ -871,7 +882,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                     ),
                   ),
                   Text(
-                    'Estimated Time',
+                    getPortugeseTrans('Estimated Time'),
                     style: TextStyle(
                       fontSize: 14,
                     ),
@@ -884,7 +895,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                   Container(
                     padding: EdgeInsets.only(top: 15),
                     child: Text(
-                      '10-60 minutes',
+                      getPortugeseTrans('10-60 minutes'),
                       style: TextStyle(
                         fontSize: 20,
                       ),
@@ -938,7 +949,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                               width: 25,
                             )
                           : Text(
-                              'Process',
+                              getPortugeseTrans('Process'),
                               style: TextStyle(
                                 fontSize: 20,
                                 color: (!_acceptTermsAndConditions ||
@@ -968,13 +979,13 @@ class _ExchangeNowState extends State<ExchangeNow> {
           Container(
             padding: EdgeInsets.only(bottom: 20),
             child: Text(
-              'Sending',
+              getPortugeseTrans('Sending'),
               style: TextStyle(fontSize: 20),
             ),
           ),
           Container(
             padding: EdgeInsets.only(bottom: 10),
-            child: Text('Waiting'),
+            child: Text(getPortugeseTrans('Waiting')),
           ),
           Row(
             children: [
@@ -998,7 +1009,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
           ),
           Container(
             padding: EdgeInsets.only(top: 10, bottom: 10),
-            child: Text('Address'),
+            child: Text(getPortugeseTrans('Address')),
           ),
           Container(
             padding: EdgeInsets.only(top: 15, bottom: 15, right: 15, left: 15),
@@ -1024,7 +1035,8 @@ class _ExchangeNowState extends State<ExchangeNow> {
                         text: dexProvider.processPayment['payinAddress'],
                       ),
                     );
-                    snackAlert(context, SnackTypes.success, 'Copied');
+                    snackAlert(context, SnackTypes.success,
+                        getPortugeseTrans('Copied'));
                   },
                   child: Image.asset(
                     'assets/img/copy.png',
@@ -1064,7 +1076,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
           ),
           Container(
             padding: EdgeInsets.only(bottom: 10),
-            child: Text('Receive'),
+            child: Text(getPortugeseTrans('Receive')),
           ),
           Row(
             children: [
@@ -1088,7 +1100,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
           ),
           Container(
             padding: EdgeInsets.only(top: 10, bottom: 10),
-            child: Text('Address'),
+            child: Text(getPortugeseTrans('Address')),
           ),
           Container(
             padding: EdgeInsets.only(top: 15, bottom: 15, right: 15, left: 15),
@@ -1114,7 +1126,8 @@ class _ExchangeNowState extends State<ExchangeNow> {
                         text: dexProvider.processPayment['payoutAddress'],
                       ),
                     );
-                    snackAlert(context, SnackTypes.success, 'Copied');
+                    snackAlert(context, SnackTypes.success,
+                        getPortugeseTrans('Copied'));
                   },
                   child: Image.asset(
                     'assets/img/copy.png',

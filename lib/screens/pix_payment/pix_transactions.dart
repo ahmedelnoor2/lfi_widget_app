@@ -24,6 +24,7 @@ class _PixTransactionsState extends State<PixTransactions>
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this);
+    getAllClientTransaction();
   }
 
   @override
@@ -99,14 +100,17 @@ class _PixTransactionsState extends State<PixTransactions>
                       itemBuilder: (BuildContext context, int index) {
                         var transaction = allTransactions[index];
                         return ListTile(
-                          onTap: () async {
-                            payments.decryptPixQR(
-                              {"qr_code": transaction['qr_code']},
-                            );
-                            await payments.setSelectedTransaction(transaction);
-                            Navigator.pushNamed(
-                                context, PixPaymentDetails.routeName);
-                          },
+                          onTap: transaction['qr_code'] == null
+                              ? null
+                              : () async {
+                                  payments.decryptPixQR(
+                                    {"qr_code": transaction['qr_code']},
+                                  );
+                                  await payments
+                                      .setSelectedTransaction(transaction);
+                                  Navigator.pushNamed(
+                                      context, PixPaymentDetails.routeName);
+                                },
                           title: const Text(
                             'BRL',
                             style: TextStyle(
@@ -115,23 +119,26 @@ class _PixTransactionsState extends State<PixTransactions>
                             ),
                           ),
                           subtitle: Text(
-                            DateFormat('dd-MM-y H:mm').format(
-                              DateTime.parse('${transaction['date_end']}'),
-                            ),
+                            transaction['date_end'] == null
+                                ? 'Invalid CPF for KYC transaction'
+                                : DateFormat('dd-MM-y H:mm').format(
+                                    DateTime.parse(
+                                        '${transaction['date_end']}'),
+                                  ),
                           ),
                           trailing: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               Text(
-                                '${transaction['value']}',
+                                '${transaction['value'] ?? '--'}',
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               Text(
-                                '${transaction['status']}',
+                                '${transaction['status'] ?? '--'}',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: transaction['status'] == 'ACCEPTED'

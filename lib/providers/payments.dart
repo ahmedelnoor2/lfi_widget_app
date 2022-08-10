@@ -343,6 +343,8 @@ class Payments with ChangeNotifier {
       '/payment_gateway/pix/get_client_kyc_transactions/$uuid',
     );
 
+    print(uuid);
+
     try {
       final response = await http.get(
         url,
@@ -350,6 +352,8 @@ class Payments with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
+
+      print(responseData);
 
       if (responseData['code'] == '0') {
         _allPixTransactions = responseData['data'];

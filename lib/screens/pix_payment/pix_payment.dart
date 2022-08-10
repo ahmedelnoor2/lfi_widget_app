@@ -670,6 +670,9 @@ class _PixPaymentState extends State<PixPayment>
                             _processTransaction)
                         ? null
                         : () async {
+                            setState(() {
+                              _processTransaction = true;
+                            });
                             if (_formKey.currentState!.validate()) {
                               await payments.getKycVerificationDetails({
                                 'userId': auth.userInfo['id'],
@@ -688,9 +691,6 @@ class _PixPaymentState extends State<PixPayment>
 
                               if (payments.pixKycClients.isNotEmpty) {
                                 if (payments.pixKycClients['activate']) {
-                                  setState(() {
-                                    _processTransaction = true;
-                                  });
                                   await payments.createNewPixTransaction(
                                       context,
                                       {
@@ -709,6 +709,9 @@ class _PixPaymentState extends State<PixPayment>
                                         context, '/pix_process_payment');
                                   }
                                 } else {
+                                  setState(() {
+                                    _processTransaction = false;
+                                  });
                                   showModalBottomSheet<void>(
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.vertical(
@@ -738,6 +741,9 @@ class _PixPaymentState extends State<PixPayment>
                                   );
                                 }
                               } else {
+                                setState(() {
+                                  _processTransaction = false;
+                                });
                                 showModalBottomSheet<void>(
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.vertical(
@@ -815,7 +821,7 @@ class _PixPaymentState extends State<PixPayment>
             if (payments.kycTransaction.isNotEmpty) {
               if (payments.kycTransaction['date_end'] != null) {
                 _timer = Timer.periodic(
-                  const Duration(seconds: 1),
+                  const Duration(seconds: 3),
                   (Timer timer) {
                     getClientUpdate(payments);
                   },
@@ -884,205 +890,263 @@ class _PixPaymentState extends State<PixPayment>
                             ),
                           ),
                         ),
-                        Container(
-                          padding: EdgeInsets.all(10),
-                          child: payments.kycTransaction.isNotEmpty
-                              ? payments.kycTransaction['status'] == 'ACCEPTED'
-                                  ? Align(
+                        payments.kycTransaction['status'] == null
+                            ? Container(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Align(
                                       alignment: Alignment.center,
                                       child: Image.asset(
-                                        'assets/img/approved.png',
-                                        width: 50,
+                                        'assets/img/rejected.png',
+                                        width: 100,
                                       ),
-                                    )
-                                  : Stack(
-                                      children: [
-                                        Image.asset(
-                                          'assets/img/qr_scan.png',
-                                          width: 150,
-                                        ),
-                                        Container(
-                                          padding:
-                                              EdgeInsets.only(top: 9, left: 10),
-                                          child: payments
-                                                  .kycTransaction.isNotEmpty
-                                              ? QrImage(
-                                                  data: utf8.decode(
-                                                    base64.decode(payments
-                                                                    .kycTransaction[
-                                                                'qr_code'] !=
-                                                            null
-                                                        ? payments
-                                                                .kycTransaction[
-                                                            'qr_code']
-                                                        : ''),
-                                                  ),
-                                                  version: QrVersions.auto,
-                                                  backgroundColor: Colors.white,
-                                                  size: 130.0,
-                                                )
-                                              : Container(),
-                                        ),
-                                        payments.kycTransaction.isNotEmpty
-                                            ? (payments.kycTransaction[
-                                                            'status'] ==
-                                                        'CHARGEBACK' ||
-                                                    payments.kycTransaction[
-                                                            'status'] ==
-                                                        'REVERSED')
-                                                ? InkWell(
-                                                    onTap: () async {
-                                                      setState(() {
-                                                        _reRequestKYCAuth =
-                                                            true;
-                                                      });
-                                                      await payments
-                                                          .clearKycTransactions();
-                                                      // reRequestKyc();
-                                                    },
-                                                    child: Container(
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.only(
+                                        left: 10,
+                                        right: 10,
+                                        bottom: 5,
+                                      ),
+                                      child: Text(
+                                        'Invalid CPF number',
+                                        style: TextStyle(color: errorColor),
+                                      ),
+                                    ),
+                                    Text(
+                                      'Please update CPF to request your KYC verification',
+                                      style: TextStyle(color: warningColor),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : Container(),
+                        payments.kycTransaction['status'] == null
+                            ? Container()
+                            : Container(
+                                padding: EdgeInsets.all(10),
+                                child: payments.kycTransaction.isNotEmpty
+                                    ? payments.kycTransaction['status'] ==
+                                            'ACCEPTED'
+                                        ? Align(
+                                            alignment: Alignment.center,
+                                            child: Image.asset(
+                                              'assets/img/approved.png',
+                                              width: 50,
+                                            ),
+                                          )
+                                        : Stack(
+                                            children: [
+                                              Image.asset(
+                                                'assets/img/qr_scan.png',
+                                                width: 150,
+                                              ),
+                                              Container(
+                                                padding: EdgeInsets.only(
+                                                    top: 9, left: 10),
+                                                child: payments.kycTransaction
+                                                        .isNotEmpty
+                                                    ? QrImage(
+                                                        data: utf8.decode(
+                                                          base64.decode(payments
+                                                                          .kycTransaction[
+                                                                      'qr_code'] !=
+                                                                  null
+                                                              ? payments
+                                                                      .kycTransaction[
+                                                                  'qr_code']
+                                                              : ''),
+                                                        ),
+                                                        version:
+                                                            QrVersions.auto,
+                                                        backgroundColor:
+                                                            Colors.white,
+                                                        size: 130.0,
+                                                      )
+                                                    : Container(),
+                                              ),
+                                              payments.kycTransaction.isNotEmpty
+                                                  ? (payments.kycTransaction[
+                                                                  'status'] ==
+                                                              'CHARGEBACK' ||
+                                                          payments.kycTransaction[
+                                                                  'status'] ==
+                                                              'REVERSED')
+                                                      ? InkWell(
+                                                          onTap: () async {
+                                                            setState(() {
+                                                              _reRequestKYCAuth =
+                                                                  true;
+                                                            });
+                                                            await payments
+                                                                .clearKycTransactions();
+                                                            // reRequestKyc();
+                                                          },
+                                                          child: Container(
+                                                            margin:
+                                                                EdgeInsets.only(
+                                                                    top: 5,
+                                                                    left: 5),
+                                                            height: 140,
+                                                            width: 140,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: Color
+                                                                  .fromARGB(
+                                                                      207,
+                                                                      94,
+                                                                      98,
+                                                                      146),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          5),
+                                                              border:
+                                                                  Border.all(
+                                                                style:
+                                                                    BorderStyle
+                                                                        .solid,
+                                                                width: 0.3,
+                                                                color: Color(
+                                                                    0xff5E6292),
+                                                              ),
+                                                            ),
+                                                            child: Align(
+                                                              alignment:
+                                                                  Alignment
+                                                                      .center,
+                                                              child: Icon(
+                                                                Icons.refresh,
+                                                                size: 50,
+                                                              ),
+                                                            ),
+                                                          ))
+                                                      : Container(
+                                                          margin:
+                                                              EdgeInsets.only(
+                                                                  top: 5,
+                                                                  left: 5),
+                                                          height: 140,
+                                                          width: 140,
+                                                        )
+                                                  : Container(
                                                       margin: EdgeInsets.only(
                                                           top: 5, left: 5),
                                                       height: 140,
                                                       width: 140,
-                                                      decoration: BoxDecoration(
-                                                        color: Color.fromARGB(
-                                                            207, 94, 98, 146),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(5),
-                                                        border: Border.all(
-                                                          style:
-                                                              BorderStyle.solid,
-                                                          width: 0.3,
-                                                          color:
-                                                              Color(0xff5E6292),
-                                                        ),
-                                                      ),
-                                                      child: Align(
-                                                        alignment:
-                                                            Alignment.center,
-                                                        child: Icon(
-                                                          Icons.refresh,
-                                                          size: 50,
-                                                        ),
-                                                      ),
-                                                    ))
-                                                : Container(
-                                                    margin: EdgeInsets.only(
-                                                        top: 5, left: 5),
-                                                    height: 140,
-                                                    width: 140,
-                                                  )
-                                            : Container(
-                                                margin: EdgeInsets.only(
-                                                    top: 5, left: 5),
-                                                height: 140,
-                                                width: 140,
-                                              ),
+                                                    ),
+                                            ],
+                                          )
+                                    : Container(),
+                              ),
+                        payments.kycTransaction['status'] == null
+                            ? Container()
+                            : InkWell(
+                                onTap: () {
+                                  Clipboard.setData(
+                                    ClipboardData(
+                                      text:
+                                          '${payments.kycTransaction['qr_code'] != null ? payments.kycTransaction['qr_code'] : ''}',
+                                    ),
+                                  );
+                                  showAlert(
+                                    context,
+                                    Icon(Icons.copy),
+                                    'Copied',
+                                    [
+                                      Text('QR Code copied!'),
+                                    ],
+                                    'Ok',
+                                  );
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(10),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.only(right: 10),
+                                        child: Text('PIX QR Code'),
+                                      ),
+                                      Icon(
+                                        Icons.copy,
+                                        size: 18,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                        payments.kycTransaction['status'] == null
+                            ? Container()
+                            : Container(
+                                padding: EdgeInsets.only(top: 10),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Text('Status'),
+                                        Container(
+                                          padding: EdgeInsets.all(5),
+                                          child: Text(
+                                            '${payments.kycTransaction['status']}',
+                                            style: TextStyle(
+                                              color: payments.kycTransaction[
+                                                          'status'] ==
+                                                      'ACCEPTED'
+                                                  ? successColor
+                                                  : warningColor,
+                                            ),
+                                          ),
+                                        ),
                                       ],
-                                    )
-                              : Container(),
-                        ),
-                        InkWell(
-                          onTap: () {
-                            Clipboard.setData(
-                              ClipboardData(
-                                text:
-                                    '${payments.kycTransaction['qr_code'] != null ? payments.kycTransaction['qr_code'] : ''}',
+                                    ),
+                                    Column(
+                                      children: [
+                                        Text('Countdown'),
+                                        Container(
+                                          padding: EdgeInsets.all(5),
+                                          child: Text(
+                                            'KYC Transaction',
+                                            style: TextStyle(
+                                              color: linkColor,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                            );
-                            showAlert(
-                              context,
-                              Icon(Icons.copy),
-                              'Copied',
-                              [Text('QR Code copied!')],
-                              'Ok',
-                            );
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.only(right: 10),
-                                  child: Text('PIX QR Code'),
-                                ),
-                                Icon(
-                                  Icons.copy,
-                                  size: 18,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.only(top: 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Column(
-                                children: [
-                                  Text('Status'),
-                                  Container(
-                                    padding: EdgeInsets.all(5),
-                                    child: Text(
-                                      '${payments.kycTransaction['status']}',
-                                      style: TextStyle(
-                                        color:
-                                            payments.kycTransaction['status'] ==
-                                                    'ACCEPTED'
-                                                ? successColor
-                                                : warningColor,
+                        payments.kycTransaction['status'] == null
+                            ? Container()
+                            : Container(
+                                padding: EdgeInsets.only(top: 20),
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.only(top: 5),
+                                      child: Text(
+                                        '${payments.pixKycClients['name_client']}',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                children: [
-                                  Text('Countdown'),
-                                  Container(
-                                    padding: EdgeInsets.all(5),
-                                    child: Text(
-                                      'KYC Transaction',
-                                      style: TextStyle(
-                                        color: linkColor,
-                                        fontSize: 16,
-                                      ),
+                                    Container(
+                                      child: Text(
+                                          '${payments.pixKycClients['email_client']}'),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.only(top: 20),
-                          child: Column(
-                            children: [
-                              Container(
-                                padding: EdgeInsets.only(top: 5),
-                                child: Text(
-                                  '${payments.pixKycClients['name_client']}',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                    Container(
+                                      child: Text(
+                                          '${payments.pixKycClients['cpf_client']}'),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              Container(
-                                child: Text(
-                                    '${payments.pixKycClients['email_client']}'),
-                              ),
-                              Container(
-                                child: Text(
-                                    '${payments.pixKycClients['cpf_client']}'),
-                              ),
-                            ],
-                          ),
-                        ),
                         Container(
                           padding: EdgeInsets.all(40),
                           child: InkWell(
@@ -1093,7 +1157,7 @@ class _PixPaymentState extends State<PixPayment>
                             },
                             child: Text(
                               'Update CPF',
-                              style: TextStyle(color: linkColor),
+                              style: TextStyle(fontSize: 18, color: linkColor),
                             ),
                           ),
                         )
@@ -1419,52 +1483,58 @@ class _PixPaymentState extends State<PixPayment>
                                       },
                                       child: Text('Continue'),
                                     )
-                                  : TextButton(
-                                      onPressed: () async {
-                                        // print(payments.pixKycClients[0]['client_uuid']);
-                                        setState(() {
-                                          _reRequestKYCAuth = true;
-                                        });
-                                        await payments.clearKycTransactions();
-                                        // reRequestKyc();
-                                      },
-                                      child: Text('Resend KYC verification'),
+                                  : payments.kycTransaction['status'] == null
+                                      ? Container()
+                                      : TextButton(
+                                          onPressed: () async {
+                                            // print(payments.pixKycClients[0]['client_uuid']);
+                                            setState(() {
+                                              _reRequestKYCAuth = true;
+                                            });
+                                            await payments
+                                                .clearKycTransactions();
+                                            // reRequestKyc();
+                                          },
+                                          child:
+                                              Text('Resend KYC verification'),
+                                        ),
+                        ),
+                      ),
+                      payments.kycTransaction['status'] == null
+                          ? Container()
+                          : Container(
+                              width: width,
+                              padding: EdgeInsets.all(10),
+                              margin: EdgeInsets.only(bottom: 50),
+                              decoration: BoxDecoration(
+                                color: Color(0xff1E2144),
+                                borderRadius: BorderRadius.circular(5),
+                                border: Border.all(
+                                  style: BorderStyle.solid,
+                                  width: 0.3,
+                                  color: Color(0xff1E2144),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.only(right: 10),
+                                    child: Icon(
+                                      Icons.info,
+                                      size: 15,
+                                      color: secondaryTextColor,
                                     ),
-                        ),
-                      ),
-                      Container(
-                        width: width,
-                        padding: EdgeInsets.all(10),
-                        margin: EdgeInsets.only(bottom: 50),
-                        decoration: BoxDecoration(
-                          color: Color(0xff1E2144),
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(
-                            style: BorderStyle.solid,
-                            width: 0.3,
-                            color: Color(0xff1E2144),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.only(right: 10),
-                              child: Icon(
-                                Icons.info,
-                                size: 15,
-                                color: secondaryTextColor,
+                                  ),
+                                  Text(
+                                    'Please scan the code to pay to verify your CPF',
+                                    style: TextStyle(
+                                      color: secondaryTextColor,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            Text(
-                              'Please scan the code to pay to verify your CPF',
-                              style: TextStyle(
-                                color: secondaryTextColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     ],
                   )
                 : Container(
@@ -1505,7 +1575,7 @@ class _PixPaymentState extends State<PixPayment>
                                 });
                               }
 
-                              print(_reRequestKYCAuth);
+                              // print(_reRequestKYCAuth);
                               if (_fieldErrors.isEmpty) {
                                 if (_reRequestKYCAuth) {
                                   reRequestKyc();
