@@ -14,6 +14,26 @@ class Payments with ChangeNotifier {
     'exchange-token': '',
   };
 
+  // Change language
+  bool _portugeseLang = false;
+
+  bool get portugeseLang {
+    return _portugeseLang;
+  }
+
+  void toggleEnLang() {
+    _portugeseLang = !_portugeseLang;
+    notifyListeners();
+  }
+
+  String getPortugeseTrans(value) {
+    if (_portugeseLang) {
+      return getPortugeseTranslate(value);
+    } else {
+      return value;
+    }
+  }
+
   Map _selectedFiatCurrency = {};
 
   void setSelectedFiatCurrency(selectCurrency) {

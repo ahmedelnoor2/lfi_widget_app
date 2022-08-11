@@ -101,6 +101,70 @@ String getPortugeseTranslate(String text) {
       return 'Copiado';
     case 'Receive':
       return 'Receba';
+    case 'Deposit':
+      return 'Depósito';
+    case 'Currency':
+      return 'Moeda';
+    case 'Enter':
+      return 'Digite';
+    case 'Please enter amount':
+      return 'Favor informar o valor';
+    case 'Minimum':
+      return 'Mínimo';
+    case 'value':
+      return 'valor';
+    case 'You receive':
+      return 'Você recebe';
+    case 'You pay':
+      return 'Você paga';
+    case 'Deposit with':
+      return 'Depósito com';
+    case 'Recommended':
+      return 'Recomendado';
+    case 'Bank Transfer':
+      return 'Transferência bancária';
+    case 'Fee':
+      return 'Tarifa';
+    case 'Real-time payment':
+      return 'Pagamento em tempo real';
+    case 'Continue':
+      return 'Continuar';
+    case 'Verification':
+      return 'Verificação';
+    case 'Update CPF':
+      return 'Atualização do CPF';
+    case 'Additional Information':
+      return 'Informações adicionais';
+    case 'Invalid CPF number':
+      return 'Número de CPF inválido';
+    case 'Please enter name':
+      return 'Por favor, digite o nome';
+    case 'Enter your name':
+      return 'Digite seu nome';
+    case 'Full Name':
+      return 'Nome completo';
+    case 'Email':
+      return 'Email';
+    case 'Please enter email':
+      return 'Por favor, digite o e-mail';
+    case 'Enter your email':
+      return 'Digite seu e-mail';
+    case 'Awaiting payment':
+      return 'Aguardando pagamento';
+    case 'Resend KYC verification':
+      return 'Reenviar verificação KYC';
+    case 'Please enter CPF account number':
+      return 'Favor inserir o número da conta CPF';
+    case 'Invalid email format':
+      return 'Formato de e-mail inválido';
+    case 'Please scan the code to pay to verify your CPF':
+      return 'Por favor, digitalize o código a pagar para verificar seu CPF';
+    case 'Please input your own CPF to proceed with the transactions. Any other CPF will cause the deposit to fail.':
+      return 'Favor inserir seu próprio CPF para prosseguir com as transações. Qualquer outro CPF fará com que o depósito falhe.';
+    case 'Please update CPF to request your KYC verification':
+      return 'Favor atualizar o CPF para solicitar sua verificação KYC';
+    case 'The QR code with 5 Dollar deposit is used to verify your CPF account. Once Approved, you will be redirect to next screen for transferring payments for deposit.':
+      return 'O código QR com depósito de 5 dólares é usado para verificar sua conta CPF. Uma vez aprovado, você será redirecionado para a tela seguinte para transferir pagamentos para depósito.';
     default:
       return text;
   }

@@ -54,7 +54,6 @@ class _PixPaymentState extends State<PixPayment>
   bool _reRequestKYCAuth = false;
   String _sendUsdtAmount = '';
   Map _userAddresses = {};
-  bool _enLang = false;
 
   String _transactionType = 'bank_transfer';
 
@@ -96,14 +95,6 @@ class _PixPaymentState extends State<PixPayment>
           });
         });
       }
-    }
-  }
-
-  String getPortugeseTrans(value) {
-    if (_enLang) {
-      return value;
-    } else {
-      return getPortugeseTranslate(value);
     }
   }
 
@@ -308,6 +299,8 @@ class _PixPaymentState extends State<PixPayment>
     var auth = Provider.of<Auth>(context, listen: true);
     var payments = Provider.of<Payments>(context, listen: true);
 
+    var getPortugeseTrans = payments.getPortugeseTrans;
+
     return GestureDetector(
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
@@ -339,7 +332,7 @@ class _PixPaymentState extends State<PixPayment>
                               ),
                             ),
                             Text(
-                              'Deposit BRL',
+                              '${getPortugeseTrans('Deposit')} BRL',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -347,11 +340,27 @@ class _PixPaymentState extends State<PixPayment>
                             ),
                           ],
                         ),
-                        IconButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, '/pix_transactions');
-                          },
-                          icon: Icon(Icons.history),
+                        Row(
+                          children: [
+                            Switch(
+                              value: payments.portugeseLang,
+                              onChanged: (val) {
+                                payments.toggleEnLang();
+                              },
+                              activeColor: greenIndicator,
+                              activeThumbImage:
+                                  const AssetImage('assets/img/brl_lang.png'),
+                              inactiveThumbImage:
+                                  const AssetImage('assets/img/en_lang.png'),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                    context, '/pix_transactions');
+                              },
+                              icon: Icon(Icons.history),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -360,7 +369,7 @@ class _PixPaymentState extends State<PixPayment>
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Currency'),
+                          Text('${getPortugeseTrans('Currency')}'),
                         ],
                       ),
                     ),
@@ -422,9 +431,13 @@ class _PixPaymentState extends State<PixPayment>
                               textAlign: TextAlign.end,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please enter amount';
+                                  return getPortugeseTrans(
+                                    'Please enter amount',
+                                  );
                                 } else if (double.parse(value) < 100) {
-                                  return 'Minimum 100 BRL';
+                                  return '${getPortugeseTrans(
+                                    'Minimum',
+                                  )} 100 BRL';
                                 }
                                 return null;
                               },
@@ -436,7 +449,7 @@ class _PixPaymentState extends State<PixPayment>
                                   const TextInputType.numberWithOptions(
                                 decimal: true,
                               ),
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                 contentPadding: EdgeInsets.zero,
                                 isDense: true,
                                 border: UnderlineInputBorder(
@@ -445,7 +458,8 @@ class _PixPaymentState extends State<PixPayment>
                                 hintStyle: TextStyle(
                                   fontSize: 14,
                                 ),
-                                hintText: "Enter 10-100000",
+                                hintText:
+                                    "${getPortugeseTrans('Enter')} 10-100000",
                               ),
                             ),
                           )
@@ -522,7 +536,8 @@ class _PixPaymentState extends State<PixPayment>
                               textAlign: TextAlign.end,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please enter amount';
+                                  return getPortugeseTrans(
+                                      'Please enter amount');
                                 }
                                 return null;
                               },
@@ -534,7 +549,7 @@ class _PixPaymentState extends State<PixPayment>
                                   const TextInputType.numberWithOptions(
                                 decimal: true,
                               ),
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                 contentPadding: EdgeInsets.zero,
                                 isDense: true,
                                 border: UnderlineInputBorder(
@@ -543,7 +558,8 @@ class _PixPaymentState extends State<PixPayment>
                                 hintStyle: TextStyle(
                                   fontSize: 14,
                                 ),
-                                hintText: "Enter USDT value",
+                                hintText:
+                                    "${getPortugeseTrans('Enter')} USDT ${getPortugeseTrans('value')}",
                               ),
                             ),
                           )
@@ -563,7 +579,7 @@ class _PixPaymentState extends State<PixPayment>
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'You receive:',
+                                '${getPortugeseTrans('You receive')}:',
                                 style: TextStyle(color: secondaryTextColor),
                               ),
                               Text(
@@ -577,7 +593,7 @@ class _PixPaymentState extends State<PixPayment>
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'You pay:',
+                                '${getPortugeseTrans('You pay')}:',
                                 style: TextStyle(color: secondaryTextColor),
                               ),
                               Text(
@@ -600,7 +616,7 @@ class _PixPaymentState extends State<PixPayment>
                           Container(
                             padding: EdgeInsets.only(right: 10),
                             child: Text(
-                              'Deposit with',
+                              getPortugeseTrans('Deposit with'),
                             ),
                           ),
                           Container(
@@ -610,7 +626,7 @@ class _PixPaymentState extends State<PixPayment>
                             ),
                             padding: EdgeInsets.all(5),
                             child: Text(
-                              'Recommended',
+                              getPortugeseTrans('Recommended'),
                               style: TextStyle(fontSize: 12),
                             ),
                           ),
@@ -651,13 +667,13 @@ class _PixPaymentState extends State<PixPayment>
                               children: [
                                 Container(
                                   child: Text(
-                                    'Bank Transfer (PIX)',
+                                    '${getPortugeseTrans('Bank Transfer')} (PIX)',
                                     style: TextStyle(fontSize: 16),
                                   ),
                                 ),
                                 Container(
                                   child: Text(
-                                    '${payments.pixCurrencyCommission}% Fee, Real-time payment',
+                                    '${payments.pixCurrencyCommission}% ${getPortugeseTrans('Fee')}, ${getPortugeseTrans('Real-time payment')}',
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: secondaryTextColor,
@@ -784,7 +800,9 @@ class _PixPaymentState extends State<PixPayment>
                               }
                             }
                           },
-                    text: 'Continue',
+                    text: getPortugeseTrans(
+                      'Continue',
+                    ),
                     active: true,
                     isLoading: _processTransaction,
                     activeColor: (_amountBrlController.text.isEmpty ||
@@ -823,6 +841,8 @@ class _PixPaymentState extends State<PixPayment>
     width = MediaQuery.of(context).size.width;
 
     var payments = Provider.of<Payments>(context, listen: true);
+
+    var getPortugeseTrans = payments.getPortugeseTrans;
 
     if (payments.kycTransaction.isNotEmpty) {
       if (payments.kycTransaction['status'] == 'PROCESSING') {
@@ -868,8 +888,8 @@ class _PixPaymentState extends State<PixPayment>
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
-                              'KYC Verification',
+                            Text(
+                              'KYC ${getPortugeseTrans('Verification')}',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -893,7 +913,8 @@ class _PixPaymentState extends State<PixPayment>
                         Divider(),
                         Container(
                           child: Text(
-                            'The QR code with 5 Dollar deposit is used to verify your CPF account. Once Approved, you will be redirect to next screen for transferring payments for deposit.',
+                            getPortugeseTrans(
+                                'The QR code with 5 Dollar deposit is used to verify your CPF account. Once Approved, you will be redirect to next screen for transferring payments for deposit.'),
                             style: TextStyle(
                               color: secondaryTextColor,
                               fontSize: 12,
@@ -919,12 +940,14 @@ class _PixPaymentState extends State<PixPayment>
                                         bottom: 5,
                                       ),
                                       child: Text(
-                                        'Invalid CPF number',
+                                        getPortugeseTrans('Invalid CPF number'),
                                         style: TextStyle(color: errorColor),
                                       ),
                                     ),
                                     Text(
-                                      'Please update CPF to request your KYC verification',
+                                      getPortugeseTrans(
+                                        'Please update CPF to request your KYC verification',
+                                      ),
                                       style: TextStyle(color: warningColor),
                                     ),
                                   ],
@@ -1166,7 +1189,9 @@ class _PixPaymentState extends State<PixPayment>
                               });
                             },
                             child: Text(
-                              'Update CPF',
+                              getPortugeseTrans(
+                                'Update CPF',
+                              ),
                               style: TextStyle(fontSize: 18, color: linkColor),
                             ),
                           ),
@@ -1179,8 +1204,8 @@ class _PixPaymentState extends State<PixPayment>
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'Additional Information',
+                          Text(
+                            getPortugeseTrans('Additional Information'),
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -1200,7 +1225,8 @@ class _PixPaymentState extends State<PixPayment>
                       Divider(),
                       Container(
                         child: Text(
-                          'Please input your own CPF to proceed with the transactions. Any other CPF will cause the deposit to fail.',
+                          getPortugeseTrans(
+                              'Please input your own CPF to proceed with the transactions. Any other CPF will cause the deposit to fail.'),
                           style: TextStyle(
                             color: secondaryTextColor,
                             fontSize: 12,
@@ -1217,7 +1243,9 @@ class _PixPaymentState extends State<PixPayment>
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text('Full Name'),
+                                      Text(
+                                        getPortugeseTrans('Full Name'),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -1241,7 +1269,8 @@ class _PixPaymentState extends State<PixPayment>
                                           validator: (value) {
                                             if (value == null ||
                                                 value.isEmpty) {
-                                              return 'Please enter name';
+                                              return getPortugeseTrans(
+                                                  'Please enter name');
                                             }
                                             return null;
                                           },
@@ -1251,7 +1280,7 @@ class _PixPaymentState extends State<PixPayment>
                                             });
                                           },
                                           controller: _nameController,
-                                          decoration: const InputDecoration(
+                                          decoration: InputDecoration(
                                             contentPadding: EdgeInsets.zero,
                                             isDense: true,
                                             border: UnderlineInputBorder(
@@ -1260,7 +1289,9 @@ class _PixPaymentState extends State<PixPayment>
                                             hintStyle: TextStyle(
                                               fontSize: 14,
                                             ),
-                                            hintText: "Enter your name",
+                                            hintText: getPortugeseTrans(
+                                              "Enter your name",
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -1294,7 +1325,11 @@ class _PixPaymentState extends State<PixPayment>
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text('Email'),
+                                      Text(
+                                        getPortugeseTrans(
+                                          "Email",
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -1318,7 +1353,9 @@ class _PixPaymentState extends State<PixPayment>
                                           validator: (value) {
                                             if (value == null ||
                                                 value.isEmpty) {
-                                              return 'Please enter email';
+                                              return getPortugeseTrans(
+                                                "Please enter email",
+                                              );
                                             }
                                             return null;
                                           },
@@ -1328,7 +1365,7 @@ class _PixPaymentState extends State<PixPayment>
                                             });
                                           },
                                           controller: _emailController,
-                                          decoration: const InputDecoration(
+                                          decoration: InputDecoration(
                                             contentPadding: EdgeInsets.zero,
                                             isDense: true,
                                             border: UnderlineInputBorder(
@@ -1337,7 +1374,9 @@ class _PixPaymentState extends State<PixPayment>
                                             hintStyle: TextStyle(
                                               fontSize: 14,
                                             ),
-                                            hintText: "Enter your email",
+                                            hintText: getPortugeseTrans(
+                                              "Enter your email",
+                                            ),
                                           ),
                                         ),
                                       )
@@ -1388,7 +1427,8 @@ class _PixPaymentState extends State<PixPayment>
                               child: TextFormField(
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Please enter CPF account number';
+                                    return getPortugeseTrans(
+                                        'Please enter CPF account number');
                                   }
                                   return null;
                                 },
@@ -1402,7 +1442,7 @@ class _PixPaymentState extends State<PixPayment>
                                   decimal: true,
                                 ),
                                 controller: _cpfController,
-                                decoration: const InputDecoration(
+                                decoration: InputDecoration(
                                   contentPadding: EdgeInsets.zero,
                                   isDense: true,
                                   border: UnderlineInputBorder(
@@ -1411,7 +1451,9 @@ class _PixPaymentState extends State<PixPayment>
                                   hintStyle: TextStyle(
                                     fontSize: 14,
                                   ),
-                                  hintText: "Enter 11 digits of your CPF",
+                                  hintText: getPortugeseTrans(
+                                    "Enter 11 digits of your CPF",
+                                  ),
                                 ),
                               ),
                             )
@@ -1457,7 +1499,7 @@ class _PixPaymentState extends State<PixPayment>
                                       ),
                                     ),
                                     Text(
-                                      'Awaiting payment',
+                                      getPortugeseTrans('Awaiting payment'),
                                       style: TextStyle(
                                         color: warningColor,
                                       ),
@@ -1491,7 +1533,9 @@ class _PixPaymentState extends State<PixPayment>
                                               context, '/pix_process_payment');
                                         }
                                       },
-                                      child: Text('Continue'),
+                                      child: Text(
+                                        getPortugeseTrans('Continue'),
+                                      ),
                                     )
                                   : payments.kycTransaction['status'] == null
                                       ? Container()
@@ -1505,8 +1549,10 @@ class _PixPaymentState extends State<PixPayment>
                                                 .clearKycTransactions();
                                             // reRequestKyc();
                                           },
-                                          child:
-                                              Text('Resend KYC verification'),
+                                          child: Text(
+                                            getPortugeseTrans(
+                                                'Resend KYC verification'),
+                                          ),
                                         ),
                         ),
                       ),
@@ -1537,7 +1583,9 @@ class _PixPaymentState extends State<PixPayment>
                                     ),
                                   ),
                                   Text(
-                                    'Please scan the code to pay to verify your CPF',
+                                    getPortugeseTrans(
+                                      'Please scan the code to pay to verify your CPF',
+                                    ),
                                     style: TextStyle(
                                       color: secondaryTextColor,
                                     ),
@@ -1594,7 +1642,7 @@ class _PixPaymentState extends State<PixPayment>
                                 }
                               }
                             },
-                      text: 'Continue',
+                      text: getPortugeseTrans('Continue'),
                       active: true,
                       isLoading: _processKyc,
                       activeColor: ((_name.isEmpty && !_reRequestKYCAuth) ||
