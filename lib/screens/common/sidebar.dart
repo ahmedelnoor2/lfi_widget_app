@@ -1,9 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/user.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
+import 'package:lyotrade/screens/common/widget/error_dialog.dart';
+import 'package:lyotrade/screens/common/widget/loading_dialog.dart';
 
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
@@ -28,7 +33,57 @@ class _SideBarState extends State<SideBar> {
   void initState() {
     checkVersion();
     checkFeeCoinStatus();
+    getProfileImage();
     super.initState();
+  }
+
+  XFile? imageXFile;
+  final ImagePicker _picker = ImagePicker();
+  Future<void> _getImage() async {
+    var auth = Provider.of<Auth>(context, listen: false);
+    var public = Provider.of<Public>(context, listen: false);
+    imageXFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (imageXFile != null) {
+      setState(() {
+        imageXFile;
+      });
+    }
+    startUploading();
+  }
+
+  Future<void> startUploading() async {
+    var auth = Provider.of<Auth>(context, listen: false);
+   
+    if (imageXFile == null) {
+      showDialog(
+          context: context,
+          builder: (c) {
+            return ErrorDialog(
+              message: "Please select an image.",
+            );
+          });
+    } else {
+      showDialog(
+          context: context,
+          builder: (c) {
+            return LoadingDialog(
+              message: "Uploading Image",
+            );
+          });
+
+      await auth.uploadProfileImage(context, auth.loginVerificationToken,
+        auth.userInfo['id'], imageXFile, imageXFile!.name);
+
+      getProfileImage();
+    }
+  }
+
+  Future<void> getProfileImage() async {
+    var auth = Provider.of<Auth>(context, listen: false);
+    await auth.getProfileImage(context, {
+      "token": auth.loginVerificationToken,
+      "userId": "${auth.userInfo['id']}"
+    });
   }
 
   Future<void> checkVersion() async {
@@ -101,8 +156,30 @@ class _SideBarState extends State<SideBar> {
                             ),
                           )
                         : ListTile(
-                            leading: const CircleAvatar(
-                              child: Icon(Icons.person),
+                            leading: InkWell(
+                              onTap: () {
+                                _getImage();
+                              },
+                              child: CircleAvatar(
+                                radius:
+                                    MediaQuery.of(context).size.width * 0.10,
+                                backgroundColor: Colors.white,
+                                backgroundImage: imageXFile == null &&
+                                        auth.avatarrespons.isEmpty
+                                    ? null
+                                    : NetworkImage(
+                                        "${auth.avatarrespons[0]['file']['link'] ?? FileImage(File(imageXFile!.path))}"),
+                                child: imageXFile == null &&
+                                        auth.avatarrespons.isEmpty
+                                    ? Icon(
+                                        Icons.add_photo_alternate,
+                                        size:
+                                            MediaQuery.of(context).size.width *
+                                                0.10,
+                                        color: Colors.grey,
+                                      )
+                                    : null,
+                              ),
                             ),
                             title: Text(
                               '${auth.userInfo['userAccount']}',

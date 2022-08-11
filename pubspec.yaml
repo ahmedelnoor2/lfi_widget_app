@@ -66,6 +66,7 @@ dependencies:
   dotted_line: ^3.1.0
   flutter_slidable: ^2.0.0
   pull_to_refresh: ^2.0.0
+  image_picker: ^0.8.5+3
   
  
 
