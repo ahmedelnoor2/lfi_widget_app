@@ -1610,7 +1610,9 @@ class _PixPaymentState extends State<PixPayment>
                                 ).hasMatch(_email)) {
                                   setState(() {
                                     _fieldErrors['email'] =
-                                        'Invalid email format';
+                                        getPortugeseTrans(
+                                      'Invalid email format',
+                                    );
                                   });
                                 } else {
                                   setState(() {

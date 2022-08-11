@@ -57,6 +57,34 @@ String getPortugeseTranslate(String text) {
   switch (text) {
     case 'Exchange Now':
       return 'Trocar agora';
+    case 'Transaction Details':
+      return 'Detalhes da transacção';
+    case 'You have a pending transaction':
+      return 'Tem uma transacção pendente';
+    case 'Transfer money to process with order':
+      return 'Transferir dinheiro para processar com ordem';
+    case 'BRL Transactions':
+      return 'Transacções em BRL';
+    case 'No Transactions':
+      return 'Sem Transacções';
+    case 'Merchant Name':
+      return 'Nome do Comerciante';
+    case 'Country Code':
+      return 'Código do país';
+    case 'Payment Successfull':
+      return 'Pagamento bem sucedidol';
+    case 'Rejected':
+      return 'Rejeitado';
+    case 'Waiting for payment':
+      return 'À espera de pagamento';
+    case 'Transaction ID':
+      return 'Identificação da transacção';
+    case 'PIX QR Code':
+      return 'Código PIX QR';
+     case 'Merchant City':
+      return 'Cidade Mercante';
+    case 'Bank Details':
+      return 'Dados bancários';
     case 'Fixed Rate':
       return 'Taxa fixa';
     case 'From Amount':

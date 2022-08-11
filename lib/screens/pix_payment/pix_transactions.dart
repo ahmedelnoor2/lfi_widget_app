@@ -44,6 +44,8 @@ class _PixTransactionsState extends State<PixTransactions>
     width = MediaQuery.of(context).size.width;
 
     var payments = Provider.of<Payments>(context, listen: true);
+    
+    var getPortugeseTrans = payments.getPortugeseTrans;
 
     var allTransactions = [];
     if (payments.allPixTransactions.isNotEmpty) {
@@ -72,7 +74,7 @@ class _PixTransactionsState extends State<PixTransactions>
                       ),
                     ),
                     Text(
-                      'BRL Transactions',
+                      getPortugeseTrans('BRL Transactions'),
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -86,7 +88,7 @@ class _PixTransactionsState extends State<PixTransactions>
                 ? Center(
                     child: SizedBox(
                       height: height * 0.85,
-                      child: noData('No Transactions'),
+                      child: noData(getPortugeseTrans('No Transactions')),
                     ),
                   )
                 : SizedBox(
