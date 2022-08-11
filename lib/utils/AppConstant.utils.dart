@@ -25,6 +25,7 @@ var loanApiVersion = '/loans';
 var loansApiestimate = '/loans/estimate';
 var loanhistory = '/mstloan';
 var getemailverifytoken = '/customers';
+var profileuser='/user-avatar';
 var getfavmarkert = '/admin';
 var incrementApi = kIsWeb ? '/api/fe-increment-api' : '/fe-increment-api';
 var openApiUrl = 'openapi.lyotrade.com';

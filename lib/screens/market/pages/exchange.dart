@@ -130,6 +130,7 @@ class _ExchangeScreenState extends State<ExchangeScreen>
 
     var public = Provider.of<Public>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
+    
 
     return Scaffold(
       appBar: hiddenAppBar(),
@@ -175,33 +176,35 @@ class _ExchangeScreenState extends State<ExchangeScreen>
 
                 return ListTile(
                   leading: InkWell(
-                    
                     onTap: (() async {
-                      if (public.favMarketNameList
-                          .contains(_market['symbol'])) {
-                        await public.deleteFavMarket(context, {
-                          'token': "${auth.loginVerificationToken}",
-                          'userId': "${auth.userInfo['id']}",
-                          "marketName": "${_market['symbol']}",
-                        }).whenComplete(() async {
-                          await public.getFavMarketList(context, {
+                      if (auth.isAuthenticated) {
+                        if (public.favMarketNameList
+                            .contains(_market['symbol'])) {
+                          await public.deleteFavMarket(context, {
                             'token': "${auth.loginVerificationToken}",
                             'userId': "${auth.userInfo['id']}",
-                          });
-                        });
-                      } else {
-                        await public.createFavMarket(context, {
-                          'token': "${auth.loginVerificationToken}",
-                          'userId': "${auth.userInfo['id']}",
-                          "marketName": "${_market['symbol']}",
-                          "marketDetails":
-                              _market
-                        }).whenComplete(() async => {
-                              await public.getFavMarketList(context, {
-                                'token': "${auth.loginVerificationToken}",
-                                'userId': "${auth.userInfo['id']}",
-                              })
+                            "marketName": "${_market['symbol']}",
+                          }).whenComplete(() async {
+                            await public.getFavMarketList(context, {
+                              'token': "${auth.loginVerificationToken}",
+                              'userId': "${auth.userInfo['id']}",
                             });
+                          });
+                        } else {
+                          await public.createFavMarket(context, {
+                            'token': "${auth.loginVerificationToken}",
+                            'userId': "${auth.userInfo['id']}",
+                            "marketName": "${_market['symbol']}",
+                            "marketDetails": _market
+                          }).whenComplete(() async => {
+                                await public.getFavMarketList(context, {
+                                  'token': "${auth.loginVerificationToken}",
+                                  'userId': "${auth.userInfo['id']}",
+                                })
+                              });
+                        }
+                      } else {
+                        Navigator.pushNamed(context, '/authentication');
                       }
                     }),
                     child: Icon(
