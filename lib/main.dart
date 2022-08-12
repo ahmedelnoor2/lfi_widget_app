@@ -12,6 +12,7 @@ import 'package:lyotrade/providers/referral.dart';
 import 'package:lyotrade/providers/staking.dart';
 import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/providers/user.dart';
+import 'package:lyotrade/providers/user_kyc.dart';
 import 'package:lyotrade/screens/assets/assets.dart';
 import 'package:lyotrade/screens/assets/deposit_assets.dart';
 import 'package:lyotrade/screens/assets/digital_assets.dart';
@@ -81,7 +82,6 @@ class MyApp extends StatelessWidget {
 
     return MultiProvider(
       providers: [
-          
         ChangeNotifierProvider<Auth>(create: (_) => Auth()),
         ChangeNotifierProvider<Public>(create: (_) => Public()),
         ChangeNotifierProvider<Asset>(create: (_) => Asset()),
@@ -92,12 +92,15 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<LoanProvider>(
           create: (_) => LoanProvider(),
         ),
-        ChangeNotifierProvider< ReferralProvider>(create:  (_)=> ReferralProvider()),
+        ChangeNotifierProvider<ReferralProvider>(
+            create: (_) => ReferralProvider()),
         ChangeNotifierProvider<Payments>(create: (_) => Payments()),
         ChangeNotifierProvider<DexProvider>(create: (_) => DexProvider()),
         ChangeNotifierProvider<ReferralProvider>(
             create: (_) => ReferralProvider()),
-        ChangeNotifierProvider<Notificationprovider>(create:(_)=> Notificationprovider())
+        ChangeNotifierProvider<Notificationprovider>(
+            create: (_) => Notificationprovider()),
+        ChangeNotifierProvider<UserKyc>(create: (_) => UserKyc()),
       ],
       child: Consumer<Auth>(
         builder: (context, auth, _) {
@@ -290,12 +293,11 @@ class MyApp extends StatelessWidget {
               PixPaymentDetails.routeName: (context) =>
                   const PixPaymentDetails(),
               MarketSearch.routeName: (context) => const MarketSearch(),
-               Refralinvitation.routeName:(context) => const Refralinvitation(),
-              LeaderBoard.routeName:(context) =>  LeaderBoard(),
+              Refralinvitation.routeName: (context) => const Refralinvitation(),
+              LeaderBoard.routeName: (context) => LeaderBoard(),
               AnnouncementDetails.routeName: (context) =>
                   const AnnouncementDetails(),
-                 Createpassword.routeName: (context) =>
-                  const Createpassword(),
+              Createpassword.routeName: (context) => const Createpassword(),
             },
           );
         },

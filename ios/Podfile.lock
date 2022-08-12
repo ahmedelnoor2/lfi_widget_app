@@ -2,6 +2,9 @@ PODS:
   - Flutter (1.0.0)
   - flutter_aliyun_captcha (1.0.4):
     - Flutter
+  - flutter_idensic_mobile_sdk_plugin (1.19.7):
+    - Flutter
+    - IdensicMobileSDK (= 1.19.7)
   - flutter_share (0.0.1):
     - Flutter
   - fluttertoast (0.0.2):
@@ -9,6 +12,11 @@ PODS:
     - Toast
   - gallery_saver (0.0.1):
     - Flutter
+  - IdensicMobileSDK (1.19.7):
+    - IdensicMobileSDK/Default (= 1.19.7)
+  - IdensicMobileSDK/Core (1.19.7)
+  - IdensicMobileSDK/Default (1.19.7):
+    - IdensicMobileSDK/Core
   - MTBBarcodeScanner (5.0.11)
   - package_info_plus (0.4.5):
     - Flutter
@@ -28,6 +36,7 @@ PODS:
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_aliyun_captcha (from `.symlinks/plugins/flutter_aliyun_captcha/ios`)
+  - flutter_idensic_mobile_sdk_plugin (from `.symlinks/plugins/flutter_idensic_mobile_sdk_plugin/ios`)
   - flutter_share (from `.symlinks/plugins/flutter_share/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - gallery_saver (from `.symlinks/plugins/gallery_saver/ios`)
@@ -39,6 +48,8 @@ DEPENDENCIES:
   - webview_flutter_wkwebview (from `.symlinks/plugins/webview_flutter_wkwebview/ios`)
 
 SPEC REPOS:
+  https://github.com/SumSubstance/Specs.git:
+    - IdensicMobileSDK
   trunk:
     - MTBBarcodeScanner
     - Toast
@@ -48,6 +59,8 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_aliyun_captcha:
     :path: ".symlinks/plugins/flutter_aliyun_captcha/ios"
+  flutter_idensic_mobile_sdk_plugin:
+    :path: ".symlinks/plugins/flutter_idensic_mobile_sdk_plugin/ios"
   flutter_share:
     :path: ".symlinks/plugins/flutter_share/ios"
   fluttertoast:
@@ -70,9 +83,11 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
   flutter_aliyun_captcha: ae5a6d128035eb2075be2a99606bb58bea31cffe
+  flutter_idensic_mobile_sdk_plugin: 20a8906cb5d3cca99941dcfaa7ccfce538b71f6e
   flutter_share: 4be0208963c60b537e6255ed2ce1faae61cd9ac2
   fluttertoast: 16fbe6039d06a763f3533670197d01fc73459037
   gallery_saver: 9fc173c9f4fcc48af53b2a9ebea1b643255be542
+  IdensicMobileSDK: 5b56aae41519bdb8fe287f135033b4399cc3f50e
   MTBBarcodeScanner: f453b33c4b7dfe545d8c6484ed744d55671788cb
   package_info_plus: 6c92f08e1f853dc01228d6f553146438dafcd14e
   path_provider_ios: 14f3d2fd28c4fdb42f44e0f751d12861c43cee02
@@ -82,6 +97,6 @@ SPEC CHECKSUMS:
   url_launcher_ios: 839c58cdb4279282219f5e248c3321761ff3c4de
   webview_flutter_wkwebview: b7e70ef1ddded7e69c796c7390ee74180182971f
 
-PODFILE CHECKSUM: a75497545d4391e2d394c3668e20cfb1c2bbd4aa
+PODFILE CHECKSUM: b87506c759d9d3b3877054bcacc505f2908f4c57
 
 COCOAPODS: 1.11.3

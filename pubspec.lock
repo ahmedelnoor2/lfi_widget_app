@@ -118,6 +118,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.4"
+  flutter_idensic_mobile_sdk_plugin:
+    dependency: "direct main"
+    description:
+      name: flutter_idensic_mobile_sdk_plugin
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.19.7"
   flutter_lints:
     dependency: "direct dev"
     description:
