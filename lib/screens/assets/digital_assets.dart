@@ -334,13 +334,59 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                       Text('Hide Small Balance'),
                     ],
                   ),
-                  // GestureDetector(
-                  //   onTap: () {},
-                  //   child: Icon(
-                  //     Icons.search,
-                  //     size: 18,
-                  //   ),
-                  // )
+                 Container(
+                                margin: EdgeInsets.only(right: 2),
+                                child: Container(
+                                  padding: EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                      style: BorderStyle.solid,
+                                      width: 0.3,
+                                      color: Color(0xff5E6292),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                    Container(
+                                        padding: EdgeInsets.only(right: 8),
+                                        child: Icon(
+                                          Icons.search,
+                                          size: 14,
+                                          color: secondaryTextColor,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: width * 0.30,
+                                        child: TextField(
+                                          // onChanged: (value) async {
+                                          //   // await asset.filterSearchResults(value);
+                                          //   await public
+                                          //       .filterMarketSearchResults(
+                                          //     value,
+                                          //     public.allMarkets[
+                                          //         _currentMarketSort],
+                                          //     _currentMarketSort,
+                                          //   );
+                                          // },
+                                          // controller: _searchController,
+                                          decoration: InputDecoration(
+                                            contentPadding: EdgeInsets.zero,
+                                            isDense: true,
+                                            border: UnderlineInputBorder(
+                                              borderSide: BorderSide.none,
+                                            ),
+                                            hintStyle: TextStyle(
+                                              fontSize: 14,
+                                            ),
+                                            hintText: "Search",
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                 ],
               ),
             ),

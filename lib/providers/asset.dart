@@ -905,8 +905,45 @@ class Asset with ChangeNotifier {
     return _transactionDetails;
   }
 
+  List _digitalAssets = [];
+
+  List get digitalAssets{
+
+    return _digitalAssets;
+  }
+  void setdigitassetslist(digAsset) {
+    _digitialAss = digAsset;
+    notifyListeners();
+  }
+ //search
+
   Future<void> setTransactionDetails(transaction) async {
     _transactionDetails = transaction;
     return notifyListeners();
+  }
+
+   Future<void> filterMarginMarketSearchResults(
+    query,
+    _searchAllMarkets,
+    sMarketSort,
+  ) async {
+    if (query.isNotEmpty) {
+      List dummyListData = [];
+      for (var item in _searchAllMarkets) {
+        if (item['symbol'].contains(query.toLowerCase())) {
+          dummyListData.add(item);
+          notifyListeners();
+        }
+      }
+    //  _allSearchMarket[sMarketSort].clear();
+     // _allSearchMarket[sMarketSort].addAll(dummyListData);
+      notifyListeners();
+      return;
+    } else {
+   //   _allSearchMarket[sMarketSort].clear();
+    //  _allSearchMarket[sMarketSort].addAll(_searchAllMarkets);
+      notifyListeners();
+      return;
+    }
   }
 }
