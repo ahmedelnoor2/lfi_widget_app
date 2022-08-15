@@ -1,7 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:path/path.dart';
+import 'package:async/async.dart';
+
+import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+
 import 'package:lyotrade/screens/common/alert.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
@@ -9,12 +14,17 @@ import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/Translate.utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http_parser/http_parser.dart';
 
 class Auth with ChangeNotifier {
   Map<String, String> headers = {
     'Content-type': 'application/json;charset=utf-8',
     'Accept': 'application/json',
     'exchange-token': '',
+  };
+   Map<String, String> headers1 = {
+    'Content-type': 'application/json;charset=utf-8',
+    'Accept': 'application/json',
   };
 
   String _emailVerificationToken = '';
@@ -963,6 +973,69 @@ class Auth with ChangeNotifier {
     } catch (error) {
       snackAlert(ctx, SnackTypes.errors, 'Server Error!');
       return notifyListeners();
+    }
+  }
+  
+  //////upload profile image
+  Future<void> uploadProfileImage(context, token, uid, imageXFile, imgname) async {
+   
+    var request = new http.MultipartRequest(
+        "POST", Uri.parse('https://api.m.lyotrade.com/user-avatar/create'));
+    request.fields['token'] = "$token";
+    request.fields['userId'] = "$uid";
+
+    request.files.add(await http.MultipartFile.fromPath(
+        'image', imageXFile.path,
+        filename: imgname, contentType: MediaType("image", "jpg")));
+    return request.send().then((response) {
+      http.Response.fromStream(response).then((onValue) {
+        try {
+          if(response.statusCode==200){
+            Navigator.pop(context);
+          }
+          return;
+          // get your response here...
+        } catch (e) {
+          // handle exeption
+          return;
+        }
+      });
+    });
+  }
+
+ //////get user profile image
+ List _avatarresponse = [];
+  List get avatarrespons {
+    return _avatarresponse;
+  }
+
+  Future<void> getProfileImage(ctx, formData) async {
+    var url = Uri.https(
+      lyoApiUrl,
+      profileuser,
+    );
+   
+    var postData = json.encode(formData);
+   
+    try {
+      final response = await http.post(url, body: postData,headers: headers1);
+      final responseData = json.decode(response.body);
+     
+      if (responseData['code'] == '0') {
+        _avatarresponse = responseData['data'];
+        
+      
+        notifyListeners();
+        return;
+      } else {
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
+      }
+
+      return;
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server Error!');
+      return;
+      // throw error;
     }
   }
 }

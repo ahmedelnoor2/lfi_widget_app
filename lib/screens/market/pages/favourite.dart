@@ -13,8 +13,15 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({
     Key? key,
+    this.scaffoldKey,
+    this.updateMarket,
+    this.currentMarketSort,
+    this.upateCurrentMarketSort,
   }) : super(key: key);
-
+  final scaffoldKey;
+  final updateMarket;
+  final currentMarketSort;
+  final upateCurrentMarketSort;
   @override
   State<FavoritesScreen> createState() => _FavoritesScreenState();
 }
@@ -23,24 +30,15 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   @override
   void initState() {
     super.initState();
-    getFavouriteMarket();
-  }
-
-  Future<void> getFavouriteMarket() async {
-    var public = Provider.of<Public>(context, listen: false);
-    var auth = Provider.of<Auth>(context, listen: false);
-
-    await public.getFavMarketList(context, {
-      'token': "${auth.loginVerificationToken}",
-      'userId': "${auth.userInfo['id']}",
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
-    var public = Provider.of<Public>(context, listen: false);
+
+    var public = Provider.of<Public>(context, listen: true);
+    var auth = Provider.of<Auth>(context, listen: true);
 
     return Scaffold(
       appBar: hiddenAppBar(),
@@ -48,19 +46,45 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         children: <Widget>[
           Expanded(
             child: public.favMarketList.isEmpty
-                ? noData('No Favorites')
+                ? noData("No Favourite")
                 : ListView.separated(
                     separatorBuilder: (context, index) {
+                     
                       return Divider();
                     },
+                    
                     shrinkWrap: true,
                     itemCount: public.favMarketList.length,
                     itemBuilder: (context, index) {
+                      var _market = public.favMarketList[index]['marketDetails'];
+
                       return ListTile(
-                        leading: Icon(
-                          Icons.star,
-                          size: 20,
-                          color: seconadarytextcolour,
+                        leading: InkWell(
+                          onTap: (() async {
+                            if (public.favMarketNameList
+                                .contains(_market['symbol'])) {
+                              await public.deleteFavMarket(context, {
+                                'token': "${auth.loginVerificationToken}",
+                                'userId': "${auth.userInfo['id']}",
+                                "marketName":_market['symbol'],
+                              }).whenComplete(() async {
+                                await public.getFavMarketList(context, {
+                                  'token': "${auth.loginVerificationToken}",
+                                  'userId': "${auth.userInfo['id']}",
+                                });
+                              });
+                            } 
+                          }),
+                          child: Icon(
+                            Icons.star,
+                            size: 20,
+                            color: public.favMarketNameList.isNotEmpty
+                                ? public.favMarketNameList
+                                        .contains(_market['symbol'])
+                                    ? linkColor
+                                    : secondaryTextColor
+                                : secondaryTextColor,
+                          ),
                         ),
                         minLeadingWidth: 5,
                         title: Column(
@@ -69,15 +93,13 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                             Row(
                               children: [
                                 Text(
-                                  'lyo',
-                                  // '${_market['showName'].split('/')[0]}',
+                                  '${_market['showName'].split('/')[0]}',
                                   style: TextStyle(
                                     fontSize: 18,
                                   ),
                                 ),
                                 Text(
-                                  'market',
-                                  //  ' /${_market['showName'].split('/')[1]}',
+                                  ' /${_market['showName'].split('/')[1]}',
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: secondaryTextColor,
@@ -89,6 +111,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                               children: [
                                 InkWell(
                                   onTap: () async {
+                                    await public.setActiveMarket(_market);
                                     Navigator.pushNamed(context, '/trade');
                                   },
                                   child: Container(
@@ -108,7 +131,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                 ),
                                 InkWell(
                                   onTap: () async {
-                                    // await public.setActiveMarket(_market);
+                                    await public.setActiveMarket(_market);
                                     Navigator.pushNamed(
                                         context, '/kline_chart');
                                   },
@@ -137,16 +160,40 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              '',
+                              '${public.activeMarketAllTicks[_market['symbol']] != null ? public.activeMarketAllTicks[_market['symbol']]['close'] : '--'}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.red,
+                                color: public.activeMarketAllTicks[
+                                            _market['symbol']] !=
+                                        null
+                                    ? (((double.parse('${public.activeMarketAllTicks[_market['symbol']]['open']}') -
+                                                    double.parse(
+                                                        '${public.activeMarketAllTicks[_market['symbol']]['close']}')) /
+                                                double.parse(
+                                                    '${public.activeMarketAllTicks[_market['symbol']]['open']}')) >
+                                            0)
+                                        ? greenlightchartColor
+                                        : errorColor
+                                    : Colors.white,
                               ),
                             ),
                             Text(
-                              '',
-                              style: TextStyle(),
+                              '${public.activeMarketAllTicks[_market['symbol']] != null ? (double.parse(public.activeMarketAllTicks[_market['symbol']]['rose']) * 100).toStringAsFixed(2) : '--'}%',
+                              style: TextStyle(
+                                color: public.activeMarketAllTicks[
+                                            _market['symbol']] !=
+                                        null
+                                    ? double.parse(public.activeMarketAllTicks[
+                                                        _market['symbol']]
+                                                    ['rose'] ??
+                                                '0') >
+                                            0
+                                        ? greenlightchartColor
+                                        : errorColor
+                                    : secondaryTextColor,
+                                fontSize: 14,
+                              ),
                             ),
                           ],
                         ),

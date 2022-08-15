@@ -51,6 +51,7 @@ class FutureMarket with ChangeNotifier {
         if ((item['contractOtherName'].toLowerCase())
             .contains(query.toLowerCase())) {
           dummyListData.add(item);
+          notifyListeners();
         }
       }
       _allSearchMarket[sMarketSort].clear();

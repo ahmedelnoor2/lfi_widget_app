@@ -67,6 +67,7 @@ dependencies:
   flutter_slidable: ^2.0.0
   pull_to_refresh: ^2.0.0
   flutter_idensic_mobile_sdk_plugin: ^1.19.7
+  image_picker: ^0.8.5+3
 
 dev_dependencies:
   flutter_test:

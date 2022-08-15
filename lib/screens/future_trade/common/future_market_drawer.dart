@@ -191,7 +191,9 @@ class _FutureMarketDrawerState extends State<FutureMarketDrawer>
                       : futureMarket.allMarkets[_currentMarketSort].length,
               itemBuilder: (context, index) {
                 var _market =
-                    futureMarket.allSearchMarket[_currentMarketSort][index];
+                    futureMarket.allSearchMarket[_currentMarketSort].isNotEmpty
+                    ?futureMarket.allSearchMarket[_currentMarketSort][index]
+                    :futureMarket.allMarkets[_currentMarketSort][index];
 
                 return ListTile(
                   onTap: () async {

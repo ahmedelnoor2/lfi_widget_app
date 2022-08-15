@@ -305,6 +305,7 @@ class Public with ChangeNotifier {
       for (var item in _searchAllMarkets) {
         if (item['symbol'].contains(query.toLowerCase())) {
           dummyListData.add(item);
+          notifyListeners();
         }
       }
       _allSearchMarket[sMarketSort].clear();
@@ -329,6 +330,7 @@ class Public with ChangeNotifier {
       for (var item in _searchAllMarkets) {
         if (item['symbol'].contains(query.toLowerCase())) {
           dummyListData.add(item);
+          notifyListeners();
         }
       }
       _allSearchMarket[sMarketSort].clear();
@@ -679,13 +681,14 @@ class Public with ChangeNotifier {
     return _favMarketList;
   }
 
-  List<dynamic> _selectedItems = [];
+  List _favMarketNameList = [];
 
-  List get selectedItems {
-    return _selectedItems;
+  List get favMarketNameList {
+    return _favMarketNameList;
   }
 
   bool isfavloading = true;
+  var tabindex=0;
   Future<void> getFavMarketList(ctx, formData) async {
     var url = Uri.https(lyoApiUrl, '$getfavmarkert/favorite-market');
     var postData = json.encode(formData);
@@ -696,16 +699,83 @@ class Public with ChangeNotifier {
       final responseData = json.decode(response.body);
       if (responseData['code'] == '0') {
         _favMarketList = responseData['data'];
-
+        _favMarketNameList.clear();
+        for (var favMarket in _favMarketList) {
+          _favMarketNameList.add(favMarket['marketDetails']['symbol']);
+        }
         notifyListeners();
         return;
       } else {
-        // snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
+        _favMarketList = [];
+        _favMarketNameList.clear();
+        notifyListeners();
+        return;
+      }
+    } catch (error) {
+      _favMarketList = [];
+      _favMarketNameList.clear();
+      notifyListeners();
+      snackAlert(ctx, SnackTypes.errors, 'Server Error!');
+      return;
+      // throw error;
+    }
+  }
+
+  Map _insertresponse = {};
+
+  Map get insertresponse {
+    return _insertresponse;
+  }
+bool isMyLoading=true;
+  Future<void> createFavMarket(ctx, formData) async {
+    var url = Uri.https(lyoApiUrl, '$getfavmarkert/favorite-market/create');
+
+    var postData = json.encode(formData);
+  
+    try {
+      final response = await http.post(url, body: postData, headers: headers);
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _insertresponse = responseData['data'];
+
+        snackAlert(ctx, SnackTypes.success, getTranslate(responseData['msg']));
+          isMyLoading=false;
+        notifyListeners();
+        return;
+      } else {
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
 
       return;
     } catch (error) {
       snackAlert(ctx, SnackTypes.errors, 'Server Error!');
+      return;
+      // throw error;
+    }
+  }
+
+  Future<void> deleteFavMarket(ctx, formData) async {
+    var url = Uri.https(lyoApiUrl, '$getfavmarkert/favorite-market/delete');
+
+    var postData = json.encode(formData);
+    try {
+      final response = await http.post(url, body: postData, headers: headers);
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        snackAlert(ctx, SnackTypes.success, getTranslate(responseData['msg']));
+
+        notifyListeners();
+        return;
+      } else {
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
+        return;
+      }
+    } catch (error) {
+      print(error);
       return;
       // throw error;
     }

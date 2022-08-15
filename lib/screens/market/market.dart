@@ -53,7 +53,7 @@ class _MarketState extends State<Market> {
     var auth = Provider.of<Auth>(context, listen: false);
     await public.getrecomendedsybol(auth);
   }
-
+  var tabindex=0;
   @override
   Widget build(BuildContext context) {
     var _currentRoute = ModalRoute.of(context)!.settings.name;
@@ -277,6 +277,12 @@ class _MarketState extends State<Market> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               ButtonsTabBar(
+                                onTap: ((p0) {
+                                  setState(() {
+                                     tabindex=p0;
+                                  });
+                                
+                                }),
                                 height: height * 0.043,
                                 radius: 2,
                                 contentPadding:
@@ -300,11 +306,11 @@ class _MarketState extends State<Market> {
                                       Icons.star,
                                       size: 12,
                                     ),
-                                    text: "Favorites",
+                                    text: "Favourites",
                                   ),
                                 ],
                               ),
-                              Container(
+                           tabindex==1?Container():Container(
                                 margin: EdgeInsets.only(right: 2),
                                 child: Container(
                                   padding: EdgeInsets.all(5),
@@ -318,7 +324,7 @@ class _MarketState extends State<Market> {
                                   ),
                                   child: Row(
                                     children: [
-                                      Container(
+                                    Container(
                                         padding: EdgeInsets.only(right: 8),
                                         child: Icon(
                                           Icons.search,
@@ -365,7 +371,9 @@ class _MarketState extends State<Market> {
                                 ExchangeScreen(
                                     currentMarketSort: _currentMarketSort,
                                     upateCurrentMarketSort: updateMarketSort),
-                                FavoritesScreen(),
+                                FavoritesScreen(
+                                    currentMarketSort: _currentMarketSort,
+                                    upateCurrentMarketSort: updateMarketSort),
                               ],
                             ),
                           ),

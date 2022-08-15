@@ -702,6 +702,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
   Widget swapCoins(context, setState, asset) {
     var auth = Provider.of<Auth>(context, listen: false);
     var dexProvider = Provider.of<DexProvider>(context, listen: true);
+  
 
     return Scaffold(
       appBar: hiddenAppBarWithDefaultHeight(),
