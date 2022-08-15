@@ -905,12 +905,6 @@ class Asset with ChangeNotifier {
     return _transactionDetails;
   }
 
-  List _digitalAssets = [];
-
-  List get digitalAssets{
-
-    return _digitalAssets;
-  }
   void setdigitassetslist(digAsset) {
     _digitialAss = digAsset;
     notifyListeners();
@@ -922,26 +916,49 @@ class Asset with ChangeNotifier {
     return notifyListeners();
   }
 
-   Future<void> filterMarginMarketSearchResults(
+
+  List _digitalAssets = [];
+
+  List get digitalAssets{
+
+    return _digitalAssets;
+  }
+
+     void setDigtalList(digAsset) {
+    _digitalAssets = digAsset;
+    notifyListeners();
+  }
+    List _searchallcoin = [];
+
+  List get searchallcoin{
+
+    return _searchallcoin;
+  }
+   Future<void> filterCoin(
     query,
-    _searchAllMarkets,
-    sMarketSort,
+    digitalAssetslist,
+    _totalBalanceSymbol,
   ) async {
+
     if (query.isNotEmpty) {
       List dummyListData = [];
-      for (var item in _searchAllMarkets) {
-        if (item['symbol'].contains(query.toLowerCase())) {
+      _searchallcoin.clear();
+      for (var item in digitalAssetslist) {
+      
+        if ((item['coin'].toLowerCase()).contains(query.toLowerCase())) {
           dummyListData.add(item);
+      
           notifyListeners();
         }
       }
-    //  _allSearchMarket[sMarketSort].clear();
-     // _allSearchMarket[sMarketSort].addAll(dummyListData);
+    //  _searchallcoin[sMarketSort].clear();
+     _searchallcoin.addAll(dummyListData);
+     //print(_searchallcoin);
       notifyListeners();
       return;
     } else {
-   //   _allSearchMarket[sMarketSort].clear();
-    //  _allSearchMarket[sMarketSort].addAll(_searchAllMarkets);
+    //  _searchallcoin[_totalBalanceSymbol].clear();
+    //  _searchallcoin[_totalBalanceSymbol].addAll(_digitalAssets);
       notifyListeners();
       return;
     }
