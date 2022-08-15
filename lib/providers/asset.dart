@@ -905,8 +905,62 @@ class Asset with ChangeNotifier {
     return _transactionDetails;
   }
 
+  void setdigitassetslist(digAsset) {
+    _digitialAss = digAsset;
+    notifyListeners();
+  }
+ //search
+
   Future<void> setTransactionDetails(transaction) async {
     _transactionDetails = transaction;
     return notifyListeners();
+  }
+
+
+  List _digitalAssets = [];
+
+  List get digitalAssets{
+
+    return _digitalAssets;
+  }
+
+     void setDigtalList(digAsset) {
+    _digitalAssets = digAsset;
+    notifyListeners();
+  }
+    List _searchallcoin = [];
+
+  List get searchallcoin{
+
+    return _searchallcoin;
+  }
+   Future<void> filterCoin(
+    query,
+    digitalAssetslist,
+    _totalBalanceSymbol,
+  ) async {
+
+    if (query.isNotEmpty) {
+      List dummyListData = [];
+      _searchallcoin.clear();
+      for (var item in digitalAssetslist) {
+      
+        if ((item['coin'].toLowerCase()).contains(query.toLowerCase())) {
+          dummyListData.add(item);
+      
+          notifyListeners();
+        }
+      }
+    //  _searchallcoin[sMarketSort].clear();
+     _searchallcoin.addAll(dummyListData);
+     //print(_searchallcoin);
+      notifyListeners();
+      return;
+    } else {
+    //  _searchallcoin[_totalBalanceSymbol].clear();
+    //  _searchallcoin[_totalBalanceSymbol].addAll(_digitalAssets);
+      notifyListeners();
+      return;
+    }
   }
 }

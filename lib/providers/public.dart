@@ -305,6 +305,7 @@ class Public with ChangeNotifier {
       for (var item in _searchAllMarkets) {
         if (item['symbol'].contains(query.toLowerCase())) {
           dummyListData.add(item);
+          notifyListeners();
         }
       }
       _allSearchMarket[sMarketSort].clear();
@@ -329,6 +330,7 @@ class Public with ChangeNotifier {
       for (var item in _searchAllMarkets) {
         if (item['symbol'].contains(query.toLowerCase())) {
           dummyListData.add(item);
+          notifyListeners();
         }
       }
       _allSearchMarket[sMarketSort].clear();
