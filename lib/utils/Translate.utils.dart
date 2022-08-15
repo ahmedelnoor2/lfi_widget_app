@@ -48,6 +48,8 @@ String getTranslate(String text) {
       return 'Quantity is less than minimum';
     case '邮件发送失败':
       return 'Email sending failed';
+    case '验证码不正确':
+      return 'Incorrect verification code';
     default:
       return text;
   }
@@ -81,7 +83,7 @@ String getPortugeseTranslate(String text) {
       return 'Identificação da transacção';
     case 'PIX QR Code':
       return 'Código PIX QR';
-     case 'Merchant City':
+    case 'Merchant City':
       return 'Cidade Mercante';
     case 'Bank Details':
       return 'Dados bancários';

@@ -14,7 +14,6 @@ class _EnitityVerificationState extends State<EnitityVerification>
     with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
-    final _size = MediaQuery.of(context).size;
     return Scaffold(
         appBar: hiddenAppBar(),
         body: SingleChildScrollView(

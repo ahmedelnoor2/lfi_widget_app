@@ -212,10 +212,21 @@ class _personalverificationState extends State<personalverification>
     });
     var auth = Provider.of<Auth>(context, listen: false);
     var userKyc = Provider.of<UserKyc>(context, listen: false);
-    await userKyc.getSamsubToken(context, auth, {
-      'levelName': levelName,
-      'type': '0',
-    });
+    if (levelName == 'Tire1') {
+      await userKyc.getSamsubToken(context, auth, {
+        'levelName': levelName,
+        'type': '0',
+      });
+    } else {
+      await userKyc.changeSamsubToken(context, auth, {
+        'levelName': levelName,
+        'type': '0',
+      });
+      await userKyc.getAccessSamsubToken(context, auth, {
+        'levelName': levelName,
+        'type': '0',
+      });
+    }
     var accessToken = userKyc.samsubToken['accessToken'];
 
     final onTokenExpiration = () async {
@@ -411,20 +422,32 @@ class _personalverificationState extends State<personalverification>
                                                                           'levelName']]
                                                                       [
                                                                       'reviewStatus'] ==
-                                                                  1
+                                                                  0
                                                               ? Icon(
-                                                                  Icons
-                                                                      .check_circle,
+                                                                  Icons.timer,
                                                                   size: 18,
                                                                   color:
-                                                                      successColor,
+                                                                      warningColor,
                                                                 )
-                                                              : Icon(
-                                                                  Icons.cancel,
-                                                                  size: 18,
-                                                                  color:
-                                                                      errorColor,
-                                                                ),
+                                                              : userInfoList[kycTier[
+                                                                              'levelName']]
+                                                                          [
+                                                                          'reviewStatus'] ==
+                                                                      1
+                                                                  ? Icon(
+                                                                      Icons
+                                                                          .check_circle,
+                                                                      size: 18,
+                                                                      color:
+                                                                          successColor,
+                                                                    )
+                                                                  : Icon(
+                                                                      Icons
+                                                                          .cancel,
+                                                                      size: 18,
+                                                                      color:
+                                                                          errorColor,
+                                                                    ),
                                                         ),
                                                         Text(
                                                           userInfoList[kycTier[
@@ -433,15 +456,26 @@ class _personalverificationState extends State<personalverification>
                                                                       'reviewStatus'] ==
                                                                   1
                                                               ? 'Verified'
-                                                              : 'Rejected',
+                                                              : userInfoList[kycTier[
+                                                                              'levelName']]
+                                                                          [
+                                                                          'reviewStatus'] ==
+                                                                      0
+                                                                  ? 'Pending'
+                                                                  : 'Rejected',
                                                           style: TextStyle(
                                                             color: userInfoList[
                                                                             kycTier['levelName']]
                                                                         [
                                                                         'reviewStatus'] ==
-                                                                    1
-                                                                ? successColor
-                                                                : errorColor,
+                                                                    0
+                                                                ? warningColor
+                                                                : userInfoList[kycTier['levelName']]
+                                                                            [
+                                                                            'reviewStatus'] ==
+                                                                        1
+                                                                    ? successColor
+                                                                    : errorColor,
                                                           ),
                                                         ),
                                                       ],
@@ -478,6 +512,27 @@ class _personalverificationState extends State<personalverification>
                                                   startVerifictaion(
                                                       kycTier['levelName']);
                                                 }
+                                              } else if (kycTier['levelName'] ==
+                                                  'Tier2') {
+                                                if (userInfoList.containsKey(
+                                                    kycTier['levelName'])) {
+                                                  if ((userInfoList[kycTier[
+                                                                  'levelName']][
+                                                              'reviewStatus'] ==
+                                                          2 ||
+                                                      userInfoList[kycTier[
+                                                                  'levelName']][
+                                                              'reviewStatus'] ==
+                                                          0)) {
+                                                    print('Upadte');
+                                                    startVerifictaion(
+                                                        kycTier['levelName']);
+                                                  }
+                                                } else {
+                                                  print('Apply');
+                                                  startVerifictaion(
+                                                      kycTier['levelName']);
+                                                }
                                               }
                                             },
                                       text: userInfoList
@@ -487,28 +542,39 @@ class _personalverificationState extends State<personalverification>
                                                   1
                                               ? 'Verified'
                                               : (userInfoList[kycTier[
-                                                                  'levelName']][
-                                                              'reviewStatus'] ==
-                                                          2 ||
-                                                      userInfoList[kycTier[
-                                                                  'levelName']][
-                                                              'reviewStatus'] ==
-                                                          0)
+                                                              'levelName']]
+                                                          ['reviewStatus'] ==
+                                                      2)
                                                   ? 'Resubmit'
-                                                  : 'Start Now'
+                                                  : userInfoList[kycTier[
+                                                                  'levelName']][
+                                                              'reviewStatus'] ==
+                                                          0
+                                                      ? 'Update'
+                                                      : 'Start Now'
                                           : 'Start Now',
                                       active: userInfoList
                                               .containsKey(kycTier['levelName'])
-                                          ? (userInfoList[kycTier['levelName']]
+                                          ? ((kycTier['levelName'] == 'Tier1' ||
+                                                      kycTier['levelName'] ==
+                                                          'Tier2') &&
+                                                  userInfoList[kycTier['levelName']]
                                                           ['reviewStatus'] ==
-                                                      2 ||
-                                                  userInfoList[kycTier[
-                                                              'levelName']]
-                                                          ['reviewStatus'] ==
-                                                      0)
+                                                      1)
                                               ? true
-                                              : false
-                                          : false,
+                                              : (userInfoList[kycTier['levelName']][
+                                                              'reviewStatus'] ==
+                                                          2 ||
+                                                      userInfoList[kycTier['levelName']][
+                                                              'reviewStatus'] ==
+                                                          0)
+                                                  ? true
+                                                  : false
+                                          : (kycTier['levelName'] == 'Tier2' &&
+                                                  !userInfoList.containsKey(
+                                                      [kycTier['levelName']]))
+                                              ? true
+                                              : false,
                                       activeColor: userInfoList
                                               .containsKey(kycTier['levelName'])
                                           ? userInfoList[kycTier['levelName']]

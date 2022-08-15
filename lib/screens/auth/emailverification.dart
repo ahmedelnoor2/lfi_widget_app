@@ -73,9 +73,6 @@ class _EmailVerificationState extends State<EmailVerification> {
   }
 
   Future<void> sendVerificationCode() async {
-    print(widget.token);
-    print(widget.isMobile);
-
     var auth = Provider.of<Auth>(context, listen: false);
 
     if (widget.emailVerification) {

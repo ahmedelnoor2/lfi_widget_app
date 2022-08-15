@@ -286,6 +286,7 @@ class Auth with ChangeNotifier {
     }
     isverifyloader = true;
     notifyListeners();
+
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
