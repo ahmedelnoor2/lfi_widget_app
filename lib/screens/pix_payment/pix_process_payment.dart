@@ -7,6 +7,7 @@ import 'package:flutter/src/animation/animation_controller.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/ticker_provider.dart';
+import 'package:http/http.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/payments.dart';
 import 'package:lyotrade/screens/common/alert.dart';
@@ -107,9 +108,8 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
-
     var payments = Provider.of<Payments>(context, listen: true);
-
+    var getPortugeseTrans = payments.getPortugeseTrans;
     return Scaffold(
       appBar: hiddenAppBar(),
       body: SingleChildScrollView(
@@ -141,7 +141,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                       ),
                                       'Are you sure?',
                                       [
-                                        Text('You have a pending transaction.'),
+                                        Text(getPortugeseTrans('You have a pending transaction')),
                                       ],
                                       'Cancel Transaction',
                                     );
@@ -159,7 +159,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                       ),
                                       'Are you sure?',
                                       [
-                                        Text('You have a pending transaction.'),
+                                        Text(getPortugeseTrans("You have a pending transaction")),
                                       ],
                                       'Cancel Transaction',
                                     );
@@ -172,7 +172,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                             ),
                           ),
                           Text(
-                            'Transfer money to process with order',
+                            getPortugeseTrans('Transfer money to process with order'),
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -249,7 +249,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                         child: Container(
                                           padding: EdgeInsets.all(10),
                                           child: Text(
-                                            'Bank Details',
+                                          getPortugeseTrans('Bank Details'),
                                             style: TextStyle(fontSize: 16),
                                           ),
                                         ),
@@ -262,7 +262,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              'Merchant Name',
+                                            getPortugeseTrans('Merchant Name'),
                                               style: TextStyle(
                                                 color: secondaryTextColor,
                                               ),
@@ -287,7 +287,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                                     snackAlert(
                                                         context,
                                                         SnackTypes.success,
-                                                        'Copied');
+                                                        getPortugeseTrans('Copied'));
                                                   },
                                                   child: Icon(
                                                     Icons.copy,
@@ -307,7 +307,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              'Merchant City',
+                                            getPortugeseTrans('Merchant City'),
                                               style: TextStyle(
                                                 color: secondaryTextColor,
                                               ),
@@ -332,7 +332,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                                     snackAlert(
                                                         context,
                                                         SnackTypes.success,
-                                                        'Copied');
+                                                        getPortugeseTrans('Copied'));
                                                   },
                                                   child: Icon(
                                                     Icons.copy,
@@ -352,7 +352,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              'Country Code',
+                                              getPortugeseTrans('Country Code'),
                                               style: TextStyle(
                                                 color: secondaryTextColor,
                                               ),
@@ -377,7 +377,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                                     snackAlert(
                                                         context,
                                                         SnackTypes.success,
-                                                        'Copied');
+                                                        getPortugeseTrans('Copied'));
                                                   },
                                                   child: Icon(
                                                     Icons.copy,
@@ -397,7 +397,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              'Transaction ID',
+                                              getPortugeseTrans('Transaction ID'),
                                               style: TextStyle(
                                                 color: secondaryTextColor,
                                               ),
@@ -422,7 +422,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                                     snackAlert(
                                                         context,
                                                         SnackTypes.success,
-                                                        'Copied');
+                                                       getPortugeseTrans('Copied'));
                                                   },
                                                   child: Icon(
                                                     Icons.copy,
@@ -492,7 +492,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                       children: [
                                         Container(
                                           padding: EdgeInsets.only(right: 10),
-                                          child: Text('PIX QR Code'),
+                                          child: Text(getPortugeseTrans('PIX QR Code')),
                                         ),
                                         Icon(
                                           Icons.copy,
@@ -541,7 +541,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                     ? Container(
                                         padding: EdgeInsets.all(5),
                                         child: Text(
-                                          'Payment Successfull',
+                                        getPortugeseTrans('Payment Successfull'),
                                           style: TextStyle(
                                             color: greenIndicator,
                                             fontWeight: FontWeight.bold,
@@ -553,7 +553,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                         ? Container(
                                             padding: EdgeInsets.all(5),
                                             child: Text(
-                                              'Rejected',
+                                              getPortugeseTrans('Rejected'),
                                               style: TextStyle(
                                                 color: errorColor,
                                                 fontWeight: FontWeight.bold,
@@ -563,7 +563,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                         : Container(
                                             padding: EdgeInsets.all(5),
                                             child: Text(
-                                              'Waiting for payment',
+                                              getPortugeseTrans('Waiting for payment'),
                                               style: TextStyle(
                                                 color: warningColor,
                                                 fontWeight: FontWeight.bold,

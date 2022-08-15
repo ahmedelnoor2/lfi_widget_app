@@ -14,7 +14,6 @@ class _EnitityVerificationState extends State<EnitityVerification>
     with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
-    final _size = MediaQuery.of(context).size;
     return Scaffold(
         appBar: hiddenAppBar(),
         body: SingleChildScrollView(
@@ -44,11 +43,7 @@ class _EnitityVerificationState extends State<EnitityVerification>
                 ),
               ],
             ),
-            Divider(thickness: 1, height: 1),
-            SizedBox(
-              height: 20,
-            ),
-        
+            Divider(),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child:
@@ -67,8 +62,8 @@ class _EnitityVerificationState extends State<EnitityVerification>
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.w500),
                           ),
-                         ),
-                         Card(
+                        ),
+                        Card(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
@@ -183,7 +178,7 @@ class _EnitityVerificationState extends State<EnitityVerification>
                                     )),
                               ],
                             ),
-                             Container(
+                            Container(
                               height: 30,
                               child: ListTile(
                                 trailing: Text('',
@@ -271,7 +266,7 @@ class _EnitityVerificationState extends State<EnitityVerification>
                 SizedBox(
                   height: 10,
                 ),
-             Container(
+                Container(
                   width: MediaQuery.of(context).size.width,
                   color: selectboxcolour,
                   child: Column(
@@ -401,7 +396,7 @@ class _EnitityVerificationState extends State<EnitityVerification>
                                     )),
                               ],
                             ),
-                             Container(
+                            Container(
                               height: 30,
                               child: ListTile(
                                 trailing: Text('',
@@ -616,7 +611,7 @@ class _EnitityVerificationState extends State<EnitityVerification>
                                     )),
                               ],
                             ),
-                             Container(
+                            Container(
                               height: 30,
                               child: ListTile(
                                 trailing: Text('',
@@ -701,11 +696,8 @@ class _EnitityVerificationState extends State<EnitityVerification>
                         ),
                       ]),
                 ),
-                
-          ]),
+              ]),
             )
-         
-         
           ]),
         ));
   }

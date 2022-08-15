@@ -14,6 +14,26 @@ class Payments with ChangeNotifier {
     'exchange-token': '',
   };
 
+  // Change language
+  bool _portugeseLang = false;
+
+  bool get portugeseLang {
+    return _portugeseLang;
+  }
+
+  void toggleEnLang() {
+    _portugeseLang = !_portugeseLang;
+    notifyListeners();
+  }
+
+  String getPortugeseTrans(value) {
+    if (_portugeseLang) {
+      return getPortugeseTranslate(value);
+    } else {
+      return value;
+    }
+  }
+
   Map _selectedFiatCurrency = {};
 
   void setSelectedFiatCurrency(selectCurrency) {
@@ -343,6 +363,8 @@ class Payments with ChangeNotifier {
       '/payment_gateway/pix/get_client_kyc_transactions/$uuid',
     );
 
+    print(uuid);
+
     try {
       final response = await http.get(
         url,
@@ -350,6 +372,8 @@ class Payments with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
+
+      print(responseData);
 
       if (responseData['code'] == '0') {
         _allPixTransactions = responseData['data'];

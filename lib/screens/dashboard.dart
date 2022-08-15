@@ -44,7 +44,6 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   void initState() {
-    // checkScreenSize();
     getBanners();
     getNoticeInfo();
     checkSocket();

@@ -431,7 +431,7 @@ class Asset with ChangeNotifier {
         body: postData,
         headers: headers,
       );
-
+      print(response.statusCode);
       final responseData = json.decode(response.body);
 
       if (responseData['code'] == '0') {
@@ -441,9 +441,9 @@ class Asset with ChangeNotifier {
         snackAlert(ctx, SnackTypes.errors, responseData['msg']);
         auth.checkResponseCode(ctx, responseData['code']);
       }
-      notifyListeners();
+      return notifyListeners();
     } catch (error) {
-      notifyListeners();
+      return notifyListeners();
       // throw error;
     }
   }

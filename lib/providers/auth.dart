@@ -296,6 +296,7 @@ class Auth with ChangeNotifier {
     }
     isverifyloader = true;
     notifyListeners();
+
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
@@ -941,6 +942,40 @@ class Auth with ChangeNotifier {
     }
   }
 
+  // Personal KYC tier
+  Map _personalKycTiers = {};
+
+  Map get personalKycTiers {
+    return _personalKycTiers;
+  }
+
+  Future<void> getPersonalKycTiers(ctx, formData) async {
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/sumsub/v2/get_level_list',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(url, body: postData, headers: headers);
+
+      final responseData = json.decode(response.body);
+      if (responseData['code'] == '0') {
+        _personalKycTiers = responseData['data'];
+        return notifyListeners();
+      } else {
+        _personalKycTiers = {};
+        notifyListeners();
+      }
+
+      return notifyListeners();
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server Error!');
+      return notifyListeners();
+    }
+  }
+  
   //////upload profile image
   Future<void> uploadProfileImage(context, token, uid, imageXFile, imgname) async {
    
@@ -968,8 +1003,7 @@ class Auth with ChangeNotifier {
     });
   }
 
-  //////get user profile image
-  ///
+ //////get user profile image
  List _avatarresponse = [];
   List get avatarrespons {
     return _avatarresponse;

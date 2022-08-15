@@ -18,6 +18,7 @@ import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:lyotrade/utils/Translate.utils.dart';
 import 'package:provider/provider.dart';
 
 import 'package:qr_flutter/qr_flutter.dart';
@@ -298,6 +299,8 @@ class _PixPaymentState extends State<PixPayment>
     var auth = Provider.of<Auth>(context, listen: true);
     var payments = Provider.of<Payments>(context, listen: true);
 
+    var getPortugeseTrans = payments.getPortugeseTrans;
+
     return GestureDetector(
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
@@ -329,7 +332,7 @@ class _PixPaymentState extends State<PixPayment>
                               ),
                             ),
                             Text(
-                              'Deposit BRL',
+                              '${getPortugeseTrans('Deposit')} BRL',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -337,11 +340,27 @@ class _PixPaymentState extends State<PixPayment>
                             ),
                           ],
                         ),
-                        IconButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, '/pix_transactions');
-                          },
-                          icon: Icon(Icons.history),
+                        Row(
+                          children: [
+                            Switch(
+                              value: payments.portugeseLang,
+                              onChanged: (val) {
+                                payments.toggleEnLang();
+                              },
+                              activeColor: greenIndicator,
+                              activeThumbImage:
+                                  const AssetImage('assets/img/brl_lang.png'),
+                              inactiveThumbImage:
+                                  const AssetImage('assets/img/en_lang.png'),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                    context, '/pix_transactions');
+                              },
+                              icon: Icon(Icons.history),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -350,7 +369,7 @@ class _PixPaymentState extends State<PixPayment>
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Currency'),
+                          Text('${getPortugeseTrans('Currency')}'),
                         ],
                       ),
                     ),
@@ -412,9 +431,13 @@ class _PixPaymentState extends State<PixPayment>
                               textAlign: TextAlign.end,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please enter amount';
+                                  return getPortugeseTrans(
+                                    'Please enter amount',
+                                  );
                                 } else if (double.parse(value) < 100) {
-                                  return 'Minimum 100 BRL';
+                                  return '${getPortugeseTrans(
+                                    'Minimum',
+                                  )} 100 BRL';
                                 }
                                 return null;
                               },
@@ -426,7 +449,7 @@ class _PixPaymentState extends State<PixPayment>
                                   const TextInputType.numberWithOptions(
                                 decimal: true,
                               ),
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                 contentPadding: EdgeInsets.zero,
                                 isDense: true,
                                 border: UnderlineInputBorder(
@@ -435,7 +458,8 @@ class _PixPaymentState extends State<PixPayment>
                                 hintStyle: TextStyle(
                                   fontSize: 14,
                                 ),
-                                hintText: "Enter 10-100000",
+                                hintText:
+                                    "${getPortugeseTrans('Enter')} 10-100000",
                               ),
                             ),
                           )
@@ -512,7 +536,8 @@ class _PixPaymentState extends State<PixPayment>
                               textAlign: TextAlign.end,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please enter amount';
+                                  return getPortugeseTrans(
+                                      'Please enter amount');
                                 }
                                 return null;
                               },
@@ -524,7 +549,7 @@ class _PixPaymentState extends State<PixPayment>
                                   const TextInputType.numberWithOptions(
                                 decimal: true,
                               ),
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                 contentPadding: EdgeInsets.zero,
                                 isDense: true,
                                 border: UnderlineInputBorder(
@@ -533,7 +558,8 @@ class _PixPaymentState extends State<PixPayment>
                                 hintStyle: TextStyle(
                                   fontSize: 14,
                                 ),
-                                hintText: "Enter USDT value",
+                                hintText:
+                                    "${getPortugeseTrans('Enter')} USDT ${getPortugeseTrans('value')}",
                               ),
                             ),
                           )
@@ -553,7 +579,7 @@ class _PixPaymentState extends State<PixPayment>
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'You receive:',
+                                '${getPortugeseTrans('You receive')}:',
                                 style: TextStyle(color: secondaryTextColor),
                               ),
                               Text(
@@ -567,7 +593,7 @@ class _PixPaymentState extends State<PixPayment>
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'You pay:',
+                                '${getPortugeseTrans('You pay')}:',
                                 style: TextStyle(color: secondaryTextColor),
                               ),
                               Text(
@@ -590,7 +616,7 @@ class _PixPaymentState extends State<PixPayment>
                           Container(
                             padding: EdgeInsets.only(right: 10),
                             child: Text(
-                              'Deposit with',
+                              getPortugeseTrans('Deposit with'),
                             ),
                           ),
                           Container(
@@ -600,7 +626,7 @@ class _PixPaymentState extends State<PixPayment>
                             ),
                             padding: EdgeInsets.all(5),
                             child: Text(
-                              'Recommended',
+                              getPortugeseTrans('Recommended'),
                               style: TextStyle(fontSize: 12),
                             ),
                           ),
@@ -641,13 +667,13 @@ class _PixPaymentState extends State<PixPayment>
                               children: [
                                 Container(
                                   child: Text(
-                                    'Bank Transfer (PIX)',
+                                    '${getPortugeseTrans('Bank Transfer')} (PIX)',
                                     style: TextStyle(fontSize: 16),
                                   ),
                                 ),
                                 Container(
                                   child: Text(
-                                    '${payments.pixCurrencyCommission}% Fee, Real-time payment',
+                                    '${payments.pixCurrencyCommission}% ${getPortugeseTrans('Fee')}, ${getPortugeseTrans('Real-time payment')}',
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: secondaryTextColor,
@@ -670,6 +696,9 @@ class _PixPaymentState extends State<PixPayment>
                             _processTransaction)
                         ? null
                         : () async {
+                            setState(() {
+                              _processTransaction = true;
+                            });
                             if (_formKey.currentState!.validate()) {
                               await payments.getKycVerificationDetails({
                                 'userId': auth.userInfo['id'],
@@ -688,9 +717,6 @@ class _PixPaymentState extends State<PixPayment>
 
                               if (payments.pixKycClients.isNotEmpty) {
                                 if (payments.pixKycClients['activate']) {
-                                  setState(() {
-                                    _processTransaction = true;
-                                  });
                                   await payments.createNewPixTransaction(
                                       context,
                                       {
@@ -709,6 +735,9 @@ class _PixPaymentState extends State<PixPayment>
                                         context, '/pix_process_payment');
                                   }
                                 } else {
+                                  setState(() {
+                                    _processTransaction = false;
+                                  });
                                   showModalBottomSheet<void>(
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.vertical(
@@ -738,6 +767,9 @@ class _PixPaymentState extends State<PixPayment>
                                   );
                                 }
                               } else {
+                                setState(() {
+                                  _processTransaction = false;
+                                });
                                 showModalBottomSheet<void>(
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.vertical(
@@ -768,7 +800,9 @@ class _PixPaymentState extends State<PixPayment>
                               }
                             }
                           },
-                    text: 'Continue',
+                    text: getPortugeseTrans(
+                      'Continue',
+                    ),
                     active: true,
                     isLoading: _processTransaction,
                     activeColor: (_amountBrlController.text.isEmpty ||
@@ -808,6 +842,8 @@ class _PixPaymentState extends State<PixPayment>
 
     var payments = Provider.of<Payments>(context, listen: true);
 
+    var getPortugeseTrans = payments.getPortugeseTrans;
+
     if (payments.kycTransaction.isNotEmpty) {
       if (payments.kycTransaction['status'] == 'PROCESSING') {
         if (_timer == null) {
@@ -815,7 +851,7 @@ class _PixPaymentState extends State<PixPayment>
             if (payments.kycTransaction.isNotEmpty) {
               if (payments.kycTransaction['date_end'] != null) {
                 _timer = Timer.periodic(
-                  const Duration(seconds: 1),
+                  const Duration(seconds: 3),
                   (Timer timer) {
                     getClientUpdate(payments);
                   },
@@ -852,8 +888,8 @@ class _PixPaymentState extends State<PixPayment>
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
-                              'KYC Verification',
+                            Text(
+                              'KYC ${getPortugeseTrans('Verification')}',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -877,212 +913,273 @@ class _PixPaymentState extends State<PixPayment>
                         Divider(),
                         Container(
                           child: Text(
-                            'The QR code with 5 Dollar deposit is used to verify your CPF account. Once Approved, you will be redirect to next screen for transferring payments for deposit.',
+                            getPortugeseTrans(
+                                'The QR code with 5 Dollar deposit is used to verify your CPF account. Once Approved, you will be redirect to next screen for transferring payments for deposit.'),
                             style: TextStyle(
                               color: secondaryTextColor,
                               fontSize: 12,
                             ),
                           ),
                         ),
-                        Container(
-                          padding: EdgeInsets.all(10),
-                          child: payments.kycTransaction.isNotEmpty
-                              ? payments.kycTransaction['status'] == 'ACCEPTED'
-                                  ? Align(
+                        payments.kycTransaction['status'] == null
+                            ? Container(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Align(
                                       alignment: Alignment.center,
                                       child: Image.asset(
-                                        'assets/img/approved.png',
-                                        width: 50,
+                                        'assets/img/rejected.png',
+                                        width: 100,
                                       ),
-                                    )
-                                  : Stack(
-                                      children: [
-                                        Image.asset(
-                                          'assets/img/qr_scan.png',
-                                          width: 150,
-                                        ),
-                                        Container(
-                                          padding:
-                                              EdgeInsets.only(top: 9, left: 10),
-                                          child: payments
-                                                  .kycTransaction.isNotEmpty
-                                              ? QrImage(
-                                                  data: utf8.decode(
-                                                    base64.decode(payments
-                                                                    .kycTransaction[
-                                                                'qr_code'] !=
-                                                            null
-                                                        ? payments
-                                                                .kycTransaction[
-                                                            'qr_code']
-                                                        : ''),
-                                                  ),
-                                                  version: QrVersions.auto,
-                                                  backgroundColor: Colors.white,
-                                                  size: 130.0,
-                                                )
-                                              : Container(),
-                                        ),
-                                        payments.kycTransaction.isNotEmpty
-                                            ? (payments.kycTransaction[
-                                                            'status'] ==
-                                                        'CHARGEBACK' ||
-                                                    payments.kycTransaction[
-                                                            'status'] ==
-                                                        'REVERSED')
-                                                ? InkWell(
-                                                    onTap: () async {
-                                                      setState(() {
-                                                        _reRequestKYCAuth =
-                                                            true;
-                                                      });
-                                                      await payments
-                                                          .clearKycTransactions();
-                                                      // reRequestKyc();
-                                                    },
-                                                    child: Container(
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.only(
+                                        left: 10,
+                                        right: 10,
+                                        bottom: 5,
+                                      ),
+                                      child: Text(
+                                        getPortugeseTrans('Invalid CPF number'),
+                                        style: TextStyle(color: errorColor),
+                                      ),
+                                    ),
+                                    Text(
+                                      getPortugeseTrans(
+                                        'Please update CPF to request your KYC verification',
+                                      ),
+                                      style: TextStyle(color: warningColor),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : Container(),
+                        payments.kycTransaction['status'] == null
+                            ? Container()
+                            : Container(
+                                padding: EdgeInsets.all(10),
+                                child: payments.kycTransaction.isNotEmpty
+                                    ? payments.kycTransaction['status'] ==
+                                            'ACCEPTED'
+                                        ? Align(
+                                            alignment: Alignment.center,
+                                            child: Image.asset(
+                                              'assets/img/approved.png',
+                                              width: 50,
+                                            ),
+                                          )
+                                        : Stack(
+                                            children: [
+                                              Image.asset(
+                                                'assets/img/qr_scan.png',
+                                                width: 150,
+                                              ),
+                                              Container(
+                                                padding: EdgeInsets.only(
+                                                    top: 9, left: 10),
+                                                child: payments.kycTransaction
+                                                        .isNotEmpty
+                                                    ? QrImage(
+                                                        data: utf8.decode(
+                                                          base64.decode(payments
+                                                                          .kycTransaction[
+                                                                      'qr_code'] !=
+                                                                  null
+                                                              ? payments
+                                                                      .kycTransaction[
+                                                                  'qr_code']
+                                                              : ''),
+                                                        ),
+                                                        version:
+                                                            QrVersions.auto,
+                                                        backgroundColor:
+                                                            Colors.white,
+                                                        size: 130.0,
+                                                      )
+                                                    : Container(),
+                                              ),
+                                              payments.kycTransaction.isNotEmpty
+                                                  ? (payments.kycTransaction[
+                                                                  'status'] ==
+                                                              'CHARGEBACK' ||
+                                                          payments.kycTransaction[
+                                                                  'status'] ==
+                                                              'REVERSED')
+                                                      ? InkWell(
+                                                          onTap: () async {
+                                                            setState(() {
+                                                              _reRequestKYCAuth =
+                                                                  true;
+                                                            });
+                                                            await payments
+                                                                .clearKycTransactions();
+                                                            // reRequestKyc();
+                                                          },
+                                                          child: Container(
+                                                            margin:
+                                                                EdgeInsets.only(
+                                                                    top: 5,
+                                                                    left: 5),
+                                                            height: 140,
+                                                            width: 140,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: Color
+                                                                  .fromARGB(
+                                                                      207,
+                                                                      94,
+                                                                      98,
+                                                                      146),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          5),
+                                                              border:
+                                                                  Border.all(
+                                                                style:
+                                                                    BorderStyle
+                                                                        .solid,
+                                                                width: 0.3,
+                                                                color: Color(
+                                                                    0xff5E6292),
+                                                              ),
+                                                            ),
+                                                            child: Align(
+                                                              alignment:
+                                                                  Alignment
+                                                                      .center,
+                                                              child: Icon(
+                                                                Icons.refresh,
+                                                                size: 50,
+                                                              ),
+                                                            ),
+                                                          ))
+                                                      : Container(
+                                                          margin:
+                                                              EdgeInsets.only(
+                                                                  top: 5,
+                                                                  left: 5),
+                                                          height: 140,
+                                                          width: 140,
+                                                        )
+                                                  : Container(
                                                       margin: EdgeInsets.only(
                                                           top: 5, left: 5),
                                                       height: 140,
                                                       width: 140,
-                                                      decoration: BoxDecoration(
-                                                        color: Color.fromARGB(
-                                                            207, 94, 98, 146),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(5),
-                                                        border: Border.all(
-                                                          style:
-                                                              BorderStyle.solid,
-                                                          width: 0.3,
-                                                          color:
-                                                              Color(0xff5E6292),
-                                                        ),
-                                                      ),
-                                                      child: Align(
-                                                        alignment:
-                                                            Alignment.center,
-                                                        child: Icon(
-                                                          Icons.refresh,
-                                                          size: 50,
-                                                        ),
-                                                      ),
-                                                    ))
-                                                : Container(
-                                                    margin: EdgeInsets.only(
-                                                        top: 5, left: 5),
-                                                    height: 140,
-                                                    width: 140,
-                                                  )
-                                            : Container(
-                                                margin: EdgeInsets.only(
-                                                    top: 5, left: 5),
-                                                height: 140,
-                                                width: 140,
-                                              ),
+                                                    ),
+                                            ],
+                                          )
+                                    : Container(),
+                              ),
+                        payments.kycTransaction['status'] == null
+                            ? Container()
+                            : InkWell(
+                                onTap: () {
+                                  Clipboard.setData(
+                                    ClipboardData(
+                                      text:
+                                          '${payments.kycTransaction['qr_code'] != null ? payments.kycTransaction['qr_code'] : ''}',
+                                    ),
+                                  );
+                                  showAlert(
+                                    context,
+                                    Icon(Icons.copy),
+                                    'Copied',
+                                    [
+                                      Text('QR Code copied!'),
+                                    ],
+                                    'Ok',
+                                  );
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(10),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.only(right: 10),
+                                        child: Text('PIX QR Code'),
+                                      ),
+                                      Icon(
+                                        Icons.copy,
+                                        size: 18,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                        payments.kycTransaction['status'] == null
+                            ? Container()
+                            : Container(
+                                padding: EdgeInsets.only(top: 10),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Text('Status'),
+                                        Container(
+                                          padding: EdgeInsets.all(5),
+                                          child: Text(
+                                            '${payments.kycTransaction['status']}',
+                                            style: TextStyle(
+                                              color: payments.kycTransaction[
+                                                          'status'] ==
+                                                      'ACCEPTED'
+                                                  ? successColor
+                                                  : warningColor,
+                                            ),
+                                          ),
+                                        ),
                                       ],
-                                    )
-                              : Container(),
-                        ),
-                        InkWell(
-                          onTap: () {
-                            Clipboard.setData(
-                              ClipboardData(
-                                text:
-                                    '${payments.kycTransaction['qr_code'] != null ? payments.kycTransaction['qr_code'] : ''}',
+                                    ),
+                                    Column(
+                                      children: [
+                                        Text('Countdown'),
+                                        Container(
+                                          padding: EdgeInsets.all(5),
+                                          child: Text(
+                                            'KYC Transaction',
+                                            style: TextStyle(
+                                              color: linkColor,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                            );
-                            showAlert(
-                              context,
-                              Icon(Icons.copy),
-                              'Copied',
-                              [Text('QR Code copied!')],
-                              'Ok',
-                            );
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.only(right: 10),
-                                  child: Text('PIX QR Code'),
-                                ),
-                                Icon(
-                                  Icons.copy,
-                                  size: 18,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.only(top: 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Column(
-                                children: [
-                                  Text('Status'),
-                                  Container(
-                                    padding: EdgeInsets.all(5),
-                                    child: Text(
-                                      '${payments.kycTransaction['status']}',
-                                      style: TextStyle(
-                                        color:
-                                            payments.kycTransaction['status'] ==
-                                                    'ACCEPTED'
-                                                ? successColor
-                                                : warningColor,
+                        payments.kycTransaction['status'] == null
+                            ? Container()
+                            : Container(
+                                padding: EdgeInsets.only(top: 20),
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.only(top: 5),
+                                      child: Text(
+                                        '${payments.pixKycClients['name_client']}',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                children: [
-                                  Text('Countdown'),
-                                  Container(
-                                    padding: EdgeInsets.all(5),
-                                    child: Text(
-                                      'KYC Transaction',
-                                      style: TextStyle(
-                                        color: linkColor,
-                                        fontSize: 16,
-                                      ),
+                                    Container(
+                                      child: Text(
+                                          '${payments.pixKycClients['email_client']}'),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.only(top: 20),
-                          child: Column(
-                            children: [
-                              Container(
-                                padding: EdgeInsets.only(top: 5),
-                                child: Text(
-                                  '${payments.pixKycClients['name_client']}',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                    Container(
+                                      child: Text(
+                                          '${payments.pixKycClients['cpf_client']}'),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              Container(
-                                child: Text(
-                                    '${payments.pixKycClients['email_client']}'),
-                              ),
-                              Container(
-                                child: Text(
-                                    '${payments.pixKycClients['cpf_client']}'),
-                              ),
-                            ],
-                          ),
-                        ),
                         Container(
                           padding: EdgeInsets.all(40),
                           child: InkWell(
@@ -1092,8 +1189,10 @@ class _PixPaymentState extends State<PixPayment>
                               });
                             },
                             child: Text(
-                              'Update CPF',
-                              style: TextStyle(color: linkColor),
+                              getPortugeseTrans(
+                                'Update CPF',
+                              ),
+                              style: TextStyle(fontSize: 18, color: linkColor),
                             ),
                           ),
                         )
@@ -1105,8 +1204,8 @@ class _PixPaymentState extends State<PixPayment>
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'Additional Information',
+                          Text(
+                            getPortugeseTrans('Additional Information'),
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -1126,7 +1225,8 @@ class _PixPaymentState extends State<PixPayment>
                       Divider(),
                       Container(
                         child: Text(
-                          'Please input your own CPF to proceed with the transactions. Any other CPF will cause the deposit to fail.',
+                          getPortugeseTrans(
+                              'Please input your own CPF to proceed with the transactions. Any other CPF will cause the deposit to fail.'),
                           style: TextStyle(
                             color: secondaryTextColor,
                             fontSize: 12,
@@ -1143,7 +1243,9 @@ class _PixPaymentState extends State<PixPayment>
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text('Full Name'),
+                                      Text(
+                                        getPortugeseTrans('Full Name'),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -1167,7 +1269,8 @@ class _PixPaymentState extends State<PixPayment>
                                           validator: (value) {
                                             if (value == null ||
                                                 value.isEmpty) {
-                                              return 'Please enter name';
+                                              return getPortugeseTrans(
+                                                  'Please enter name');
                                             }
                                             return null;
                                           },
@@ -1177,7 +1280,7 @@ class _PixPaymentState extends State<PixPayment>
                                             });
                                           },
                                           controller: _nameController,
-                                          decoration: const InputDecoration(
+                                          decoration: InputDecoration(
                                             contentPadding: EdgeInsets.zero,
                                             isDense: true,
                                             border: UnderlineInputBorder(
@@ -1186,7 +1289,9 @@ class _PixPaymentState extends State<PixPayment>
                                             hintStyle: TextStyle(
                                               fontSize: 14,
                                             ),
-                                            hintText: "Enter your name",
+                                            hintText: getPortugeseTrans(
+                                              "Enter your name",
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -1220,7 +1325,11 @@ class _PixPaymentState extends State<PixPayment>
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text('Email'),
+                                      Text(
+                                        getPortugeseTrans(
+                                          "Email",
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -1244,7 +1353,9 @@ class _PixPaymentState extends State<PixPayment>
                                           validator: (value) {
                                             if (value == null ||
                                                 value.isEmpty) {
-                                              return 'Please enter email';
+                                              return getPortugeseTrans(
+                                                "Please enter email",
+                                              );
                                             }
                                             return null;
                                           },
@@ -1254,7 +1365,7 @@ class _PixPaymentState extends State<PixPayment>
                                             });
                                           },
                                           controller: _emailController,
-                                          decoration: const InputDecoration(
+                                          decoration: InputDecoration(
                                             contentPadding: EdgeInsets.zero,
                                             isDense: true,
                                             border: UnderlineInputBorder(
@@ -1263,7 +1374,9 @@ class _PixPaymentState extends State<PixPayment>
                                             hintStyle: TextStyle(
                                               fontSize: 14,
                                             ),
-                                            hintText: "Enter your email",
+                                            hintText: getPortugeseTrans(
+                                              "Enter your email",
+                                            ),
                                           ),
                                         ),
                                       )
@@ -1314,7 +1427,8 @@ class _PixPaymentState extends State<PixPayment>
                               child: TextFormField(
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Please enter CPF account number';
+                                    return getPortugeseTrans(
+                                        'Please enter CPF account number');
                                   }
                                   return null;
                                 },
@@ -1328,7 +1442,7 @@ class _PixPaymentState extends State<PixPayment>
                                   decimal: true,
                                 ),
                                 controller: _cpfController,
-                                decoration: const InputDecoration(
+                                decoration: InputDecoration(
                                   contentPadding: EdgeInsets.zero,
                                   isDense: true,
                                   border: UnderlineInputBorder(
@@ -1337,7 +1451,9 @@ class _PixPaymentState extends State<PixPayment>
                                   hintStyle: TextStyle(
                                     fontSize: 14,
                                   ),
-                                  hintText: "Enter 11 digits of your CPF",
+                                  hintText: getPortugeseTrans(
+                                    "Enter 11 digits of your CPF",
+                                  ),
                                 ),
                               ),
                             )
@@ -1383,7 +1499,7 @@ class _PixPaymentState extends State<PixPayment>
                                       ),
                                     ),
                                     Text(
-                                      'Awaiting payment',
+                                      getPortugeseTrans('Awaiting payment'),
                                       style: TextStyle(
                                         color: warningColor,
                                       ),
@@ -1417,54 +1533,66 @@ class _PixPaymentState extends State<PixPayment>
                                               context, '/pix_process_payment');
                                         }
                                       },
-                                      child: Text('Continue'),
+                                      child: Text(
+                                        getPortugeseTrans('Continue'),
+                                      ),
                                     )
-                                  : TextButton(
-                                      onPressed: () async {
-                                        // print(payments.pixKycClients[0]['client_uuid']);
-                                        setState(() {
-                                          _reRequestKYCAuth = true;
-                                        });
-                                        await payments.clearKycTransactions();
-                                        // reRequestKyc();
-                                      },
-                                      child: Text('Resend KYC verification'),
+                                  : payments.kycTransaction['status'] == null
+                                      ? Container()
+                                      : TextButton(
+                                          onPressed: () async {
+                                            // print(payments.pixKycClients[0]['client_uuid']);
+                                            setState(() {
+                                              _reRequestKYCAuth = true;
+                                            });
+                                            await payments
+                                                .clearKycTransactions();
+                                            // reRequestKyc();
+                                          },
+                                          child: Text(
+                                            getPortugeseTrans(
+                                                'Resend KYC verification'),
+                                          ),
+                                        ),
+                        ),
+                      ),
+                      payments.kycTransaction['status'] == null
+                          ? Container()
+                          : Container(
+                              width: width,
+                              padding: EdgeInsets.all(10),
+                              margin: EdgeInsets.only(bottom: 50),
+                              decoration: BoxDecoration(
+                                color: Color(0xff1E2144),
+                                borderRadius: BorderRadius.circular(5),
+                                border: Border.all(
+                                  style: BorderStyle.solid,
+                                  width: 0.3,
+                                  color: Color(0xff1E2144),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.only(right: 10),
+                                    child: Icon(
+                                      Icons.info,
+                                      size: 15,
+                                      color: secondaryTextColor,
                                     ),
-                        ),
-                      ),
-                      Container(
-                        width: width,
-                        padding: EdgeInsets.all(10),
-                        margin: EdgeInsets.only(bottom: 50),
-                        decoration: BoxDecoration(
-                          color: Color(0xff1E2144),
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(
-                            style: BorderStyle.solid,
-                            width: 0.3,
-                            color: Color(0xff1E2144),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.only(right: 10),
-                              child: Icon(
-                                Icons.info,
-                                size: 15,
-                                color: secondaryTextColor,
+                                  ),
+                                  Text(
+                                    getPortugeseTrans(
+                                      'Please scan the code to pay to verify your CPF',
+                                    ),
+                                    style: TextStyle(
+                                      color: secondaryTextColor,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            Text(
-                              'Please scan the code to pay to verify your CPF',
-                              style: TextStyle(
-                                color: secondaryTextColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     ],
                   )
                 : Container(
@@ -1482,7 +1610,9 @@ class _PixPaymentState extends State<PixPayment>
                                 ).hasMatch(_email)) {
                                   setState(() {
                                     _fieldErrors['email'] =
-                                        'Invalid email format';
+                                        getPortugeseTrans(
+                                      'Invalid email format',
+                                    );
                                   });
                                 } else {
                                   setState(() {
@@ -1505,7 +1635,7 @@ class _PixPaymentState extends State<PixPayment>
                                 });
                               }
 
-                              print(_reRequestKYCAuth);
+                              // print(_reRequestKYCAuth);
                               if (_fieldErrors.isEmpty) {
                                 if (_reRequestKYCAuth) {
                                   reRequestKyc();
@@ -1514,7 +1644,7 @@ class _PixPaymentState extends State<PixPayment>
                                 }
                               }
                             },
-                      text: 'Continue',
+                      text: getPortugeseTrans('Continue'),
                       active: true,
                       isLoading: _processKyc,
                       activeColor: ((_name.isEmpty && !_reRequestKYCAuth) ||

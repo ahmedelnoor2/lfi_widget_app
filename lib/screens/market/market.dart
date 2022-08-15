@@ -33,7 +33,6 @@ class _MarketState extends State<Market> {
   @override
   void initState() {
     getrecommendedsymbol();
-
     super.initState();
   }
 
