@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:intl/intl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +29,8 @@ class Notificationsscreen extends StatefulWidget {
 
 class _NotificationsscreenState extends State<Notificationsscreen>
     with SingleTickerProviderStateMixin {
+  
+
   String dropdownValue = 'All';
 
   bool _isselected = false;
@@ -45,6 +49,9 @@ class _NotificationsscreenState extends State<Notificationsscreen>
     super.initState();
   }
 
+
+
+
   Future<void> getnotification() async {
     var notificationProvider =
         Provider.of<Notificationprovider>(context, listen: false);
@@ -60,8 +67,8 @@ class _NotificationsscreenState extends State<Notificationsscreen>
     var notificationProvider =
         Provider.of<Notificationprovider>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: false);
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
+
+   
 
     return Scaffold(
       appBar: hiddenAppBar(),
