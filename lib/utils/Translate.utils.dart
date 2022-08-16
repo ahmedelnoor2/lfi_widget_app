@@ -195,6 +195,8 @@ String getPortugeseTranslate(String text) {
       return 'Favor atualizar o CPF para solicitar sua verificação KYC';
     case 'The QR code with 5 Dollar deposit is used to verify your CPF account. Once Approved, you will be redirect to next screen for transferring payments for deposit.':
       return 'O código QR com depósito de 5 dólares é usado para verificar sua conta CPF. Uma vez aprovado, você será redirecionado para a tela seguinte para transferir pagamentos para depósito.';
+    case 'TAX Amount':
+      return 'Valor do IMPOSTO';
     default:
       return text;
   }

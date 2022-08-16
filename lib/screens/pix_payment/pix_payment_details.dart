@@ -400,6 +400,32 @@ class _PixPaymentDetailsState extends State<PixPaymentDetails>
                                       ],
                                     ),
                                   ),
+                                  Container(
+                                    padding: EdgeInsets.all(10),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          getPortugeseTrans('TAX Amount'),
+                                          style: TextStyle(
+                                            color: secondaryTextColor,
+                                          ),
+                                        ),
+                                        Row(
+                                          children: [
+                                            Container(
+                                              padding:
+                                                  EdgeInsets.only(right: 5),
+                                              child: Text(
+                                                '1.62 BRL',
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -446,8 +472,14 @@ class _PixPaymentDetailsState extends State<PixPaymentDetails>
                               onTap: () {
                                 Clipboard.setData(
                                   ClipboardData(
-                                    text:
-                                        '${payments.selectedTransaction.isNotEmpty ? payments.selectedTransaction['qr_code'] : payments.pixNewTransaction['qr_code']}',
+                                    text: utf8.decode(
+                                      base64.decode(payments
+                                              .selectedTransaction.isNotEmpty
+                                          ? payments
+                                              .selectedTransaction['qr_code']
+                                          : payments
+                                              .pixNewTransaction['qr_code']),
+                                    ),
                                   ),
                                 );
                                 snackAlert(context, SnackTypes.success,

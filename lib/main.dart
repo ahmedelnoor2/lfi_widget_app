@@ -68,14 +68,13 @@ import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 int? initScreen;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   SharedPreferences preferences = await SharedPreferences.getInstance();
-  initScreen =  await preferences.getInt('initScreen');
+  initScreen = await preferences.getInt('initScreen');
   await preferences.setInt('initScreen', 1);
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
       overlays: [SystemUiOverlay.top]).then((_) => runApp(const MyApp()));
@@ -246,7 +245,9 @@ class MyApp extends StatelessWidget {
 
             // darkTheme: ThemeData.dark(),
             // themeMode: ThemeMode.dark,
-            home:  initScreen == 0 || initScreen == null ? IntroScreen() :SpashScreen(),
+            home: initScreen == 0 || initScreen == null
+                ? IntroScreen()
+                : SpashScreen(),
             routes: {
               Dashboard.routeName: (context) => const Dashboard(),
               Authentication.routeName: (context) => const Authentication(),
@@ -307,6 +308,7 @@ class MyApp extends StatelessWidget {
               AnnouncementDetails.routeName: (context) =>
                   const AnnouncementDetails(),
               Createpassword.routeName: (context) => const Createpassword(),
+              SpashScreen.routeName: (context) => const SpashScreen(),
             },
           );
         },
