@@ -44,7 +44,7 @@ class _PixTransactionsState extends State<PixTransactions>
     width = MediaQuery.of(context).size.width;
 
     var payments = Provider.of<Payments>(context, listen: true);
-    
+
     var getPortugeseTrans = payments.getPortugeseTrans;
 
     var allTransactions = [];
@@ -102,7 +102,8 @@ class _PixTransactionsState extends State<PixTransactions>
                       itemBuilder: (BuildContext context, int index) {
                         var transaction = allTransactions[index];
                         return ListTile(
-                          onTap: transaction['qr_code'] == null
+                          onTap: ((transaction['qr_code'] == null) ||
+                                  ('${transaction['status']}' == 'CHARGEBACK'))
                               ? null
                               : () async {
                                   payments.decryptPixQR(
@@ -123,10 +124,10 @@ class _PixTransactionsState extends State<PixTransactions>
                           subtitle: Text(
                             transaction['date_end'] == null
                                 ? 'Invalid CPF for KYC transaction'
-                                : DateFormat('dd-MM-y H:mm').format(
-                                    DateTime.parse(
-                                        '${transaction['date_end']}'),
-                                  ),
+                                : DateFormat('dd-MM-y H:mm').add_jm().format(
+                                      DateTime.parse(
+                                          '${transaction['date_end']}'),
+                                    ),
                           ),
                           trailing: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
