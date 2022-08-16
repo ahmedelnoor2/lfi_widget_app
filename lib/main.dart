@@ -304,7 +304,7 @@ class MyApp extends StatelessWidget {
                   const PixPaymentDetails(),
               MarketSearch.routeName: (context) => const MarketSearch(),
               Refralinvitation.routeName: (context) => const Refralinvitation(),
-              LeaderBoard.routeName: (context) => LeaderBoard(),
+              LeaderBoard.routeName: (context) => const LeaderBoard(),
               AnnouncementDetails.routeName: (context) =>
                   const AnnouncementDetails(),
               Createpassword.routeName: (context) => const Createpassword(),
