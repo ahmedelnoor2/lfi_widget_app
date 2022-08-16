@@ -55,7 +55,7 @@ var redIndicator = Color(0xffD84646);
 var redPercentageIndicator = Color.fromARGB(77, 216, 70, 70);
 var greenPercentageIndicator = Color.fromARGB(77, 70, 216, 138);
 var linkColor = Color.fromARGB(255, 1, 254, 246);
-
+var onboardText=Color(0xFF5E6292);
 var geryTextColor = Color(0xFF39434a);
 var buttonBGColor = Color(0xFF10255c);
 var tabBarindicatorColor = Color(0xFF305dc3);

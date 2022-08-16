@@ -33,6 +33,7 @@ import 'package:lyotrade/screens/dashboard/announcement/announcement_details.dar
 import 'package:lyotrade/screens/dashboard/market_search.dart';
 import 'package:lyotrade/screens/dex_swap/dex_swap.dart';
 import 'package:lyotrade/screens/future_trade/future_trade.dart';
+import 'package:lyotrade/screens/intro_screen/intro_screen.dart';
 import 'package:lyotrade/screens/kyc/enitityverificatrion.dart';
 import 'package:lyotrade/screens/kyc/kycscreen.dart';
 import 'package:lyotrade/screens/kyc/perosmalvarification.dart';
@@ -53,6 +54,7 @@ import 'package:lyotrade/screens/security/google_auth.dart';
 import 'package:lyotrade/screens/security/password.dart';
 import 'package:lyotrade/screens/security/phone.dart';
 import 'package:lyotrade/screens/security/security.dart';
+import 'package:lyotrade/screens/splash_screen/splash.dart';
 import 'package:lyotrade/screens/staking/common/stake_order.dart';
 import 'package:lyotrade/screens/staking/stake.dart';
 import 'package:lyotrade/screens/take_loan/confrim_loan.dart';
@@ -64,12 +66,19 @@ import 'package:lyotrade/screens/trade/trade.dart';
 import 'package:lyotrade/screens/trade/trade_history.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+
+int? initScreen;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  SharedPreferences preferences = await SharedPreferences.getInstance();
+  initScreen =  await preferences.getInt('initScreen');
+  await preferences.setInt('initScreen', 1);
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
       overlays: [SystemUiOverlay.top]).then((_) => runApp(const MyApp()));
-  // runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -237,7 +246,7 @@ class MyApp extends StatelessWidget {
 
             // darkTheme: ThemeData.dark(),
             // themeMode: ThemeMode.dark,
-            home: const Dashboard(),
+            home:  initScreen == 0 || initScreen == null ? IntroScreen() :SpashScreen(),
             routes: {
               Dashboard.routeName: (context) => const Dashboard(),
               Authentication.routeName: (context) => const Authentication(),

@@ -47,13 +47,12 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   void initState() {
-    getBanners();
     getNoticeInfo();
     checkSocket();
-    getPublicInfo();
+
     getAssetsRate();
     checkLoginStatus();
-    
+
     timer = Timer.periodic(Duration(seconds: 15), (Timer t) {
       readCount();
     });
@@ -78,11 +77,6 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
-  Future<void> getBanners() async {
-    var public = Provider.of<Public>(context, listen: false);
-    await public.getBanners();
-  }
-
   Future<void> getNoticeInfo() async {
     var public = Provider.of<Public>(context, listen: false);
     await public.getNoticeInfo();
@@ -93,10 +87,10 @@ class _DashboardState extends State<Dashboard> {
     await public.checkSocket(context);
   }
 
-  Future<void> getPublicInfo() async {
-    var public = Provider.of<Public>(context, listen: false);
-    await public.getPublicInfo();
-  }
+  // Future<void> getPublicInfo() async {
+  //   var public = Provider.of<Public>(context, listen: false);
+  //   await public.getPublicInfo();
+  // }
 
   Future<void> checkScreenSize() async {
     width = MediaQuery.of(context).size.width;
@@ -119,59 +113,14 @@ class _DashboardState extends State<Dashboard> {
   }
 
   Future<void> getAssetsRate() async {
-    var public = Provider.of<Public>(context, listen: false);
-    await public.assetsRate();
-    await public.getFiatCoins();
-    await public.getPublicInfoMarket();
-    if (public.headerSymbols.isEmpty) {
-      await setHeaderSymbols();
-    }
+    // var public = Provider.of<Public>(context, listen: false);
+    // await public.assetsRate();
+    // await public.getFiatCoins();
+    // await public.getPublicInfoMarket();
+    // if (public.headerSymbols.isEmpty) {
+    //   await setHeaderSymbols();
+    // }
     connectWebSocket();
-  }
-
-  Future<void> setHeaderSymbols() async {
-    var public = Provider.of<Public>(context, listen: false);
-    List _headerSymbols = [];
-    List _headerSybolsToAdd = [];
-
-    for (int i = 0;
-        i <
-            public
-                .publicInfoMarket['market']['home_symbol_show']
-                    ['recommend_symbol_list']
-                .length;
-        i++) {
-      _headerSybolsToAdd.add(public.publicInfoMarket['market']
-          ['home_symbol_show']['recommend_symbol_list'][i]);
-      _headerSymbols.add({
-        'coin': public.publicInfoMarket['market']['home_symbol_show']
-                ['recommend_symbol_list'][i]
-            .split("/")[0],
-        'market': public.publicInfoMarket['market']['home_symbol_show']
-            ['recommend_symbol_list'][i],
-        'price': '0',
-        'change': '0',
-      });
-    }
-
-    for (int i = 0;
-        i < public.publicInfoMarket['market']['headerSymbol'].length;
-        i++) {
-      if (!_headerSybolsToAdd
-          .contains(public.publicInfoMarket['market']['headerSymbol'][i])) {
-        _headerSybolsToAdd
-            .add(public.publicInfoMarket['market']['headerSymbol'][i]);
-        _headerSymbols.add({
-          'coin': public.publicInfoMarket['market']['headerSymbol'][i]
-              .split("/")[0],
-          'market': public.publicInfoMarket['market']['headerSymbol'][i],
-          'price': '0',
-          'change': '0',
-        });
-      }
-    }
-    await public.setHeaderSymbols(_headerSymbols);
-    return;
   }
 
   Future<void> checkLoginStatus() async {
