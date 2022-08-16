@@ -1,176 +1,233 @@
-// import 'package:flutter/foundation.dart';
-// import 'package:flutter/material.dart';
-// import 'package:introduction_screen/introduction_screen.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:lyotrade/screens/common/lyo_buttons.dart';
+import 'package:lyotrade/screens/dashboard.dart';
+import 'package:lyotrade/utils/Colors.utils.dart';
 
-// class OnBoarding extends StatefulWidget {
-//     static const routeName = '/onboarding';
-//   @override
-//   _OnBoardingState createState() => _OnBoardingState();
-// }
+class IntroScreen extends StatefulWidget {
+  @override
+  _IntroScreenState createState() => _IntroScreenState();
+}
 
-// class _OnBoardingState extends State<OnBoarding> {
-//   final introKey = GlobalKey<IntroductionScreenState>();
+class _IntroScreenState extends State<IntroScreen> {
+  List<SliderModel> slides = [];
+  int currentIndex = 0;
+  PageController? _controller;
 
-//   void _onIntroEnd(context) {
-//     // Navigator.of(context).push(
-//     //   MaterialPageRoute(builder: (_) => HomePage()),
-//     // );
-//   }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _controller = PageController(initialPage: 0);
+    slides = getSlides();
+  }
 
-//   Widget _buildFullscreenImage() {
-//     return Image.asset(
-//       'assets/img/Group1.png',
-//       fit: BoxFit.cover,
-//       height: double.infinity,
-//       width: double.infinity,
-//       alignment: Alignment.center,
-//     );
-//   }
+  @override
+  void dispose() {
+    _controller!.dispose();
+    super.dispose();
+  }
 
-//   Widget _buildImage(String assetName, [double width = 350]) {
-//     return Image.asset('assets/$assetName', width: width);
-//   }
+  void goHomepage(context) {
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) {
+      return const Dashboard();
+    }), (Route<dynamic> route) => false);
+    //Navigate to home page and remove the intro screen history
+    //so that "Back" button wont work.
+  }
 
-//   @override
-//   Widget build(BuildContext context) {
-//     const bodyStyle = TextStyle(fontSize: 19.0);
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body:  Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 80, right: 30),
+              child: InkWell(
+                onTap: () {
+                  goHomepage(context);
+                },
+                child: const Text(
+                  'Skip',
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
+            Expanded(
+              child: PageView.builder(
+                  scrollDirection: Axis.horizontal,
+                  onPageChanged: (value) {
+                    setState(() {
+                      currentIndex = value;
+                    });
+                  },
+                  itemCount: slides.length,
+                  itemBuilder: (context, index) {
+                   
+                    // contents of slider
+                    return Slider(
+                      image: slides[index].getImage(),
+                      title: slides[index].getTitle(),
+                      description: slides[index].getDescription(),
+                    );
+                  }),
+            ),
+            Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  slides.length,
+                  (index) => buildDot(index, context),
+                ),
+              ),
+            ),
+            currentIndex == slides.length - 1
+                ? Container(
+                    height: 60,
+                    margin: EdgeInsets.all(40),
+                    width: double.infinity,
+                    color: linkColor,
+                    child: LyoButton(
+                      text: 'Get Started',
+                      active: true,
+                      activeColor: linkColor,
+                      activeTextColor: Colors.black,
+                      onPressed: () {
+                        goHomepage(context);
+                      },
+                    ),
+                  )
+                : Container(
+                    height: 60,
+                  ),
+          ],
+        ),
+    
+    );
+  }
 
-//     const pageDecoration = const PageDecoration(
-//       titleTextStyle: TextStyle(fontSize: 28.0, fontWeight: FontWeight.w700),
-//       bodyTextStyle: bodyStyle,
-//       bodyPadding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
-//       pageColor: Colors.white,
-//       imagePadding: EdgeInsets.zero,
-//     );
+  // container created for dots
+  Container buildDot(int index, BuildContext context) {
+    return Container(
+      height: 10,
+      width: currentIndex == index ? 25 : 10,
+      margin: EdgeInsets.only(right: 5),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: currentIndex == index ? linkColor : seconadarytextcolour,
+      ),
+    );
+  }
+}
 
-//     return IntroductionScreen(
-//       key: introKey,
-//       globalBackgroundColor: Colors.white,
-//       globalHeader: Align(
-//         alignment: Alignment.topRight,
-//         child: SafeArea(
-//           child: Padding(
-//             padding: const EdgeInsets.only(top: 16, right: 16),
-//             child:_buildFullscreenImage(),
-//           ),
-//         ),
-//       ),
-//       globalFooter: SizedBox(
-//         width: double.infinity,
-//         height: 60,
-//         child: ElevatedButton(
-//           child: const Text(
-//             'Let\'s go right away!',
-//             style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-//           ),
-//           onPressed: () => _onIntroEnd(context),
-//         ),
-//       ),
-//       pages: [
-//         PageViewModel(
-//           title: "Fractional shares",
-//           body:
-//           "Instead of having to buy an entire share, invest any amount you want.",
-//           image: _buildImage('img1.jpg'),
-//           decoration: pageDecoration,
-//         ),
-//         PageViewModel(
-//           title: "Learn as you go",
-//           body:
-//           "Download the Stockpile app and master the market with our mini-lesson.",
-//           image: _buildImage('img2.jpg'),
-//           decoration: pageDecoration,
-//         ),
-//         PageViewModel(
-//           title: "Kids and teens",
-//           body:
-//           "Kids and teens can track their stocks 24/7 and place trades that you approve.",
-//           image: _buildImage('img3.jpg'),
-//           decoration: pageDecoration,
-//         ),
-//         PageViewModel(
-//           title: "Full Screen Page",
-//           body:
-//           "Pages can be full screen as well.\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc id euismod lectus, non tempor felis. Nam rutrum rhoncus est ac venenatis.",
-//           image: _buildFullscreenImage(),
-//           decoration: pageDecoration.copyWith(
-//             contentMargin: const EdgeInsets.symmetric(horizontal: 16),
-//             fullScreen: true,
-//             bodyFlex: 2,
-//             imageFlex: 3,
-//           ),
-//         ),
-//         PageViewModel(
-//           title: "Another title page",
-//           body: "Another beautiful body text for this example onboarding",
-//           image: _buildImage('img2.jpg'),
-//           footer: ElevatedButton(
-//             onPressed: () {
-//               introKey.currentState?.animateScroll(0);
-//             },
-//             child: const Text(
-//               'FooButton',
-//               style: TextStyle(color: Colors.white),
-//             ),
-//             style: ElevatedButton.styleFrom(
-//               primary: Colors.lightBlue,
-//               shape: RoundedRectangleBorder(
-//                 borderRadius: BorderRadius.circular(8.0),
-//               ),
-//             ),
-//           ),
-//           decoration: pageDecoration,
-//         ),
-//         PageViewModel(
-//           title: "Title of last page - reversed",
-//           bodyWidget: Row(
-//             mainAxisAlignment: MainAxisAlignment.center,
-//             children: const [
-//               Text("Click on ", style: bodyStyle),
-//               Icon(Icons.edit),
-//               Text(" to edit a post", style: bodyStyle),
-//             ],
-//           ),
-//           decoration: pageDecoration.copyWith(
-//             bodyFlex: 2,
-//             imageFlex: 4,
-//             bodyAlignment: Alignment.bottomCenter,
-//             imageAlignment: Alignment.topCenter,
-//           ),
-//           image: _buildImage('img1.jpg'),
-//           reverse: true,
-//         ),
-//       ],
-//       onDone: () => _onIntroEnd(context),
-//       //onSkip: () => _onIntroEnd(context), // You can override onSkip callback
-//       showSkipButton: false,
-//       skipOrBackFlex: 0,
-//       nextFlex: 0,
-//       showBackButton: true,
-//       //rtl: true, // Display as right-to-left
-//       back: const Icon(Icons.arrow_back),
-//       skip: const Text('Skip', style: TextStyle(fontWeight: FontWeight.w600)),
-//       next: const Icon(Icons.arrow_forward),
-//       done: const Text('Done', style: TextStyle(fontWeight: FontWeight.w600)),
-//       curve: Curves.fastLinearToSlowEaseIn,
-//       controlsMargin: const EdgeInsets.all(16),
-//       controlsPadding: kIsWeb
-//           ? const EdgeInsets.all(12.0)
-//           : const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-//       dotsDecorator: const DotsDecorator(
-//         size: Size(10.0, 10.0),
-//         color: Color(0xFFBDBDBD),
-//         activeSize: Size(22.0, 10.0),
-//         activeShape: RoundedRectangleBorder(
-//           borderRadius: BorderRadius.all(Radius.circular(25.0)),
-//         ),
-//       ),
-//       dotsContainerDecorator: const ShapeDecoration(
-//         color: Colors.black87,
-//         shape: RoundedRectangleBorder(
-//           borderRadius: BorderRadius.all(Radius.circular(8.0)),
-//         ),
-//       ),
-//     );
-//   }
-// }
+// ignore: must_be_immutable
+// slider declared
+class Slider extends StatelessWidget {
+  String? image;
+  String? title;
+  String? description;
+  Slider({this.image, this.title, this.description});
+
+  @override
+  Widget build(BuildContext context) {
+    return  Container(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // image given in slider
+            Image(image: AssetImage(image!)),
+
+            Padding(
+              padding: const EdgeInsets.only(top: 16, bottom: 8),
+              child: Text(title!,
+                  style: TextStyle(
+                      fontSize: 26.0,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white)),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(description!,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 16.0,
+                      color: onboardText,
+                      fontWeight: FontWeight.w400)),
+            ),
+            SizedBox(height: 25),
+          ],
+        ),
+      
+    );
+  }
+}
+
+class SliderModel {
+  String? image;
+  String? title;
+  String? description;
+
+  // Constructor for variables
+  SliderModel({this.title, this.description, this.image});
+
+  void setImage(String getImage) {
+    image = getImage;
+  }
+
+  void setTitle(String getTitle) {
+    title = getTitle;
+  }
+
+  void setDescription(String getDescription) {
+    description = getDescription;
+  }
+
+  String? getImage() {
+    return image;
+  }
+
+  String? getTitle() {
+    return title;
+  }
+
+  String? getDescription() {
+    return description;
+  }
+}
+
+// List created
+List<SliderModel> getSlides() {
+  // ignore: deprecated_member_use
+  List<SliderModel> slides = [];
+  SliderModel sliderModel = new SliderModel();
+
+  // Item 1
+  sliderModel.setImage("assets/img/Group1.png");
+  sliderModel.setTitle("Easy Exchange");
+  sliderModel.setDescription(
+      "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.");
+  slides.add(sliderModel);
+
+  sliderModel = new SliderModel();
+
+  // Item 2
+  sliderModel.setImage("assets/img/Group2.png");
+  sliderModel.setTitle("Decentralized finance");
+  sliderModel.setDescription(
+      "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.");
+  slides.add(sliderModel);
+
+  sliderModel = new SliderModel();
+
+  // Item 3
+  sliderModel.setImage("assets/img/Group3.png");
+  sliderModel.setTitle("Cold Wallet");
+  sliderModel.setDescription(
+      "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.");
+  slides.add(sliderModel);
+
+  sliderModel = new SliderModel();
+  return slides;
+}

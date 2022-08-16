@@ -1,11 +1,12 @@
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/dashboard.dart';
+import 'package:provider/provider.dart';
 
 class SpashScreen extends StatefulWidget {
-   static const routeName = '/splashScreen';
+  static const routeName = '/splashScreen';
   const SpashScreen({Key? key}) : super(key: key);
 
   @override
@@ -22,46 +23,129 @@ class _SpashScreenState extends State<SpashScreen>
     _controller.dispose();
   }
 
-
-
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this);
-      Timer(Duration(seconds: 3), () {
-      Navigator.of(context)
-          .pushReplacement(MaterialPageRoute(builder: (_) => Dashboard()));
-    });
+    waitCalls();
+  }
+
+  Future<void> waitCalls() async {
+    await getPublicInfo();
+    await getBanners();
+    await getAssetsRate();
+     Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
+  }
+
+  Future<void> getAssetsRate() async {
+    var public = Provider.of<Public>(context, listen: false);
+    await public.assetsRate();
+    await public.getFiatCoins();
+    await public.getPublicInfoMarket();
+    if (public.headerSymbols.isEmpty) {
+      await setHeaderSymbols();
+    }
+    return;
+  }
+
+  Future<void> setHeaderSymbols() async {
+    var public = Provider.of<Public>(context, listen: false);
+    List _headerSymbols = [];
+    List _headerSybolsToAdd = [];
+
+    for (int i = 0;
+        i <
+            public
+                .publicInfoMarket['market']['home_symbol_show']
+                    ['recommend_symbol_list']
+                .length;
+        i++) {
+      _headerSybolsToAdd.add(public.publicInfoMarket['market']
+          ['home_symbol_show']['recommend_symbol_list'][i]);
+      _headerSymbols.add({
+        'coin': public.publicInfoMarket['market']['home_symbol_show']
+                ['recommend_symbol_list'][i]
+            .split("/")[0],
+        'market': public.publicInfoMarket['market']['home_symbol_show']
+            ['recommend_symbol_list'][i],
+        'price': '0',
+        'change': '0',
+      });
+    }
+
+    for (int i = 0;
+        i < public.publicInfoMarket['market']['headerSymbol'].length;
+        i++) {
+      if (!_headerSybolsToAdd
+          .contains(public.publicInfoMarket['market']['headerSymbol'][i])) {
+        _headerSybolsToAdd
+            .add(public.publicInfoMarket['market']['headerSymbol'][i]);
+        _headerSymbols.add({
+          'coin': public.publicInfoMarket['market']['headerSymbol'][i]
+              .split("/")[0],
+          'market': public.publicInfoMarket['market']['headerSymbol'][i],
+          'price': '0',
+          'change': '0',
+        });
+      }
+    }
+    await public.setHeaderSymbols(_headerSymbols);
+    return;
+  }
+
+  Future<void> getPublicInfo() async {
+    var public = Provider.of<Public>(context, listen: false);
+    await public.getPublicInfo();
+    return;
+  }
+
+  Future<void> getBanners() async {
+    var public = Provider.of<Public>(context, listen: false);
+    await public.getBanners();
+    return;
   }
 
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
-    final width=MediaQuery.of(context).size.width;
+    final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
       body: Container(
-        
-    
         constraints: const BoxConstraints.expand(),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Container(
-             
               padding: EdgeInsets.only(
-                top: height * 0.4,
+                top: height * 0.20,
                 left: 20,
                 right: 20,
               ),
-              child: Image.asset('assets/img/logo_s.png',width: width*0.30,),
+              child: Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                  Image.asset(
+                    'assets/img/splash.png',
+                    width: 300,
+                    height: 280,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 40),
+                    child: Text(
+                      'LYOTRADE',
+                      style: const TextStyle(
+                          fontSize: 32, fontWeight: FontWeight.w500),
+                    ),
+                  )
+                ],
+              ),
             ),
             const Spacer(),
             Container(
               padding: EdgeInsets.only(bottom: height * 0.2),
-              child:CircularProgressIndicator(
-                color: Colors.blue.shade900,
-                
+              child: CircularProgressIndicator(
+               
               ),
             ),
           ],
