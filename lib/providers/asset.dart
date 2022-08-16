@@ -431,7 +431,6 @@ class Asset with ChangeNotifier {
         body: postData,
         headers: headers,
       );
-      print(response.statusCode);
       final responseData = json.decode(response.body);
 
       if (responseData['code'] == '0') {
@@ -909,56 +908,53 @@ class Asset with ChangeNotifier {
     _digitialAss = digAsset;
     notifyListeners();
   }
- //search
+  //search
 
   Future<void> setTransactionDetails(transaction) async {
     _transactionDetails = transaction;
     return notifyListeners();
   }
 
-
   List _digitalAssets = [];
 
-  List get digitalAssets{
-
+  List get digitalAssets {
     return _digitalAssets;
   }
 
-     void setDigtalList(digAsset) {
+  void setDigtalList(digAsset) {
     _digitalAssets = digAsset;
     notifyListeners();
   }
-    List _searchallcoin = [];
 
-  List get searchallcoin{
+  List _searchallcoin = [];
 
+  List get searchallcoin {
     return _searchallcoin;
   }
-   Future<void> filterCoin(
+
+  Future<void> filterCoin(
     query,
     digitalAssetslist,
     _totalBalanceSymbol,
   ) async {
-
     if (query.isNotEmpty) {
       List dummyListData = [];
       _searchallcoin.clear();
       for (var item in digitalAssetslist) {
-      
         if ((item['coin'].toLowerCase()).contains(query.toLowerCase())) {
           dummyListData.add(item);
-      
+
           notifyListeners();
         }
       }
-    //  _searchallcoin[sMarketSort].clear();
-     _searchallcoin.addAll(dummyListData);
-     //print(_searchallcoin);
+      //  _searchallcoin[sMarketSort].clear();
+      _searchallcoin.addAll(dummyListData);
+      //print(_searchallcoin);
       notifyListeners();
       return;
     } else {
-    //  _searchallcoin[_totalBalanceSymbol].clear();
-    //  _searchallcoin[_totalBalanceSymbol].addAll(_digitalAssets);
+      //  _searchallcoin[_totalBalanceSymbol].clear();
+      //  _searchallcoin[_totalBalanceSymbol].addAll(_digitalAssets);
       notifyListeners();
       return;
     }

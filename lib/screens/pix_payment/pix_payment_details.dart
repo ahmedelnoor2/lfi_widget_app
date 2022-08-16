@@ -217,12 +217,12 @@ class _PixPaymentDetailsState extends State<PixPaymentDetails>
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                         getPortugeseTrans('Merchant Name'),
+                                          getPortugeseTrans('Merchant Name'),
                                           style: TextStyle(
                                             color: secondaryTextColor,
                                           ),
                                         ),
-                                        Row(
+                                        Wrap(
                                           children: [
                                             Container(
                                               padding:
@@ -242,7 +242,8 @@ class _PixPaymentDetailsState extends State<PixPaymentDetails>
                                                 snackAlert(
                                                     context,
                                                     SnackTypes.success,
-                                                    getPortugeseTrans('Copied'));
+                                                    getPortugeseTrans(
+                                                        'Copied'));
                                               },
                                               child: Icon(
                                                 Icons.copy,
@@ -287,7 +288,8 @@ class _PixPaymentDetailsState extends State<PixPaymentDetails>
                                                 snackAlert(
                                                     context,
                                                     SnackTypes.success,
-                                                    getPortugeseTrans('Copied'));
+                                                    getPortugeseTrans(
+                                                        'Copied'));
                                               },
                                               child: Icon(
                                                 Icons.copy,
@@ -332,7 +334,8 @@ class _PixPaymentDetailsState extends State<PixPaymentDetails>
                                                 snackAlert(
                                                     context,
                                                     SnackTypes.success,
-                                                   getPortugeseTrans('Copied'));
+                                                    getPortugeseTrans(
+                                                        'Copied'));
                                               },
                                               child: Icon(
                                                 Icons.copy,
@@ -351,41 +354,48 @@ class _PixPaymentDetailsState extends State<PixPaymentDetails>
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text(
-                                          getPortugeseTrans('Transaction ID'),
-                                          style: TextStyle(
-                                            color: secondaryTextColor,
+                                        Expanded(
+                                          flex: 1,
+                                          child: Text(
+                                            getPortugeseTrans('Transaction ID'),
+                                            style: TextStyle(
+                                              color: secondaryTextColor,
+                                            ),
                                           ),
                                         ),
-                                        Row(
-                                          children: [
-                                            Container(
-                                              padding:
-                                                  EdgeInsets.only(right: 5),
-                                              child: Text(
-                                                '${payments.getTxDetails['txid']}',
+                                        Expanded(
+                                          flex: 1,
+                                          child: Wrap(
+                                            children: [
+                                              Container(
+                                                padding:
+                                                    EdgeInsets.only(right: 5),
+                                                child: Text(
+                                                  '${payments.getTxDetails['txid']}',
+                                                ),
                                               ),
-                                            ),
-                                            InkWell(
-                                              onTap: () {
-                                                Clipboard.setData(
-                                                  ClipboardData(
-                                                    text:
-                                                        '${payments.getTxDetails['txid']}',
-                                                  ),
-                                                );
-                                                snackAlert(
-                                                    context,
-                                                    SnackTypes.success,
-                                                    getPortugeseTrans('Copied'));
-                                              },
-                                              child: Icon(
-                                                Icons.copy,
-                                                size: 16,
-                                                color: secondaryTextColor,
-                                              ),
-                                            )
-                                          ],
+                                              InkWell(
+                                                onTap: () {
+                                                  Clipboard.setData(
+                                                    ClipboardData(
+                                                      text:
+                                                          '${payments.getTxDetails['txid']}',
+                                                    ),
+                                                  );
+                                                  snackAlert(
+                                                      context,
+                                                      SnackTypes.success,
+                                                      getPortugeseTrans(
+                                                          'Copied'));
+                                                },
+                                                child: Icon(
+                                                  Icons.copy,
+                                                  size: 16,
+                                                  color: secondaryTextColor,
+                                                ),
+                                              )
+                                            ],
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -419,7 +429,11 @@ class _PixPaymentDetailsState extends State<PixPaymentDetails>
                                   child: QrImage(
                                     data: utf8.decode(
                                       base64.decode(payments
-                                          .pixNewTransaction['qr_code']),
+                                              .selectedTransaction.isNotEmpty
+                                          ? payments
+                                              .selectedTransaction['qr_code']
+                                          : payments
+                                              .pixNewTransaction['qr_code']),
                                     ),
                                     version: QrVersions.auto,
                                     backgroundColor: Colors.white,
@@ -433,11 +447,11 @@ class _PixPaymentDetailsState extends State<PixPaymentDetails>
                                 Clipboard.setData(
                                   ClipboardData(
                                     text:
-                                        '${payments.pixNewTransaction['qr_code']}',
+                                        '${payments.selectedTransaction.isNotEmpty ? payments.selectedTransaction['qr_code'] : payments.pixNewTransaction['qr_code']}',
                                   ),
                                 );
-                                snackAlert(
-                                    context, SnackTypes.success, getPortugeseTrans('Copied'));
+                                snackAlert(context, SnackTypes.success,
+                                    getPortugeseTrans('Copied'));
                               },
                               child: Container(
                                 padding: EdgeInsets.all(20),
@@ -446,7 +460,8 @@ class _PixPaymentDetailsState extends State<PixPaymentDetails>
                                   children: [
                                     Container(
                                       padding: EdgeInsets.only(right: 10),
-                                      child: Text(getPortugeseTrans('PIX QR Code')),
+                                      child: Text(
+                                          getPortugeseTrans('PIX QR Code')),
                                     ),
                                     Icon(
                                       Icons.copy,
@@ -515,9 +530,10 @@ class _PixPaymentDetailsState extends State<PixPaymentDetails>
                                         ),
                                       )
                                     : Container(
-                                        padding: EdgeInsets.all(5),
+                                        padding: EdgeInsets.all(10),
                                         child: Text(
-                                          getPortugeseTrans('Waiting for payment'),
+                                          getPortugeseTrans(
+                                              'Waiting for payment'),
                                           style: TextStyle(
                                             color: warningColor,
                                             fontWeight: FontWeight.bold,
@@ -526,16 +542,18 @@ class _PixPaymentDetailsState extends State<PixPaymentDetails>
                                       ),
                             payments.selectedTransaction['status'] ==
                                     'PROCESSING'
-                                ? Container(
-                                    padding: EdgeInsets.all(5),
-                                    child: Text(
-                                      payments.awaitingTime,
-                                      style: TextStyle(
-                                        color: linkColor,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  )
+                                ? payments.selectedTransaction['value'] == 5
+                                    ? Container()
+                                    : Container(
+                                        padding: EdgeInsets.all(5),
+                                        child: Text(
+                                          payments.awaitingTime,
+                                          style: TextStyle(
+                                            color: linkColor,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      )
                                 : Container(),
                           ],
                         ),

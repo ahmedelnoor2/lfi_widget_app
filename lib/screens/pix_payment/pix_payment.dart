@@ -914,7 +914,7 @@ class _PixPaymentState extends State<PixPayment>
                         Container(
                           child: Text(
                             getPortugeseTrans(
-                                'The QR code with 5 Dollar deposit is used to verify your CPF account. Once Approved, you will be redirect to next screen for transferring payments for deposit.'),
+                                'The QR code with 5 BRL deposit is used to verify your CPF account. Once Approved, you will be redirect to next screen for transferring payments for deposit.'),
                             style: TextStyle(
                               color: secondaryTextColor,
                               fontSize: 12,
@@ -1609,8 +1609,7 @@ class _PixPaymentState extends State<PixPayment>
                                   r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$",
                                 ).hasMatch(_email)) {
                                   setState(() {
-                                    _fieldErrors['email'] =
-                                        getPortugeseTrans(
+                                    _fieldErrors['email'] = getPortugeseTrans(
                                       'Invalid email format',
                                     );
                                   });

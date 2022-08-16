@@ -26,6 +26,8 @@ class _CryptoCoinDrawerState extends State<CryptoCoinDrawer> {
   Future<void> changeCryptoCoin(payments, currency) async {
     var auth = Provider.of<Auth>(context, listen: false);
 
+    print(currency);
+
     payments.setSelectedCryptoCurrency(currency);
     Navigator.pop(context);
     await payments.getEstimateRate(context, auth, {

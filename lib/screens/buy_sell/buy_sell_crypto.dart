@@ -32,6 +32,8 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
   bool _loadingCoins = false;
   String _defaultNetwork = '';
   String _currentAddress = '';
+  String _providerType = 'guardarian';
+  bool _selectorFalse = true;
 
   @override
   void initState() {
@@ -276,6 +278,154 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                     ],
                   ),
                   Divider(),
+                  _selectorFalse
+                      ? Container()
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _providerType = 'guardarian';
+                                  });
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.all(10),
+                                  padding: EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                      style: BorderStyle.solid,
+                                      width: 1,
+                                      color: _providerType == 'guardarian'
+                                          ? linkColor
+                                          : secondaryTextColor,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 30,
+                                        height: 30,
+                                        child: Radio(
+                                          activeColor: linkColor,
+                                          value: 'guardarian',
+                                          groupValue: _providerType,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _providerType = value as String;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.only(left: 10),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              child: Text(
+                                                'GUARDARIAN',
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: _providerType ==
+                                                            'guardarian'
+                                                        ? Colors.white
+                                                        : secondaryTextColor),
+                                              ),
+                                            ),
+                                            Container(
+                                              child: Text(
+                                                '1% Fee',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: secondaryTextColor,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _providerType = 'onramper';
+                                  });
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.all(10),
+                                  padding: EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                      style: BorderStyle.solid,
+                                      width: 1,
+                                      color: _providerType == 'onramper'
+                                          ? linkColor
+                                          : secondaryTextColor,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 30,
+                                        height: 30,
+                                        child: Radio(
+                                          activeColor: linkColor,
+                                          value: 'onramper',
+                                          groupValue: _providerType,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _providerType = value as String;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.only(left: 10),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              child: Text(
+                                                'Onramper',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: _providerType ==
+                                                          'onramper'
+                                                      ? Colors.white
+                                                      : secondaryTextColor,
+                                                ),
+                                              ),
+                                            ),
+                                            Container(
+                                              child: Text(
+                                                '1% Fee',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: secondaryTextColor,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                   Container(
                     padding: EdgeInsets.all(10),
                     child: Container(
@@ -411,7 +561,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                           width: 25,
                                         )
                                       : Text(
-                                          '${payments.estimateRate.isNotEmpty ? double.parse(payments.estimateRate['value']).toStringAsFixed(4) : 0.00}',
+                                          '${payments.estimateRate.isNotEmpty ? double.parse('${payments.estimateRate['value']}').toStringAsFixed(4) : 0.00}',
                                           style: TextStyle(fontSize: 22),
                                         ),
                                 ],
@@ -490,7 +640,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                         payments.estimateRate.isEmpty
                             ? Container()
                             : Text(
-                                '1 ${payments.selectedCryptoCurrency['current_ticker'].toUpperCase()} ~ ${(double.parse(_fiatController.text) / double.parse(payments.estimateRate['value'])).toStringAsFixed(4)} ${payments.selectedFiatCurrency['ticker'].toUpperCase()}'),
+                                '1 ${payments.selectedCryptoCurrency['current_ticker'].toUpperCase()} ~ ${(double.parse(_fiatController.text) / double.parse('${payments.estimateRate['value']}')).toStringAsFixed(4)} ${payments.selectedFiatCurrency['ticker'].toUpperCase()}'),
                       ],
                     ),
                   ),
