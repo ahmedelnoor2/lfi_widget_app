@@ -39,7 +39,6 @@ class UserKyc with ChangeNotifier {
 
       final responseData = json.decode(response.body);
 
-      print(responseData);
       if (responseData['code'] == '0') {
         _samsubToken = responseData['data'];
         notifyListeners();
@@ -74,7 +73,7 @@ class UserKyc with ChangeNotifier {
       final responseData = json.decode(response.body);
 
       if (responseData['code'] == '0') {
-        snackAlert(ctx, SnackTypes.success, 'Processing Tier2 verfication');
+        snackAlert(ctx, SnackTypes.warning, 'Processing verfication');
         notifyListeners();
       } else {
         snackAlert(
