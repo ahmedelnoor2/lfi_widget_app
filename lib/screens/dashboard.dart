@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:archive/archive.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/notification_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/user.dart';
 import 'package:lyotrade/screens/common/bottomnav.dart';
@@ -33,6 +35,7 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  Timer? timer;
   final TextEditingController _searchController = TextEditingController();
   final GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
   var _channel;
@@ -50,6 +53,10 @@ class _DashboardState extends State<Dashboard> {
     getPublicInfo();
     getAssetsRate();
     checkLoginStatus();
+    
+    timer = Timer.periodic(Duration(seconds: 15), (Timer t) {
+      readCount();
+    });
     super.initState();
   }
 
@@ -58,7 +65,17 @@ class _DashboardState extends State<Dashboard> {
     if (_channel != null) {
       _channel.sink.close();
     }
+    timer?.cancel();
     super.dispose();
+  }
+
+  Future<void> readCount() async {
+    var notificationProvider =
+        Provider.of<Notificationprovider>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
+    if (auth.isAuthenticated) {
+      await notificationProvider.readCountMeassage(context, auth);
+    }
   }
 
   Future<void> getBanners() async {

@@ -170,4 +170,44 @@ class Notificationprovider extends ChangeNotifier {
       return;
     }
   }
+
+bool _readCountResponse=false;
+
+bool get readCountResponse{
+
+  return _readCountResponse;
+}
+
+  Future<void> readCountMeassage(ctx, auth) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/message/v4/get_no_read_message_count',
+    );
+
+    var data = {};
+
+    var body = jsonEncode(data);
+    try {
+      isdeleteloading = true;
+      final response = await http.post(url, headers: headers, body: body);
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _readCountResponse = responseData['data']['noReadMsgCount'] == 0 ? false : true;
+        print(_readCountResponse);
+        notifyListeners();
+       /// snackAlert(ctx, SnackTypes.success, 'All notifications mark as read');
+        return;
+      } else {
+        snackAlert(ctx, SnackTypes.errors,
+            getTranslate(responseData['msg'].toString()));
+        return;
+      }
+    } catch (error) {
+      snackAlert(ctx, SnackTypes.errors, 'Server Error.');
+      return;
+    }
+  }
 }

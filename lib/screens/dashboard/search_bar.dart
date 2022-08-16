@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/notification_provider.dart';
 import 'package:lyotrade/providers/user.dart';
 import 'package:lyotrade/screens/common/alert.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
@@ -66,7 +67,10 @@ class _SearchBarState extends State<SearchBar>
     width = MediaQuery.of(context).size.width;
 
     var _currentRoute = ModalRoute.of(context)!.settings.name;
-    var auth = Provider.of<Auth>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: true);
+    var notificationProvider =
+        Provider.of<Notificationprovider>(context, listen: true);
+    
     return Container(
       padding: EdgeInsets.only(
         bottom: 10,
@@ -179,9 +183,17 @@ class _SearchBarState extends State<SearchBar>
                         Navigator.pushNamed(context, '/authentication');
                       }
                     },
-                    child: Image.asset(
-                      'assets/img/notification.png',
-                      width: 24,
+                    child: Stack(
+                      children: <Widget>[
+                        Icon(Icons.notifications, color: secondaryTextColor, size: 26,),
+                        notificationProvider.readCountResponse ? Positioned(
+                          top: 1,
+                          right: 2,
+                          child:  Icon(Icons.brightness_1, size: 12, 
+                            color: errorColor,
+                            ),
+                        ) : Container()
+                      ]
                     ),
                   ),
                 ),
