@@ -982,13 +982,9 @@ class _PixPaymentState extends State<PixPayment>
                                                     ? QrImage(
                                                         data: utf8.decode(
                                                           base64.decode(payments
-                                                                          .kycTransaction[
-                                                                      'qr_code'] !=
-                                                                  null
-                                                              ? payments
                                                                       .kycTransaction[
-                                                                  'qr_code']
-                                                              : ''),
+                                                                  'qr_code'] ??
+                                                              ''),
                                                         ),
                                                         version:
                                                             QrVersions.auto,
@@ -1078,8 +1074,11 @@ class _PixPaymentState extends State<PixPayment>
                                 onTap: () {
                                   Clipboard.setData(
                                     ClipboardData(
-                                      text:
-                                          '${payments.kycTransaction['qr_code'] != null ? payments.kycTransaction['qr_code'] : ''}',
+                                      text: utf8.decode(
+                                        base64.decode(payments
+                                                .kycTransaction['qr_code'] ??
+                                            ''),
+                                      ),
                                     ),
                                   );
                                   showAlert(
@@ -1189,13 +1188,32 @@ class _PixPaymentState extends State<PixPayment>
                               });
                             },
                             child: Text(
+                              '${getPortugeseTrans(
+                                'TAX Amount',
+                              )}: 1.64 BRL',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: warningColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(40),
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                _reRequestKYCAuth = true;
+                              });
+                            },
+                            child: Text(
                               getPortugeseTrans(
                                 'Update CPF',
                               ),
                               style: TextStyle(fontSize: 18, color: linkColor),
                             ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   )
