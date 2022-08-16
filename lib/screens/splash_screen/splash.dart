@@ -34,7 +34,7 @@ class _SpashScreenState extends State<SpashScreen>
     await getPublicInfo();
     await getBanners();
     await getAssetsRate();
-     Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
+    Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
   }
 
   Future<void> getAssetsRate() async {
@@ -144,9 +144,7 @@ class _SpashScreenState extends State<SpashScreen>
             const Spacer(),
             Container(
               padding: EdgeInsets.only(bottom: height * 0.2),
-              child: CircularProgressIndicator(
-               
-              ),
+              child: CircularProgressIndicator(),
             ),
           ],
         ),

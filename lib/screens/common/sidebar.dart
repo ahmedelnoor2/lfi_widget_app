@@ -55,7 +55,7 @@ class _SideBarState extends State<SideBar> {
 
   Future<void> startUploading() async {
     var auth = Provider.of<Auth>(context, listen: false);
-   
+
     if (imageXFile == null) {
       showDialog(
           context: context,
@@ -74,7 +74,7 @@ class _SideBarState extends State<SideBar> {
           });
 
       await auth.uploadProfileImage(context, auth.loginVerificationToken,
-        auth.userInfo['id'], imageXFile, imageXFile!.name);
+          auth.userInfo['id'], imageXFile, imageXFile!.name);
 
       getProfileImage();
     }
@@ -363,7 +363,7 @@ class _SideBarState extends State<SideBar> {
                                 _processLogout = false;
                               });
                               Navigator.pushNamedAndRemoveUntil(
-                                  context, '/', (route) => false);
+                                  context, '/dashboard', (route) => false);
                             },
                       text: 'Logout',
                       active: true,

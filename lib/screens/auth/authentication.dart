@@ -246,7 +246,7 @@ class _AuthenticationState extends State<Authentication> {
                                 auth.setLoginCreds({});
                                 Navigator.pushNamedAndRemoveUntil(
                                   context,
-                                  '/',
+                                  '/dashboard',
                                   (route) => false,
                                 );
                               },

@@ -131,7 +131,7 @@ bottomNav(context, auth) {
         default:
           Navigator.pushNamedAndRemoveUntil(
             context,
-            '/',
+            '/dashboard',
             (route) => false,
           );
           break;
