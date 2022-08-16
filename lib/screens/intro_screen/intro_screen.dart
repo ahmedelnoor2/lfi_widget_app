@@ -29,10 +29,8 @@ class _IntroScreenState extends State<IntroScreen> {
   }
 
   void goHomepage(context) {
-    Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) {
-      return const Dashboard();
-    }), (Route<dynamic> route) => false);
+    Navigator.of(context)
+        .pushNamedAndRemoveUntil('/splashScreen', (route) => false);
     //Navigate to home page and remove the intro screen history
     //so that "Back" button wont work.
   }
@@ -40,71 +38,69 @@ class _IntroScreenState extends State<IntroScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:  Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 80, right: 30),
-              child: InkWell(
-                onTap: () {
-                  goHomepage(context);
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 80, right: 30),
+            child: InkWell(
+              onTap: () {
+                goHomepage(context);
+              },
+              child: const Text(
+                'Skip',
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+          ),
+          Expanded(
+            child: PageView.builder(
+                scrollDirection: Axis.horizontal,
+                onPageChanged: (value) {
+                  setState(() {
+                    currentIndex = value;
+                  });
                 },
-                child: const Text(
-                  'Skip',
-                  style: const TextStyle(color: Colors.white),
-                ),
+                itemCount: slides.length,
+                itemBuilder: (context, index) {
+                  // contents of slider
+                  return Slider(
+                    image: slides[index].getImage(),
+                    title: slides[index].getTitle(),
+                    description: slides[index].getDescription(),
+                  );
+                }),
+          ),
+          Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                slides.length,
+                (index) => buildDot(index, context),
               ),
             ),
-            Expanded(
-              child: PageView.builder(
-                  scrollDirection: Axis.horizontal,
-                  onPageChanged: (value) {
-                    setState(() {
-                      currentIndex = value;
-                    });
-                  },
-                  itemCount: slides.length,
-                  itemBuilder: (context, index) {
-                   
-                    // contents of slider
-                    return Slider(
-                      image: slides[index].getImage(),
-                      title: slides[index].getTitle(),
-                      description: slides[index].getDescription(),
-                    );
-                  }),
-            ),
-            Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  slides.length,
-                  (index) => buildDot(index, context),
-                ),
-              ),
-            ),
-            currentIndex == slides.length - 1
-                ? Container(
-                    height: 60,
-                    margin: EdgeInsets.all(40),
-                    width: double.infinity,
-                    color: linkColor,
-                    child: LyoButton(
-                      text: 'Get Started',
-                      active: true,
-                      activeColor: linkColor,
-                      activeTextColor: Colors.black,
-                      onPressed: () {
-                        goHomepage(context);
-                      },
-                    ),
-                  )
-                : Container(
-                    height: 60,
+          ),
+          currentIndex == slides.length - 1
+              ? Container(
+                  height: 60,
+                  margin: EdgeInsets.all(40),
+                  width: double.infinity,
+                  color: linkColor,
+                  child: LyoButton(
+                    text: 'Get Started',
+                    active: true,
+                    activeColor: linkColor,
+                    activeTextColor: Colors.black,
+                    onPressed: () {
+                      goHomepage(context);
+                    },
                   ),
-          ],
-        ),
-    
+                )
+              : Container(
+                  height: 60,
+                ),
+        ],
+      ),
     );
   }
 
@@ -132,34 +128,33 @@ class Slider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  Container(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // image given in slider
-            Image(image: AssetImage(image!)),
+    return Container(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // image given in slider
+          Image(image: AssetImage(image!)),
 
-            Padding(
-              padding: const EdgeInsets.only(top: 16, bottom: 8),
-              child: Text(title!,
-                  style: TextStyle(
-                      fontSize: 26.0,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white)),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(description!,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontSize: 16.0,
-                      color: onboardText,
-                      fontWeight: FontWeight.w400)),
-            ),
-            SizedBox(height: 25),
-          ],
-        ),
-      
+          Padding(
+            padding: const EdgeInsets.only(top: 16, bottom: 8),
+            child: Text(title!,
+                style: TextStyle(
+                    fontSize: 26.0,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white)),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(description!,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontSize: 16.0,
+                    color: onboardText,
+                    fontWeight: FontWeight.w400)),
+          ),
+          SizedBox(height: 25),
+        ],
+      ),
     );
   }
 }

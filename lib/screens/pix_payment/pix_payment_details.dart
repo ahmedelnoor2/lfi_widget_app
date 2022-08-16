@@ -418,7 +418,7 @@ class _PixPaymentDetailsState extends State<PixPaymentDetails>
                                               padding:
                                                   EdgeInsets.only(right: 5),
                                               child: Text(
-                                                '1.64 BRL',
+                                                '1.62 BRL',
                                               ),
                                             ),
                                           ],

@@ -20,6 +20,8 @@ class _PixTransactionsState extends State<PixTransactions>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
+  bool _processAjax = false;
+
   @override
   void initState() {
     super.initState();
@@ -34,8 +36,14 @@ class _PixTransactionsState extends State<PixTransactions>
   }
 
   Future<void> getAllClientTransaction() async {
+    setState(() {
+      _processAjax = true;
+    });
     var payments = Provider.of<Payments>(context, listen: false);
     await payments.getAllPixTransactions(payments.pixKycClients['client_uuid']);
+    setState(() {
+      _processAjax = false;
+    });
   }
 
   @override
@@ -54,112 +62,120 @@ class _PixTransactionsState extends State<PixTransactions>
 
     return Scaffold(
       appBar: hiddenAppBar(),
-      body: Container(
-        padding: EdgeInsets.all(15),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.only(right: 10),
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: Icon(Icons.chevron_left),
-                      ),
-                    ),
-                    Text(
-                      getPortugeseTrans('BRL Transactions'),
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            allTransactions.length <= 0
-                ? Center(
-                    child: SizedBox(
-                      height: height * 0.85,
-                      child: noData(getPortugeseTrans('No Transactions')),
-                    ),
-                  )
-                : SizedBox(
-                    height: height * 0.85,
-                    child: ListView.separated(
-                      separatorBuilder: (context, index) {
-                        return Divider();
-                      },
-                      padding: EdgeInsets.zero,
-                      itemCount: payments.allPixTransactions.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        var transaction = allTransactions[index];
-                        return ListTile(
-                          onTap: ((transaction['qr_code'] == null) ||
-                                  ('${transaction['status']}' == 'CHARGEBACK'))
-                              ? null
-                              : () async {
-                                  payments.decryptPixQR(
-                                    {"qr_code": transaction['qr_code']},
-                                  );
-                                  await payments
-                                      .setSelectedTransaction(transaction);
-                                  Navigator.pushNamed(
-                                      context, PixPaymentDetails.routeName);
-                                },
-                          title: const Text(
-                            'BRL',
+      body: (_processAjax)
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : Container(
+              padding: EdgeInsets.all(15),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(right: 10),
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Icon(Icons.chevron_left),
+                            ),
+                          ),
+                          Text(
+                            getPortugeseTrans('BRL Transactions'),
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          subtitle: Text(
-                            transaction['date_end'] == null
-                                ? 'Invalid CPF for KYC transaction'
-                                : DateFormat('dd-MM-y H:mm').add_jm().format(
-                                      DateTime.parse(
-                                          '${transaction['date_end']}'),
-                                    ),
-                          ),
-                          trailing: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Text(
-                                '${transaction['value'] ?? '--'}',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                '${transaction['status'] ?? '--'}',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: transaction['status'] == 'ACCEPTED'
-                                      ? successColor
-                                      : transaction['status'] == 'PROCESSING'
-                                          ? warningColor
-                                          : errorColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
+                        ],
+                      ),
+                    ],
                   ),
-          ],
-        ),
-      ),
+                  allTransactions.length <= 0
+                      ? Center(
+                          child: SizedBox(
+                            height: height * 0.85,
+                            child: noData(getPortugeseTrans('No Transactions')),
+                          ),
+                        )
+                      : SizedBox(
+                          height: height * 0.85,
+                          child: ListView.separated(
+                            separatorBuilder: (context, index) {
+                              return Divider();
+                            },
+                            padding: EdgeInsets.zero,
+                            itemCount: payments.allPixTransactions.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              var transaction = allTransactions[index];
+                              return ListTile(
+                                onTap: ((transaction['qr_code'] == null) ||
+                                        ('${transaction['status']}' ==
+                                            'CHARGEBACK'))
+                                    ? null
+                                    : () async {
+                                        payments.decryptPixQR(
+                                          {"qr_code": transaction['qr_code']},
+                                        );
+                                        await payments.setSelectedTransaction(
+                                            transaction);
+                                        Navigator.pushNamed(context,
+                                            PixPaymentDetails.routeName);
+                                      },
+                                title: const Text(
+                                  'BRL',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  transaction['date_end'] == null
+                                      ? 'Invalid CPF for KYC transaction'
+                                      : DateFormat('dd-MM-y').add_jm().format(
+                                            DateTime.parse(
+                                                '${transaction['date_end']}'),
+                                          ),
+                                ),
+                                trailing: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Text(
+                                      '${transaction['value'] ?? '--'}',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${transaction['status'] ?? '--'}',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color:
+                                            transaction['status'] == 'ACCEPTED'
+                                                ? successColor
+                                                : transaction['status'] ==
+                                                        'PROCESSING'
+                                                    ? warningColor
+                                                    : errorColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                ],
+              ),
+            ),
     );
   }
 }

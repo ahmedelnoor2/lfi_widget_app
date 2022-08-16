@@ -1190,7 +1190,7 @@ class _PixPaymentState extends State<PixPayment>
                             child: Text(
                               '${getPortugeseTrans(
                                 'TAX Amount',
-                              )}: 1.64 BRL',
+                              )}: 1.62 BRL',
                               style: TextStyle(
                                 fontSize: 18,
                                 color: warningColor,

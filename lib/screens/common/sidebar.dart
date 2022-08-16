@@ -2,10 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/user.dart';
+import 'package:lyotrade/screens/common/alert.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
@@ -187,8 +189,36 @@ class _SideBarState extends State<SideBar> {
                               '${auth.userInfo['userAccount']}',
                               style: const TextStyle(fontSize: 20),
                             ),
-                            subtitle: Text(
-                              'Account Status: ${auth.userInfo.isNotEmpty ? auth.userInfo['accountStatus'] : '-'}',
+                            subtitle: InkWell(
+                              onTap: () {
+                                Clipboard.setData(
+                                  ClipboardData(
+                                    text: auth.userInfo['userAccount'],
+                                  ),
+                                );
+                                showAlert(
+                                  context,
+                                  Icon(Icons.copy),
+                                  'Copy',
+                                  [Text('Copied!')],
+                                  'Ok',
+                                );
+                              },
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.only(right: 5),
+                                    child: Text(
+                                      'UUID: ${auth.userInfo.isNotEmpty ? auth.userInfo['id'] : '-'}',
+                                    ),
+                                  ),
+                                  Icon(
+                                    Icons.copy,
+                                    color: secondaryTextColor,
+                                    size: 14,
+                                  )
+                                ],
+                              ),
                             ),
                             trailing: const Icon(
                               Icons.chevron_right,

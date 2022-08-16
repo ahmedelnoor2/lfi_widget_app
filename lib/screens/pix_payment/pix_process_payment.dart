@@ -141,7 +141,8 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                       ),
                                       'Are you sure?',
                                       [
-                                        Text(getPortugeseTrans('You have a pending transaction')),
+                                        Text(getPortugeseTrans(
+                                            'You have a pending transaction')),
                                       ],
                                       'Cancel Transaction',
                                     );
@@ -159,7 +160,8 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                       ),
                                       'Are you sure?',
                                       [
-                                        Text(getPortugeseTrans("You have a pending transaction")),
+                                        Text(getPortugeseTrans(
+                                            "You have a pending transaction")),
                                       ],
                                       'Cancel Transaction',
                                     );
@@ -172,7 +174,8 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                             ),
                           ),
                           Text(
-                            getPortugeseTrans('Transfer money to process with order'),
+                            getPortugeseTrans(
+                                'Transfer money to process with order'),
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -249,7 +252,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                         child: Container(
                                           padding: EdgeInsets.all(10),
                                           child: Text(
-                                          getPortugeseTrans('Bank Details'),
+                                            getPortugeseTrans('Bank Details'),
                                             style: TextStyle(fontSize: 16),
                                           ),
                                         ),
@@ -262,7 +265,8 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                            getPortugeseTrans('Merchant Name'),
+                                              getPortugeseTrans(
+                                                  'Merchant Name'),
                                               style: TextStyle(
                                                 color: secondaryTextColor,
                                               ),
@@ -287,7 +291,8 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                                     snackAlert(
                                                         context,
                                                         SnackTypes.success,
-                                                        getPortugeseTrans('Copied'));
+                                                        getPortugeseTrans(
+                                                            'Copied'));
                                                   },
                                                   child: Icon(
                                                     Icons.copy,
@@ -307,7 +312,8 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                            getPortugeseTrans('Merchant City'),
+                                              getPortugeseTrans(
+                                                  'Merchant City'),
                                               style: TextStyle(
                                                 color: secondaryTextColor,
                                               ),
@@ -332,7 +338,8 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                                     snackAlert(
                                                         context,
                                                         SnackTypes.success,
-                                                        getPortugeseTrans('Copied'));
+                                                        getPortugeseTrans(
+                                                            'Copied'));
                                                   },
                                                   child: Icon(
                                                     Icons.copy,
@@ -377,7 +384,8 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                                     snackAlert(
                                                         context,
                                                         SnackTypes.success,
-                                                        getPortugeseTrans('Copied'));
+                                                        getPortugeseTrans(
+                                                            'Copied'));
                                                   },
                                                   child: Icon(
                                                     Icons.copy,
@@ -396,8 +404,61 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           children: [
+                                            Expanded(
+                                              flex: 1,
+                                              child: Text(
+                                                getPortugeseTrans(
+                                                    'Transaction ID'),
+                                                style: TextStyle(
+                                                  color: secondaryTextColor,
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              flex: 1,
+                                              child: Wrap(
+                                                children: [
+                                                  Container(
+                                                    padding: EdgeInsets.only(
+                                                        right: 5),
+                                                    child: Text(
+                                                      '${payments.getTxDetails['txid']}',
+                                                    ),
+                                                  ),
+                                                  InkWell(
+                                                    onTap: () {
+                                                      Clipboard.setData(
+                                                        ClipboardData(
+                                                          text:
+                                                              '${payments.getTxDetails['txid']}',
+                                                        ),
+                                                      );
+                                                      snackAlert(
+                                                          context,
+                                                          SnackTypes.success,
+                                                          getPortugeseTrans(
+                                                              'Copied'));
+                                                    },
+                                                    child: Icon(
+                                                      Icons.copy,
+                                                      size: 16,
+                                                      color: secondaryTextColor,
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.all(10),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
                                             Text(
-                                              getPortugeseTrans('Transaction ID'),
+                                              getPortugeseTrans('TAX Amount'),
                                               style: TextStyle(
                                                 color: secondaryTextColor,
                                               ),
@@ -408,28 +469,9 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                                   padding:
                                                       EdgeInsets.only(right: 5),
                                                   child: Text(
-                                                    '${payments.getTxDetails['txid']}',
+                                                    '1.62 BRL',
                                                   ),
                                                 ),
-                                                InkWell(
-                                                  onTap: () {
-                                                    Clipboard.setData(
-                                                      ClipboardData(
-                                                        text:
-                                                            '${payments.getTxDetails['txid']}',
-                                                      ),
-                                                    );
-                                                    snackAlert(
-                                                        context,
-                                                        SnackTypes.success,
-                                                       getPortugeseTrans('Copied'));
-                                                  },
-                                                  child: Icon(
-                                                    Icons.copy,
-                                                    size: 16,
-                                                    color: secondaryTextColor,
-                                                  ),
-                                                )
                                               ],
                                             ),
                                           ],
@@ -477,8 +519,10 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                   onTap: () {
                                     Clipboard.setData(
                                       ClipboardData(
-                                        text:
-                                            '${payments.pixNewTransaction['qr_code']}',
+                                        text: utf8.decode(
+                                          base64.decode(payments
+                                              .pixNewTransaction['qr_code']),
+                                        ),
                                       ),
                                     );
                                     snackAlert(
@@ -492,7 +536,8 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                       children: [
                                         Container(
                                           padding: EdgeInsets.only(right: 10),
-                                          child: Text(getPortugeseTrans('PIX QR Code')),
+                                          child: Text(
+                                              getPortugeseTrans('PIX QR Code')),
                                         ),
                                         Icon(
                                           Icons.copy,
@@ -541,7 +586,8 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                     ? Container(
                                         padding: EdgeInsets.all(5),
                                         child: Text(
-                                        getPortugeseTrans('Payment Successfull'),
+                                          getPortugeseTrans(
+                                              'Payment Successfull'),
                                           style: TextStyle(
                                             color: greenIndicator,
                                             fontWeight: FontWeight.bold,
@@ -563,7 +609,8 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                         : Container(
                                             padding: EdgeInsets.all(5),
                                             child: Text(
-                                              getPortugeseTrans('Waiting for payment'),
+                                              getPortugeseTrans(
+                                                  'Waiting for payment'),
                                               style: TextStyle(
                                                 color: warningColor,
                                                 fontWeight: FontWeight.bold,
