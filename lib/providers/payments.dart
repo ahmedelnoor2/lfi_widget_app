@@ -87,7 +87,8 @@ class Payments with ChangeNotifier {
       if (responseData['code'] == '0') {
         _fiatCurrencies = responseData['data'];
         _fiatSearchCurrencies = responseData['data'];
-        _selectedFiatCurrency = responseData['data'].last;
+        _selectedFiatCurrency =
+            responseData['data'].firstWhere((item) => item['ticker'] == 'gbp');
         return notifyListeners();
       } else if (responseData['code'] == '10002') {
         snackAlert(
@@ -210,6 +211,8 @@ class Payments with ChangeNotifier {
         return notifyListeners();
       } else if (responseData['code'] == '4000') {
         snackAlert(ctx, SnackTypes.errors, responseData['msg']['message']);
+        _estimateLoader = false;
+        return notifyListeners();
       } else if (responseData['code'] == '10002') {
         snackAlert(
             ctx, SnackTypes.warning, 'Session Expired, Please login back');
