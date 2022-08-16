@@ -22,7 +22,7 @@ class Auth with ChangeNotifier {
     'Accept': 'application/json',
     'exchange-token': '',
   };
-   Map<String, String> headers1 = {
+  Map<String, String> headers1 = {
     'Content-type': 'application/json;charset=utf-8',
     'Accept': 'application/json',
   };
@@ -975,10 +975,10 @@ class Auth with ChangeNotifier {
       return notifyListeners();
     }
   }
-  
+
   //////upload profile image
-  Future<void> uploadProfileImage(context, token, uid, imageXFile, imgname) async {
-   
+  Future<void> uploadProfileImage(
+      context, token, uid, imageXFile, imgname) async {
     var request = new http.MultipartRequest(
         "POST", Uri.parse('https://api.m.lyotrade.com/user-avatar/create'));
     request.fields['token'] = "$token";
@@ -990,7 +990,7 @@ class Auth with ChangeNotifier {
     return request.send().then((response) {
       http.Response.fromStream(response).then((onValue) {
         try {
-          if(response.statusCode==200){
+          if (response.statusCode == 200) {
             Navigator.pop(context);
           }
           return;
@@ -1003,8 +1003,8 @@ class Auth with ChangeNotifier {
     });
   }
 
- //////get user profile image
- List _avatarresponse = [];
+  //////get user profile image
+  List _avatarresponse = [];
   List get avatarrespons {
     return _avatarresponse;
   }
@@ -1014,23 +1014,19 @@ class Auth with ChangeNotifier {
       lyoApiUrl,
       profileuser,
     );
-   
+
     var postData = json.encode(formData);
-   
+
     try {
-      final response = await http.post(url, body: postData,headers: headers1);
+      final response = await http.post(url, body: postData, headers: headers1);
       final responseData = json.decode(response.body);
-     
+
       if (responseData['code'] == '0') {
         _avatarresponse = responseData['data'];
-        
-      
+
         notifyListeners();
         return;
-      } else {
-        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
-
       return;
     } catch (error) {
       snackAlert(ctx, SnackTypes.errors, 'Server Error!');

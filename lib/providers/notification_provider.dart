@@ -171,12 +171,11 @@ class Notificationprovider extends ChangeNotifier {
     }
   }
 
-bool _readCountResponse=false;
+  bool _readCountResponse = false;
 
-bool get readCountResponse{
-
-  return _readCountResponse;
-}
+  bool get readCountResponse {
+    return _readCountResponse;
+  }
 
   Future<void> readCountMeassage(ctx, auth) async {
     headers['exchange-token'] = auth.loginVerificationToken;
@@ -195,11 +194,15 @@ bool get readCountResponse{
       final responseData = json.decode(response.body);
 
       if (responseData['code'] == '0') {
-        _readCountResponse = responseData['data']['noReadMsgCount'] == 0 ? false : true;
+        _readCountResponse =
+            responseData['data']['noReadMsgCount'] == 0 ? false : true;
         print(_readCountResponse);
         notifyListeners();
-       /// snackAlert(ctx, SnackTypes.success, 'All notifications mark as read');
+
+        /// snackAlert(ctx, SnackTypes.success, 'All notifications mark as read');
         return;
+      } else if (responseData['code'] == '10002') {
+        auth.checkLoginSession(ctx);
       } else {
         snackAlert(ctx, SnackTypes.errors,
             getTranslate(responseData['msg'].toString()));
