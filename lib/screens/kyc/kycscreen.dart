@@ -65,7 +65,7 @@ class _KycscreenState extends State<Kycscreen>
                     ),
                   ),
                   Text(
-                    'Kyc',
+                    'KYC',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
