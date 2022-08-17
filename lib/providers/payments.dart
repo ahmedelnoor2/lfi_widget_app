@@ -571,6 +571,7 @@ class Payments with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         _pixCurrencyExchange = double.parse(responseData['data']['price']);
+        print(_pixCurrencyExchange);
         return notifyListeners();
       } else {
         _pixCurrencyExchange = 5.6;
