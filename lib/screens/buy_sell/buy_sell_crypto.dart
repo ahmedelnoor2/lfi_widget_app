@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
@@ -7,6 +8,8 @@ import 'package:lyotrade/providers/payments.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/buy_sell/common/crypto_coin_drawer.dart';
 import 'package:lyotrade/screens/buy_sell/common/fiat_coin_drawer.dart';
+import 'package:lyotrade/screens/buy_sell/common/onramper_crypto_coins.dart';
+import 'package:lyotrade/screens/buy_sell/common/onramper_fiat_coins.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
@@ -38,6 +41,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
   @override
   void initState() {
     getCurrencies();
+    getOnRamperDetails();
     super.initState();
   }
 
@@ -52,6 +56,11 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
   //   final Uri url = Uri.parse(_url);
   //   if (!await launchUrl(url)) throw 'Could not launch $url';
   // }
+
+  Future<void> getOnRamperDetails() async {
+    var payments = Provider.of<Payments>(context, listen: false);
+    await payments.getOnRamperDetails(context);
+  }
 
   Future<void> getDigitalBalance() async {
     setState(() {
@@ -229,6 +238,8 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
     width = MediaQuery.of(context).size.width;
 
     var payments = Provider.of<Payments>(context, listen: true);
+
+    print(payments.onRamperDetails);
 
     return WillPopScope(
       onWillPop: () {
@@ -534,19 +545,41 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                                             '$changeNowApi${payments.selectedFiatCurrency['icon']['url']}',
                                                             width: 50,
                                                           )
-                                                        : Container(),
+                                                        : payments
+                                                                .selectedOnrampFiatCurrency
+                                                                .isNotEmpty
+                                                            ? Image.memory(
+                                                                base64Decode(
+                                                                  payments
+                                                                      .onRamperDetails[
+                                                                          'icons']
+                                                                          [
+                                                                          payments
+                                                                              .selectedOnrampFiatCurrency['code']]
+                                                                          [
+                                                                          'icon']
+                                                                      .split(',')[
+                                                                          1]
+                                                                      .replaceAll(
+                                                                          "\n",
+                                                                          ""),
+                                                                ),
+                                                              )
+                                                            : Container(),
                                                   ),
                                                 ),
                                                 Container(
                                                   padding: EdgeInsets.only(
-                                                      right: 10),
+                                                    right: 10,
+                                                  ),
                                                   child: payments
                                                           .selectedFiatCurrency
                                                           .isNotEmpty
                                                       ? Text(
                                                           '${payments.selectedFiatCurrency['ticker'].toUpperCase()}',
                                                           style: TextStyle(
-                                                              fontSize: 16),
+                                                            fontSize: 16,
+                                                          ),
                                                         )
                                                       : Container(),
                                                 ),
@@ -680,7 +713,237 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                           ],
                         )
                       : Column(
-                          children: [],
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(10),
+                              child: Container(
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: Color(0xff292C51),
+                                  borderRadius: BorderRadius.circular(5),
+                                  border: Border.all(
+                                    style: BorderStyle.solid,
+                                    width: 0.3,
+                                    color: Color(0xff5E6292),
+                                  ),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'From',
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                color: secondaryTextColor,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: width * 0.5,
+                                              child: TextFormField(
+                                                onChanged: (value) {
+                                                  if (value.isNotEmpty) {
+                                                    estimateCrypto(payments);
+                                                  }
+                                                },
+                                                controller: _fiatController,
+                                                keyboardType:
+                                                    const TextInputType
+                                                        .numberWithOptions(
+                                                  decimal: true,
+                                                ),
+                                                style: const TextStyle(
+                                                    fontSize: 22),
+                                                decoration:
+                                                    const InputDecoration(
+                                                  contentPadding:
+                                                      EdgeInsets.zero,
+                                                  isDense: true,
+                                                  border: UnderlineInputBorder(
+                                                    borderSide: BorderSide.none,
+                                                  ),
+                                                  hintStyle: TextStyle(
+                                                    fontSize: 22,
+                                                  ),
+                                                  hintText: "0.00",
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          width: width * 0.30,
+                                          child: InkWell(
+                                            onTap: () {
+                                              showModalBottomSheet<void>(
+                                                context: context,
+                                                isScrollControlled: true,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return StatefulBuilder(
+                                                    builder: (BuildContext
+                                                            context,
+                                                        StateSetter setState) {
+                                                      return Scaffold(
+                                                        resizeToAvoidBottomInset:
+                                                            false,
+                                                        appBar:
+                                                            hiddenAppBarWithDefaultHeight(),
+                                                        body: selectFiatCoin(
+                                                          context,
+                                                          setState,
+                                                        ),
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                              );
+                                            },
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  padding: EdgeInsets.only(
+                                                      right: 10),
+                                                  child: CircleAvatar(
+                                                    radius: 14,
+                                                    child: payments
+                                                            .selectedFiatCurrency
+                                                            .isNotEmpty
+                                                        ? SvgPicture.network(
+                                                            '$changeNowApi${payments.selectedFiatCurrency['icon']['url']}',
+                                                            width: 50,
+                                                          )
+                                                        : Container(),
+                                                  ),
+                                                ),
+                                                Container(
+                                                  padding: EdgeInsets.only(
+                                                      right: 10),
+                                                  child: payments
+                                                          .selectedFiatCurrency
+                                                          .isNotEmpty
+                                                      ? Text(
+                                                          '${payments.selectedFiatCurrency['ticker'].toUpperCase()}',
+                                                          style: TextStyle(
+                                                              fontSize: 16),
+                                                        )
+                                                      : Container(),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Divider(),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'To',
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                color: secondaryTextColor,
+                                              ),
+                                            ),
+                                            payments.estimateLoader
+                                                ? SizedBox(
+                                                    child:
+                                                        CircularProgressIndicator
+                                                            .adaptive(
+                                                                strokeWidth: 2),
+                                                    height: 25,
+                                                    width: 25,
+                                                  )
+                                                : Text(
+                                                    '${payments.estimateRate.isNotEmpty ? double.parse('${payments.estimateRate['value']}').toStringAsFixed(4) : 0.00}',
+                                                    style:
+                                                        TextStyle(fontSize: 22),
+                                                  ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          width: width * 0.30,
+                                          child: InkWell(
+                                            onTap: () {
+                                              showModalBottomSheet<void>(
+                                                context: context,
+                                                isScrollControlled: true,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return StatefulBuilder(
+                                                    builder: (BuildContext
+                                                            context,
+                                                        StateSetter setState) {
+                                                      return Scaffold(
+                                                        resizeToAvoidBottomInset:
+                                                            false,
+                                                        appBar:
+                                                            hiddenAppBarWithDefaultHeight(),
+                                                        body: selectCryptoCoin(
+                                                          context,
+                                                          setState,
+                                                        ),
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                              );
+                                            },
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  padding: EdgeInsets.only(
+                                                      right: 10),
+                                                  child: CircleAvatar(
+                                                    radius: 14,
+                                                    child: payments
+                                                            .selectedCryptoCurrency
+                                                            .isNotEmpty
+                                                        ? SvgPicture.network(
+                                                            '$changeNowApi${payments.selectedCryptoCurrency['icon']['url']}',
+                                                            width: 50,
+                                                          )
+                                                        : Container(),
+                                                  ),
+                                                ),
+                                                Container(
+                                                  padding: EdgeInsets.only(
+                                                    right: 10,
+                                                  ),
+                                                  child: payments
+                                                          .selectedCryptoCurrency
+                                                          .isNotEmpty
+                                                      ? Text(
+                                                          '${payments.selectedCryptoCurrency['current_ticker'].toUpperCase()}',
+                                                          style: TextStyle(
+                                                            fontSize: 16,
+                                                          ),
+                                                        )
+                                                      : Container(),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                 ],
               ),
@@ -720,7 +983,8 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                       child: (_loadingCoins || payments.estimateLoader)
                           ? SizedBox(
                               child: CircularProgressIndicator.adaptive(
-                                  strokeWidth: 2),
+                                strokeWidth: 2,
+                              ),
                               height: 25,
                               width: 25,
                             )
@@ -746,15 +1010,19 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
   }
 
   Widget selectFiatCoin(context, setState) {
-    return FiatCoinDrawer(
-      fiatController: _fiatController,
-    );
+    return (_providerType == 'onramper')
+        ? OnramperFiatCoins()
+        : FiatCoinDrawer(
+            fiatController: _fiatController,
+          );
   }
 
   Widget selectCryptoCoin(context, setState) {
-    return CryptoCoinDrawer(
-      fiatController: _fiatController,
-      getDigitalBalance: getDigitalBalance,
-    );
+    return (_providerType == 'onramper')
+        ? OnramperCryptoCoins()
+        : CryptoCoinDrawer(
+            fiatController: _fiatController,
+            getDigitalBalance: getDigitalBalance,
+          );
   }
 }

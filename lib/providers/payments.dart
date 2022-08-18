@@ -472,8 +472,6 @@ class Payments with ChangeNotifier {
       '/payment_gateway/pix/kyc',
     );
 
-    print(postData);
-
     try {
       final response = await http.put(
         url,
@@ -482,8 +480,6 @@ class Payments with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-
-      print(responseData);
 
       if (responseData['code'] == '0') {
         _newKyc = responseData['data'];
@@ -704,5 +700,71 @@ class Payments with ChangeNotifier {
   Future<void> setSelectedTransaction(transaction) async {
     _selectedTransaction = transaction;
     return notifyListeners();
+  }
+
+  // Onramp fiat selected transaction
+  Map _selectedOnrampFiatCurrency = {};
+
+  Map get selectedOnrampFiatCurrency {
+    return _selectedOnrampFiatCurrency;
+  }
+
+  void setSelectedOnrampFiatCurrency(selectCurrency) {
+    _selectedOnrampFiatCurrency = selectCurrency;
+    return notifyListeners();
+  }
+
+  // Onramp crypto selected transaction
+  Map _selectedOnrampCryptoCurrency = {};
+
+  Map get selectedOnrampCryptoCurrency {
+    return _selectedOnrampCryptoCurrency;
+  }
+
+  void setSelectedOnrampCryptoCurrency(selectCurrency) {
+    _selectedOnrampCryptoCurrency = selectCurrency;
+    return notifyListeners();
+  }
+
+  // get on ramper details
+  Map _onRamperDetails = {};
+
+  Map get onRamperDetails {
+    return _onRamperDetails;
+  }
+
+  Future<void> getOnRamperDetails(ctx) async {
+    var url = Uri.https(
+      lyoApiUrl,
+      '/on-ramper/gateway',
+    );
+
+    try {
+      final response = await http.get(
+        url,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _onRamperDetails = responseData['data'];
+        _selectedOnrampFiatCurrency = responseData['data']['gateways']
+                ['fiatCurrencies']
+            .firstWhere((item) => item['code'] == 'EUR');
+        // _selectedOnrampCryptoCurrency =
+        //     responseData['data']['gateways']['cryptoCurrencies'];
+
+        return notifyListeners();
+      } else {
+        _onRamperDetails = {};
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      _onRamperDetails = {};
+      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again.');
+      return notifyListeners();
+    }
   }
 }
