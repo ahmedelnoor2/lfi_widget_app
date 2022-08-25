@@ -37,13 +37,13 @@ class _SearchBarState extends State<SearchBar>
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this);
+    getUserInvitaionInfo();
   }
 
   @override
   void dispose() {
     super.dispose();
     _controller.dispose();
-    getUserInvitaionInfo();
   }
 
   Future<void> getUserInvitaionInfo() async {
@@ -70,7 +70,7 @@ class _SearchBarState extends State<SearchBar>
     var auth = Provider.of<Auth>(context, listen: true);
     var notificationProvider =
         Provider.of<Notificationprovider>(context, listen: true);
-    
+
     return Container(
       padding: EdgeInsets.only(
         bottom: 10,
@@ -176,25 +176,31 @@ class _SearchBarState extends State<SearchBar>
                   padding: EdgeInsets.only(left: 10),
                   child: GestureDetector(
                     onTap: () {
-                     if (auth.isAuthenticated) {
+                      if (auth.isAuthenticated) {
                         //  snackAlert(context, SnackTypes.warning, 'Coming Soon...');
                         Navigator.pushNamed(context, '/notification_screen');
                       } else {
                         Navigator.pushNamed(context, '/authentication');
                       }
                     },
-                    child: Stack(
-                      children: <Widget>[
-                        Icon(Icons.notifications, color: secondaryTextColor, size: 26,),
-                        notificationProvider.readCountResponse ? Positioned(
-                          top: 1,
-                          right: 2,
-                          child:  Icon(Icons.brightness_1, size: 12, 
-                            color: errorColor,
-                            ),
-                        ) : Container()
-                      ]
-                    ),
+                    child: Stack(children: <Widget>[
+                      Icon(
+                        Icons.notifications,
+                        color: secondaryTextColor,
+                        size: 26,
+                      ),
+                      notificationProvider.readCountResponse
+                          ? Positioned(
+                              top: 1,
+                              right: 2,
+                              child: Icon(
+                                Icons.brightness_1,
+                                size: 12,
+                                color: errorColor,
+                              ),
+                            )
+                          : Container()
+                    ]),
                   ),
                 ),
               ],
