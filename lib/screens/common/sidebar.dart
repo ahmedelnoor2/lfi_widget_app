@@ -187,6 +187,7 @@ class _SideBarState extends State<SideBar> {
                             ),
                             title: Text(
                               '${auth.userInfo['userAccount']}',
+                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(fontSize: 20),
                             ),
                             subtitle: InkWell(

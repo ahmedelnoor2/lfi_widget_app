@@ -18,6 +18,7 @@ import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Coins.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:lyotrade/utils/Number.utils.dart';
 import 'package:provider/provider.dart';
 
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -344,7 +345,6 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
       });
     }
   }
-
 
   Future<void> processWithdrawAmount() async {
     setState(() {
@@ -755,11 +755,16 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                           padding: EdgeInsets.only(right: 10),
                                           child: GestureDetector(
                                             onTap: () async {
-                                              _amountController.text =
+                                              _amountController.text = truncateTo(
                                                   asset.accountBalance[
                                                               'allCoinMap']
                                                           [_defaultCoin]
-                                                      ['normal_balance'];
+                                                      ['normal_balance'],
+                                                  public.publicInfo['market']
+                                                                  ['coinList']
+                                                              [_defaultCoin]
+                                                          ['showPrecision'] ??
+                                                      2);
                                             },
                                             child: Text(
                                               'ALL',
