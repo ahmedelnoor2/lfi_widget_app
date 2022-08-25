@@ -138,13 +138,17 @@ class _LatestListingState extends State<LatestListing> {
                       ),
                       Text(
                         public.listingSymbol.isNotEmpty
-                            ? '+${_percentageChange.toStringAsFixed(6)}'
+                            ? _percentageChange > 0
+                                ? '+${_percentageChange.toStringAsFixed(6)}'
+                                : _percentageChange.toStringAsFixed(6)
                             : '0.000000',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: public.listingSymbol.isNotEmpty
-                              ? greenIndicator
+                              ? _percentageChange > 0
+                                  ? greenIndicator
+                                  : errorColor
                               : Colors.white,
                         ),
                       ),
