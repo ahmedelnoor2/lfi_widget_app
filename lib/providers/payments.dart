@@ -749,11 +749,10 @@ class Payments with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         _onRamperDetails = responseData['data'];
-        _selectedOnrampFiatCurrency = responseData['data']['gateways']
+        // print(_onRamperDetails['gateways'][0]['fiatCurrencies']);
+        _selectedOnrampFiatCurrency = _onRamperDetails['gateways'][0]
                 ['fiatCurrencies']
             .firstWhere((item) => item['code'] == 'EUR');
-        // _selectedOnrampCryptoCurrency =
-        //     responseData['data']['gateways']['cryptoCurrencies'];
 
         return notifyListeners();
       } else {

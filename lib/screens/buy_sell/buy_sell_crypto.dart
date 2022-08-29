@@ -239,7 +239,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
 
     var payments = Provider.of<Payments>(context, listen: true);
 
-    print(payments.onRamperDetails);
+    print(payments.selectedOnrampFiatCurrency);
 
     return WillPopScope(
       onWillPop: () {
@@ -340,11 +340,12 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                               child: Text(
                                                 'GUARDARIAN',
                                                 style: TextStyle(
-                                                    fontSize: 16,
-                                                    color: _providerType ==
-                                                            'guardarian'
-                                                        ? Colors.white
-                                                        : secondaryTextColor),
+                                                  fontSize: 16,
+                                                  color: _providerType ==
+                                                          'guardarian'
+                                                      ? Colors.white
+                                                      : secondaryTextColor,
+                                                ),
                                               ),
                                             ),
                                             Container(
