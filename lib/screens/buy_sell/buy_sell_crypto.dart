@@ -11,11 +11,12 @@ import 'package:lyotrade/screens/buy_sell/common/fiat_coin_drawer.dart';
 import 'package:lyotrade/screens/buy_sell/common/onramper_crypto_coins.dart';
 import 'package:lyotrade/screens/buy_sell/common/onramper_fiat_coins.dart';
 import 'package:lyotrade/screens/common/header.dart';
+import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/ScreenControl.utils.dart';
 import 'package:provider/provider.dart';
-// import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -31,6 +32,11 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _fiatController = TextEditingController();
   final TextEditingController _cryptoController = TextEditingController();
+
+  final TextEditingController _fiatOnrampController = TextEditingController();
+  final TextEditingController _cryptoOnrampController = TextEditingController();
+
+  Map<dynamic, TextEditingController> _textControllers = {};
 
   bool _loadingCoins = false;
   String _defaultNetwork = '';
@@ -49,17 +55,37 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
   void dispose() async {
     _fiatController.dispose();
     _cryptoController.dispose();
+    _fiatOnrampController.dispose();
+    _cryptoOnrampController.dispose();
     super.dispose();
   }
-
-  // void _launchUrl(_url) async {
-  //   final Uri url = Uri.parse(_url);
-  //   if (!await launchUrl(url)) throw 'Could not launch $url';
-  // }
 
   Future<void> getOnRamperDetails() async {
     var payments = Provider.of<Payments>(context, listen: false);
     await payments.getOnRamperDetails(context);
+    if (payments.onRamperDetails.isNotEmpty) {
+      setState(() {
+        _fiatOnrampController.text =
+            '${payments.onRamperDetails['defaultAmounts'][payments.selectedOnrampFiatCurrency['code']]}';
+      });
+      getEstimateRate(payments.onRamperDetails['defaultAmounts']
+          [payments.selectedOnrampFiatCurrency['code']]);
+    }
+  }
+
+  Future<void> getEstimateRate(amount) async {
+    var payments = Provider.of<Payments>(context, listen: false);
+
+    await payments.getOnrampEstimateRate(context, {
+      "fromCurrency": payments.selectedOnrampFiatCurrency['code'],
+      "toCurrency": payments.selectedOnrampCryptoCurrency['code'],
+      "paymentMethod": payments.defaultOnrampGateway['paymentMethods'][0],
+      "amount": amount
+    });
+  }
+
+  Future<void> callOnrampForm() async {
+    print(_textControllers);
   }
 
   Future<void> getDigitalBalance() async {
@@ -232,14 +258,51 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
     }
   }
 
+  Future<void> processOnrampOrder() async {
+    var payments = Provider.of<Payments>(context, listen: false);
+
+    if (payments.estimateOnrampRate['nextStep']['type'] == 'iframe') {
+      _launchUrl(payments.estimateOnrampRate['nextStep']['url']);
+    }
+
+    if (payments.estimateOnrampRate['nextStep']['type'] == 'form') {
+      showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Scaffold(
+                resizeToAvoidBottomInset: false,
+                appBar: hiddenAppBarWithDefaultHeight(),
+                body: onrampFormSheet(
+                  context,
+                  setState,
+                  payments.estimateOnrampRate['nextStep'],
+                ),
+              );
+            },
+          );
+        },
+      );
+      // await payments.callOnrampForm({
+      //   'url': payments.estimateOnrampRate['nextStep']['url'],
+      //   'data': jsonEncode({})
+      // });
+    }
+  }
+
+  void _launchUrl(_url) async {
+    final Uri url = Uri.parse(_url);
+    if (!await launchUrl(url)) throw 'Could not launch $url';
+  }
+
   @override
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
 
     var payments = Provider.of<Payments>(context, listen: true);
-
-    print(payments.selectedOnrampFiatCurrency);
 
     return WillPopScope(
       onWillPop: () {
@@ -611,12 +674,13 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                                     child:
                                                         CircularProgressIndicator
                                                             .adaptive(
-                                                                strokeWidth: 2),
+                                                      strokeWidth: 2,
+                                                    ),
                                                     height: 25,
                                                     width: 25,
                                                   )
                                                 : Text(
-                                                    '${payments.estimateRate.isNotEmpty ? double.parse('${payments.estimateRate['value']}').toStringAsFixed(4) : 0.00}',
+                                                    '${payments.estimateRate.isNotEmpty ? double.parse('${payments.estimateRate['value'] ?? 0.00}').toStringAsFixed(4) : 0.00}',
                                                     style:
                                                         TextStyle(fontSize: 22),
                                                   ),
@@ -707,7 +771,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                   payments.estimateRate.isEmpty
                                       ? Container()
                                       : Text(
-                                          '1 ${payments.selectedCryptoCurrency['current_ticker'].toUpperCase()} ~ ${(double.parse(_fiatController.text) / double.parse('${payments.estimateRate['value']}')).toStringAsFixed(4)} ${payments.selectedFiatCurrency['ticker'].toUpperCase()}'),
+                                          '1 ${payments.selectedCryptoCurrency['current_ticker'] != null ? payments.selectedCryptoCurrency['current_ticker'].toUpperCase() : ''} ~ ${(double.parse(_fiatController.text) / double.parse('${payments.estimateRate['value'] ?? 0.00}')).toStringAsFixed(4)} ${payments.selectedFiatCurrency['ticker'].toUpperCase()}'),
                                 ],
                               ),
                             ),
@@ -750,10 +814,14 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                               child: TextFormField(
                                                 onChanged: (value) {
                                                   if (value.isNotEmpty) {
-                                                    estimateCrypto(payments);
+                                                    if (double.parse(value) >
+                                                        0) {
+                                                      getEstimateRate(value);
+                                                    }
                                                   }
                                                 },
-                                                controller: _fiatController,
+                                                controller:
+                                                    _fiatOnrampController,
                                                 keyboardType:
                                                     const TextInputType
                                                         .numberWithOptions(
@@ -812,13 +880,24 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                                   padding: EdgeInsets.only(
                                                       right: 10),
                                                   child: CircleAvatar(
+                                                    backgroundColor:
+                                                        Colors.white,
                                                     radius: 14,
                                                     child: payments
-                                                            .selectedFiatCurrency
+                                                            .selectedOnrampFiatCurrency
                                                             .isNotEmpty
-                                                        ? SvgPicture.network(
-                                                            '$changeNowApi${payments.selectedFiatCurrency['icon']['url']}',
-                                                            width: 50,
+                                                        ? Image.memory(
+                                                            base64Decode(
+                                                              payments
+                                                                  .onRamperDetails[
+                                                                      'icons'][
+                                                                      payments.selectedOnrampFiatCurrency[
+                                                                          'code']]
+                                                                      ['icon']
+                                                                  .split(',')[1]
+                                                                  .replaceAll(
+                                                                      "\n", ""),
+                                                            ),
                                                           )
                                                         : Container(),
                                                   ),
@@ -827,12 +906,13 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                                   padding: EdgeInsets.only(
                                                       right: 10),
                                                   child: payments
-                                                          .selectedFiatCurrency
+                                                          .selectedOnrampFiatCurrency
                                                           .isNotEmpty
                                                       ? Text(
-                                                          '${payments.selectedFiatCurrency['ticker'].toUpperCase()}',
+                                                          '${payments.selectedOnrampFiatCurrency['code'].toUpperCase()}',
                                                           style: TextStyle(
-                                                              fontSize: 16),
+                                                            fontSize: 16,
+                                                          ),
                                                         )
                                                       : Container(),
                                                 ),
@@ -868,7 +948,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                                     width: 25,
                                                   )
                                                 : Text(
-                                                    '${payments.estimateRate.isNotEmpty ? double.parse('${payments.estimateRate['value']}').toStringAsFixed(4) : 0.00}',
+                                                    '${payments.estimateOnrampRate.isNotEmpty ? double.parse('${payments.estimateOnrampRate['receivedCrypto']}').toStringAsFixed(4) : 0.00}',
                                                     style:
                                                         TextStyle(fontSize: 22),
                                                   ),
@@ -906,15 +986,27 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                               children: [
                                                 Container(
                                                   padding: EdgeInsets.only(
-                                                      right: 10),
+                                                    right: 10,
+                                                  ),
                                                   child: CircleAvatar(
                                                     radius: 14,
+                                                    backgroundColor:
+                                                        Colors.transparent,
                                                     child: payments
-                                                            .selectedCryptoCurrency
+                                                            .selectedOnrampCryptoCurrency
                                                             .isNotEmpty
-                                                        ? SvgPicture.network(
-                                                            '$changeNowApi${payments.selectedCryptoCurrency['icon']['url']}',
-                                                            width: 50,
+                                                        ? Image.memory(
+                                                            base64Decode(
+                                                              payments
+                                                                  .onRamperDetails[
+                                                                      'icons'][
+                                                                      payments.selectedOnrampCryptoCurrency[
+                                                                          'code']]
+                                                                      ['icon']
+                                                                  .split(',')[1]
+                                                                  .replaceAll(
+                                                                      "\n", ""),
+                                                            ),
                                                           )
                                                         : Container(),
                                                   ),
@@ -924,10 +1016,10 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                                     right: 10,
                                                   ),
                                                   child: payments
-                                                          .selectedCryptoCurrency
+                                                          .selectedOnrampCryptoCurrency
                                                           .isNotEmpty
                                                       ? Text(
-                                                          '${payments.selectedCryptoCurrency['current_ticker'].toUpperCase()}',
+                                                          '${payments.selectedOnrampCryptoCurrency['code'].toUpperCase()}',
                                                           style: TextStyle(
                                                             fontSize: 16,
                                                           ),
@@ -944,6 +1036,25 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                 ),
                               ),
                             ),
+                            Container(
+                              padding: EdgeInsets.all(10),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Estimated rate',
+                                    style: TextStyle(
+                                      color: secondaryTextColor,
+                                    ),
+                                  ),
+                                  payments.estimateOnrampRate.isEmpty
+                                      ? Container()
+                                      : Text(
+                                          '${_fiatOnrampController.text} ${payments.selectedCryptoCurrency['current_ticker'].toUpperCase()} ~ ${(double.parse('${payments.estimateOnrampRate['receivedCrypto']}')).toStringAsFixed(4)} ${payments.selectedOnrampCryptoCurrency['code'].toUpperCase()}'),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                 ],
@@ -952,7 +1063,11 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                 onTap: _loadingCoins
                     ? null
                     : () {
-                        processBuy();
+                        if (_providerType == 'guardarian') {
+                          processBuy();
+                        } else {
+                          processOnrampOrder();
+                        }
                       },
                 child: Container(
                   width: width,
@@ -1001,6 +1116,117 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                             ),
                     ),
                   ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget onrampFormSheet(context, setState, formDetails) {
+    return Scaffold(
+      appBar: hiddenAppBar(),
+      body: SingleChildScrollView(
+        child: Container(
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.only(left: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '${formDetails['eventLabel']}',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: Icon(
+                        Icons.close,
+                        size: 20,
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              Divider(),
+              Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
+                        children: formDetails['data'].isNotEmpty
+                            ? formDetails['data'].map<Widget>((formData) {
+                                setState(() {
+                                  _textControllers[formData['name']] =
+                                      TextEditingController();
+                                });
+                                return Container(
+                                  margin: EdgeInsets.all(5),
+                                  padding: EdgeInsets.all(15),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                      style: BorderStyle.solid,
+                                      width: 0.3,
+                                      color: Color(0xff5E6292),
+                                    ),
+                                  ),
+                                  child: TextFormField(
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please enter ${formData['humanName']}';
+                                      }
+                                      return null;
+                                    },
+                                    keyboardType: formData['name'] == 'email'
+                                        ? TextInputType.emailAddress
+                                        : TextInputType.text,
+                                    controller:
+                                        _textControllers[formData['name']],
+                                    decoration: InputDecoration(
+                                      contentPadding: EdgeInsets.zero,
+                                      isDense: true,
+                                      border: UnderlineInputBorder(
+                                        borderSide: BorderSide.none,
+                                      ),
+                                      hintStyle: TextStyle(
+                                        fontSize: 14,
+                                      ),
+                                      hintText:
+                                          'Enter ${formData['humanName']}',
+                                    ),
+                                  ),
+                                );
+                              }).toList()
+                            : [],
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.all(10),
+                      child: LyoButton(
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            print('process');
+                          } else {
+                            print('notvalidating');
+                          }
+                        },
+                        text: 'Continue',
+                        active: true,
+                        isLoading: false,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

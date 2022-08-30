@@ -138,11 +138,13 @@ class _OnramperCryptoCoinsState extends State<OnramperCryptoCoins>
                   children: [
                     ListTile(
                       onTap: () async {
-                        // changeFiatCoin(payments, _fiatCurrency);
+                        payments
+                            .setSelectedOnrampCryptoCurrency(_cryptoCurrency);
+                        Navigator.pop(context);
                       },
                       leading: CircleAvatar(
                         radius: 18,
-                        backgroundColor: Colors.white,
+                        backgroundColor: Colors.transparent,
                         child: Image.memory(
                           base64Decode(
                             payments.onRamperDetails['icons']
@@ -159,7 +161,7 @@ class _OnramperCryptoCoinsState extends State<OnramperCryptoCoins>
                         ),
                       ),
                       subtitle: Text(
-                        '${_cryptoCurrency['code']}',
+                        '${_cryptoCurrency['network'] ?? _cryptoCurrency['id']}',
                         style: TextStyle(
                           fontSize: 14,
                           color: secondaryTextColor,
