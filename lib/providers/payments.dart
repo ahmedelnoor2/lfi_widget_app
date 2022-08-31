@@ -257,9 +257,16 @@ class Payments with ChangeNotifier {
       final responseData = json.decode(response.body);
 
       if (responseData['code'] == '0') {
-        _estimateOnrampRate = responseData['data'][0];
-        _estimateLoader = false;
-        return notifyListeners();
+        if (responseData['data'].isNotEmpty) {
+          _estimateOnrampRate = responseData['data'][0];
+          _estimateLoader = false;
+          return notifyListeners();
+        } else {
+          snackAlert(ctx, SnackTypes.errors, 'This pair is not supported');
+          _estimateOnrampRate = {};
+          _estimateLoader = false;
+          return notifyListeners();
+        }
       } else if ((responseData['code'] == '400') ||
           (responseData['code'] == '500')) {
         snackAlert(ctx, SnackTypes.errors, responseData['msg']);
@@ -847,15 +854,16 @@ class Payments with ChangeNotifier {
     return _formCallResponse;
   }
 
-  Future<void> callOnrampForm(ctx) async {
+  Future<void> callOnrampForm(ctx, formData) async {
     var url = Uri.https(
       lyoApiUrl,
       '/on-ramper/call-form',
     );
 
     try {
-      final response = await http.get(
+      final response = await http.post(
         url,
+        body: jsonEncode(formData),
         headers: headers,
       );
 
@@ -863,14 +871,17 @@ class Payments with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         _formCallResponse = responseData['data'];
+        Navigator.pop(ctx);
         return notifyListeners();
       } else {
         _formCallResponse = {};
+        Navigator.pop(ctx);
         return notifyListeners();
       }
     } catch (error) {
       print(error);
       _formCallResponse = {};
+      Navigator.pop(ctx);
       snackAlert(ctx, SnackTypes.errors, 'Server error, please try again.');
       return notifyListeners();
     }

@@ -12,6 +12,8 @@ import 'package:lyotrade/screens/buy_sell/common/onramper_crypto_coins.dart';
 import 'package:lyotrade/screens/buy_sell/common/onramper_fiat_coins.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/ScreenControl.utils.dart';
@@ -82,6 +84,13 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
       "paymentMethod": payments.defaultOnrampGateway['paymentMethods'][0],
       "amount": amount
     });
+
+    if (payments.estimateOnrampRate.isEmpty) {
+      setState(() {
+        _fiatOnrampController.clear();
+        _cryptoOnrampController.clear();
+      });
+    }
   }
 
   Future<void> callOnrampForm() async {
@@ -261,11 +270,14 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
   Future<void> processOnrampOrder() async {
     var payments = Provider.of<Payments>(context, listen: false);
 
+    print(payments.estimateOnrampRate);
+
     if (payments.estimateOnrampRate['nextStep']['type'] == 'iframe') {
       _launchUrl(payments.estimateOnrampRate['nextStep']['url']);
     }
 
-    if (payments.estimateOnrampRate['nextStep']['type'] == 'form') {
+    if ((payments.estimateOnrampRate['nextStep']['type'] == 'form') ||
+        (payments.estimateOnrampRate['nextStep']['type'] == 'wait')) {
       showModalBottomSheet<void>(
         context: context,
         isScrollControlled: true,
@@ -285,16 +297,51 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
           );
         },
       );
-      // await payments.callOnrampForm({
-      //   'url': payments.estimateOnrampRate['nextStep']['url'],
-      //   'data': jsonEncode({})
-      // });
     }
   }
 
   void _launchUrl(_url) async {
     final Uri url = Uri.parse(_url);
     if (!await launchUrl(url)) throw 'Could not launch $url';
+  }
+
+  Future<void> processOnrampBuy(formDetails) async {
+    var data = {};
+    var payments = Provider.of<Payments>(context, listen: false);
+    for (var key in _textControllers.keys) {
+      data[key] = _textControllers[key]!.text;
+    }
+
+    await payments.callOnrampForm(context, {
+      'url': payments.estimateOnrampRate['nextStep']['url'],
+      'data': jsonEncode(data)
+    });
+
+    if (payments.formCallResponse.isNotEmpty) {
+      if (payments.formCallResponse['type'] == 'form') {
+        showModalBottomSheet<void>(
+          context: context,
+          isScrollControlled: true,
+          builder: (BuildContext context) {
+            return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return Scaffold(
+                  resizeToAvoidBottomInset: false,
+                  appBar: hiddenAppBarWithDefaultHeight(),
+                  body: onrampFormSheet(
+                    context,
+                    setState,
+                    payments.formCallResponse['nextStep'],
+                  ),
+                );
+              },
+            );
+          },
+        );
+      } else {
+        _launchUrl(payments.formCallResponse['url']);
+      }
+    }
   }
 
   @override
@@ -814,10 +861,10 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                               child: TextFormField(
                                                 onChanged: (value) {
                                                   if (value.isNotEmpty) {
-                                                    if (double.parse(value) >
-                                                        0) {
+                                                    if (double.parse(value) >=
+                                                        100) {
                                                       getEstimateRate(value);
-                                                    }
+                                                    } else {}
                                                   }
                                                 },
                                                 controller:
@@ -1066,7 +1113,14 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                         if (_providerType == 'guardarian') {
                           processBuy();
                         } else {
-                          processOnrampOrder();
+                          if (_fiatOnrampController.text.isNotEmpty) {
+                            if (double.parse(_fiatOnrampController.text) > 50) {
+                              processOnrampOrder();
+                            } else {
+                              snackAlert(context, SnackTypes.errors,
+                                  'Price is lower then required amount');
+                            }
+                          }
                         }
                       },
                 child: Container(
@@ -1126,6 +1180,8 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
   }
 
   Widget onrampFormSheet(context, setState, formDetails) {
+    var formDatas = formDetails['data'] ?? formDetails['extraData'];
+
     return Scaffold(
       appBar: hiddenAppBar(),
       body: SingleChildScrollView(
@@ -1138,7 +1194,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '${formDetails['eventLabel']}',
+                      '${formDetails['eventLabel'] ?? 'Process payment'}',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -1164,8 +1220,8 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                     Container(
                       padding: const EdgeInsets.all(10),
                       child: Column(
-                        children: formDetails['data'].isNotEmpty
-                            ? formDetails['data'].map<Widget>((formData) {
+                        children: formDatas.isNotEmpty
+                            ? formDatas.map<Widget>((formData) {
                                 setState(() {
                                   _textControllers[formData['name']] =
                                       TextEditingController();
@@ -1203,7 +1259,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                         fontSize: 14,
                                       ),
                                       hintText:
-                                          'Enter ${formData['humanName']}',
+                                          'Enter ${formData['humanName'] ?? formData['name']}',
                                     ),
                                   ),
                                 );
@@ -1217,6 +1273,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
                             print('process');
+                            processOnrampBuy(formDetails);
                           } else {
                             print('notvalidating');
                           }
