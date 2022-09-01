@@ -44,6 +44,9 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
   String _defaultNetwork = '';
   String _currentAddress = '';
   String _providerType = 'guardarian';
+
+  String _defaultOnrampNetwork = 'BTC';
+  String _currentOnrampAddress = '';
   bool _selectorFalse = false;
 
   @override
@@ -76,6 +79,8 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
   }
 
   Future<void> getEstimateRate(amount) async {
+    var asset = Provider.of<Asset>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
     var payments = Provider.of<Payments>(context, listen: false);
 
     await payments.getOnrampEstimateRate(context, {
@@ -270,8 +275,6 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
   Future<void> processOnrampOrder() async {
     var payments = Provider.of<Payments>(context, listen: false);
 
-    print(payments.estimateOnrampRate);
-
     if (payments.estimateOnrampRate['nextStep']['type'] == 'iframe') {
       _launchUrl(payments.estimateOnrampRate['nextStep']['url']);
     }
@@ -303,6 +306,48 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
   void _launchUrl(_url) async {
     final Uri url = Uri.parse(_url);
     if (!await launchUrl(url)) throw 'Could not launch $url';
+  }
+
+  void toggleProvider(value) async {
+    setState(() {
+      _providerType = value;
+      _loadingCoins = true;
+    });
+
+    var auth = Provider.of<Auth>(context, listen: false);
+    var asset = Provider.of<Asset>(context, listen: false);
+
+    if (_providerType == 'guardarian') {
+      if (_defaultNetwork.isNotEmpty) {
+        await asset.getChangeAddress(context, auth, _defaultNetwork);
+        if (asset.changeAddress['addressStr'] != null) {
+          setState(() {
+            _currentAddress = asset.changeAddress['addressStr'];
+          });
+        }
+      }
+    } else {
+      if (_defaultOnrampNetwork.isNotEmpty) {
+        await asset.getChangeAddress(context, auth, _defaultOnrampNetwork);
+
+        if (asset.changeAddress['addressStr'] != null) {
+          setState(() {
+            _currentOnrampAddress = asset.changeAddress['addressStr'];
+          });
+        }
+      } else {
+        await asset.getChangeAddress(context, auth, _defaultOnrampNetwork);
+
+        if (asset.changeAddress['addressStr'] != null) {
+          setState(() {
+            _currentOnrampAddress = asset.changeAddress['addressStr'];
+          });
+        }
+      }
+    }
+    setState(() {
+      _loadingCoins = false;
+    });
   }
 
   Future<void> processOnrampBuy(formDetails) async {
@@ -407,9 +452,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                             Expanded(
                               child: InkWell(
                                 onTap: () {
-                                  setState(() {
-                                    _providerType = 'guardarian';
-                                  });
+                                  toggleProvider('guardarian');
                                 },
                                 child: Container(
                                   margin: EdgeInsets.all(10),
@@ -478,9 +521,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                             Expanded(
                               child: InkWell(
                                 onTap: () {
-                                  setState(() {
-                                    _providerType = 'onramper';
-                                  });
+                                  toggleProvider('onramper');
                                 },
                                 child: Container(
                                   margin: EdgeInsets.all(10),
@@ -1225,7 +1266,13 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                 setState(() {
                                   _textControllers[formData['name']] =
                                       TextEditingController();
+                                  if (formData['name'] ==
+                                      'cryptocurrencyAddress') {
+                                    _textControllers[formData['name']]!.text =
+                                        _currentOnrampAddress;
+                                  }
                                 });
+
                                 return Container(
                                   margin: EdgeInsets.all(5),
                                   padding: EdgeInsets.all(15),
