@@ -1,11 +1,12 @@
 import 'package:buttons_tabbar/buttons_tabbar.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/bottomnav.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/no_data.dart';
-
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:lyotrade/screens/market/pages/exchange.dart';
 import 'package:lyotrade/screens/market/pages/favourite.dart';
 import 'package:lyotrade/screens/trade/kline_chart.dart';
@@ -53,7 +54,8 @@ class _MarketState extends State<Market> {
     var auth = Provider.of<Auth>(context, listen: false);
     await public.getrecomendedsybol(auth);
   }
-  var tabindex=0;
+
+  var tabindex = 0;
   @override
   Widget build(BuildContext context) {
     var _currentRoute = ModalRoute.of(context)!.settings.name;
@@ -142,22 +144,25 @@ class _MarketState extends State<Market> {
                                         children: [
                                           Row(
                                             children: [
-                                              Stack(
-                                                children: [
-                                                  Container(
-                                                    padding: EdgeInsets.only(
-                                                        left: 10),
-                                                    child: Image.network(
-                                                      '${public.publicInfoMarket['market']['coinList']['${public.marketrecoomendsymbol[index].split('/')[1]}']['icon']}',
-                                                      width: 16,
+                                              kIsWeb
+                                                  ? Container()
+                                                  : Stack(
+                                                      children: [
+                                                        Container(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  left: 10),
+                                                          child: Image.network(
+                                                            '${public.publicInfoMarket['market']['coinList']['${public.marketrecoomendsymbol[index].split('/')[1]}']['icon']}',
+                                                            width: 16,
+                                                          ),
+                                                        ),
+                                                        Image.network(
+                                                          '${public.publicInfoMarket['market']['coinList']['${public.marketrecoomendsymbol[index].split('/')[0]}']['icon']}',
+                                                          width: 16,
+                                                        ),
+                                                      ],
                                                     ),
-                                                  ),
-                                                  Image.network(
-                                                    '${public.publicInfoMarket['market']['coinList']['${public.marketrecoomendsymbol[index].split('/')[0]}']['icon']}',
-                                                    width: 16,
-                                                  ),
-                                                ],
-                                              ),
                                               Container(
                                                 padding:
                                                     EdgeInsets.only(left: 5),
@@ -279,9 +284,8 @@ class _MarketState extends State<Market> {
                               ButtonsTabBar(
                                 onTap: ((p0) {
                                   setState(() {
-                                     tabindex=p0;
+                                    tabindex = p0;
                                   });
-                                
                                 }),
                                 height: height * 0.043,
                                 radius: 2,
@@ -310,59 +314,64 @@ class _MarketState extends State<Market> {
                                   ),
                                 ],
                               ),
-                           tabindex==1?Container():Container(
-                                margin: EdgeInsets.only(right: 2),
-                                child: Container(
-                                  padding: EdgeInsets.all(5),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
-                                    border: Border.all(
-                                      style: BorderStyle.solid,
-                                      width: 0.3,
-                                      color: Color(0xff5E6292),
-                                    ),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                    Container(
-                                        padding: EdgeInsets.only(right: 8),
-                                        child: Icon(
-                                          Icons.search,
-                                          size: 14,
-                                          color: secondaryTextColor,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: width * 0.37,
-                                        child: TextField(
-                                          onChanged: (value) async {
-                                            // await asset.filterSearchResults(value);
-                                            await public
-                                                .filterMarketSearchResults(
-                                              value,
-                                              public.allMarkets[
-                                                  _currentMarketSort],
-                                              _currentMarketSort,
-                                            );
-                                          },
-                                          controller: _searchController,
-                                          decoration: InputDecoration(
-                                            contentPadding: EdgeInsets.zero,
-                                            isDense: true,
-                                            border: UnderlineInputBorder(
-                                              borderSide: BorderSide.none,
-                                            ),
-                                            hintStyle: TextStyle(
-                                              fontSize: 14,
-                                            ),
-                                            hintText: "Search",
+                              tabindex == 1
+                                  ? Container()
+                                  : Container(
+                                      margin: EdgeInsets.only(right: 2),
+                                      child: Container(
+                                        padding: EdgeInsets.all(5),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          border: Border.all(
+                                            style: BorderStyle.solid,
+                                            width: 0.3,
+                                            color: Color(0xff5E6292),
                                           ),
                                         ),
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              padding:
+                                                  EdgeInsets.only(right: 8),
+                                              child: Icon(
+                                                Icons.search,
+                                                size: 14,
+                                                color: secondaryTextColor,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: width * 0.37,
+                                              child: TextField(
+                                                onChanged: (value) async {
+                                                  // await asset.filterSearchResults(value);
+                                                  await public
+                                                      .filterMarketSearchResults(
+                                                    value,
+                                                    public.allMarkets[
+                                                        _currentMarketSort],
+                                                    _currentMarketSort,
+                                                  );
+                                                },
+                                                controller: _searchController,
+                                                decoration: InputDecoration(
+                                                  contentPadding:
+                                                      EdgeInsets.zero,
+                                                  isDense: true,
+                                                  border: UnderlineInputBorder(
+                                                    borderSide: BorderSide.none,
+                                                  ),
+                                                  hintStyle: TextStyle(
+                                                    fontSize: 14,
+                                                  ),
+                                                  hintText: "Search",
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ],
-                                  ),
-                                ),
-                              ),
+                                    ),
                             ],
                           ),
                           Expanded(

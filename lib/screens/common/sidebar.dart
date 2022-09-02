@@ -162,7 +162,7 @@ class _SideBarState extends State<SideBar> {
                         : ListTile(
                             leading: InkWell(
                               onTap: () {
-                                _getImage();
+                                kIsWeb ? null : _getImage();
                               },
                               child: CircleAvatar(
                                 radius:
@@ -250,25 +250,27 @@ class _SideBarState extends State<SideBar> {
                 ),
               ),
             ),
-            Card(
-              child: ListTile(
-                title: Text('KYC'),
-                subtitle: Text(
-                  'Complete your KYC',
-                  style: TextStyle(
-                    fontSize: 12,
+            kIsWeb
+                ? Container()
+                : Card(
+                    child: ListTile(
+                      title: Text('KYC'),
+                      subtitle: Text(
+                        'Complete your KYC',
+                        style: TextStyle(
+                          fontSize: 12,
+                        ),
+                      ),
+                      onTap: () {
+                        if (auth.isAuthenticated) {
+                          Navigator.pushNamed(context, '/kyc_screen');
+                        } else {
+                          Navigator.pushNamed(context, '/authentication');
+                        }
+                      },
+                      trailing: Icon(Icons.verified_user),
+                    ),
                   ),
-                ),
-                onTap: () {
-                  if (auth.isAuthenticated) {
-                    Navigator.pushNamed(context, '/kyc_screen');
-                  } else {
-                    Navigator.pushNamed(context, '/authentication');
-                  }
-                },
-                trailing: Icon(Icons.verified_user),
-              ),
-            ),
             Card(
               child: Column(
                 children: [
