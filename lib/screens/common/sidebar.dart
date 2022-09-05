@@ -211,7 +211,7 @@ class _SideBarState extends State<SideBar> {
                                   Container(
                                     padding: EdgeInsets.only(right: 5),
                                     child: Text(
-                                      'UUID: ${auth.userInfo.isNotEmpty ? auth.userInfo['id'] : '-'}',
+                                      'UID: ${auth.userInfo.isNotEmpty ? auth.userInfo['id'] : '-'}',
                                     ),
                                   ),
                                   Icon(
