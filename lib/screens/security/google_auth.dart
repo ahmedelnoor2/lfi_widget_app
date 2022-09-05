@@ -224,10 +224,19 @@ class _GoogleAuthState extends State<GoogleAuth> {
                           .split(',')[1]
                           .replaceAll("\n", ""),
                     ),
+                    scale: 0.6,
                   )
                 : Container(),
             Container(
-              padding: const EdgeInsets.only(top: 15),
+              margin: const EdgeInsets.only(top: 20, bottom: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(
+                  style: BorderStyle.solid,
+                  width: 0.3,
+                  color: Color(0xff5E6292),
+                ),
+              ),
               child: ListTile(
                 onTap: () {
                   Clipboard.setData(

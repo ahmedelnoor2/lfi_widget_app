@@ -194,7 +194,8 @@ class _SideBarState extends State<SideBar> {
                               onTap: () {
                                 Clipboard.setData(
                                   ClipboardData(
-                                    text: auth.userInfo['userAccount'],
+                                    text:
+                                        '${auth.userInfo.isNotEmpty ? auth.userInfo['id'] : '-'}',
                                   ),
                                 );
                                 showAlert(

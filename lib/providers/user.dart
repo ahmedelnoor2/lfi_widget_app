@@ -114,7 +114,7 @@ class User with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         snackAlert(ctx, SnackTypes.success, 'Google authenticator activated');
-        auth.getUserInfo();
+        auth.getUserInfo(ctx);
         Navigator.pop(ctx);
         return;
       } else {
