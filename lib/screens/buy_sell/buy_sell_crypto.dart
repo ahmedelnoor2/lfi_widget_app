@@ -308,6 +308,118 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
     if (!await launchUrl(url)) throw 'Could not launch $url';
   }
 
+  void changeOnrampCrpto() async {
+    var payments = Provider.of<Payments>(context, listen: false);
+    var public = Provider.of<Public>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
+    var asset = Provider.of<Asset>(context, listen: false);
+
+    setState(() {
+      _loadingCoins = true;
+    });
+
+    if (public.publicInfoMarket['market']['followCoinList']
+            [payments.selectedOnrampCryptoCurrency['code'].toUpperCase()] !=
+        null) {
+      public.publicInfoMarket['market']['followCoinList']
+              [payments.selectedOnrampCryptoCurrency['code'].toUpperCase()]
+          .forEach((key, _network) {
+        try {
+          if (_network['mainChainName'] ==
+              ((payments.selectedOnrampCryptoCurrency['id'].split('_').length >
+                      1)
+                  ? (payments.selectedOnrampCryptoCurrency['id']
+                      .split('_')[1]
+                      .toUpperCase())
+                  : payments.selectedOnrampCryptoCurrency['id']
+                      .toUpperCase())) {
+            setState(() {
+              _defaultOnrampNetwork = _network['showName'];
+            });
+          } else {
+            setState(() {
+              _defaultOnrampNetwork = '';
+            });
+          }
+        } catch (e) {
+          try {
+            if (_network['mainChainName'] ==
+                (payments.selectedOnrampCryptoCurrency['network']
+                        .replaceAll("-", ""))
+                    .toUpperCase()) {
+              setState(() {
+                _defaultOnrampNetwork = _network['showName'];
+              });
+            }
+          } catch (e) {
+            setState(() {
+              _defaultOnrampNetwork = '';
+            });
+          }
+        }
+      });
+    } else {
+      try {
+        if (public.publicInfoMarket['market']['coinList'][
+                    payments.selectedOnrampCryptoCurrency['code'].toUpperCase()]
+                ['mainChainName'] ==
+            (payments.selectedOnrampCryptoCurrency['network']
+                    .replaceAll("-", ""))
+                .toUpperCase()) {
+          setState(() {
+            _defaultOnrampNetwork = public.publicInfoMarket['market']
+                        ['coinList'][
+                    payments.selectedOnrampCryptoCurrency['code'].toUpperCase()]
+                ['showName'];
+          });
+        } else {
+          setState(() {
+            _defaultOnrampNetwork = '';
+          });
+        }
+
+        if (payments.selectedOnrampCryptoCurrency['id'] == 'SOL') {
+          if ('${public.publicInfoMarket['market']['coinList']['${payments.selectedOnrampCryptoCurrency['id'].toUpperCase()}1']['mainChainName']}' ==
+              '${payments.selectedOnrampCryptoCurrency['id'].toUpperCase()}1') {
+            setState(() {
+              _defaultOnrampNetwork =
+                  '${public.publicInfoMarket['market']['coinList']['${payments.selectedOnrampCryptoCurrency['id'].toUpperCase()}1']['showName']}';
+            });
+          } else {
+            setState(() {
+              _defaultOnrampNetwork = '';
+            });
+          }
+        }
+      } catch (e) {
+        setState(() {
+          _defaultOnrampNetwork = '';
+        });
+      }
+    }
+
+    if (_defaultOnrampNetwork.isNotEmpty) {
+      await asset.getChangeAddress(context, auth, _defaultOnrampNetwork);
+
+      print(asset.changeAddress);
+
+      if (asset.changeAddress['addressStr'] != null) {
+        setState(() {
+          _currentOnrampAddress = asset.changeAddress['addressStr'];
+        });
+      }
+    } else {
+      setState(() {
+        _currentOnrampAddress = '';
+      });
+    }
+    print(_currentOnrampAddress);
+
+    setState(() {
+      _loadingCoins = false;
+    });
+  }
+
   void toggleProvider(value) async {
     setState(() {
       _providerType = value;
@@ -1350,7 +1462,9 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
 
   Widget selectCryptoCoin(context, setState) {
     return (_providerType == 'onramper')
-        ? OnramperCryptoCoins()
+        ? OnramperCryptoCoins(
+            changeOnrampCrpto: changeOnrampCrpto,
+          )
         : CryptoCoinDrawer(
             fiatController: _fiatController,
             getDigitalBalance: getDigitalBalance,

@@ -32,3 +32,4 @@ String getMarketName(String coinName) {
       return coinName;
   }
 }
+

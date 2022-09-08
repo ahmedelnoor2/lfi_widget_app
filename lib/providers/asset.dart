@@ -433,6 +433,8 @@ class Asset with ChangeNotifier {
       );
       final responseData = json.decode(response.body);
 
+      print(responseData);
+
       if (responseData['code'] == '0') {
         _changeAddress = responseData['data'];
       } else {

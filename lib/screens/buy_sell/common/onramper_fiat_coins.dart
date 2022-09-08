@@ -140,6 +140,8 @@ class _OnramperFiatCoinsState extends State<OnramperFiatCoins>
                       onTap: () async {
                         // changeFiatCoin(payments, _fiatCurrency);
                         payments.setSelectedOnrampFiatCurrency(_fiatCurrency);
+                       // payments.getOnRamperDetails(context);
+                        
                         Navigator.pop(context);
                       },
                       leading: CircleAvatar(

@@ -5,13 +5,19 @@ import 'package:flutter/src/animation/animation_controller.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/ticker_provider.dart';
+import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/payments.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 
 class OnramperCryptoCoins extends StatefulWidget {
-  const OnramperCryptoCoins({Key? key}) : super(key: key);
+  const OnramperCryptoCoins({
+    Key? key,
+    required this.changeOnrampCrpto,
+  }) : super(key: key);
+
+  final Function changeOnrampCrpto;
 
   @override
   State<OnramperCryptoCoins> createState() => _OnramperCryptoCoinsState();
@@ -40,6 +46,7 @@ class _OnramperCryptoCoinsState extends State<OnramperCryptoCoins>
     height = MediaQuery.of(context).size.height;
 
     var payments = Provider.of<Payments>(context, listen: true);
+    var asset = Provider.of<Asset>(context, listen: true);
 
     return Container(
       height: height,
@@ -138,8 +145,11 @@ class _OnramperCryptoCoinsState extends State<OnramperCryptoCoins>
                   children: [
                     ListTile(
                       onTap: () async {
-                        payments
+                        await payments
                             .setSelectedOnrampCryptoCurrency(_cryptoCurrency);
+                        widget.changeOnrampCrpto();
+                        //asset.getChangeAddress(context, auth, _defaultOnrampNetwork);
+
                         Navigator.pop(context);
                       },
                       leading: CircleAvatar(

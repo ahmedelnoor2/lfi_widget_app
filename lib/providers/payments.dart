@@ -777,7 +777,7 @@ class Payments with ChangeNotifier {
     return _selectedOnrampCryptoCurrency;
   }
 
-  void setSelectedOnrampCryptoCurrency(selectCurrency) {
+  Future<void> setSelectedOnrampCryptoCurrency(selectCurrency) async {
     _selectedOnrampCryptoCurrency = selectCurrency;
     return notifyListeners();
   }
