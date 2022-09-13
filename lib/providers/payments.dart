@@ -207,6 +207,7 @@ class Payments with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         _estimateRate = responseData['data'];
+        print(_estimateRate);
         _estimateLoader = false;
         return notifyListeners();
       } else if (responseData['code'] == '4000') {
@@ -257,6 +258,8 @@ class Payments with ChangeNotifier {
       final responseData = json.decode(response.body);
 
       if (responseData['code'] == '0') {
+     
+       
         if (responseData['data'].isNotEmpty) {
           _estimateOnrampRate = responseData['data'][0];
           _estimateLoader = false;
@@ -297,6 +300,7 @@ class Payments with ChangeNotifier {
   }
 
   Future<void> createTransaction(ctx, auth, formData) async {
+  
     _changenowTransaction = {};
     notifyListeners();
     headers['exchange-token'] = auth.loginVerificationToken;
@@ -315,6 +319,8 @@ class Payments with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         _changenowTransaction = responseData['data'];
+        print('check......');
+        print(_changenowTransaction);
         return notifyListeners();
       } else if (responseData['code'] == '4000') {
         snackAlert(ctx, SnackTypes.errors, responseData['msg']['message']);
@@ -898,6 +904,8 @@ class Payments with ChangeNotifier {
   }
 
   Future<void> callOnrampForm(ctx, formData) async {
+    
+   
     var url = Uri.https(
       lyoApiUrl,
       '/on-ramper/call-form',
@@ -911,9 +919,13 @@ class Payments with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-
+       print('check..........>>>>>>>>>>>>>>>>>>>>>>>>');
+      print(responseData);
       if (responseData['code'] == '0') {
         _formCallResponse = responseData['data'];
+       
+
+     
         Navigator.pop(ctx);
         return notifyListeners();
       } else {
@@ -930,44 +942,5 @@ class Payments with ChangeNotifier {
     }
   }
 
-  //// on Ramper rate
-  ///
-  Map _onRamperRateResponse = {};
-
-  Map get onRamperRateResponse {
-    return _onRamperRateResponse;
-  }
-
-  Future<void> ramperRateResponse(ctx, formData) async {
-    var url = Uri.https(
-      lyoApiUrl,
-      '/on-ramper/rate',
-    );
-
-    try {
-      final response = await http.post(
-        url,
-        body: jsonEncode(formData),
-        headers: headers,
-      );
-     
-      final responseData = json.decode(response.body);
-
-      if (responseData['code'] == '0') {
-        _onRamperRateResponse = responseData['data'];
-
-        return notifyListeners();
-      } else {
-        _onRamperRateResponse = {};
-
-        return notifyListeners();
-      }
-    } catch (error) {
-      print(error);
-      _onRamperRateResponse = {};
-
-      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again.');
-      return notifyListeners();
-    }
-  }
+  
 }

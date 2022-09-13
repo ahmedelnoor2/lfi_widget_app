@@ -23,6 +23,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:webviewx/webviewx.dart';
 
 import 'common/selectOnrampProvider.dart';
 
@@ -525,6 +526,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              
               Column(
                 children: [
                   Row(
@@ -1287,47 +1289,44 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                 },
                               );
                             },
-                            child: Container(
-                              width: width,
-                              padding: EdgeInsets.all(height * 0.02),
-                              decoration: BoxDecoration(
-                                color: orangeBGColor,
-                                borderRadius: BorderRadius.circular(5),
-                                border: Border.all(
-                                  style: BorderStyle.solid,
-                                  width: 0.3,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.keyboard_arrow_down,
-                                        color: Colors.white,
-                                        size: 30,
-                                      ),
-                                      Text(
-                                        payments.onRampIdentifier.toString(),
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
+                            child: Card(
+                              child: Container(
+                                width: width,
+                                padding: EdgeInsets.all(height * 0.02),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  border: Border.all(
+                                    style: BorderStyle.solid,
+                                    width: 0.1,
+                                    color: secondaryTextColor,
                                   ),
-                                ],
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      payments.onRampIdentifier.toString(),
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: linkColor,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.keyboard_arrow_down,
+                                      color: Colors.white,
+                                      size: 30,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                           SizedBox(
+                          SizedBox(
                             height: height * .02,
                           ),
-                         InkWell(
+                          InkWell(
                             onTap: () {
                               setState(() {});
                               showModalBottomSheet(
@@ -1344,40 +1343,37 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                 },
                               );
                             },
-                            child: Container(
-                              width: width,
-                              padding: EdgeInsets.all(height * 0.02),
-                              decoration: BoxDecoration(
-                                color: orangeBGColor,
-                                borderRadius: BorderRadius.circular(5),
-                                border: Border.all(
-                                  style: BorderStyle.solid,
-                                  width: 0.3,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.keyboard_arrow_down,
-                                        color: Colors.white,
-                                        size: 30,
-                                      ),
-                                      Text(
-                                        payments.selectedpaymentmethod.toString(),
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
+                            child: Card(
+                              child: Container(
+                                width: width,
+                                padding: EdgeInsets.all(height * 0.02),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  border: Border.all(
+                                    style: BorderStyle.solid,
+                                    width: 0.1,
+                                    color: secondaryTextColor,
                                   ),
-                                ],
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      payments.selectedpaymentmethod.toString(),
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: linkColor,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.keyboard_arrow_down,
+                                      color: Colors.white,
+                                      size: 30,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -1438,7 +1434,6 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                               width: 25,
                             )
                           : InkWell(
-                             
                               child: Text(
                                 'Buy',
                                 style: TextStyle(
@@ -1561,6 +1556,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
                             print('process');
+                          
                             processOnrampBuy(formDetails);
                           } else {
                             print('notvalidating');

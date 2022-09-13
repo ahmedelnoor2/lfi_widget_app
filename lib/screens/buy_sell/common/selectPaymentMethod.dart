@@ -85,6 +85,7 @@ class _PayementMethodState extends State<PayementMethod> {
                             payments.selectedpaymentmethod =
                                 payments.paymentMethods[index];
                           });
+                          Navigator.pop(context);
                         },
                         child: Row(
                           children: [

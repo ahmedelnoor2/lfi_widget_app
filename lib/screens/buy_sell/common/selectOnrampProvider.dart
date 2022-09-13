@@ -73,7 +73,7 @@ class _OnRampServiceProviderState extends State<OnRampServiceProvider> {
                         border: Border.all(
                             style: BorderStyle.solid,
                             width: 1,
-                            color: linkColor),
+                            color:payments.tappedIdentifier == index? linkColor:seconadarytextcolour),
                       ),
                       child: InkWell(
                         onTap: () async {
@@ -84,6 +84,7 @@ class _OnRampServiceProviderState extends State<OnRampServiceProvider> {
 
                           payments.setpaymentMethods(
                               payments.onrampGateways[index]['paymentMethods']);
+                          Navigator.pop(context);
                         },
                         child: Row(
                           children: [
