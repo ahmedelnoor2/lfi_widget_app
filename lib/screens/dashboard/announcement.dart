@@ -43,25 +43,38 @@ class _AnnouncementState extends State<Announcement> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(right: 10),
-                          height: 16,
-                          child: Image.asset('assets/img/announcement.png'),
-                        ),
-                        Text(
-                          '${notice['title']}',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: secondaryTextColor,
+                    Expanded(
+                      flex: 11,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: Container(
+                              padding: EdgeInsets.only(right: 10),
+                              height: 16,
+                              child: Image.asset('assets/img/announcement.png'),
+                            ),
                           ),
-                        )
-                      ],
+                          Expanded(
+                            flex: 11,
+                            child: Text(
+                              '${notice['title']}',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: secondaryTextColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    GestureDetector(
-                      child: Image.asset('assets/img/list.png'),
-                    )
+                    Expanded(
+                      flex: 1,
+                      child: GestureDetector(
+                        child: Image.asset('assets/img/list.png'),
+                      ),
+                    ),
                   ],
                 ),
               );

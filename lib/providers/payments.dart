@@ -207,6 +207,7 @@ class Payments with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         _estimateRate = responseData['data'];
+        print(_estimateRate);
         _estimateLoader = false;
         return notifyListeners();
       } else if (responseData['code'] == '4000') {
@@ -233,6 +234,64 @@ class Payments with ChangeNotifier {
     }
   }
 
+  // Onramp
+  Map _estimateOnrampRate = {};
+
+  Map get estimateOnrampRate {
+    return _estimateOnrampRate;
+  }
+
+  Future<void> getOnrampEstimateRate(ctx, formData) async {
+    _estimateLoader = true;
+    notifyListeners();
+
+    var url = Uri.https(
+      lyoApiUrl,
+      '/on-ramper/rate',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(url, body: postData, headers: headers);
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+     
+       
+        if (responseData['data'].isNotEmpty) {
+          _estimateOnrampRate = responseData['data'][0];
+          _estimateLoader = false;
+          return notifyListeners();
+        } else {
+          snackAlert(ctx, SnackTypes.errors, 'This pair is not supported');
+          _estimateOnrampRate = {};
+          _estimateLoader = false;
+          return notifyListeners();
+        }
+      } else if ((responseData['code'] == '400') ||
+          (responseData['code'] == '500')) {
+        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+        _estimateLoader = false;
+        return notifyListeners();
+      } else {
+        _estimateRate = {
+          'rate': 0,
+        };
+        _estimateLoader = false;
+        return notifyListeners();
+      }
+    } catch (error) {
+      _estimateRate = {
+        'rate': 0,
+      };
+      _estimateLoader = false;
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return notifyListeners();
+    }
+  }
+
   // Create Transaction
   Map _changenowTransaction = {};
 
@@ -241,6 +300,7 @@ class Payments with ChangeNotifier {
   }
 
   Future<void> createTransaction(ctx, auth, formData) async {
+  
     _changenowTransaction = {};
     notifyListeners();
     headers['exchange-token'] = auth.loginVerificationToken;
@@ -259,6 +319,8 @@ class Payments with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         _changenowTransaction = responseData['data'];
+        print('check......');
+        print(_changenowTransaction);
         return notifyListeners();
       } else if (responseData['code'] == '4000') {
         snackAlert(ctx, SnackTypes.errors, responseData['msg']['message']);
@@ -472,8 +534,6 @@ class Payments with ChangeNotifier {
       '/payment_gateway/pix/kyc',
     );
 
-    print(postData);
-
     try {
       final response = await http.put(
         url,
@@ -482,8 +542,6 @@ class Payments with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-
-      print(responseData);
 
       if (responseData['code'] == '0') {
         _newKyc = responseData['data'];
@@ -706,4 +764,183 @@ class Payments with ChangeNotifier {
     _selectedTransaction = transaction;
     return notifyListeners();
   }
+
+  // Onramp fiat selected transaction
+  Map _selectedOnrampFiatCurrency = {};
+
+  Map get selectedOnrampFiatCurrency {
+    return _selectedOnrampFiatCurrency;
+  }
+
+  void setSelectedOnrampFiatCurrency(selectCurrency) {
+    _selectedOnrampFiatCurrency = selectCurrency;
+    return notifyListeners();
+  }
+
+  // Onramp crypto selected transaction
+  Map _selectedOnrampCryptoCurrency = {};
+
+  Map get selectedOnrampCryptoCurrency {
+    return _selectedOnrampCryptoCurrency;
+  }
+
+  Future<void> setSelectedOnrampCryptoCurrency(selectCurrency) async {
+    _selectedOnrampCryptoCurrency = selectCurrency;
+    return notifyListeners();
+  }
+
+  Map _defaultOnrampGateway = {};
+
+  Map get defaultOnrampGateway {
+    return _defaultOnrampGateway;
+  }
+
+  void setDefaultOnrampGateway(gateway) {
+    _defaultOnrampGateway = gateway;
+    return notifyListeners();
+  }
+
+  String _onRampIdentifier = '';
+
+  String get onRampIdentifier {
+    return _onRampIdentifier;
+  }
+
+  void setonRampIdentifier(data) {
+    _onRampIdentifier = data;
+    return notifyListeners();
+  }
+
+  int _tappedIdentifier = 0;
+
+  int get tappedIdentifier {
+    return _tappedIdentifier;
+  }
+
+  void setTappedIdentifier(index) {
+    _tappedIdentifier = index;
+
+    return notifyListeners();
+  }
+
+  List _onrampGateways = [];
+
+  List get onrampGateways {
+    return _onrampGateways;
+  }
+
+  List _paymentMethods = [];
+
+  List get paymentMethods {
+    return _paymentMethods;
+  }
+
+  var selectedpaymentmethod;
+
+
+
+  void setpaymentMethods(data) {
+    _paymentMethods = data;
+    return notifyListeners();
+  }
+
+  void setOnrampGateways(gateways) {
+    _onrampGateways = gateways;
+    return notifyListeners();
+  }
+
+  // get on ramper details
+  Map _onRamperDetails = {};
+
+  Map get onRamperDetails {
+    return _onRamperDetails;
+  }
+
+  Future<void> getOnRamperDetails(ctx) async {
+    var url = Uri.https(
+      lyoApiUrl,
+      '/on-ramper/gateway',
+    );
+
+    try {
+      final response = await http.get(
+        url,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _onRamperDetails = responseData['data'];
+        _onrampGateways = _onRamperDetails['gateways'];
+        _paymentMethods = _onRamperDetails['gateways'][0]['paymentMethods'];
+        selectedpaymentmethod=_onRamperDetails['gateways'][0]['paymentMethods'].first;
+         
+        _defaultOnrampGateway = _onRamperDetails['gateways'][0];
+        _onRampIdentifier = _onRamperDetails['gateways'][0]['identifier'];
+        _selectedOnrampFiatCurrency = _onRamperDetails['gateways'][0]
+                ['fiatCurrencies']
+            .firstWhere((item) => item['code'] == 'EUR');
+        _selectedOnrampCryptoCurrency = _onRamperDetails['gateways'][0]
+                ['cryptoCurrencies']
+            .firstWhere((item) => item['code'] == 'BTC');
+        return notifyListeners();
+      } else {
+        _onRamperDetails = {};
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      _onRamperDetails = {};
+      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again.');
+      return notifyListeners();
+    }
+  }
+
+  Map _formCallResponse = {};
+
+  Map get formCallResponse {
+    return _formCallResponse;
+  }
+
+  Future<void> callOnrampForm(ctx, formData) async {
+    
+   
+    var url = Uri.https(
+      lyoApiUrl,
+      '/on-ramper/call-form',
+    );
+
+    try {
+      final response = await http.post(
+        url,
+        body: jsonEncode(formData),
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+       print('check..........>>>>>>>>>>>>>>>>>>>>>>>>');
+      print(responseData);
+      if (responseData['code'] == '0') {
+        _formCallResponse = responseData['data'];
+       
+
+     
+        Navigator.pop(ctx);
+        return notifyListeners();
+      } else {
+        _formCallResponse = {};
+        Navigator.pop(ctx);
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      _formCallResponse = {};
+      Navigator.pop(ctx);
+      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again.');
+      return notifyListeners();
+    }
+  }
+
+  
 }

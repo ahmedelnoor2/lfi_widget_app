@@ -202,25 +202,25 @@ List<SliderModel> getSlides() {
   sliderModel.setImage("assets/img/Group1.png");
   sliderModel.setTitle("Easy Exchange");
   sliderModel.setDescription(
-      "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.");
+      "LYOTRADE services refers to various services provided to you such as Virtual Spot Wallet, Crypto-Crypto Spot Trading and Exchange services");
   slides.add(sliderModel);
 
   sliderModel = new SliderModel();
 
   // Item 2
   sliderModel.setImage("assets/img/Group2.png");
-  sliderModel.setTitle("Decentralized finance");
+  sliderModel.setTitle("Virtual Asset");
   sliderModel.setDescription(
-      "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.");
+      "A virtual asset service provider that combines international exchanges ecosystem platforms with a robust liquidity system with over 300 partners worldwide.");
   slides.add(sliderModel);
 
   sliderModel = new SliderModel();
 
   // Item 3
   sliderModel.setImage("assets/img/Group3.png");
-  sliderModel.setTitle("Cold Wallet");
+  sliderModel.setTitle("Future Trading");
   sliderModel.setDescription(
-      "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.");
+      "Future Contract is an agreement to buy or sell an asset at a future date for a fixed price. Generally, it is used by traders to lock in profits when trading in volatile markets.");
   slides.add(sliderModel);
 
   sliderModel = new SliderModel();

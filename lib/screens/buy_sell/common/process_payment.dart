@@ -35,8 +35,12 @@ class _ProcessPaymentState extends State<ProcessPayment> {
         onWebViewCreated: (controller) => _controller = controller,
         onPageStarted: (src) =>
             debugPrint('A new page has started loading: $src\n'),
-        onPageFinished: (src) =>
-            debugPrint('The page has finished loading: $src\n'),
+        onPageFinished: (src) {
+
+            debugPrint('The page has finished loading: $src\n');
+
+        }
+        
       ),
     );
   }
