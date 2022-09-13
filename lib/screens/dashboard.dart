@@ -153,6 +153,24 @@ class _DashboardState extends State<Dashboard> {
     });
   }
 
+  Future<void> getPublicInfo() async {
+    var public = Provider.of<Public>(context, listen: false);
+    await public.getPublicInfo();
+    return;
+  }
+
+  Future<void> getBanners() async {
+    var public = Provider.of<Public>(context, listen: false);
+    await public.getBanners();
+    return;
+  }
+
+  Future<void> waitCalls() async {
+    await getPublicInfo();
+    await getBanners();
+    await getAssetsRate();
+  }
+
   void extractStreamData(streamData, public) async {
     if (streamData != null) {
       var inflated =
@@ -200,6 +218,7 @@ class _DashboardState extends State<Dashboard> {
           onRefresh: () async {
             getAssetsRate();
             checkLoginStatus();
+            waitCalls();
             await Future.delayed(const Duration(seconds: 2));
           },
           child: SingleChildScrollView(
