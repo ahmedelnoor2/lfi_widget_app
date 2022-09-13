@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/payments.dart';
@@ -10,6 +11,7 @@ import 'package:lyotrade/screens/buy_sell/common/crypto_coin_drawer.dart';
 import 'package:lyotrade/screens/buy_sell/common/fiat_coin_drawer.dart';
 import 'package:lyotrade/screens/buy_sell/common/onramper_crypto_coins.dart';
 import 'package:lyotrade/screens/buy_sell/common/onramper_fiat_coins.dart';
+import 'package:lyotrade/screens/buy_sell/common/selectPaymentMethod.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
@@ -21,6 +23,8 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
+
+import 'common/selectOnrampProvider.dart';
 
 class BuySellCrypto extends StatefulWidget {
   static const routeName = '/buy_sell_crypto';
@@ -1259,6 +1263,128 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                         ),
                 ],
               ),
+              _providerType == 'onramper'
+                  ? Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              setState(() {});
+                              showModalBottomSheet(
+                                isScrollControlled: true,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(5),
+                                      topRight: Radius.circular(5)),
+                                ),
+                                context: context,
+                                builder: (context) {
+                                  return OnRampServiceProvider(
+                                      payments.onrampGateways);
+                                },
+                              );
+                            },
+                            child: Container(
+                              width: width,
+                              padding: EdgeInsets.all(height * 0.02),
+                              decoration: BoxDecoration(
+                                color: orangeBGColor,
+                                borderRadius: BorderRadius.circular(5),
+                                border: Border.all(
+                                  style: BorderStyle.solid,
+                                  width: 0.3,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.keyboard_arrow_down,
+                                        color: Colors.white,
+                                        size: 30,
+                                      ),
+                                      Text(
+                                        payments.onRampIdentifier.toString(),
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                           SizedBox(
+                            height: height * .02,
+                          ),
+                         InkWell(
+                            onTap: () {
+                              setState(() {});
+                              showModalBottomSheet(
+                                isScrollControlled: true,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(5),
+                                      topRight: Radius.circular(5)),
+                                ),
+                                context: context,
+                                builder: (context) {
+                                  return PayementMethod(
+                                      payments.paymentMethods);
+                                },
+                              );
+                            },
+                            child: Container(
+                              width: width,
+                              padding: EdgeInsets.all(height * 0.02),
+                              decoration: BoxDecoration(
+                                color: orangeBGColor,
+                                borderRadius: BorderRadius.circular(5),
+                                border: Border.all(
+                                  style: BorderStyle.solid,
+                                  width: 0.3,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.keyboard_arrow_down,
+                                        color: Colors.white,
+                                        size: 30,
+                                      ),
+                                      Text(
+                                        payments.selectedpaymentmethod.toString(),
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Container(),
               InkWell(
                 onTap: _loadingCoins
                     ? null
@@ -1311,14 +1437,17 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                               height: 25,
                               width: 25,
                             )
-                          : Text(
-                              'Buy',
-                              style: TextStyle(
-                                fontSize: 20,
-                                color:
-                                    (_loadingCoins || payments.estimateLoader)
-                                        ? secondaryTextColor
-                                        : Colors.white,
+                          : InkWell(
+                             
+                              child: Text(
+                                'Buy',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color:
+                                      (_loadingCoins || payments.estimateLoader)
+                                          ? secondaryTextColor
+                                          : Colors.white,
+                                ),
                               ),
                             ),
                     ),

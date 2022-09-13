@@ -793,10 +793,48 @@ class Payments with ChangeNotifier {
     return notifyListeners();
   }
 
+  String _onRampIdentifier = '';
+
+  String get onRampIdentifier {
+    return _onRampIdentifier;
+  }
+
+  void setonRampIdentifier(data) {
+    _onRampIdentifier = data;
+    return notifyListeners();
+  }
+
+  int _tappedIdentifier = 0;
+
+  int get tappedIdentifier {
+    return _tappedIdentifier;
+  }
+
+  void setTappedIdentifier(index) {
+    _tappedIdentifier = index;
+
+    return notifyListeners();
+  }
+
   List _onrampGateways = [];
 
   List get onrampGateways {
     return _onrampGateways;
+  }
+
+  List _paymentMethods = [];
+
+  List get paymentMethods {
+    return _paymentMethods;
+  }
+
+  var selectedpaymentmethod;
+
+
+
+  void setpaymentMethods(data) {
+    _paymentMethods = data;
+    return notifyListeners();
   }
 
   void setOnrampGateways(gateways) {
@@ -828,7 +866,11 @@ class Payments with ChangeNotifier {
       if (responseData['code'] == '0') {
         _onRamperDetails = responseData['data'];
         _onrampGateways = _onRamperDetails['gateways'];
+        _paymentMethods = _onRamperDetails['gateways'][0]['paymentMethods'];
+        selectedpaymentmethod=_onRamperDetails['gateways'][0]['paymentMethods'].first;
+         
         _defaultOnrampGateway = _onRamperDetails['gateways'][0];
+        _onRampIdentifier = _onRamperDetails['gateways'][0]['identifier'];
         _selectedOnrampFiatCurrency = _onRamperDetails['gateways'][0]
                 ['fiatCurrencies']
             .firstWhere((item) => item['code'] == 'EUR');
@@ -882,6 +924,47 @@ class Payments with ChangeNotifier {
       print(error);
       _formCallResponse = {};
       Navigator.pop(ctx);
+      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again.');
+      return notifyListeners();
+    }
+  }
+
+  //// on Ramper rate
+  ///
+  Map _onRamperRateResponse = {};
+
+  Map get onRamperRateResponse {
+    return _onRamperRateResponse;
+  }
+
+  Future<void> ramperRateResponse(ctx, formData) async {
+    var url = Uri.https(
+      lyoApiUrl,
+      '/on-ramper/rate',
+    );
+
+    try {
+      final response = await http.post(
+        url,
+        body: jsonEncode(formData),
+        headers: headers,
+      );
+     
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+        _onRamperRateResponse = responseData['data'];
+
+        return notifyListeners();
+      } else {
+        _onRamperRateResponse = {};
+
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      _onRamperRateResponse = {};
+
       snackAlert(ctx, SnackTypes.errors, 'Server error, please try again.');
       return notifyListeners();
     }
