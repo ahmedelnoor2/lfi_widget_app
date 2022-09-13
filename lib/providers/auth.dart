@@ -250,6 +250,7 @@ class Auth with ChangeNotifier {
     );
 
     var postData = json.encode(formData);
+
     isLoginloader = true;
     try {
       final response = await http.post(url, body: postData, headers: headers);
@@ -315,6 +316,8 @@ class Auth with ChangeNotifier {
 
       return '${responseData['code']}';
     } catch (error) {
+      isverifyloader = false;
+      notifyListeners();
       snackAlert(ctx, SnackTypes.errors, 'Server Error!');
       return '0';
       // throw error;
@@ -477,12 +480,18 @@ class Auth with ChangeNotifier {
       '$exApi/v4/common/smsValidCode',
     );
 
+    print(url);
+
     var postData = json.encode(formData);
+
+    print(postData);
 
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
+
+      print(responseData);
 
       if (responseData['code'] == '0') {
         snackAlert(

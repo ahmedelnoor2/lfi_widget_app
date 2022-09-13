@@ -68,7 +68,7 @@ class _PhoneState extends State<Phone> {
       'countryCode': _currentCoutnry,
       'mobile': _mobileNumber.text,
       'operationType': 2,
-      'smsType': '',
+      'smsType': '0',
     });
   }
 

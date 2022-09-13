@@ -69,6 +69,7 @@ dependencies:
   flutter_idensic_mobile_sdk_plugin: ^1.19.7
   image_picker: ^0.8.5+3
   introduction_screen: ^3.0.2
+  camera: ^0.10.0+1
 
 dev_dependencies:
   flutter_test:

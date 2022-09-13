@@ -18,7 +18,9 @@ import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Coins.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:lyotrade/utils/Number.utils.dart';
 import 'package:provider/provider.dart';
+import 'package:camera/camera.dart';
 
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
@@ -44,6 +46,8 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  var cameras = [];
+
   bool _openQrScanner = false;
   Barcode? result;
   QRViewController? controller;
@@ -68,6 +72,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
   void initState() {
     getDigitalBalance();
     Future.delayed(const Duration(seconds: 0), () async {
+      cameras = await availableCameras();
       checkUserAuthMethods();
     });
     super.initState();
@@ -345,7 +350,6 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
     }
   }
 
-
   Future<void> processWithdrawAmount() async {
     setState(() {
       _validateEmailProcess = false;
@@ -553,6 +557,12 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                     var network = _allNetworks[index];
                                     return GestureDetector(
                                       onTap: () {
+                                        _formVeriKey.currentState!.reset();
+                                        _addressController.clear();
+                                        _amountController.clear();
+                                        _emailVeirficationCode.clear();
+                                        _smsVeirficationCode.clear();
+                                        _googleVeirficationCode.clear();
                                         changeCoinType(network);
                                       },
                                       child: Container(
@@ -628,9 +638,6 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                           }
                                           return null;
                                         },
-                                        onChanged: (value) async {
-                                          print(value);
-                                        },
                                         controller: _addressController,
                                         decoration: const InputDecoration(
                                           contentPadding: EdgeInsets.zero,
@@ -667,7 +674,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                             ),
                                           ),
                                         ),
-                                        kIsWeb
+                                        (kIsWeb || cameras.isEmpty)
                                             ? Container()
                                             : GestureDetector(
                                                 onTap: () async {
@@ -721,14 +728,20 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                         validator: (value) {
                                           if (value == null || value.isEmpty) {
                                             return 'Please enter amount';
+                                          } else if (double.parse(value) >
+                                              (double.parse(
+                                                      asset.accountBalance[
+                                                                  'allCoinMap']
+                                                              [_defaultCoin]
+                                                          ['normal_balance']) -
+                                                  double.parse(
+                                                      '${asset.getCost['defaultFee']}'))) {
+                                            return 'Maximum withdrawal amount is ${truncateTo('${(double.parse(asset.accountBalance['allCoinMap'][_defaultCoin]['normal_balance']) - double.parse('${asset.getCost['defaultFee']}'))}', public.publicInfo['market']['coinList'][_defaultCoin]['showPrecision'] ?? 2)}';
                                           } else if (double.parse(value) <
                                               asset.getCost['withdraw_min']) {
                                             return 'Minimum withdrawal amount is ${asset.getCost['withdraw_min']}';
                                           }
                                           return null;
-                                        },
-                                        onChanged: (value) async {
-                                          print(value);
                                         },
                                         controller: _amountController,
                                         keyboardType: const TextInputType
@@ -755,11 +768,13 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                           padding: EdgeInsets.only(right: 10),
                                           child: GestureDetector(
                                             onTap: () async {
-                                              _amountController.text =
-                                                  asset.accountBalance[
-                                                              'allCoinMap']
-                                                          [_defaultCoin]
-                                                      ['normal_balance'];
+                                              _amountController.text = truncateTo(
+                                                  '${(double.parse(asset.accountBalance['allCoinMap'][_defaultCoin]['normal_balance']) - double.parse('${asset.getCost['defaultFee']}'))}',
+                                                  public.publicInfo['market']
+                                                                  ['coinList']
+                                                              [_defaultCoin]
+                                                          ['showPrecision'] ??
+                                                      2);
                                             },
                                             child: Text(
                                               'ALL',

@@ -162,7 +162,7 @@ class _SideBarState extends State<SideBar> {
                         : ListTile(
                             leading: InkWell(
                               onTap: () {
-                                _getImage();
+                                kIsWeb ? null : _getImage();
                               },
                               child: CircleAvatar(
                                 radius:
@@ -187,13 +187,15 @@ class _SideBarState extends State<SideBar> {
                             ),
                             title: Text(
                               '${auth.userInfo['userAccount']}',
+                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(fontSize: 20),
                             ),
                             subtitle: InkWell(
                               onTap: () {
                                 Clipboard.setData(
                                   ClipboardData(
-                                    text: auth.userInfo['userAccount'],
+                                    text:
+                                        '${auth.userInfo.isNotEmpty ? auth.userInfo['id'] : '-'}',
                                   ),
                                 );
                                 showAlert(
@@ -209,7 +211,7 @@ class _SideBarState extends State<SideBar> {
                                   Container(
                                     padding: EdgeInsets.only(right: 5),
                                     child: Text(
-                                      'UUID: ${auth.userInfo.isNotEmpty ? auth.userInfo['id'] : '-'}',
+                                      'UID: ${auth.userInfo.isNotEmpty ? auth.userInfo['id'] : '-'}',
                                     ),
                                   ),
                                   Icon(
@@ -249,25 +251,27 @@ class _SideBarState extends State<SideBar> {
                 ),
               ),
             ),
-            Card(
-              child: ListTile(
-                title: Text('KYC'),
-                subtitle: Text(
-                  'Complete your KYC',
-                  style: TextStyle(
-                    fontSize: 12,
+            kIsWeb
+                ? Container()
+                : Card(
+                    child: ListTile(
+                      title: Text('KYC'),
+                      subtitle: Text(
+                        'Complete your KYC',
+                        style: TextStyle(
+                          fontSize: 12,
+                        ),
+                      ),
+                      onTap: () {
+                        if (auth.isAuthenticated) {
+                          Navigator.pushNamed(context, '/kyc_screen');
+                        } else {
+                          Navigator.pushNamed(context, '/authentication');
+                        }
+                      },
+                      trailing: Icon(Icons.verified_user),
+                    ),
                   ),
-                ),
-                onTap: () {
-                  if (auth.isAuthenticated) {
-                    Navigator.pushNamed(context, '/kyc_screen');
-                  } else {
-                    Navigator.pushNamed(context, '/authentication');
-                  }
-                },
-                trailing: Icon(Icons.verified_user),
-              ),
-            ),
             Card(
               child: Column(
                 children: [

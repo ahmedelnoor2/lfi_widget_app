@@ -1,4 +1,6 @@
 PODS:
+  - camera_avfoundation (0.0.1):
+    - Flutter
   - Flutter (1.0.0)
   - flutter_aliyun_captcha (1.0.4):
     - Flutter
@@ -36,6 +38,7 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - camera_avfoundation (from `.symlinks/plugins/camera_avfoundation/ios`)
   - Flutter (from `Flutter`)
   - flutter_aliyun_captcha (from `.symlinks/plugins/flutter_aliyun_captcha/ios`)
   - flutter_idensic_mobile_sdk_plugin (from `.symlinks/plugins/flutter_idensic_mobile_sdk_plugin/ios`)
@@ -58,6 +61,8 @@ SPEC REPOS:
     - Toast
 
 EXTERNAL SOURCES:
+  camera_avfoundation:
+    :path: ".symlinks/plugins/camera_avfoundation/ios"
   Flutter:
     :path: Flutter
   flutter_aliyun_captcha:
@@ -86,7 +91,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/webview_flutter_wkwebview/ios"
 
 SPEC CHECKSUMS:
-  Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
+  camera_avfoundation: 07c77549ea54ad95d8581be86617c094a46280d9
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
   flutter_aliyun_captcha: ae5a6d128035eb2075be2a99606bb58bea31cffe
   flutter_idensic_mobile_sdk_plugin: 20a8906cb5d3cca99941dcfaa7ccfce538b71f6e
   flutter_share: 4be0208963c60b537e6255ed2ce1faae61cd9ac2
@@ -103,6 +109,6 @@ SPEC CHECKSUMS:
   url_launcher_ios: 839c58cdb4279282219f5e248c3321761ff3c4de
   webview_flutter_wkwebview: b7e70ef1ddded7e69c796c7390ee74180182971f
 
-PODFILE CHECKSUM: b87506c759d9d3b3877054bcacc505f2908f4c57
+PODFILE CHECKSUM: 9a127408274dc03dfe6a0c31790590d6d7d08a0f
 
 COCOAPODS: 1.11.3

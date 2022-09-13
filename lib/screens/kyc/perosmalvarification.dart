@@ -512,8 +512,8 @@ class _personalverificationState extends State<personalverification>
                                             ? Container()
                                             : Divider()
                                         : Container(),
-                                    userInfoList
-                                            .containsKey(kycTier['levelName'])
+                                    (userInfoList
+                                            .containsKey(kycTier['levelName']))
                                         ? userInfoList[kycTier['levelName']]
                                                     ['reviewStatus'] ==
                                                 1
@@ -645,7 +645,17 @@ class _personalverificationState extends State<personalverification>
                                                     : Color(0xff5E6292),
                                                 isLoading: _processingSdk,
                                               )
-                                        : Container(),
+                                        : (kycTier['levelName'] == 'Tier1')
+                                            ? LyoButton(
+                                                onPressed: () {
+                                                  startVerifictaion(
+                                                      kycTier['levelName']);
+                                                },
+                                                text: 'Start Now',
+                                                active: true,
+                                                isLoading: _processingSdk,
+                                              )
+                                            : Container(),
                                   ],
                                 ),
                               ),

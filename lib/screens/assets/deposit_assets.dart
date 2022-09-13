@@ -162,6 +162,7 @@ class _DepositAssetsState extends State<DepositAssets> {
     });
     await asset.getCoinCosts(auth, netwrk['showName']);
     await asset.getChangeAddress(context, auth, netwrk['showName']);
+    loadQrCode();
     setState(() {
       _loadingAddress = false;
     });
