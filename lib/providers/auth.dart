@@ -250,6 +250,7 @@ class Auth with ChangeNotifier {
     );
 
     var postData = json.encode(formData);
+
     isLoginloader = true;
     try {
       final response = await http.post(url, body: postData, headers: headers);

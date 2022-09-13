@@ -183,22 +183,43 @@ class _AuthenticationState extends State<Authentication> {
 
     var auth = Provider.of<Auth>(context, listen: false);
     auth.setLoginCreds(value);
-    String loginToken = await auth.login(context, {
-      "geetest_challenge": "sys_conf_validate",
-      "geetest_seccode": "sys_conf_validate",
-      "geetest_validate": "sys_conf_validate",
-      // 'csessionid': kIsWeb
-      //     ? _captchaVerification['csessionid']
-      //     : _captchaVerification['sessionId'],
-      'mobileNumber': value['mobileNumber'],
-      'loginPword': value['loginPword'],
-      "nc": null,
-      // 'scene': 'other',
-      // 'sig': _captchaVerification['sig'],
-      // 'token': _captchaVerification['token'],
-      'token': true,
-      'verificationType': '0',
-    });
+    Map _formParams = {};
+    if (_verificationType == '1') {
+      _formParams = {
+        // "geetest_challenge": "sys_conf_validate",
+        // "geetest_seccode": "sys_conf_validate",
+        // "geetest_validate": "sys_conf_validate",
+        'csessionid': kIsWeb
+            ? _captchaVerification['csessionid']
+            : _captchaVerification['sessionId'],
+        'mobileNumber': value['mobileNumber'],
+        'loginPword': value['loginPword'],
+        "nc": null,
+        'scene': 'other',
+        'sig': _captchaVerification['sig'],
+        'token': _captchaVerification['token'],
+        // 'token': true,
+        'verificationType': _verificationType,
+      };
+    } else {
+      _formParams = {
+        "geetest_challenge": "sys_conf_validate",
+        "geetest_seccode": "sys_conf_validate",
+        "geetest_validate": "sys_conf_validate",
+        // 'csessionid': kIsWeb
+        //     ? _captchaVerification['csessionid']
+        //     : _captchaVerification['sessionId'],
+        'mobileNumber': value['mobileNumber'],
+        'loginPword': value['loginPword'],
+        "nc": null,
+        // 'scene': 'other',
+        // 'sig': _captchaVerification['sig'],
+        // 'token': _captchaVerification['token'],
+        'token': true,
+        'verificationType': '0',
+      };
+    }
+    String loginToken = await auth.login(context, _formParams);
 
     return loginToken;
   }
