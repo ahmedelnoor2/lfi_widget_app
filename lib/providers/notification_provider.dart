@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:lyotrade/main.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
@@ -192,11 +193,14 @@ class Notificationprovider extends ChangeNotifier {
       isdeleteloading = true;
       final response = await http.post(url, headers: headers, body: body);
       final responseData = json.decode(response.body);
+       print(responseData);
 
       if (responseData['code'] == '0') {
+
+        setbackGroundnotificationData('12');
         _readCountResponse =
             responseData['data']['noReadMsgCount'] == 0 ? false : true;
-        print(_readCountResponse);
+       
         notifyListeners();
 
         /// snackAlert(ctx, SnackTypes.success, 'All notifications mark as read');
