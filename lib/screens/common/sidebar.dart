@@ -375,7 +375,10 @@ class _SideBarState extends State<SideBar> {
                       }).toList(),
                     ),
                   ),
-                  const ListTile(
+                   ListTile(
+                    onTap: () {
+                      Navigator.pushNamed(context, '/setting');
+                    },
                     leading: Icon(Icons.settings),
                     title: Text('Settings'),
                   ),

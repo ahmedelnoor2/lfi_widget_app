@@ -54,6 +54,7 @@ import 'package:lyotrade/screens/security/google_auth.dart';
 import 'package:lyotrade/screens/security/password.dart';
 import 'package:lyotrade/screens/security/phone.dart';
 import 'package:lyotrade/screens/security/security.dart';
+import 'package:lyotrade/screens/setting/setting.dart';
 import 'package:lyotrade/screens/splash_screen/splash.dart';
 import 'package:lyotrade/screens/staking/common/stake_order.dart';
 import 'package:lyotrade/screens/staking/stake.dart';
@@ -67,17 +68,73 @@ import 'package:lyotrade/screens/trade/trade_history.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:workmanager/workmanager.dart';
 
 int? initScreen;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
+  if (backGroundnotificationData != null) {
+    // Periodic task registration
+    Workmanager().registerPeriodicTask("1", "simplePeriodicTask",
+        existingWorkPolicy: ExistingWorkPolicy.append);
+    callbackDispatcher();
+  } else {
+    
+    print('else');
+  }
 
   SharedPreferences preferences = await SharedPreferences.getInstance();
   initScreen = await preferences.getInt('initScreen');
   await preferences.setInt('initScreen', 1);
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
       overlays: [SystemUiOverlay.top]).then((_) => runApp(const MyApp()));
+}
+
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) {
+    //  Timer? timer;
+
+    FlutterLocalNotificationsPlugin flip =
+        new FlutterLocalNotificationsPlugin();
+
+    var android = new AndroidInitializationSettings('@mipmap/ic_launcher');
+    var IOS = new IOSInitializationSettings();
+
+    var settings = new InitializationSettings(android: android, iOS: IOS);
+    flip.initialize(settings);
+    _showNotificationWithDefaultSound(flip);
+
+    return Future.value(true);
+  });
+}
+
+Future _showNotificationWithDefaultSound(flip) async {
+  var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
+      'your channel id', 'your channel name',
+      importance: Importance.max, priority: Priority.high);
+  var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
+
+  var platformChannelSpecifics = new NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+      iOS: iOSPlatformChannelSpecifics);
+  await flip.show(
+      0,
+      'LyoTrade',
+      'Your are one step away to connect with GeeksforGeeks',
+      platformChannelSpecifics,
+      payload: 'Default_Sound');
+}
+
+//// background notification message status check//
+var backGroundnotificationData;
+
+void setbackGroundnotificationData(data) {
+  backGroundnotificationData = data;
+
+  print(backGroundnotificationData);
 }
 
 class MyApp extends StatelessWidget {
@@ -309,6 +366,7 @@ class MyApp extends StatelessWidget {
                   const AnnouncementDetails(),
               Createpassword.routeName: (context) => const Createpassword(),
               SpashScreen.routeName: (context) => const SpashScreen(),
+              Setting.routeName: ((context) => const Setting())
             },
           );
         },
