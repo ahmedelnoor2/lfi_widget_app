@@ -7,6 +7,8 @@ PODS:
   - flutter_idensic_mobile_sdk_plugin (1.19.7):
     - Flutter
     - IdensicMobileSDK (= 1.19.7)
+  - flutter_local_notifications (0.0.1):
+    - Flutter
   - flutter_share (0.0.1):
     - Flutter
   - fluttertoast (0.0.2):
@@ -36,12 +38,15 @@ PODS:
     - Flutter
   - webview_flutter_wkwebview (0.0.1):
     - Flutter
+  - workmanager (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - camera_avfoundation (from `.symlinks/plugins/camera_avfoundation/ios`)
   - Flutter (from `Flutter`)
   - flutter_aliyun_captcha (from `.symlinks/plugins/flutter_aliyun_captcha/ios`)
   - flutter_idensic_mobile_sdk_plugin (from `.symlinks/plugins/flutter_idensic_mobile_sdk_plugin/ios`)
+  - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - flutter_share (from `.symlinks/plugins/flutter_share/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - gallery_saver (from `.symlinks/plugins/gallery_saver/ios`)
@@ -52,6 +57,7 @@ DEPENDENCIES:
   - shared_preferences_ios (from `.symlinks/plugins/shared_preferences_ios/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
   - webview_flutter_wkwebview (from `.symlinks/plugins/webview_flutter_wkwebview/ios`)
+  - workmanager (from `.symlinks/plugins/workmanager/ios`)
 
 SPEC REPOS:
   https://github.com/SumSubstance/Specs.git:
@@ -69,6 +75,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_aliyun_captcha/ios"
   flutter_idensic_mobile_sdk_plugin:
     :path: ".symlinks/plugins/flutter_idensic_mobile_sdk_plugin/ios"
+  flutter_local_notifications:
+    :path: ".symlinks/plugins/flutter_local_notifications/ios"
   flutter_share:
     :path: ".symlinks/plugins/flutter_share/ios"
   fluttertoast:
@@ -89,12 +97,15 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
   webview_flutter_wkwebview:
     :path: ".symlinks/plugins/webview_flutter_wkwebview/ios"
+  workmanager:
+    :path: ".symlinks/plugins/workmanager/ios"
 
 SPEC CHECKSUMS:
   camera_avfoundation: 07c77549ea54ad95d8581be86617c094a46280d9
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
   flutter_aliyun_captcha: ae5a6d128035eb2075be2a99606bb58bea31cffe
   flutter_idensic_mobile_sdk_plugin: 20a8906cb5d3cca99941dcfaa7ccfce538b71f6e
+  flutter_local_notifications: 0c0b1ae97e741e1521e4c1629a459d04b9aec743
   flutter_share: 4be0208963c60b537e6255ed2ce1faae61cd9ac2
   fluttertoast: 16fbe6039d06a763f3533670197d01fc73459037
   gallery_saver: 9fc173c9f4fcc48af53b2a9ebea1b643255be542
@@ -108,6 +119,7 @@ SPEC CHECKSUMS:
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   url_launcher_ios: 839c58cdb4279282219f5e248c3321761ff3c4de
   webview_flutter_wkwebview: b7e70ef1ddded7e69c796c7390ee74180182971f
+  workmanager: 0afdcf5628bbde6924c21af7836fed07b42e30e6
 
 PODFILE CHECKSUM: 9a127408274dc03dfe6a0c31790590d6d7d08a0f
 
