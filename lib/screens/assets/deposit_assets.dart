@@ -94,7 +94,7 @@ class _DepositAssetsState extends State<DepositAssets> {
         setState(() {
           _allNetworks.add(v);
           _defaultCoin = netwrkType;
-          _defaultNetwork = '${v['mainChainName']}';
+          _defaultNetwork = '${v['name']}';
         });
       });
     } else {
@@ -104,7 +104,7 @@ class _DepositAssetsState extends State<DepositAssets> {
             .add(public.publicInfoMarket['market']['coinList'][netwrkType]);
         _defaultCoin = netwrkType;
         _defaultNetwork =
-            '${public.publicInfoMarket['market']['coinList'][netwrkType]['mainChainName']}';
+            '${public.publicInfoMarket['market']['coinList'][netwrkType]['name']}';
       });
     }
 
@@ -158,10 +158,10 @@ class _DepositAssetsState extends State<DepositAssets> {
     var asset = Provider.of<Asset>(context, listen: false);
 
     setState(() {
-      _defaultNetwork = netwrk['mainChainName'];
+      _defaultNetwork = netwrk['name'];
     });
-    await asset.getCoinCosts(auth, netwrk['showName']);
-    await asset.getChangeAddress(context, auth, netwrk['showName']);
+    await asset.getCoinCosts(auth, netwrk['name']);
+    await asset.getChangeAddress(context, auth, netwrk['name']);
     loadQrCode();
     setState(() {
       _loadingAddress = false;
@@ -342,8 +342,7 @@ class _DepositAssetsState extends State<DepositAssets> {
                               padding: EdgeInsets.only(right: 10),
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: (network['mainChainName'] ==
-                                          _defaultNetwork)
+                                  color: (network['name'] == _defaultNetwork)
                                       ? Color(0xff01FEF5)
                                       : Color(0xff5E6292),
                                   borderRadius: BorderRadius.circular(5),

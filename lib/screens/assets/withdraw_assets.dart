@@ -232,7 +232,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
       _coinShowName = '${netwrk['name']}';
     });
 
-    await asset.getCoinCosts(auth, netwrk['showName']);
+    await asset.getCoinCosts(auth, netwrk['name']);
     // await asset.getChangeAddress(context, auth, netwrk['showName']);
   }
 
@@ -569,7 +569,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                         padding: EdgeInsets.only(right: 10),
                                         child: Container(
                                           decoration: BoxDecoration(
-                                            color: (network['mainChainName'] ==
+                                            color: (network['name'] ==
                                                     _defaultNetwork)
                                                 ? Color(0xff01FEF5)
                                                 : Color(0xff5E6292),
