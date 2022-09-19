@@ -36,7 +36,7 @@ class _DepositAssetsState extends State<DepositAssets> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   bool _loadingAddress = false;
-  String _defaultNetwork = 'ERC20';
+  String _defaultNetwork = 'USDTBSC';
   String _defaultCoin = 'USDT';
   List _allNetworks = [];
   Image? _qrCode;
