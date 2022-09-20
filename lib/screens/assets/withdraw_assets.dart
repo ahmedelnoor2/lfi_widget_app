@@ -293,7 +293,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
 
   void toggleOpenQrScanner() {
     setState(() {
-      _openQrScanner = !_openQrScanner;
+      _openQrScanner = false;
     });
   }
 
