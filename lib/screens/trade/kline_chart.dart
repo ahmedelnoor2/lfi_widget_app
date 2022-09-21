@@ -738,12 +738,14 @@ class _KlineChartState extends State<KlineChart>
                                                       child: Container(
                                                         color: Color.fromARGB(
                                                             71, 72, 163, 65),
-                                                        width: ((double.parse(
-                                                                        '${bid[1]}') /
-                                                                    double.parse(
-                                                                        '$bidMax')) *
-                                                                2) *
-                                                            100,
+                                                        width: bids.length > 2
+                                                            ? ((double.parse(
+                                                                            '${bid[1]}') /
+                                                                        double.parse(
+                                                                            '$bidMax')) *
+                                                                    2) *
+                                                                100
+                                                            : 0,
                                                         height: 20,
                                                       ),
                                                     ),
@@ -805,12 +807,14 @@ class _KlineChartState extends State<KlineChart>
                                                       child: Container(
                                                         color: Color.fromARGB(
                                                             73, 175, 86, 76),
-                                                        width: ((double.parse(
-                                                                        '${ask[1]}') /
-                                                                    double.parse(
-                                                                        '$askMax')) *
-                                                                2) *
-                                                            100,
+                                                        width: asks.length > 2
+                                                            ? ((double.parse(
+                                                                            '${ask[1]}') /
+                                                                        double.parse(
+                                                                            '$askMax')) *
+                                                                    2) *
+                                                                100
+                                                            : 0,
                                                         height: 20,
                                                       ),
                                                     ),

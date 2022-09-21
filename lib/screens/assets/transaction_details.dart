@@ -218,8 +218,10 @@ class _TransactionDetailsState extends State<TransactionDetails> {
                         child: Align(
                           alignment: Alignment.centerRight,
                           child: Text(
-                            '${DateFormat('dd-MM-y H:mm').format(DateTime.fromMillisecondsSinceEpoch(asset.transactionDetails['updateAtTime']))}',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            DateFormat('dd-MM-y H:mm').format(
+                                DateTime.fromMillisecondsSinceEpoch(int.parse(
+                                    '${asset.transactionDetails['updateAtTime']}'))),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
