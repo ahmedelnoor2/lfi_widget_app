@@ -92,7 +92,8 @@ Widget drawer(
                     '${public.publicInfoMarket['market']['coinList'][_asset['coin']]['icon']}',
                   ),
                 ),
-                title: Text(getCoinName(_asset['coin'])),
+                title: Text(getCoinName(
+                    '${public.publicInfoMarket['market']['coinList'][_asset['coin']]['showName']}')),
                 trailing: Text('${_asset['values']['total_balance']}'),
               );
             },

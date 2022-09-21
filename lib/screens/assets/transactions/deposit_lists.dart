@@ -37,8 +37,8 @@ Widget depositList(context, width, height, allDeposits) {
       Divider(
         height: 0,
       ),
-      SizedBox(
-        height: height * 0.63,
+      Expanded(
+        flex: 2,
         child: ListView.builder(
           scrollDirection: Axis.vertical,
           itemCount: allDeposits.length,

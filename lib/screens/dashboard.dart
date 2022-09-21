@@ -237,7 +237,7 @@ class _DashboardState extends State<Dashboard> {
                   ),
                   BuyCrypto(channel: _channel),
                   LatestListing(),
-                  // TopGateway(),
+                  TopGateway(),
                   Hotlinks(channel: _channel),
                   AssetsInfo(
                     headerSymbols: public.headerSymbols,
