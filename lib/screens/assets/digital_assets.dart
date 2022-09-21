@@ -32,11 +32,10 @@ class DigitalAssets extends StatefulWidget {
 }
 
 class _DigitalAssetsState extends State<DigitalAssets> {
-  
   List _smallBalancesDigitalAssets = [];
   String _totalBalanceSymbol = 'BTC';
   bool _hideSmallBalances = false;
-  final TextEditingController _searchController=TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -335,58 +334,56 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                       Text('Hide Small Balance'),
                     ],
                   ),
-                 Container(
-                                margin: EdgeInsets.only(right: 2),
-                                child: Container(
-                                  padding: EdgeInsets.all(5),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
-                                    border: Border.all(
-                                      style: BorderStyle.solid,
-                                      width: 0.3,
-                                      color: Color(0xff5E6292),
-                                    ),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                    Container(
-                                        padding: EdgeInsets.only(right: 8),
-                                        child: Icon(
-                                          Icons.search,
-                                          size: 14,
-                                          color: secondaryTextColor,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: width * 0.30,
-                                        child: TextField(
-                                          onChanged: (value) async {
-                                            
-                                            await asset
-                                                .filterCoin(
-                                              value,
-                                              asset.digitalAssets,
-                                             _totalBalanceSymbol,
-                                            );
-                                          },
-                                           controller: _searchController,
-                                          decoration: InputDecoration(
-                                            contentPadding: EdgeInsets.zero,
-                                            isDense: true,
-                                            border: UnderlineInputBorder(
-                                              borderSide: BorderSide.none,
-                                            ),
-                                            hintStyle: TextStyle(
-                                              fontSize: 14,
-                                            ),
-                                            hintText: "Search",
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                  Container(
+                    margin: EdgeInsets.only(right: 2),
+                    child: Container(
+                      padding: EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(
+                          style: BorderStyle.solid,
+                          width: 0.3,
+                          color: Color(0xff5E6292),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(right: 8),
+                            child: Icon(
+                              Icons.search,
+                              size: 14,
+                              color: secondaryTextColor,
+                            ),
+                          ),
+                          SizedBox(
+                            width: width * 0.30,
+                            child: TextField(
+                              onChanged: (value) async {
+                                await asset.filterCoin(
+                                  value,
+                                  asset.digitalAssets,
+                                  _totalBalanceSymbol,
+                                );
+                              },
+                              controller: _searchController,
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.zero,
+                                isDense: true,
+                                border: UnderlineInputBorder(
+                                  borderSide: BorderSide.none,
                                 ),
+                                hintStyle: TextStyle(
+                                  fontSize: 14,
+                                ),
+                                hintText: "Search",
                               ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -453,17 +450,19 @@ class _DigitalAssetsState extends State<DigitalAssets> {
               child: asset.digitalAssets.isEmpty
                   ? assetsSkull(context)
                   : ListView.builder(
-                    
                       padding: EdgeInsets.zero,
                       itemCount: _hideSmallBalances
                           ? _smallBalancesDigitalAssets.length
-                          :  asset.searchallcoin.isNotEmpty?
-                            asset.searchallcoin.length:asset.digitalAssets.length,
+                          : asset.searchallcoin.isNotEmpty
+                              ? asset.searchallcoin.length
+                              : asset.digitalAssets.length,
                       itemBuilder: (BuildContext context, int index) {
                         var assets = _hideSmallBalances
                             ? _smallBalancesDigitalAssets[index]
-                            : asset.searchallcoin.isNotEmpty?
-                            asset.searchallcoin[index]:asset.digitalAssets[index];
+                            : asset.searchallcoin.isNotEmpty
+                                ? asset.searchallcoin[index]
+                                : asset.digitalAssets[index];
+
                         return Container(
                           padding: EdgeInsets.only(
                             bottom: 8,
@@ -491,7 +490,8 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          '${getCoinName(assets['coin'])}',
+                                          getCoinName(
+                                              '${public.publicInfoMarket['market']['coinList'][assets['coin']]['showName']}'),
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 16),
@@ -528,8 +528,8 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                                   child: Text(
                                     _hideBalances
                                         ? _hideBalanceString
-                                        : double.parse(
-                                                assets['values']['lock_balance'])
+                                        : double.parse(assets['values']
+                                                ['lock_balance'])
                                             .toStringAsFixed(4),
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,

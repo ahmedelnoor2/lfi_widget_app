@@ -27,10 +27,14 @@ class _TransactionsState extends State<Transactions>
     with SingleTickerProviderStateMixin {
   late final TabController _tabTxHistoryController =
       TabController(length: 4, vsync: this);
+  var refreshKey = GlobalKey<RefreshIndicatorState>();
   final TextEditingController _searchController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   bool _loadingAddress = false;
+  bool _loadingDepositTransactions = false;
+  bool _loadingWithdrawTransactions = false;
+  bool _loadingFinancialTransactions = false;
   String _defaultNetwork = 'ERC20';
   String _defaultCoin = 'USDT';
   List _allNetworks = [];
@@ -49,19 +53,23 @@ class _TransactionsState extends State<Transactions>
     super.dispose();
   }
 
-  void fetchRecords() {
+  Future<void> fetchRecords() async {
     if (_tabTxHistoryController.index == 0) {
-      getDepositTransactions();
+      await getDepositTransactions();
     }
     if (_tabTxHistoryController.index == 1) {
-      getWithdrawTransactions();
+      await getWithdrawTransactions();
     }
     if (_tabTxHistoryController.index == 3) {
-      getFinancialRecords();
+      await getFinancialRecords();
     }
+    return;
   }
 
   Future<void> getDepositTransactions() async {
+    setState(() {
+      _loadingDepositTransactions = true;
+    });
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
     await asset.getDepositTransactions(auth, {
@@ -69,9 +77,15 @@ class _TransactionsState extends State<Transactions>
       'page': _page,
       'pageSize': _pageSize,
     });
+    setState(() {
+      _loadingDepositTransactions = false;
+    });
   }
 
   Future<void> getWithdrawTransactions() async {
+    setState(() {
+      _loadingWithdrawTransactions = true;
+    });
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
     await asset.getWithdrawTransactions(auth, {
@@ -79,9 +93,15 @@ class _TransactionsState extends State<Transactions>
       'page': _page,
       'pageSize': _pageSize,
     });
+    setState(() {
+      _loadingWithdrawTransactions = false;
+    });
   }
 
   Future<void> getFinancialRecords() async {
+    setState(() {
+      _loadingFinancialTransactions = true;
+    });
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
     await asset.getFinancialRecords(auth, {
@@ -89,6 +109,9 @@ class _TransactionsState extends State<Transactions>
       'gainCoin': "",
       'page': _page,
       'pageSize': _pageSize,
+    });
+    setState(() {
+      _loadingFinancialTransactions = false;
     });
   }
 
@@ -137,6 +160,12 @@ class _TransactionsState extends State<Transactions>
       }
     });
     asset.setDigAssets(_digitialAss);
+  }
+
+  Future<void> refreshList() async {
+    refreshKey.currentState?.show(atTop: false);
+    fetchRecords();
+    return;
   }
 
   @override
@@ -271,22 +300,55 @@ class _TransactionsState extends State<Transactions>
               ),
             ),
             SizedBox(
-              height: height * 0.66,
+              height: height * 0.8,
               child: TabBarView(
                 controller: _tabTxHistoryController,
                 children: [
-                  asset.depositLists.isEmpty
-                      ? noData('No Transactions')
-                      : depositList(context, width, height, asset.depositLists),
-                  asset.withdrawLists.isEmpty
-                      ? noData('No Transactions')
-                      : withdrawList(
-                          context, width, height, asset.withdrawLists),
-                  noData('No Transactions'),
-                  asset.financialRecords.isEmpty
-                      ? noData('No Transactions')
-                      : financialRecords(
-                          context, width, height, asset.financialRecords),
+                  Tab(
+                    child: RefreshIndicator(
+                      onRefresh: refreshList,
+                      key: refreshKey,
+                      child: _loadingDepositTransactions
+                          ? Center(
+                              child: CircularProgressIndicator(),
+                            )
+                          : asset.depositLists.isEmpty
+                              ? noData('No Transactions')
+                              : depositList(
+                                  context, width, height, asset.depositLists),
+                    ),
+                  ),
+                  Tab(
+                    child: RefreshIndicator(
+                      onRefresh: refreshList,
+                      key: refreshKey,
+                      child: _loadingWithdrawTransactions
+                          ? Center(
+                              child: CircularProgressIndicator(),
+                            )
+                          : asset.withdrawLists.isEmpty
+                              ? noData('No Transactions')
+                              : withdrawList(
+                                  context, width, height, asset.withdrawLists),
+                    ),
+                  ),
+                  Tab(
+                    child: noData('No Transactions'),
+                  ),
+                  Tab(
+                    child: RefreshIndicator(
+                      onRefresh: refreshList,
+                      key: refreshKey,
+                      child: _loadingFinancialTransactions
+                          ? Center(
+                              child: CircularProgressIndicator(),
+                            )
+                          : asset.financialRecords.isEmpty
+                              ? noData('No Transactions')
+                              : financialRecords(context, width, height,
+                                  asset.financialRecords),
+                    ),
+                  ),
                 ],
               ),
             ),
