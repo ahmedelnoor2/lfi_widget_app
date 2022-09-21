@@ -31,11 +31,19 @@ class _OrderBookState extends State<OrderBook> {
 
     var public = Provider.of<Public>(context, listen: true);
 
-    List? rasks = widget.asks!.isNotEmpty ? widget.asks!.sublist(0, 6) : [];
-    List? asks = List.from(rasks.reversed);
-    List? bids = widget.bids!.isNotEmpty ? widget.bids!.sublist(0, 6) : [];
+    List? rasks = widget.asks!.isNotEmpty
+        ? widget.asks!.length > 6
+            ? widget.asks!.sublist(0, 6)
+            : widget.asks
+        : [];
+    List? asks = List.from(rasks!.reversed);
+    List? bids = widget.bids!.isNotEmpty
+        ? widget.asks!.length > 6
+            ? widget.bids!.sublist(0, 6)
+            : widget.bids
+        : [];
 
-    var bidMax = bids.isNotEmpty
+    var bidMax = bids!.isNotEmpty
         ? (bids.reduce((current, next) =>
             double.parse('${current[1]}') > double.parse('${next[1]}')
                 ? current
@@ -112,7 +120,7 @@ class _OrderBookState extends State<OrderBook> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          double.parse('${asks[index][0]}')
+                          double.parse('${asks[index][0] ?? 0}')
                               .toStringAsPrecision(7),
                           style: TextStyle(
                             color: redIndicator,
@@ -120,10 +128,10 @@ class _OrderBookState extends State<OrderBook> {
                           ),
                         ),
                         Text(
-                          double.parse('${asks[index][1]}') > 10
-                              ? double.parse('${asks[index][1]}')
+                          double.parse('${asks[index][1] ?? 0}') > 10
+                              ? double.parse('${asks[index][1] ?? 0}')
                                   .toStringAsFixed(2)
-                              : double.parse('${asks[index][1]}')
+                              : double.parse('${asks[index][1] ?? 0}')
                                   .toStringAsPrecision(4),
                           style: TextStyle(fontSize: 15),
                         ),
@@ -134,10 +142,11 @@ class _OrderBookState extends State<OrderBook> {
                     alignment: Alignment.centerRight,
                     child: Container(
                       color: Color.fromARGB(73, 175, 86, 76),
-                      width: ((double.parse('${asks[index][1]}') /
-                                  double.parse('$askMax')) *
-                              2) *
-                          100,
+                      // width: ((double.parse('${asks[index][1] ?? 0}') /
+                      //             double.parse('$askMax')) *
+                      //         2) *
+                      //     100,
+                      // width: width * 0.5,
                       height: 21,
                     ),
                   ),
@@ -169,7 +178,7 @@ class _OrderBookState extends State<OrderBook> {
           itemBuilder: (BuildContext context, int index) {
             return InkWell(
               onTap: () {
-                setPriceField(public, bids[index][0]);
+                setPriceField(public, bids[index][0] ?? 0);
               },
               child: Stack(
                 children: <Widget>[
@@ -182,7 +191,7 @@ class _OrderBookState extends State<OrderBook> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          double.parse('${bids[index][0]}')
+                          double.parse('${bids[index][0] ?? 0}')
                               .toStringAsPrecision(7),
                           style: TextStyle(
                             color: greenIndicator,
@@ -190,10 +199,10 @@ class _OrderBookState extends State<OrderBook> {
                           ),
                         ),
                         Text(
-                          double.parse('${bids[index][1]}') > 10
-                              ? double.parse('${bids[index][1]}')
+                          double.parse('${bids[index][1] ?? 0}') > 10
+                              ? double.parse('${bids[index][1] ?? 0}')
                                   .toStringAsFixed(2)
-                              : double.parse('${bids[index][1]}')
+                              : double.parse('${bids[index][1] ?? 0}')
                                   .toStringAsPrecision(4),
                           style: TextStyle(fontSize: 15),
                         ),
@@ -204,10 +213,11 @@ class _OrderBookState extends State<OrderBook> {
                     alignment: Alignment.centerRight,
                     child: Container(
                       color: Color.fromARGB(71, 72, 163, 65),
-                      width: ((double.parse('${bids[index][1]}') /
-                                  double.parse('$bidMax')) *
-                              2) *
-                          100,
+                      // width: ((double.parse('${bids[index][1] ?? 0}') /
+                      //             double.parse('$bidMax')) *
+                      //         2) *
+                      //     100,
+                      // width: width * 0.5,
                       height: 21,
                     ),
                   ),

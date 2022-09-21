@@ -74,6 +74,7 @@ class _QrScannerState extends State<QrScanner> {
   }
 
   void _onQRViewCreated(QRViewController controller) {
+    controller.resumeCamera();
     setState(() {
       this.controller = controller;
     });

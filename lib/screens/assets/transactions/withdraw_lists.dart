@@ -37,8 +37,8 @@ Widget withdrawList(context, width, height, allWithdrawals) {
       Divider(
         height: 0,
       ),
-      SizedBox(
-        height: height * 0.63,
+      Expanded(
+        flex: 2,
         child: ListView.builder(
           scrollDirection: Axis.vertical,
           itemCount: allWithdrawals.length,

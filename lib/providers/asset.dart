@@ -160,7 +160,7 @@ class Asset with ChangeNotifier {
     if (query.isNotEmpty) {
       List dummyListData = [];
       for (var item in _digitialAss) {
-        if (item['coin'].contains(query)) {
+        if ((item['coin'].toLowerCase()).contains(query.toLowerCase())) {
           if (item['values']['depositOpen'] == 1) {
             dummyListData.add(item);
           }

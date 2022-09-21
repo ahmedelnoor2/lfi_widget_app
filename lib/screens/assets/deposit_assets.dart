@@ -277,7 +277,7 @@ class _DepositAssetsState extends State<DepositAssets> {
                                 ),
                               ),
                               Text(
-                                '${public.publicInfoMarket['market']['coinList'][_defaultCoin]['longName']}',
+                                '${public.publicInfoMarket['market']['coinList'][_defaultCoin]['showName']}',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.normal,
