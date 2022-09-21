@@ -341,4 +341,66 @@ class Trading with ChangeNotifier {
       // throw error;
     }
   }
+
+  /// Future history List///
+  ///
+
+  List _futureHistoryList = [];
+
+  List get futureHistoryList {
+    return _futureHistoryList;
+  }
+
+  bool _isFuturehistoruyloading = true;
+
+  bool get isFuturehistoruyloading {
+    return _isFuturehistoruyloading;
+  }
+
+  Future<void> futureOrderHistory(ctx, auth, formData) async {
+    print("i am calling...");
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      futApiUrl,
+      '$futExApi/order/history_order_list',
+    );
+    print(url);
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+
+      print(responseData);
+
+      if (responseData['code'] == "0") {
+        _futureHistoryList = responseData['data']["orderList"];
+        print(_futureHistoryList);
+        _isFuturehistoruyloading = false;
+
+        notifyListeners();
+        return;
+      } else {
+        _isFuturehistoruyloading = false;
+        notifyListeners();
+        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
+
+        return;
+      }
+    } catch (error) {
+      _isFuturehistoruyloading = false;
+      notifyListeners();
+      snackAlert(
+        ctx,
+        SnackTypes.errors,
+        'Server Error',
+      );
+    }
+  }
 }

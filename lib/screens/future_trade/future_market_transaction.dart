@@ -1,6 +1,7 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/future_market.dart';
 import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/no_data.dart';
@@ -21,12 +22,11 @@ class FutureMarketTransaction extends StatefulWidget {
 class _FutureMarketTransactionState extends State<FutureMarketTransaction>
     with SingleTickerProviderStateMixin {
   late final TabController _tabFutureMarketTransactionController =
-      TabController(length: 3, vsync: this);
+      TabController(length: 2, vsync: this);
 
   @override
   void initState() {
-    getOpenOrders();
-    getOrderHistory();
+    getFutureHistoryorder();
     super.initState();
   }
 
@@ -35,54 +35,13 @@ class _FutureMarketTransactionState extends State<FutureMarketTransaction>
     super.dispose();
   }
 
-  String getOrderType(orderType) {
-    return '$orderType' == '1' ? 'Limit' : 'Market';
-  }
-
-  Future<void> getOpenOrders() async {
+  Future<void> getFutureHistoryorder() async {
+    var futureMarket = Provider.of<FutureMarket>(context, listen: false);
     var trading = Provider.of<Trading>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
-
-    if (auth.isAuthenticated) {
-      await trading.getOpenOrders(context, auth, {
-        "entrust": 1,
-        "isShowCanceled": 0,
-        "orderType": 1,
-        "page": 1,
-        "pageSize": 10,
-        "symbol": "",
-      });
-    }
-  }
-
-  Future<void> getOrderHistory() async {
-    var trading = Provider.of<Trading>(context, listen: false);
-    var auth = Provider.of<Auth>(context, listen: false);
-
-    if (auth.isAuthenticated) {
-      await trading.getOrderHistory(context, auth, {
-        "entrust": 2,
-        "isShowCanceled": 1,
-        "orderType": 1,
-        "page": 1,
-        "pageSize": 10,
-        "symbol": "",
-        "status": null,
-      });
-    }
-  }
-
-  Future<void> cancelOrder(formData) async {
-    var trading = Provider.of<Trading>(context, listen: false);
-
-    var auth = Provider.of<Auth>(context, listen: false);
-
-    await trading.cancelOrder(
-      context,
-      auth,
-      formData,
-    );
-    getOpenOrders();
+    await trading.futureOrderHistory(context, auth, {
+      'contractId': futureMarket.activeMarket['id'],
+    });
   }
 
   @override
@@ -118,14 +77,13 @@ class _FutureMarketTransactionState extends State<FutureMarketTransaction>
             ),
             TabBar(
               indicatorSize: TabBarIndicatorSize.label,
-              isScrollable: true,
+              isScrollable: false,
               onTap: (value) => setState(() {
                 // _tabIndicatorColor = value == 0 ? Colors.green : Colors.red;
               }),
               tabs: <Tab>[
                 Tab(text: 'Open Orders'),
                 Tab(text: 'Order History'),
-                Tab(text: 'Transaction History'),
               ],
               controller: _tabFutureMarketTransactionController,
             ),
@@ -138,15 +96,12 @@ class _FutureMarketTransactionState extends State<FutureMarketTransaction>
               child: TabBarView(
                 controller: _tabFutureMarketTransactionController,
                 children: [
-                  trading.openOrders.isEmpty
+                  trading.futureHistoryList.isNotEmpty
                       ? noData('No Open Orders')
-                      : openOrders(trading.openOrders),
-                  trading.orderHistory.isEmpty
-                      ? noData('No Orders')
-                      : orderHistory(trading.orderHistory),
-                  trading.transactionHistory.isEmpty
-                      ? noData('No Transactions')
-                      : FutureMarketTransaction(trading.transactionHistory),
+                      : futureOrderHistory(trading.futureHistoryList),
+                  trading.futureHistoryList.isEmpty
+                      ? noData('No History')
+                      : futureOrderHistory(trading.futureHistoryList),
                 ],
               ),
             ),
@@ -180,7 +135,7 @@ class _FutureMarketTransactionState extends State<FutureMarketTransaction>
                             Container(
                               padding: EdgeInsets.only(bottom: 4),
                               child: Text(
-                                '${getOrderType(openOrder['type'])}/${openOrder['side']}',
+                                'test',
                                 style: TextStyle(
                                   fontSize: 10,
                                   color: openOrder['side'] == 'BUY'
@@ -328,12 +283,7 @@ class _FutureMarketTransactionState extends State<FutureMarketTransaction>
                           ),
                         ),
                         InkWell(
-                          onTap: () {
-                            cancelOrder({
-                              "orderId": openOrder['id'],
-                              "symbol": openOrder['symbol'].toLowerCase(),
-                            });
-                          },
+                          onTap: () {},
                           child: Container(
                             padding: EdgeInsets.only(
                                 left: 12, right: 12, top: 6, bottom: 6),
@@ -368,13 +318,13 @@ class _FutureMarketTransactionState extends State<FutureMarketTransaction>
     );
   }
 
-  Widget orderHistory(orderHistories) {
+  Widget futureOrderHistory(futureHistoryList) {
     return Container(
       padding: EdgeInsets.all(9),
       child: ListView.builder(
-        itemCount: orderHistories.length,
+        itemCount: futureHistoryList.length,
         itemBuilder: (BuildContext context, int index) {
-          var orderHistory = orderHistories[index];
+          var orderHistory = futureHistoryList[index];
           return Column(
             children: [
               Row(
@@ -392,7 +342,7 @@ class _FutureMarketTransactionState extends State<FutureMarketTransaction>
                                 Container(
                                   padding: EdgeInsets.only(bottom: 5, right: 5),
                                   child: Text(
-                                    '${orderHistory['symbol']}',
+                                    '${orderHistory['symbol'].toString()}',
                                     style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w600,
@@ -402,7 +352,7 @@ class _FutureMarketTransactionState extends State<FutureMarketTransaction>
                                 Container(
                                   padding: EdgeInsets.only(bottom: 4),
                                   child: Text(
-                                    '${getOrderType(orderHistory['type'])}/${orderHistory['side']}',
+                                    'testing..',
                                     style: TextStyle(
                                       fontSize: 10,
                                       color: greenIndicator,
@@ -451,15 +401,13 @@ class _FutureMarketTransactionState extends State<FutureMarketTransaction>
                                         child: Row(
                                           children: [
                                             Text(
-                                              '${double.parse(orderHistory['remain_volume']).toStringAsPrecision(4)} / ',
+                                              '${orderHistory['volume']} / ',
                                               style: TextStyle(
                                                 fontSize: 11,
                                               ),
                                             ),
                                             Text(
-                                              double.parse(
-                                                      orderHistory['volume'])
-                                                  .toStringAsPrecision(4),
+                                              orderHistory['volume'].toString(),
                                               style: TextStyle(
                                                 fontSize: 11,
                                                 color: secondaryTextColor,
@@ -471,7 +419,7 @@ class _FutureMarketTransactionState extends State<FutureMarketTransaction>
                                       Container(
                                         padding: EdgeInsets.only(right: 20),
                                         child: Text(
-                                          '${double.parse(orderHistory['price'])}',
+                                          '${(orderHistory['price'])}',
                                           style: TextStyle(
                                             fontSize: 11,
                                           ),
@@ -494,7 +442,7 @@ class _FutureMarketTransactionState extends State<FutureMarketTransaction>
                         Container(
                           padding: EdgeInsets.only(bottom: 5),
                           child: Text(
-                            '${DateFormat('yyy-mm-dd hh:mm:ss').format(DateTime.parse(orderHistory['created_at']))}',
+                            '12-12-2002',
                             style: TextStyle(
                               fontSize: 11,
                               color: secondaryTextColor,
@@ -502,9 +450,7 @@ class _FutureMarketTransactionState extends State<FutureMarketTransaction>
                           ),
                         ),
                         InkWell(
-                          onTap: () {
-                            // cancelAllOrders();
-                          },
+                          onTap: () {},
                           child: Container(
                             padding: EdgeInsets.only(
                                 left: 12, right: 12, top: 6, bottom: 6),
@@ -512,21 +458,17 @@ class _FutureMarketTransactionState extends State<FutureMarketTransaction>
                               border: Border.all(
                                 color: Color(0xff292C51),
                               ),
-                              color: orderHistory['status_text'] == 'Filled'
-                                  ? greenPercentageIndicator
-                                  : Color(0xff292C51),
+                              color: Color(0xff292C51),
                               borderRadius: BorderRadius.all(
                                 Radius.circular(2),
                               ),
                             ),
                             child: Text(
-                              '${orderHistory['status_text']}',
+                              '${orderHistory['status'].toString()}',
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
-                                color: orderHistory['status_text'] == 'Filled'
-                                    ? greenIndicator
-                                    : Colors.white,
+                                color: Colors.white,
                               ),
                             ),
                           ),
@@ -581,7 +523,7 @@ class _FutureMarketTransactionState extends State<FutureMarketTransaction>
                                   Container(
                                     padding: EdgeInsets.only(bottom: 4),
                                     child: Text(
-                                      '${getOrderType(FutureMarketTransaction['orderType'])}/${FutureMarketTransaction['side']}',
+                                      'test3',
                                       style: TextStyle(
                                         fontSize: 10,
                                         color: greenIndicator,
@@ -634,7 +576,7 @@ class _FutureMarketTransactionState extends State<FutureMarketTransaction>
                         Container(
                           padding: EdgeInsets.only(bottom: 5),
                           child: Text(
-                            '${DateFormat('yyy-mm-dd hh:mm:ss').format(DateTime.fromMillisecondsSinceEpoch(FutureMarketTransaction['ctime']))}',
+                            'test4',
                             style: TextStyle(
                               fontSize: 11,
                               color: secondaryTextColor,
@@ -646,7 +588,7 @@ class _FutureMarketTransactionState extends State<FutureMarketTransaction>
                           child: Row(
                             children: [
                               Text(
-                                '${FutureMarketTransaction['tradeVolume']}',
+                                'test6',
                                 style: TextStyle(
                                   fontSize: 12,
                                 ),
@@ -657,7 +599,7 @@ class _FutureMarketTransactionState extends State<FutureMarketTransaction>
                         Container(
                           // padding: EdgeInsets.only(right: 20),
                           child: Text(
-                            '${FutureMarketTransaction['tradePrice']}',
+                            'test7',
                             style: TextStyle(
                               fontSize: 12,
                             ),
