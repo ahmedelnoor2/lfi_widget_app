@@ -258,8 +258,6 @@ class Payments with ChangeNotifier {
       final responseData = json.decode(response.body);
 
       if (responseData['code'] == '0') {
-     
-       
         if (responseData['data'].isNotEmpty) {
           _estimateOnrampRate = responseData['data'][0];
           _estimateLoader = false;
@@ -300,7 +298,6 @@ class Payments with ChangeNotifier {
   }
 
   Future<void> createTransaction(ctx, auth, formData) async {
-  
     _changenowTransaction = {};
     notifyListeners();
     headers['exchange-token'] = auth.loginVerificationToken;
@@ -732,7 +729,10 @@ class Payments with ChangeNotifier {
         headers: headers,
       );
 
+      print(postData);
+
       final responseData = json.decode(response.body);
+      print(responseData);
 
       if (responseData['code'] == '0') {
         _transactionValue = txValue;
@@ -837,8 +837,6 @@ class Payments with ChangeNotifier {
 
   var selectedpaymentmethod;
 
-
-
   void setpaymentMethods(data) {
     _paymentMethods = data;
     return notifyListeners();
@@ -874,8 +872,9 @@ class Payments with ChangeNotifier {
         _onRamperDetails = responseData['data'];
         _onrampGateways = _onRamperDetails['gateways'];
         _paymentMethods = _onRamperDetails['gateways'][0]['paymentMethods'];
-        selectedpaymentmethod=_onRamperDetails['gateways'][0]['paymentMethods'].first;
-         
+        selectedpaymentmethod =
+            _onRamperDetails['gateways'][0]['paymentMethods'].first;
+
         _defaultOnrampGateway = _onRamperDetails['gateways'][0];
         _onRampIdentifier = _onRamperDetails['gateways'][0]['identifier'];
         _selectedOnrampFiatCurrency = _onRamperDetails['gateways'][0]
@@ -904,8 +903,6 @@ class Payments with ChangeNotifier {
   }
 
   Future<void> callOnrampForm(ctx, formData) async {
-    
-   
     var url = Uri.https(
       lyoApiUrl,
       '/on-ramper/call-form',
@@ -919,13 +916,11 @@ class Payments with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-       print('check..........>>>>>>>>>>>>>>>>>>>>>>>>');
+      print('check..........>>>>>>>>>>>>>>>>>>>>>>>>');
       print(responseData);
       if (responseData['code'] == '0') {
         _formCallResponse = responseData['data'];
-       
 
-     
         Navigator.pop(ctx);
         return notifyListeners();
       } else {
@@ -941,6 +936,4 @@ class Payments with ChangeNotifier {
       return notifyListeners();
     }
   }
-
-  
 }

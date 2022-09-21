@@ -53,7 +53,7 @@ class _PixPaymentState extends State<PixPayment>
   bool _processTransaction = false;
   bool _reRequestKYCAuth = false;
   String _sendUsdtAmount = '';
-  String _sendUsdtAmountwithouttax='';
+  String _sendUsdtAmountwithouttax = '';
   Map _userAddresses = {};
 
   String _transactionType = 'bank_transfer';
@@ -100,7 +100,6 @@ class _PixPaymentState extends State<PixPayment>
   }
 
   Future<void> getExchangeRate() async {
-    
     setState(() {
       _loading = true;
       _sendUsdtAmount = '';
@@ -136,7 +135,6 @@ class _PixPaymentState extends State<PixPayment>
   }
 
   void calculateRates(from, value) {
-   
     var payments = Provider.of<Payments>(context, listen: false);
     if (from == 'BRL') {
       if (value.isNotEmpty) {
@@ -147,14 +145,14 @@ class _PixPaymentState extends State<PixPayment>
                           (double.parse('${payments.pixCurrencyCommission}') /
                               100)))
                   .toStringAsFixed(4);
-           
+
           _sendUsdtAmount =
               ((double.parse(value) / payments.pixCurrencyExchange) +
                       ((double.parse(value) / payments.pixCurrencyExchange) *
                           (double.parse('${payments.pixCurrencyCommission}') /
                               100)))
                   .toStringAsFixed(4);
-         
+          _sendUsdtAmountwithouttax = '${(double.parse(_sendUsdtAmount))}';
         });
       } else {
         setState(() {
@@ -174,11 +172,10 @@ class _PixPaymentState extends State<PixPayment>
                               100)))
                   .toStringAsFixed(2);
 
-          _sendUsdtAmountwithouttax='${(double.parse('$value'))}';
-              
+          _sendUsdtAmountwithouttax = '${(double.parse('$value'))}';
+
           _sendUsdtAmount =
               '${(double.parse('$value') + (double.parse('$value') * (double.parse('${payments.pixCurrencyCommission}') / 100)))}';
-              
         });
       } else {
         setState(() {
@@ -726,14 +723,12 @@ class _PixPaymentState extends State<PixPayment>
 
                               if (payments.pixKycClients.isNotEmpty) {
                                 if (payments.pixKycClients['activate']) {
-                                  
                                   await payments.createNewPixTransaction(
                                       context,
-                                    
                                       {
                                         "client_id":
                                             payments.pixKycClients['userId'],
-                                        "value":_sendUsdtAmountwithouttax,
+                                        "value": _sendUsdtAmountwithouttax,
                                         "client": payments.pixKycClients,
                                         "userAddresses": _userAddresses,
                                       },
