@@ -90,7 +90,6 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
     }
   }
 
-
   Future<void> getEstimateRate(amount) async {
     var asset = Provider.of<Asset>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
@@ -1372,8 +1371,9 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      convertpaymentmethodText(payments.selectedpaymentmethod.toString()),
-                                      
+                                      convertpaymentmethodText(payments
+                                          .selectedpaymentmethod
+                                          .toString()),
                                       style: TextStyle(
                                         fontSize: 18,
                                         color: linkColor,

@@ -200,21 +200,18 @@ String getPortugeseTranslate(String text) {
     default:
       return text;
   }
-
-  
-
-    
-
 }
+
 String convertpaymentmethodText(String text) {
-   switch (text) {
-   case 'applePay':
+  switch (text) {
+    case 'applePay':
       return 'Apple Pay';
-  case 'googlePay':
+    case 'googlePay':
       return 'Goolge Pay';
-  case 'creditCard':
+    case 'creditCard':
       return 'Credit Card';
-   default:
+    default:
       return text;
   }
+  
 }
