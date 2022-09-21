@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/payments.dart';
+import 'package:lyotrade/utils/Translate.utils.dart';
 import 'package:provider/provider.dart';
 
 import '../../../utils/Colors.utils.dart';
@@ -85,6 +86,15 @@ class _PayementMethodState extends State<PayementMethod> {
                             payments.selectedpaymentmethod =
                                 payments.paymentMethods[index];
                           });
+
+                          await payments.getOnrampEstimateRate(context, {
+                            "fromCurrency":
+                                payments.selectedOnrampFiatCurrency['code'],
+                            "toCurrency":
+                                payments.selectedOnrampCryptoCurrency['code'],
+                            "paymentMethod": payments.selectedpaymentmethod,
+                            "amount": payments.amount
+                          });
                           Navigator.pop(context);
                         },
                         child: Row(
@@ -126,7 +136,9 @@ class _PayementMethodState extends State<PayementMethod> {
                                     left: 10,
                                   ),
                                   child: Text(
-                                    '${widget.payementMethod[index].toString()}',
+                                    convertpaymentmethodText(widget
+                                        .payementMethod[index]
+                                        .toString()),
                                     style: TextStyle(
                                       // color: payments.tappedIdentifier == index
                                       //     ? Colors.blueGrey

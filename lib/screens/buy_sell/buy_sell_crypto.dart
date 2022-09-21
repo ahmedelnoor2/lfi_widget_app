@@ -19,6 +19,7 @@ import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/ScreenControl.utils.dart';
+import 'package:lyotrade/utils/Translate.utils.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -58,6 +59,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
   void initState() {
     getCurrencies();
     getOnRamperDetails();
+
     super.initState();
   }
 
@@ -72,9 +74,14 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
 
   Future<void> getOnRamperDetails() async {
     var payments = Provider.of<Payments>(context, listen: false);
+
     await payments.getOnRamperDetails(context);
     if (payments.onRamperDetails.isNotEmpty) {
       setState(() {
+        payments.amount = payments.onRamperDetails['defaultAmounts']
+                [payments.selectedOnrampFiatCurrency['code']]
+            .toString();
+
         _fiatOnrampController.text =
             '${payments.onRamperDetails['defaultAmounts'][payments.selectedOnrampFiatCurrency['code']]}';
       });
@@ -82,6 +89,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
           [payments.selectedOnrampFiatCurrency['code']]);
     }
   }
+
 
   Future<void> getEstimateRate(amount) async {
     var asset = Provider.of<Asset>(context, listen: false);
@@ -91,7 +99,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
     await payments.getOnrampEstimateRate(context, {
       "fromCurrency": payments.selectedOnrampFiatCurrency['code'],
       "toCurrency": payments.selectedOnrampCryptoCurrency['code'],
-      "paymentMethod": payments.defaultOnrampGateway['paymentMethods'][0],
+      "paymentMethod": payments.selectedpaymentmethod,
       "amount": amount
     });
 
@@ -103,9 +111,9 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
     }
   }
 
-  Future<void> callOnrampForm() async {
-    print(_textControllers);
-  }
+  // Future<void> callOnrampForm() async {
+  //   print(_textControllers);
+  // }
 
   Future<void> getDigitalBalance() async {
     setState(() {
@@ -473,7 +481,8 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
     for (var key in _textControllers.keys) {
       data[key] = _textControllers[key]!.text;
     }
-
+    print('check.......');
+    print(jsonEncode(data));
     await payments.callOnrampForm(context, {
       'url': payments.estimateOnrampRate['nextStep']['url'],
       'data': jsonEncode(data)
@@ -526,7 +535,6 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              
               Column(
                 children: [
                   Row(
@@ -1022,7 +1030,11 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                                   if (value.isNotEmpty) {
                                                     if (double.parse(value) >=
                                                         100) {
-                                                      getEstimateRate(value);
+                                                      setState(() {
+                                                        payments.amount = value;
+                                                      });
+                                                      getEstimateRate(
+                                                          payments.amount);
                                                     } else {}
                                                   }
                                                 },
@@ -1257,7 +1269,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                   payments.estimateOnrampRate.isEmpty
                                       ? Container()
                                       : Text(
-                                          '${_fiatOnrampController.text} ${payments.selectedCryptoCurrency['current_ticker'].toUpperCase()} ~ ${(double.parse('${payments.estimateOnrampRate['receivedCrypto']}')).toStringAsFixed(4)} ${payments.selectedOnrampCryptoCurrency['code'].toUpperCase()}'),
+                                          '${_fiatOnrampController.text} ${payments.selectedCryptoCurrency['current_ticker']} ~ ${(double.parse('${payments.estimateOnrampRate['receivedCrypto']}')).toStringAsFixed(4)} ${payments.selectedOnrampCryptoCurrency['code'].toUpperCase()}'),
                                 ],
                               ),
                             ),
@@ -1360,7 +1372,8 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      payments.selectedpaymentmethod.toString(),
+                                      convertpaymentmethodText(payments.selectedpaymentmethod.toString()),
+                                      
                                       style: TextStyle(
                                         fontSize: 18,
                                         color: linkColor,
@@ -1556,8 +1569,9 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
                             print('process');
-                          
+
                             processOnrampBuy(formDetails);
+                            print(formDetails);
                           } else {
                             print('notvalidating');
                           }

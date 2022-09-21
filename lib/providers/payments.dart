@@ -836,6 +836,7 @@ class Payments with ChangeNotifier {
   }
 
   var selectedpaymentmethod;
+  var amount='';
 
   void setpaymentMethods(data) {
     _paymentMethods = data;
@@ -872,9 +873,8 @@ class Payments with ChangeNotifier {
         _onRamperDetails = responseData['data'];
         _onrampGateways = _onRamperDetails['gateways'];
         _paymentMethods = _onRamperDetails['gateways'][0]['paymentMethods'];
-        selectedpaymentmethod =
-            _onRamperDetails['gateways'][0]['paymentMethods'].first;
-
+        selectedpaymentmethod=_onRamperDetails['gateways'][0]['paymentMethods'].first;
+        
         _defaultOnrampGateway = _onRamperDetails['gateways'][0];
         _onRampIdentifier = _onRamperDetails['gateways'][0]['identifier'];
         _selectedOnrampFiatCurrency = _onRamperDetails['gateways'][0]
@@ -907,7 +907,6 @@ class Payments with ChangeNotifier {
       lyoApiUrl,
       '/on-ramper/call-form',
     );
-
     try {
       final response = await http.post(
         url,
@@ -916,11 +915,9 @@ class Payments with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-      print('check..........>>>>>>>>>>>>>>>>>>>>>>>>');
-      print(responseData);
+
       if (responseData['code'] == '0') {
         _formCallResponse = responseData['data'];
-
         Navigator.pop(ctx);
         return notifyListeners();
       } else {
