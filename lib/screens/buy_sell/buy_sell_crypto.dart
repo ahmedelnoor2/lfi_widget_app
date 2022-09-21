@@ -19,6 +19,7 @@ import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/ScreenControl.utils.dart';
+import 'package:lyotrade/utils/Translate.utils.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -88,6 +89,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
           [payments.selectedOnrampFiatCurrency['code']]);
     }
   }
+
 
   Future<void> getEstimateRate(amount) async {
     var asset = Provider.of<Asset>(context, listen: false);
@@ -1370,7 +1372,8 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      payments.selectedpaymentmethod.toString(),
+                                      convertpaymentmethodText(payments.selectedpaymentmethod.toString()),
+                                      
                                       style: TextStyle(
                                         fontSize: 18,
                                         color: linkColor,
