@@ -136,24 +136,19 @@ class Slider extends StatelessWidget {
           // image given in slider
           Image(image: AssetImage(image!)),
 
-          Padding(
-            padding: const EdgeInsets.only(top: 16, bottom: 8),
-            child: Text(title!,
-                style: TextStyle(
-                    fontSize: 26.0,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white)),
-          ),
+          Text(title!,
+              style: TextStyle(
+                  fontSize: 26.0,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white)),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Flexible(
-              child: Text(description!,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontSize: 16.0,
-                      color: onboardText,
-                      fontWeight: FontWeight.w400)),
-            ),
+            child: Text(description!,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontSize: 16.0,
+                    color: onboardText,
+                    fontWeight: FontWeight.w400)),
           ),
         ],
       ),

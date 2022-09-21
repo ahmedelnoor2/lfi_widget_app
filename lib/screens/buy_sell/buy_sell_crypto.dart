@@ -483,19 +483,9 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
     print(jsonEncode(data));
     await payments.callOnrampForm(context, {
       'url': payments.estimateOnrampRate['nextStep']['url'],
-      'data': jsonEncode({
-        "email": data['email'],
-        "cryptocurrencyAddress": data['cryptocurrencyAddress'],
-        // only if it's the first step and you want to attach a custom context
-        "partnerContext": {
-          "myTxId": "yOQJgrz5bjd9MoD5",
-          "myUserId": 65165468,
-          "lastTab": "wallet-funds",
-        }
-      })
+      'data': jsonEncode(data)
     });
 
-    
     if (payments.formCallResponse.isNotEmpty) {
       if (payments.formCallResponse['type'] == 'form') {
         showModalBottomSheet<void>(
