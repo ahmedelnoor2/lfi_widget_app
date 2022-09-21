@@ -85,6 +85,18 @@ class _PayementMethodState extends State<PayementMethod> {
                             payments.selectedpaymentmethod =
                                 payments.paymentMethods[index];
                           });
+                          print(payments.selectedpaymentmethod);
+                          print(payments.selectedOnrampFiatCurrency['code']);
+                          print(payments.selectedOnrampCryptoCurrency['code']);
+                          print( payments.amount);
+                          await payments.getOnrampEstimateRate(context, {
+                            "fromCurrency":
+                                payments.selectedOnrampFiatCurrency['code'],
+                            "toCurrency":
+                                payments.selectedOnrampCryptoCurrency['code'],
+                            "paymentMethod": payments.selectedpaymentmethod,
+                            "amount": payments.amount
+                          });
                           Navigator.pop(context);
                         },
                         child: Row(

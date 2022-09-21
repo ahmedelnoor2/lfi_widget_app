@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/dashboard.dart';
+import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 
 class IntroScreen extends StatefulWidget {
@@ -82,8 +83,8 @@ class _IntroScreenState extends State<IntroScreen> {
           ),
           currentIndex == slides.length - 1
               ? Container(
-                  height: 60,
-                  margin: EdgeInsets.all(40),
+                  height: height,
+                  margin: EdgeInsets.all(30),
                   width: double.infinity,
                   color: linkColor,
                   child: LyoButton(
@@ -97,7 +98,7 @@ class _IntroScreenState extends State<IntroScreen> {
                   ),
                 )
               : Container(
-                  height: 60,
+                  height: 40,
                 ),
         ],
       ),
@@ -145,14 +146,15 @@ class Slider extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(description!,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontSize: 16.0,
-                    color: onboardText,
-                    fontWeight: FontWeight.w400)),
+            child: Flexible(
+              child: Text(description!,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 16.0,
+                      color: onboardText,
+                      fontWeight: FontWeight.w400)),
+            ),
           ),
-          SizedBox(height: 25),
         ],
       ),
     );

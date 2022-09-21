@@ -32,6 +32,7 @@ import 'package:lyotrade/screens/dashboard.dart';
 import 'package:lyotrade/screens/dashboard/announcement/announcement_details.dart';
 import 'package:lyotrade/screens/dashboard/market_search.dart';
 import 'package:lyotrade/screens/dex_swap/dex_swap.dart';
+import 'package:lyotrade/screens/future_trade/future_market_transaction.dart';
 import 'package:lyotrade/screens/future_trade/future_trade.dart';
 import 'package:lyotrade/screens/intro_screen/intro_screen.dart';
 import 'package:lyotrade/screens/kyc/enitityverificatrion.dart';
@@ -310,7 +311,8 @@ class MyApp extends StatelessWidget {
                   const AnnouncementDetails(),
               Createpassword.routeName: (context) => const Createpassword(),
               SpashScreen.routeName: (context) => const SpashScreen(),
-              Setting.routeName: ((context) => const Setting())
+              Setting.routeName: ((context) => const Setting()),
+              FutureMarketTransaction.routeName:(context) => const FutureMarketTransaction(),
             },
           );
         },

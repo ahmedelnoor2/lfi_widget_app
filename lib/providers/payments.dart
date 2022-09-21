@@ -836,6 +836,7 @@ class Payments with ChangeNotifier {
   }
 
   var selectedpaymentmethod;
+  var amount='';
 
 
 
@@ -875,6 +876,7 @@ class Payments with ChangeNotifier {
         _onrampGateways = _onRamperDetails['gateways'];
         _paymentMethods = _onRamperDetails['gateways'][0]['paymentMethods'];
         selectedpaymentmethod=_onRamperDetails['gateways'][0]['paymentMethods'].first;
+        
          
         _defaultOnrampGateway = _onRamperDetails['gateways'][0];
         _onRampIdentifier = _onRamperDetails['gateways'][0]['identifier'];
@@ -904,13 +906,12 @@ class Payments with ChangeNotifier {
   }
 
   Future<void> callOnrampForm(ctx, formData) async {
+    print(formData);
     
-   
     var url = Uri.https(
       lyoApiUrl,
       '/on-ramper/call-form',
     );
-
     try {
       final response = await http.post(
         url,
@@ -919,13 +920,11 @@ class Payments with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-       print('check..........>>>>>>>>>>>>>>>>>>>>>>>>');
+      print('response....from call from');
       print(responseData);
       if (responseData['code'] == '0') {
         _formCallResponse = responseData['data'];
        
-
-     
         Navigator.pop(ctx);
         return notifyListeners();
       } else {
