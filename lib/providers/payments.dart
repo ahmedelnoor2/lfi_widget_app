@@ -855,11 +855,13 @@ class Payments with ChangeNotifier {
     return _onRamperDetails;
   }
 
-  List _onrampfiatlist = [];
+  List onrampfiatlist = [];
 
-  List get onrampfiatlist {
-    return _onrampfiatlist;
-  }
+  List onrampfoundlist = [];
+
+  List onRampCryptoList = [];
+
+  List onRampCryptoFoundList = [];
 
   Future<void> getOnRamperDetails(ctx) async {
     var url = Uri.https(
@@ -890,6 +892,9 @@ class Payments with ChangeNotifier {
         _selectedOnrampCryptoCurrency = _onRamperDetails['gateways'][0]
                 ['cryptoCurrencies']
             .firstWhere((item) => item['code'] == 'BTC');
+        onrampfiatlist = _onRamperDetails['gateways'][0]['fiatCurrencies'];
+        onRampCryptoList = _onRamperDetails['gateways'][0]['cryptoCurrencies'];
+
         return notifyListeners();
       } else {
         _onRamperDetails = {};
@@ -901,6 +906,48 @@ class Payments with ChangeNotifier {
       snackAlert(ctx, SnackTypes.errors, 'Server error, please try again.');
       return notifyListeners();
     }
+  }
+
+  void runFilter(String enteredKeyword) {
+    print(enteredKeyword.toUpperCase());
+    List results = [];
+    if (enteredKeyword.isEmpty) {
+      // if the search field is empty or only contains white-space, we'll display all users
+      results = onrampfiatlist;
+    } else {
+      results = onrampfiatlist
+          .where((item) =>
+              item['code'].toLowerCase().contains(enteredKeyword.toLowerCase()))
+          .toList();
+
+      print(results);
+      // we use the toLowerCase() method to make it case-insensitive
+    }
+
+    onrampfoundlist = results;
+
+    notifyListeners();
+  }
+
+  void runCryptoFilter(String enteredKeyword) {
+
+    List results = [];
+
+    if (enteredKeyword.isEmpty) {
+      // if the search field is empty or only contains white-space, we'll display all users
+      results = onRampCryptoList;
+    } else {
+      results = onRampCryptoList
+          .where((item) =>
+              item['code'].toLowerCase().contains(enteredKeyword.toLowerCase()))
+          .toList();
+       print(results);
+      // we use the toLowerCase() method to make it case-insensitive
+    }
+
+    onRampCryptoFoundList = results;
+    print(onRampCryptoFoundList);
+    notifyListeners();
   }
 
   Map _formCallResponse = {};

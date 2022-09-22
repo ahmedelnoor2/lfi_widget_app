@@ -95,7 +95,7 @@ class _PayementMethodState extends State<PayementMethod> {
                             "paymentMethod": payments.selectedpaymentmethod,
                             "amount": payments.amount
                           });
-                          Navigator.pop(context);
+                          
                         },
                         child: Row(
                           children: [

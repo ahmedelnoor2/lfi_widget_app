@@ -110,6 +110,9 @@ class _OnramperCryptoCoinsState extends State<OnramperCryptoCoins>
                     width: width * 0.75,
                     child: TextFormField(
                       controller: _searchController,
+                      onChanged: ((value) {
+                        payments.runCryptoFilter(value);
+                      }),
                       style: const TextStyle(fontSize: 15),
                       decoration: const InputDecoration(
                         contentPadding: EdgeInsets.zero,
@@ -131,66 +134,71 @@ class _OnramperCryptoCoinsState extends State<OnramperCryptoCoins>
           Divider(),
           SizedBox(
             height: height * 0.716,
-            child: ListView.builder(
-              // shrinkWrap: true,
-              itemCount: payments.onRamperDetails.isNotEmpty
-                  ? payments
-                      .onRamperDetails['gateways'][0]['cryptoCurrencies'].length
-                  : 0,
-              itemBuilder: (context, index) {
-                var _cryptoCurrency = payments.onRamperDetails['gateways'][0]
-                    ['cryptoCurrencies'][index];
+            child: payments.onRampCryptoFoundList.isNotEmpty
+                ? ListView.builder(
+                    // shrinkWrap: true,
+                    itemCount: payments.onRampCryptoFoundList.length,
 
-                return Column(
-                  children: [
-                    ListTile(
-                      onTap: () async {
-                        await payments
-                            .setSelectedOnrampCryptoCurrency(_cryptoCurrency);
-                        widget.changeOnrampCrpto();
-                        await payments.getOnrampEstimateRate(context, {
-                          "fromCurrency":
-                              payments.selectedOnrampFiatCurrency['code'],
-                          "toCurrency":
-                              payments.selectedOnrampCryptoCurrency['code'],
-                          "paymentMethod": payments.selectedpaymentmethod,
-                          "amount": payments.amount
-                        });
-                        //asset.getChangeAddress(context, auth, _defaultOnrampNetwork);
+                    itemBuilder: (context, index) {
+                      var _cryptoCurrency =
+                          payments.onRampCryptoFoundList[index];
 
-                        Navigator.pop(context);
-                      },
-                      leading: ClipOval(
-                     
-                        child: Image.memory(
-                          base64Decode(
-                            payments.onRamperDetails['icons']
-                                    [_cryptoCurrency['code']]['icon']
-                                .split(',')[1]
-                                .replaceAll("\n", ""),
+                      return Column(
+                        children: [
+                          ListTile(
+                            onTap: () async {
+                              await payments.setSelectedOnrampCryptoCurrency(
+                                  _cryptoCurrency);
+                              widget.changeOnrampCrpto();
+                              await payments.getOnrampEstimateRate(context, {
+                                "fromCurrency":
+                                    payments.selectedOnrampFiatCurrency['code'],
+                                "toCurrency": payments
+                                    .selectedOnrampCryptoCurrency['code'],
+                                "paymentMethod": payments.selectedpaymentmethod,
+                                "amount": payments.amount
+                              });
+                              //asset.getChangeAddress(context, auth, _defaultOnrampNetwork);
+
+                              Navigator.pop(context);
+                            },
+                            leading: ClipOval(
+                              child: Image.memory(
+                                base64Decode(
+                                  payments.onRamperDetails['icons']
+                                          [_cryptoCurrency['code']]['icon']
+                                      .split(',')[1]
+                                      .replaceAll("\n", ""),
+                                ),
+                              ),
+                            ),
+                            title: Text(
+                              '${_cryptoCurrency['code'].toUpperCase()}',
+                              style: TextStyle(
+                                fontSize: 18,
+                              ),
+                            ),
+                            subtitle: Text(
+                              '${_cryptoCurrency['network'] ?? _cryptoCurrency['id']}',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: secondaryTextColor,
+                              ),
+                            ),
                           ),
+                          Divider(),
+                        ],
+                      );
+                    },
+                  )
+                : Center(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 50),
+                child: const Text(
+                          'No results found',
+                          style: TextStyle(fontSize: 24),
                         ),
-                     
-                      ),
-                      title: Text(
-                        '${_cryptoCurrency['code'].toUpperCase()}',
-                        style: TextStyle(
-                          fontSize: 18,
-                        ),
-                      ),
-                      subtitle: Text(
-                        '${_cryptoCurrency['network'] ?? _cryptoCurrency['id']}',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: secondaryTextColor,
-                        ),
-                      ),
-                    ),
-                    Divider(),
-                  ],
-                );
-              },
-            ),
+              ))
           )
         ],
       ),
