@@ -141,7 +141,14 @@ class _OnramperFiatCoinsState extends State<OnramperFiatCoins>
                         // changeFiatCoin(payments, _fiatCurrency);
                         payments.setSelectedOnrampFiatCurrency(_fiatCurrency);
                        // payments.getOnRamperDetails(context);
-                        
+                         await payments.getOnrampEstimateRate(context, {
+                          "fromCurrency":
+                              payments.selectedOnrampFiatCurrency['code'],
+                          "toCurrency":
+                              payments.selectedOnrampCryptoCurrency['code'],
+                          "paymentMethod": payments.selectedpaymentmethod,
+                          "amount": payments.amount
+                        });
                         Navigator.pop(context);
                       },
                       leading: CircleAvatar(

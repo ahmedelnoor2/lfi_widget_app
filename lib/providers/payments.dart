@@ -836,7 +836,7 @@ class Payments with ChangeNotifier {
   }
 
   var selectedpaymentmethod;
-  var amount='';
+  var amount = '';
 
   void setpaymentMethods(data) {
     _paymentMethods = data;
@@ -853,6 +853,12 @@ class Payments with ChangeNotifier {
 
   Map get onRamperDetails {
     return _onRamperDetails;
+  }
+
+  List _onrampfiatlist = [];
+
+  List get onrampfiatlist {
+    return _onrampfiatlist;
   }
 
   Future<void> getOnRamperDetails(ctx) async {
@@ -873,8 +879,9 @@ class Payments with ChangeNotifier {
         _onRamperDetails = responseData['data'];
         _onrampGateways = _onRamperDetails['gateways'];
         _paymentMethods = _onRamperDetails['gateways'][0]['paymentMethods'];
-        selectedpaymentmethod=_onRamperDetails['gateways'][0]['paymentMethods'].first;
-        
+        selectedpaymentmethod =
+            _onRamperDetails['gateways'][0]['paymentMethods'].first;
+
         _defaultOnrampGateway = _onRamperDetails['gateways'][0];
         _onRampIdentifier = _onRamperDetails['gateways'][0]['identifier'];
         _selectedOnrampFiatCurrency = _onRamperDetails['gateways'][0]

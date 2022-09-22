@@ -148,13 +148,20 @@ class _OnramperCryptoCoinsState extends State<OnramperCryptoCoins>
                         await payments
                             .setSelectedOnrampCryptoCurrency(_cryptoCurrency);
                         widget.changeOnrampCrpto();
+                        await payments.getOnrampEstimateRate(context, {
+                          "fromCurrency":
+                              payments.selectedOnrampFiatCurrency['code'],
+                          "toCurrency":
+                              payments.selectedOnrampCryptoCurrency['code'],
+                          "paymentMethod": payments.selectedpaymentmethod,
+                          "amount": payments.amount
+                        });
                         //asset.getChangeAddress(context, auth, _defaultOnrampNetwork);
 
                         Navigator.pop(context);
                       },
-                      leading: CircleAvatar(
-                        radius: 18,
-                        backgroundColor: Colors.transparent,
+                      leading: ClipOval(
+                     
                         child: Image.memory(
                           base64Decode(
                             payments.onRamperDetails['icons']
@@ -163,6 +170,7 @@ class _OnramperCryptoCoinsState extends State<OnramperCryptoCoins>
                                 .replaceAll("\n", ""),
                           ),
                         ),
+                     
                       ),
                       title: Text(
                         '${_cryptoCurrency['code'].toUpperCase()}',

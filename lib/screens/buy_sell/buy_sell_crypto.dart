@@ -54,6 +54,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
   String _defaultOnrampNetwork = 'BTC';
   String _currentOnrampAddress = '';
   bool _selectorFalse = false;
+  bool _validate = false;
 
   @override
   void initState() {
@@ -482,6 +483,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
     }
     print('check.......');
     print(jsonEncode(data));
+
     await payments.callOnrampForm(context, {
       'url': payments.estimateOnrampRate['nextStep']['url'],
       'data': jsonEncode(data)
@@ -526,7 +528,9 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
         return onAndroidBackPress(context);
       },
       child: Scaffold(
+     
         appBar: hiddenAppBar(),
+        resizeToAvoidBottomInset:false,
         body: GestureDetector(
           onTap: () {
             FocusManager.instance.primaryFocus?.unfocus();
@@ -1026,6 +1030,11 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                               width: width * 0.5,
                                               child: TextFormField(
                                                 onChanged: (value) {
+                                                  setState(() {
+                                                    double.parse(value) <= 100
+                                                        ? _validate = true
+                                                        : _validate = false;
+                                                  });
                                                   if (value.isNotEmpty) {
                                                     if (double.parse(value) >=
                                                         100) {
@@ -1034,7 +1043,15 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                                       });
                                                       getEstimateRate(
                                                           payments.amount);
-                                                    } else {}
+                                                    } else if (double.parse(
+                                                            value) <
+                                                        100) {
+                                                      setState(() {
+                                                        payments
+                                                            .estimateOnrampRate
+                                                            .clear();
+                                                      });
+                                                    }
                                                   }
                                                 },
                                                 controller:
@@ -1046,8 +1063,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                                 ),
                                                 style: const TextStyle(
                                                     fontSize: 22),
-                                                decoration:
-                                                    const InputDecoration(
+                                                decoration: InputDecoration(
                                                   contentPadding:
                                                       EdgeInsets.zero,
                                                   isDense: true,
@@ -1058,6 +1074,9 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                                     fontSize: 22,
                                                   ),
                                                   hintText: "0.00",
+                                                  errorText: _validate
+                                                      ? 'Minimum Amount 100'
+                                                      : null,
                                                 ),
                                               ),
                                             ),
@@ -1398,6 +1417,9 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                 onTap: _loadingCoins
                     ? null
                     : () {
+                        setState(() {
+                          _textControllers.clear();
+                        });
                         if (_providerType == 'guardarian') {
                           processBuy();
                         } else {
@@ -1513,12 +1535,17 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                         children: formDatas.isNotEmpty
                             ? formDatas.map<Widget>((formData) {
                                 setState(() {
-                                  _textControllers[formData['name']] =
-                                      TextEditingController();
-                                  if (formData['name'] ==
-                                      'cryptocurrencyAddress') {
-                                    _textControllers[formData['name']]!.text =
-                                        _currentOnrampAddress;
+                                  if (_textControllers[formData['name']] ==
+                                      null) {
+                                    _textControllers[formData['name']] =
+                                        TextEditingController();
+                                    if (formData['name'] ==
+                                        'cryptocurrencyAddress') {
+                                      if (_currentOnrampAddress.isNotEmpty) {
+                                        _textControllers[formData['name']]!
+                                            .text = _currentOnrampAddress;
+                                      }
+                                    }
                                   }
                                 });
 
@@ -1534,6 +1561,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                     ),
                                   ),
                                   child: TextFormField(
+                                    autocorrect: true,
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please enter ${formData['humanName']}';
@@ -1547,7 +1575,6 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                         _textControllers[formData['name']],
                                     decoration: InputDecoration(
                                       contentPadding: EdgeInsets.zero,
-                                      isDense: true,
                                       border: UnderlineInputBorder(
                                         borderSide: BorderSide.none,
                                       ),
