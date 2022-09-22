@@ -167,7 +167,15 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
 
   Future<void> getDigitalBalance() async {
     var auth = Provider.of<Auth>(context, listen: false);
+    var public = Provider.of<Public>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
+
+    if (asset.selectedAsset.isNotEmpty) {
+      setState(() {
+        _defaultCoin =
+            '${public.publicInfoMarket['market']['coinList'][asset.selectedAsset['coin']]['name']}';
+      });
+    }
     await asset.getAccountBalance(context, auth, "");
     getCoinCosts(_defaultCoin);
   }

@@ -959,4 +959,15 @@ class Asset with ChangeNotifier {
       return;
     }
   }
+
+  Map _selectedAsset = {};
+
+  Map get selectedAsset {
+    return _selectedAsset;
+  }
+
+  void setSelectedAsset(asset) {
+    _selectedAsset = asset;
+    return notifyListeners();
+  }
 }

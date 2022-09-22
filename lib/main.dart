@@ -17,6 +17,7 @@ import 'package:lyotrade/screens/assets/assets.dart';
 import 'package:lyotrade/screens/assets/deposit_assets.dart';
 import 'package:lyotrade/screens/assets/digital_assets.dart';
 import 'package:lyotrade/screens/assets/margin_assets.dart';
+import 'package:lyotrade/screens/assets/asset_details.dart';
 import 'package:lyotrade/screens/assets/margin_transactions.dart';
 import 'package:lyotrade/screens/assets/otc_assets.dart';
 import 'package:lyotrade/screens/assets/p2p_transactions.dart';
@@ -270,6 +271,7 @@ class MyApp extends StatelessWidget {
               DepositAssets.routeName: (context) => const DepositAssets(),
               WithdrawAssets.routeName: (context) => const WithdrawAssets(),
               TransferAssets.routeName: (context) => const TransferAssets(),
+              AssetDetails.routeName: (context) => const AssetDetails(),
               Security.routeName: (context) => const Security(),
               Phone.routeName: (context) => const Phone(),
               Password.routeName: (context) => const Password(),
@@ -312,7 +314,8 @@ class MyApp extends StatelessWidget {
               Createpassword.routeName: (context) => const Createpassword(),
               SpashScreen.routeName: (context) => const SpashScreen(),
               Setting.routeName: ((context) => const Setting()),
-              FutureMarketTransaction.routeName:(context) => const FutureMarketTransaction(),
+              FutureMarketTransaction.routeName: (context) =>
+                  const FutureMarketTransaction(),
             },
           );
         },
