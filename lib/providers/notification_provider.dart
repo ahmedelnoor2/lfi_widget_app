@@ -115,7 +115,6 @@ class Notificationprovider extends ChangeNotifier {
       apiUrl,
       '$exApi/message/message_del',
     );
-    print(url);
 
     var data = {"ids": "$id"};
 
@@ -123,10 +122,8 @@ class Notificationprovider extends ChangeNotifier {
     try {
       isdeleteloading = true;
       final response = await http.post(url, headers: headers, body: body);
-      print(response.statusCode);
       final responseData = json.decode(response.body);
 
-      print(responseData);
       if (responseData['msg'] == 'success') {
         isdeleteloading = false;
         snackAlert(
@@ -192,7 +189,6 @@ class Notificationprovider extends ChangeNotifier {
       isdeleteloading = true;
       final response = await http.post(url, headers: headers, body: body);
       final responseData = json.decode(response.body);
-      print(responseData);
 
       if (responseData['code'] == '0') {
         _readCountResponse =
