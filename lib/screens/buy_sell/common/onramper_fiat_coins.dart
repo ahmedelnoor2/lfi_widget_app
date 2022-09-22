@@ -103,6 +103,9 @@ class _OnramperFiatCoinsState extends State<OnramperFiatCoins>
                     width: width * 0.75,
                     child: TextFormField(
                       controller: _searchController,
+                      onChanged: ((value) {
+                        payments.runFilter(value);
+                      }),
                       style: const TextStyle(fontSize: 15),
                       decoration: const InputDecoration(
                         contentPadding: EdgeInsets.zero,
@@ -124,15 +127,11 @@ class _OnramperFiatCoinsState extends State<OnramperFiatCoins>
           Divider(),
           SizedBox(
             height: height * 0.716,
-            child: ListView.builder(
+            child:payments.onrampfoundlist.isNotEmpty? ListView.builder(
               // shrinkWrap: true,
-              itemCount: payments.onRamperDetails.isNotEmpty
-                  ? payments
-                      .onRamperDetails['gateways'][0]['fiatCurrencies'].length
-                  : 0,
+              itemCount: payments.onrampfoundlist.length,
               itemBuilder: (context, index) {
-                var _fiatCurrency = payments.onRamperDetails['gateways'][0]
-                    ['fiatCurrencies'][index];
+                var _fiatCurrency = payments.onrampfoundlist[index];
 
                 return Column(
                   children: [
@@ -140,8 +139,8 @@ class _OnramperFiatCoinsState extends State<OnramperFiatCoins>
                       onTap: () async {
                         // changeFiatCoin(payments, _fiatCurrency);
                         payments.setSelectedOnrampFiatCurrency(_fiatCurrency);
-                       // payments.getOnRamperDetails(context);
-                         await payments.getOnrampEstimateRate(context, {
+                        // payments.getOnRamperDetails(context);
+                        await payments.getOnrampEstimateRate(context, {
                           "fromCurrency":
                               payments.selectedOnrampFiatCurrency['code'],
                           "toCurrency":
@@ -181,6 +180,14 @@ class _OnramperFiatCoinsState extends State<OnramperFiatCoins>
                   ],
                 );
               },
+            ): Center(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 50),
+                child: const Text(
+                          'No results found',
+                          style: TextStyle(fontSize: 24),
+                        ),
+              ),
             ),
           )
         ],

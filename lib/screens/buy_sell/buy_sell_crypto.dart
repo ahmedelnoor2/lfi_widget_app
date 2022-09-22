@@ -58,6 +58,9 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
 
   @override
   void initState() {
+    
+
+
     getCurrencies();
     getOnRamperDetails();
 
@@ -89,6 +92,11 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
       getEstimateRate(payments.onRamperDetails['defaultAmounts']
           [payments.selectedOnrampFiatCurrency['code']]);
     }
+    
+    setState(() {
+      payments.onrampfoundlist=payments.onrampfiatlist;
+      payments.onRampCryptoFoundList=payments.onRampCryptoList;
+    });
   }
 
   Future<void> getEstimateRate(amount) async {
