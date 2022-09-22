@@ -314,23 +314,23 @@ class _DepositAssetsState extends State<DepositAssets> {
                             color: secondaryTextColor,
                           ),
                         ),
-                        // Container(
-                        //   padding: EdgeInsets.only(right: 5),
-                        //   child: Text('Fee:'),
-                        // ),
-                        // Container(
-                        //   padding: EdgeInsets.only(right: 5),
-                        //   child: Text(
-                        //     '${asset.getCost['defaultFee']}',
-                        //     style: TextStyle(
-                        //       color: linkColor,
-                        //     ),
-                        //   ),
-                        // ),
-                        // Container(
-                        //   padding: EdgeInsets.only(right: 5),
-                        //   child: Text(getCoinName(_defaultCoin)),
-                        // ),
+                        Container(
+                          padding: EdgeInsets.only(right: 5),
+                          child: Text('Fee:'),
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(right: 5),
+                          child: Text(
+                            '${asset.getCost['defaultFee']}',
+                            style: TextStyle(
+                              color: linkColor,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(right: 5),
+                          child: Text(getCoinName(_defaultCoin)),
+                        ),
                       ],
                     ),
                   ),
