@@ -400,30 +400,112 @@ class _PixPaymentDetailsState extends State<PixPaymentDetails>
                                       ],
                                     ),
                                   ),
-                                  Container(
-                                    padding: EdgeInsets.all(10),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          getPortugeseTrans('TAX Amount'),
-                                          style: TextStyle(
-                                            color: secondaryTextColor,
+                                  InkWell(
+                                    onTap: () {
+                                      showModalBottomSheet<void>(
+                                        useRootNavigator: true,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.vertical(
+                                            top: Radius.circular(25.0),
                                           ),
                                         ),
-                                        Row(
-                                          children: [
-                                            Container(
-                                              padding:
-                                                  EdgeInsets.only(right: 5),
-                                              child: Text(
-                                                '1.62 BRL',
-                                              ),
+                                        isScrollControlled: true,
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return StatefulBuilder(
+                                            builder: (BuildContext context,
+                                                StateSetter setState) {
+                                              return Container(
+                                                padding: EdgeInsets.only(
+                                                    right: 10, left: 10),
+                                                child: Container(
+                                                  padding: EdgeInsets.only(
+                                                      bottom: 30),
+                                                  child: Column(
+                                                    children: [
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Text(
+                                                            'Network Fee',
+                                                            style: TextStyle(
+                                                              fontSize: 20,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                          IconButton(
+                                                            onPressed: () {
+                                                              FocusManager
+                                                                  .instance
+                                                                  .primaryFocus
+                                                                  ?.unfocus();
+                                                              if (_timer !=
+                                                                  null) {
+                                                                _timer!
+                                                                    .cancel();
+                                                              }
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                            icon: Icon(
+                                                              Icons.close,
+                                                              size: 20,
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                      Container(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                top: 10),
+                                                        child: Text(
+                                                          'During transfering USDT to your wallet there will be a network fee charged between 1.2 USDT to 20.2 USDT, which depends directly on blockchain network',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  warningColor),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.all(10),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            getPortugeseTrans('Network Fee:'),
+                                            style: TextStyle(
+                                              color: warningColor,
                                             ),
-                                          ],
-                                        ),
-                                      ],
+                                          ),
+                                          Row(
+                                            children: [
+                                              Container(
+                                                padding:
+                                                    EdgeInsets.only(right: 5),
+                                                child: Text(
+                                                  '1.2 USDT - 20.2 USDT',
+                                                  style: TextStyle(
+                                                    color: warningColor,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],

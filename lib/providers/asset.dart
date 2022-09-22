@@ -932,6 +932,10 @@ class Asset with ChangeNotifier {
     return _searchallcoin;
   }
 
+  void setSearchAllCoin() {
+    _searchallcoin = [];
+  }
+
   Future<void> filterCoin(
     query,
     digitalAssetslist,

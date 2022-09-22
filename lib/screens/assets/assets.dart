@@ -364,6 +364,7 @@ class _AssetsState extends State<Assets> {
                                 itemBuilder: (BuildContext context, int index) {
                                   return InkWell(
                                     onTap: () {
+                                      asset.setSearchAllCoin();
                                       Navigator.pushNamed(context,
                                           '${_accounts[index]['path']}');
                                     },

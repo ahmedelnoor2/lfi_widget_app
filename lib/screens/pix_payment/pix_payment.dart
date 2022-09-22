@@ -679,7 +679,7 @@ class _PixPaymentState extends State<PixPayment>
                                 ),
                                 Container(
                                   child: Text(
-                                    '${payments.pixCurrencyCommission}% ${getPortugeseTrans('Fee')}, ${getPortugeseTrans('Real-time payment')}',
+                                    '1% ${getPortugeseTrans('Fee')}, ${getPortugeseTrans('Real-time payment')}',
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: secondaryTextColor,
@@ -692,6 +692,13 @@ class _PixPaymentState extends State<PixPayment>
                         ],
                       ),
                     ),
+                    Container(
+                      padding: EdgeInsets.only(top: 15),
+                      child: Text(
+                        'Note: There will be a network fee charge between 1.2 USDT to 10 USDT during transfer USDT assets to your wallet. This fee depends on the blockchain network.',
+                        style: TextStyle(color: warningColor),
+                      ),
+                    )
                   ],
                 ),
                 Container(
