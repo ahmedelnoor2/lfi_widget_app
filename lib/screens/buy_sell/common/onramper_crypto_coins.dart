@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_memory_image/cached_memory_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/animation/animation_controller.dart';
 import 'package:flutter/src/foundation/key.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/ticker_provider.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/payments.dart';
+import 'package:lyotrade/screens/common/widget/loading_dialog.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
@@ -23,21 +25,17 @@ class OnramperCryptoCoins extends StatefulWidget {
   State<OnramperCryptoCoins> createState() => _OnramperCryptoCoinsState();
 }
 
-class _OnramperCryptoCoinsState extends State<OnramperCryptoCoins>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+class _OnramperCryptoCoinsState extends State<OnramperCryptoCoins> {
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this);
   }
 
   @override
   void dispose() {
     super.dispose();
-    _controller.dispose();
   }
 
   @override
@@ -46,7 +44,6 @@ class _OnramperCryptoCoinsState extends State<OnramperCryptoCoins>
     height = MediaQuery.of(context).size.height;
 
     var payments = Provider.of<Payments>(context, listen: true);
-    var asset = Provider.of<Asset>(context, listen: true);
 
     return Container(
       height: height,
@@ -109,10 +106,10 @@ class _OnramperCryptoCoinsState extends State<OnramperCryptoCoins>
                   SizedBox(
                     width: width * 0.75,
                     child: TextFormField(
-                      controller: _searchController,
                       onChanged: ((value) {
                         payments.runCryptoFilter(value);
                       }),
+                      controller: _searchController,
                       style: const TextStyle(fontSize: 15),
                       decoration: const InputDecoration(
                         contentPadding: EdgeInsets.zero,
@@ -132,74 +129,81 @@ class _OnramperCryptoCoinsState extends State<OnramperCryptoCoins>
             ),
           ),
           Divider(),
-          SizedBox(
-            height: height * 0.716,
-            child: payments.onRampCryptoFoundList.isNotEmpty
-                ? ListView.builder(
-                    // shrinkWrap: true,
-                    itemCount: payments.onRampCryptoFoundList.length,
+          Expanded(
+              child: payments.onRampCryptoFoundList.isNotEmpty
+                  ? Stack(
+                      children: [
+                        ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: payments.onRampCryptoFoundList.length,
+                          itemBuilder: (context, index) {
+                            var _cryptoCurrency =
+                                payments.onRampCryptoFoundList[index];
 
-                    itemBuilder: (context, index) {
-                      var _cryptoCurrency =
-                          payments.onRampCryptoFoundList[index];
-
-                      return Column(
-                        children: [
-                          ListTile(
-                            onTap: () async {
-                              await payments.setSelectedOnrampCryptoCurrency(
-                                  _cryptoCurrency);
-                              widget.changeOnrampCrpto();
-                              await payments.getOnrampEstimateRate(context, {
-                                "fromCurrency":
-                                    payments.selectedOnrampFiatCurrency['code'],
-                                "toCurrency": payments
-                                    .selectedOnrampCryptoCurrency['code'],
-                                "paymentMethod": payments.selectedpaymentmethod,
-                                "amount": payments.amount
-                              });
-                              //asset.getChangeAddress(context, auth, _defaultOnrampNetwork);
-
-                              Navigator.pop(context);
-                            },
-                            leading: ClipOval(
-                              child: Image.memory(
-                                base64Decode(
-                                  payments.onRamperDetails['icons']
-                                          [_cryptoCurrency['code']]['icon']
-                                      .split(',')[1]
-                                      .replaceAll("\n", ""),
+                            return Column(
+                              children: [
+                                ListTile(
+                                  onTap: () async {
+                                    await payments
+                                        .setSelectedOnrampCryptoCurrency(
+                                            _cryptoCurrency);
+                                    widget.changeOnrampCrpto();
+                                    await payments
+                                        .getOnrampEstimateRate(context, {
+                                      "fromCurrency": payments
+                                          .selectedOnrampFiatCurrency['code'],
+                                      "toCurrency": payments
+                                          .selectedOnrampCryptoCurrency['code'],
+                                      "paymentMethod":
+                                          payments.selectedpaymentmethod,
+                                      "amount": payments.amount
+                                    });
+                                    Navigator.pop(context);
+                                  },
+                                  leading: ClipOval(
+                                      child: Container(
+                                    color: Colors.transparent,
+                                    child: CachedMemoryImage(
+                                      uniqueKey: _cryptoCurrency.toString(),
+                                      base64: payments.onRamperDetails['icons']
+                                              [_cryptoCurrency['code']]['icon']
+                                          .split(',')[1]
+                                          .replaceAll("\n", ""),
+                                    ),
+                                  )),
+                                  title: Text(
+                                    '${_cryptoCurrency['code'].toUpperCase()}',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                  subtitle: Text(
+                                    '${_cryptoCurrency['network'] ?? _cryptoCurrency['id']}',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: secondaryTextColor,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                            title: Text(
-                              '${_cryptoCurrency['code'].toUpperCase()}',
-                              style: TextStyle(
-                                fontSize: 18,
-                              ),
-                            ),
-                            subtitle: Text(
-                              '${_cryptoCurrency['network'] ?? _cryptoCurrency['id']}',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: secondaryTextColor,
-                              ),
-                            ),
-                          ),
-                          Divider(),
-                        ],
-                      );
-                    },
-                  )
-                : Center(
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 50),
-                child: const Text(
-                          'No results found',
-                          style: TextStyle(fontSize: 24),
+                                Divider(),
+                              ],
+                            );
+                          },
                         ),
-              ))
-          )
+                        payments.isLoadingEstimate
+                            ? Center(
+                              child: CircularProgressIndicator(),
+                            )
+                            : Container()
+                      ],
+                    )
+                  : Align(
+                      alignment: Alignment.topCenter,
+                      child: const Text(
+                        'No results found',
+                        style: TextStyle(fontSize: 24),
+                      ),
+                    ))
         ],
       ),
     );

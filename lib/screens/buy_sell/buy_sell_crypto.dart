@@ -47,6 +47,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
   Map<dynamic, TextEditingController> _textControllers = {};
 
   bool _loadingCoins = false;
+  bool _loadOnramp = false;
   String _defaultNetwork = '';
   String _currentAddress = '';
   String _providerType = 'guardarian';
@@ -58,9 +59,6 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
 
   @override
   void initState() {
-    
-
-
     getCurrencies();
     getOnRamperDetails();
 
@@ -77,6 +75,9 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
   }
 
   Future<void> getOnRamperDetails() async {
+    setState(() {
+      _loadOnramp = true;
+    });
     var payments = Provider.of<Payments>(context, listen: false);
 
     await payments.getOnRamperDetails(context);
@@ -92,10 +93,14 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
       getEstimateRate(payments.onRamperDetails['defaultAmounts']
           [payments.selectedOnrampFiatCurrency['code']]);
     }
-    
+
     setState(() {
-      payments.onrampfoundlist=payments.onrampfiatlist;
-      payments.onRampCryptoFoundList=payments.onRampCryptoList;
+      payments.onrampfoundlist = payments.onrampfiatlist;
+      payments.onRampCryptoFoundList = payments.onRampCryptoList;
+    });
+
+    setState(() {
+      _loadOnramp = false;
     });
   }
 
@@ -536,9 +541,8 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
         return onAndroidBackPress(context);
       },
       child: Scaffold(
-     
         appBar: hiddenAppBar(),
-        resizeToAvoidBottomInset:false,
+        resizeToAvoidBottomInset: false,
         body: GestureDetector(
           onTap: () {
             FocusManager.instance.primaryFocus?.unfocus();
@@ -557,6 +561,8 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                             padding: EdgeInsets.only(right: 10),
                             child: IconButton(
                               onPressed: () {
+                                payments.setonRampIdentifier('');
+                                payments.setTappedIdentifier(0);
                                 Navigator.pop(context);
                               },
                               icon: Icon(Icons.chevron_left),
@@ -988,7 +994,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    'Estimated rate',
+                                    'Estimate rate',
                                     style: TextStyle(
                                       color: secondaryTextColor,
                                     ),
@@ -1303,7 +1309,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                         ),
                 ],
               ),
-              _providerType == 'onramper'
+              (_providerType == 'onramper' && !_loadOnramp)
                   ? Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Column(

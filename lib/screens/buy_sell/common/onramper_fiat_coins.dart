@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_memory_image/cached_memory_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/animation/animation_controller.dart';
 import 'package:flutter/src/foundation/key.dart';
@@ -125,70 +126,80 @@ class _OnramperFiatCoinsState extends State<OnramperFiatCoins>
             ),
           ),
           Divider(),
-          SizedBox(
-            height: height * 0.716,
-            child:payments.onrampfoundlist.isNotEmpty? ListView.builder(
-              // shrinkWrap: true,
-              itemCount: payments.onrampfoundlist.length,
-              itemBuilder: (context, index) {
-                var _fiatCurrency = payments.onrampfoundlist[index];
+          Expanded(
+            child: payments.onrampfoundlist.isNotEmpty
+                ? Stack(
+                    children: [
+                      ListView.builder(
+                        // shrinkWrap: true,
+                        itemCount: payments.onrampfoundlist.length,
+                        itemBuilder: (context, index) {
+                          var _fiatCurrency = payments.onrampfoundlist[index];
 
-                return Column(
-                  children: [
-                    ListTile(
-                      onTap: () async {
-                        // changeFiatCoin(payments, _fiatCurrency);
-                        payments.setSelectedOnrampFiatCurrency(_fiatCurrency);
-                        // payments.getOnRamperDetails(context);
-                        await payments.getOnrampEstimateRate(context, {
-                          "fromCurrency":
-                              payments.selectedOnrampFiatCurrency['code'],
-                          "toCurrency":
-                              payments.selectedOnrampCryptoCurrency['code'],
-                          "paymentMethod": payments.selectedpaymentmethod,
-                          "amount": payments.amount
-                        });
-                        Navigator.pop(context);
-                      },
-                      leading: CircleAvatar(
-                        radius: 18,
-                        backgroundColor: Colors.white,
-                        child: Image.memory(
-                          base64Decode(
-                            payments.onRamperDetails['icons']
-                                    [_fiatCurrency['code']]['icon']
-                                .split(',')[1]
-                                .replaceAll("\n", ""),
-                          ),
-                        ),
+                          return Column(
+                            children: [
+                              ListTile(
+                                onTap: () async {
+                                  // changeFiatCoin(payments, _fiatCurrency);
+                                  payments.setSelectedOnrampFiatCurrency(
+                                      _fiatCurrency);
+                                  // payments.getOnRamperDetails(context);
+                                  await payments
+                                      .getOnrampEstimateRate(context, {
+                                    "fromCurrency": payments
+                                        .selectedOnrampFiatCurrency['code'],
+                                    "toCurrency": payments
+                                        .selectedOnrampCryptoCurrency['code'],
+                                    "paymentMethod":
+                                        payments.selectedpaymentmethod,
+                                    "amount": payments.amount
+                                  });
+                                  Navigator.pop(context);
+                                },
+                                leading: CircleAvatar(
+                                  radius: 18,
+                                  backgroundColor: Colors.white,
+                                  child: CachedMemoryImage(
+                                    uniqueKey: _fiatCurrency.toString(),
+                                    base64: payments.onRamperDetails['icons']
+                                            [_fiatCurrency['code']]['icon']
+                                        .split(',')[1]
+                                        .replaceAll("\n", ""),
+                                  ),
+                                ),
+                                title: Text(
+                                  '${_fiatCurrency['code'].toUpperCase()}',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  '${_fiatCurrency['code']}',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: secondaryTextColor,
+                                  ),
+                                ),
+                              ),
+                              Divider(),
+                            ],
+                          );
+                        },
                       ),
-                      title: Text(
-                        '${_fiatCurrency['code'].toUpperCase()}',
-                        style: TextStyle(
-                          fontSize: 18,
-                        ),
-                      ),
-                      subtitle: Text(
-                        '${_fiatCurrency['code']}',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: secondaryTextColor,
-                        ),
-                      ),
+                      payments.isLoadingEstimate
+                          ? Center(
+                              child: CircularProgressIndicator(),
+                            )
+                          : Container()
+                    ],
+                  )
+                : Align(
+                    alignment: Alignment.topCenter,
+                    child: const Text(
+                      'No results found',
+                      style: TextStyle(fontSize: 24),
                     ),
-                    Divider(),
-                  ],
-                );
-              },
-            ): Center(
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 50),
-                child: const Text(
-                          'No results found',
-                          style: TextStyle(fontSize: 24),
-                        ),
-              ),
-            ),
+                  ),
           )
         ],
       ),
