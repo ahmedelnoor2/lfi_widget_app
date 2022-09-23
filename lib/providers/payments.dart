@@ -846,7 +846,6 @@ class Payments with ChangeNotifier {
     return notifyListeners();
   }
 
-
   List _paymentMethods = [];
 
   List get paymentMethods {
@@ -861,7 +860,6 @@ class Payments with ChangeNotifier {
     return notifyListeners();
   }
 
-  
   // get on ramper details
   Map _onRamperDetails = {};
 
@@ -917,7 +915,7 @@ class Payments with ChangeNotifier {
     } catch (error) {
       print(error);
       _onRamperDetails = {};
-      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again.');
+      // snackAlert(ctx, SnackTypes.errors, 'Server error, please try again.');
       return notifyListeners();
     }
   }

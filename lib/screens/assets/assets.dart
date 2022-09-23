@@ -12,9 +12,6 @@ import 'package:provider/provider.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Number.utils.dart';
 
-// import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
-// import 'package:ndef/ndef.dart' as ndef;
-
 class Assets extends StatefulWidget {
   static const routeName = '/assets';
   const Assets({Key? key}) : super(key: key);
@@ -97,12 +94,6 @@ class _AssetsState extends State<Assets> {
         'icon': 'stake.png',
         'name': 'Staking',
         'path': '/staking',
-        'balance': '0',
-      },
-      {
-        'icon': 'stake.png',
-        'name': 'Scan Tab',
-        'path': '/scan_tag',
         'balance': '0',
       },
     ];
@@ -373,13 +364,9 @@ class _AssetsState extends State<Assets> {
                                 itemBuilder: (BuildContext context, int index) {
                                   return InkWell(
                                     onTap: () {
-                                      if (_accounts[index]['path'] ==
-                                          '/scan_tag') {
-                                      } else {
                                         asset.setSearchAllCoin();
                                         Navigator.pushNamed(context,
                                             '${_accounts[index]['path']}');
-                                      }
                                     },
                                     child: Card(
                                       child: ListTile(

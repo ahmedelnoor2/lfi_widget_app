@@ -206,7 +206,7 @@ class Notificationprovider extends ChangeNotifier {
         return;
       }
     } catch (error) {
-      snackAlert(ctx, SnackTypes.errors, 'Server Error.');
+      // snackAlert(ctx, SnackTypes.errors, 'Server Error.');
       return;
     }
   }

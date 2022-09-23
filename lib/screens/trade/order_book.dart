@@ -44,7 +44,7 @@ class _OrderBookState extends State<OrderBook> {
         : [];
     List? bids = List.from(rbids!);
 
-    var bidMax = bids!.isNotEmpty
+    var bidMax = bids.isNotEmpty
         ? (bids.reduce((current, next) =>
             double.parse('${current[1]}') > double.parse('${next[1]}')
                 ? current
