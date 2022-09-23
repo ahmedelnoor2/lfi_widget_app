@@ -43,7 +43,7 @@ class _IntroScreenState extends State<IntroScreen> {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 80, right: 30),
+            padding: const EdgeInsets.only(top: 50, right: 30),
             child: InkWell(
               onTap: () {
                 goHomepage(context);

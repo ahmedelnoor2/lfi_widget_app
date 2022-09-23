@@ -241,8 +241,19 @@ class Payments with ChangeNotifier {
     return _estimateOnrampRate;
   }
 
+  bool _isLoadingEstimate = false;
+
+  bool get isLoadingEstimate {
+    return _isLoadingEstimate;
+  }
+
+  void setisLoadingEstimate(value) {
+    _isLoadingEstimate = value;
+    return notifyListeners();
+  }
+
   Future<void> getOnrampEstimateRate(ctx, formData) async {
-    _estimateLoader = true;
+    _isLoadingEstimate = true;
     notifyListeners();
 
     var url = Uri.https(
@@ -260,7 +271,8 @@ class Payments with ChangeNotifier {
       if (responseData['code'] == '0') {
         if (responseData['data'].isNotEmpty) {
           _estimateOnrampRate = responseData['data'][0];
-          _estimateLoader = false;
+          _isLoadingEstimate = false;
+
           return notifyListeners();
         } else {
           snackAlert(ctx, SnackTypes.errors, 'This pair is not supported');
@@ -271,20 +283,20 @@ class Payments with ChangeNotifier {
       } else if ((responseData['code'] == '400') ||
           (responseData['code'] == '500')) {
         snackAlert(ctx, SnackTypes.errors, responseData['msg']);
-        _estimateLoader = false;
+        _isLoadingEstimate = false;
         return notifyListeners();
       } else {
         _estimateRate = {
           'rate': 0,
         };
-        _estimateLoader = false;
+        _isLoadingEstimate = false;
         return notifyListeners();
       }
     } catch (error) {
       _estimateRate = {
         'rate': 0,
       };
-      _estimateLoader = false;
+      _isLoadingEstimate = false;
       // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
       return notifyListeners();
     }
@@ -829,6 +841,12 @@ class Payments with ChangeNotifier {
     return _onrampGateways;
   }
 
+  void setOnrampGateways(gateways) {
+    _onrampGateways = gateways;
+    return notifyListeners();
+  }
+
+
   List _paymentMethods = [];
 
   List get paymentMethods {
@@ -843,11 +861,7 @@ class Payments with ChangeNotifier {
     return notifyListeners();
   }
 
-  void setOnrampGateways(gateways) {
-    _onrampGateways = gateways;
-    return notifyListeners();
-  }
-
+  
   // get on ramper details
   Map _onRamperDetails = {};
 
@@ -930,7 +944,6 @@ class Payments with ChangeNotifier {
   }
 
   void runCryptoFilter(String enteredKeyword) {
-
     List results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -941,7 +954,7 @@ class Payments with ChangeNotifier {
           .where((item) =>
               item['code'].toLowerCase().contains(enteredKeyword.toLowerCase()))
           .toList();
-       print(results);
+      print(results);
       // we use the toLowerCase() method to make it case-insensitive
     }
 
