@@ -37,11 +37,12 @@ class _OrderBookState extends State<OrderBook> {
             : widget.asks
         : [];
     List? asks = List.from(rasks!.reversed);
-    List? bids = widget.bids!.isNotEmpty
-        ? widget.asks!.length > 6
+    List? rbids = widget.bids!.isNotEmpty
+        ? widget.bids!.length > 6
             ? widget.bids!.sublist(0, 6)
             : widget.bids
         : [];
+    List? bids = List.from(rbids!);
 
     var bidMax = bids!.isNotEmpty
         ? (bids.reduce((current, next) =>
