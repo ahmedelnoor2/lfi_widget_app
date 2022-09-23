@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:lyotrade/screens/common/alert.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
+import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/Translate.utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -557,6 +559,19 @@ class Payments with ChangeNotifier {
         snackAlert(ctx, SnackTypes.success, 'Resent KYC verifcation');
         return notifyListeners();
       } else {
+        showAlert(
+          ctx,
+          Icon(
+            Icons.warning,
+            color: warningColor,
+          ),
+          'Error',
+          [
+            const Text(
+                'Failed to resend KYC verification, try again or contact to the support')
+          ],
+          'Ok',
+        );
         snackAlert(
           ctx,
           SnackTypes.errors,
@@ -566,6 +581,19 @@ class Payments with ChangeNotifier {
         return notifyListeners();
       }
     } catch (error) {
+      showAlert(
+        ctx,
+        Icon(
+          Icons.warning,
+          color: warningColor,
+        ),
+        'Error',
+        [
+          const Text(
+              'Failed to resend KYC verification, try again or contact to the support')
+        ],
+        'Ok',
+      );
       snackAlert(
         ctx,
         SnackTypes.errors,
