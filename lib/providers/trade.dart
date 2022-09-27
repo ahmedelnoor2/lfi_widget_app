@@ -358,14 +358,14 @@ class Trading with ChangeNotifier {
   }
 
   Future<void> futureOrderHistory(ctx, auth, formData) async {
-    print("i am calling...");
+    
     headers['exchange-token'] = auth.loginVerificationToken;
 
     var url = Uri.https(
       futApiUrl,
       '$futExApi/order/history_order_list',
     );
-    print(url);
+    
     var postData = json.encode(formData);
 
     try {
@@ -389,7 +389,7 @@ class Trading with ChangeNotifier {
       } else {
         _isFuturehistoruyloading = false;
         notifyListeners();
-        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
+       print(getTranslate(responseData['msg']));
 
         return;
       }

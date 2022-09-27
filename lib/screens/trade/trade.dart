@@ -44,6 +44,7 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
   ];
   late final TabController _tabController =
       TabController(length: _tabs.length, vsync: this);
+  
 
   @override
   void initState() {

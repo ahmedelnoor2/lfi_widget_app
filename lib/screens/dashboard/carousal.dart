@@ -103,7 +103,7 @@ class _CarousalState extends State<Carousal> {
                               'assets/img/${slider['file']['link']}',
                               fit: BoxFit.fill,
                             )
-                          : Image.network(
+                          :Image.network(
                               '${slider['file']['link']}',
                               fit: BoxFit.fill,
                             ),

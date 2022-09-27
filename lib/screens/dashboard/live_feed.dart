@@ -67,7 +67,7 @@ class _LiveFeedState extends State<LiveFeed> {
                       child: Text(
                         '${getMarketName(market['market'])}',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 12,
                           color: secondaryTextColor,
                         ),
                       ),
