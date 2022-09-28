@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/Number.utils.dart';
@@ -21,6 +23,19 @@ class OrderBook extends StatefulWidget {
 }
 
 class _OrderBookState extends State<OrderBook> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+   
+
+  }
+  var precsionitems = [   
+    '0.00001',
+    '0.001',
+    '0.1',
+  ];
+
   void setPriceField(public, value) {
     public.setAmountField(value);
   }
@@ -122,21 +137,27 @@ class _OrderBookState extends State<OrderBook> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                double.parse('${asks[index][0] ?? 0}')
-                                    .toStringAsPrecision(7),
-                                style: TextStyle(
-                                  color: redIndicator,
-                                  fontSize: 15,
+                              FittedBox(
+                                fit: BoxFit.cover,
+                                child: Text(
+                                  double.parse('${asks[index][0] ?? 0}')
+                                      .toStringAsPrecision(7),
+                                  style: TextStyle(
+                                    color: redIndicator,
+                                   
+                                  ),
                                 ),
                               ),
-                              Text(
-                                double.parse('${asks[index][1] ?? 0}') > 10
-                                    ? double.parse('${asks[index][1] ?? 0}')
-                                        .toStringAsFixed(2)
-                                    : double.parse('${asks[index][1] ?? 0}')
-                                        .toStringAsPrecision(4),
-                                style: TextStyle(fontSize: 15),
+                              FittedBox(
+                                fit: BoxFit.cover,
+                                child: Text(
+                                  double.parse('${asks[index][1] ?? 0}') > 10
+                                      ? double.parse('${asks[index][1] ?? 0}')
+                                          .toStringAsFixed(2)
+                                      : double.parse('${asks[index][1] ?? 0}')
+                                          .toStringAsPrecision(4),
+                                  style: TextStyle(fontSize: 15),
+                                ),
                               ),
                             ],
                           ),
@@ -195,21 +216,29 @@ class _OrderBookState extends State<OrderBook> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                double.parse('${bids[index][0] ?? 0}')
-                                    .toStringAsPrecision(7),
-                                style: TextStyle(
-                                  color: greenIndicator,
-                                  fontSize: 15,
+                              FittedBox(
+                                
+                      fit: BoxFit.cover,
+                                child: Text(
+                                  double.parse('${bids[index][0] ?? 0}')
+                                      .toStringAsPrecision(7),
+                                  style: TextStyle(
+                                    color: greenIndicator,
+                                
+                                  ),
                                 ),
                               ),
-                              Text(
-                                double.parse('${bids[index][1] ?? 0}') > 10
-                                    ? double.parse('${bids[index][1] ?? 0}')
-                                        .toStringAsFixed(2)
-                                    : double.parse('${bids[index][1] ?? 0}')
-                                        .toStringAsPrecision(4),
-                                style: TextStyle(fontSize: 15),
+                              FittedBox(
+                                
+                      fit: BoxFit.cover,
+                                child: Text(
+                                  double.parse('${bids[index][1] ?? 0}') > 10
+                                      ? double.parse('${bids[index][1] ?? 0}')
+                                          .toStringAsFixed(2)
+                                      : double.parse('${bids[index][1] ?? 0}')
+                                          .toStringAsPrecision(4),
+                                  
+                                ),
                               ),
                             ],
                           ),

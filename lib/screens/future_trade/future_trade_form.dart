@@ -27,7 +27,7 @@ class FutureTradeForm extends StatefulWidget {
 }
 
 class _FutureTradeFormState extends State<FutureTradeForm> {
-  final _formTradeKey = GlobalKey<FormState>();
+  GlobalKey<FormState>  _formTradeKey3 = GlobalKey<FormState>();
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _amountField = TextEditingController();
   final TextEditingController _priceField = TextEditingController();
@@ -288,7 +288,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
     var auth = Provider.of<Auth>(context, listen: true);
 
     return Form(
-      key: _formTradeKey,
+      key: _formTradeKey3,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -1102,7 +1102,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                 child: ElevatedButton(
                   onPressed: () {
                     if (auth.isAuthenticated) {
-                      if (_formTradeKey.currentState!.validate()) {
+                      if (_formTradeKey3.currentState!.validate()) {
                         createOrder('BUY');
                         // snackAlert(
                         //     context, SnackTypes.warning, 'Coming Soon...');
@@ -1145,7 +1145,7 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (auth.isAuthenticated) {
-                            if (_formTradeKey.currentState!.validate()) {
+                            if (_formTradeKey3.currentState!.validate()) {
                               createOrder('SELL');
                             } else {
                               // widget.scaffoldKey!.currentState.hideCurrentSnackBar();

@@ -83,19 +83,17 @@ class _TradeFormState extends State<TradeForm> {
         auth,
         "${public.activeMarket['showName'].split('/')[0]},${public.activeMarket['showName'].split('/')[1]}",
       );
-      if (this.mounted) {
-        setState(() {
-          _availableBalance = _isBuy
-              ? double.parse(asset.accountBalance['allCoinMap']
-                          [public.activeMarket['name'].split('/')[1]]
-                      ['normal_balance'])
-                  .toStringAsPrecision(6)
-              : double.parse(asset.accountBalance['allCoinMap']
-                          [public.activeMarket['name'].split('/')[0]]
-                      ['normal_balance'])
-                  .toStringAsPrecision(6);
-        });
-      }
+      setState(() {
+        _availableBalance = _isBuy
+            ? double.parse(asset.accountBalance['allCoinMap']
+                        [public.activeMarket['name'].split('/')[1]]
+                    ['normal_balance'])
+                .toStringAsPrecision(6)
+            : double.parse(asset.accountBalance['allCoinMap']
+                        [public.activeMarket['name'].split('/')[0]]
+                    ['normal_balance'])
+                .toStringAsPrecision(6);
+      });
     }
   }
 

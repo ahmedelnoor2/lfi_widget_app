@@ -25,12 +25,24 @@ class _OpenOrdersState extends State<OpenOrders>
   @override
   void initState() {
     getOpenOrders();
+    getfunds();
     super.initState();
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  Future<void> getfunds() async {
+    var auth = Provider.of<Auth>(context, listen: false);
+    var public = Provider.of<Public>(context, listen: false);
+    var trading = Provider.of<Trading>(context, listen: false);
+    // print(public.activeMarket['showName'].replaceAll(new RegExp(r"\p{P}", unicode: true), ","),);
+  await  trading.getFunds(context, auth, {
+      "coinSymbols": public.activeMarket['showName']
+          .replaceAll(new RegExp(r"\p{P}", unicode: true), ","),
+    });
   }
 
   String getOrderType(orderType) {
@@ -85,6 +97,7 @@ class _OpenOrdersState extends State<OpenOrders>
 
     var auth = Provider.of<Auth>(context, listen: true);
     var trading = Provider.of<Trading>(context, listen: true);
+    var public = Provider.of<Public>(context, listen: true);
 
     return Column(
       children: [
@@ -195,7 +208,81 @@ class _OpenOrdersState extends State<OpenOrders>
                       )
                     : noAuth(context),
               ),
-              auth.isAuthenticated ? noData() : noAuth(context),
+              //auth.isAuthenticated ? noData() : noAuth(context),
+              Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Cuurent Active pair',
+                          style: TextStyle(color: greyTextColor),
+                        )
+                      ],
+                    ),
+                  ),
+                Column(
+                          children: [
+                      trading.isfundsLoading? CircularProgressIndicator():Container(
+                                child: ListTile(
+                                    leading: ClipOval(
+                                       
+                                        child: Image.network(public
+                                            .publicInfoMarket['market']
+                                                ['coinList'][
+                                                '${public.activeMarket['showName'].split('/')[0]}']
+                                                ['icon']
+                                            .toString(),
+                                            
+                                            width: 40,
+                                            height: 40,
+                                            fit: BoxFit.fill,
+                                            )
+                                            
+                                            ),
+                                    trailing: Text(
+                                      trading.funds['allCoinMap'][
+                                              '${public.activeMarket['showName'].split('/')[0]}']
+                                              ['normal_balance']
+                                          .toString(),
+                                      style: TextStyle(
+                                          color: Colors.green, fontSize: 15),
+                                    ),
+                                    title: Text(
+                                        '${public.activeMarket['showName'].split('/')[0]}'
+                                            .toString()))),
+                        trading.isfundsLoading? CircularProgressIndicator():Container(
+                                child: ListTile(
+                                    leading: ClipOval(
+                                       
+                                        child: Image.network(public
+                                            .publicInfoMarket['market']
+                                                ['coinList'][
+                                                '${public.activeMarket['showName'].split('/')[1]}']
+                                                ['icon']
+                                            .toString(),
+                                             
+                                            width: 40,
+                                            height: 40,
+                                            fit: BoxFit.fill,
+                                            
+                                            )),
+                                    trailing: Text(
+                                      trading.funds['allCoinMap'][
+                                              '${public.activeMarket['showName'].split('/')[1]}']
+                                              ['normal_balance']??''
+                                          .toString(),
+                                      style: TextStyle(
+                                          color: Colors.green, fontSize: 15),
+                                    ),
+                                    title: Text(
+                                        '${public.activeMarket['showName'].split('/')[1]}'
+                                            .toString())))
+                          ],
+                        )
+                ],
+              ),
             ],
           ),
         ),
