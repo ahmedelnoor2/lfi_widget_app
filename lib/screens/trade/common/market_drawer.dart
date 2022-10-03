@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:archive/archive.dart';
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
@@ -99,6 +101,9 @@ class _MarketDrawerState extends State<MarketDrawer>
     height = MediaQuery.of(context).size.height;
 
     var public = Provider.of<Public>(context, listen: true);
+    var auth = Provider.of<Auth>(context, listen: true);
+
+    var trading = Provider.of<Trading>(context, listen: true);
 
     return Drawer(
       child: Column(
@@ -196,6 +201,10 @@ class _MarketDrawerState extends State<MarketDrawer>
                   onTap: () async {
                     await public.setActiveMarket(_market);
                     widget.updateMarket();
+                    await trading.getFunds(context, auth, {
+                      "coinSymbols": public.activeMarket['showName']
+                          .replaceAll(new RegExp(r"\p{P}", unicode: true), ","),
+                    });
                     Navigator.pop(context);
                   },
                   title: Row(

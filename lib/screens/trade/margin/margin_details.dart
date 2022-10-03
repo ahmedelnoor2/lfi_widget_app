@@ -39,9 +39,10 @@ class _MarginDetailsState extends State<MarginDetails> {
 
   @override
   void initState() {
+    
+    super.initState();
     getDigitalBalance();
     getMarginlBalance();
-    super.initState();
   }
 
   @override

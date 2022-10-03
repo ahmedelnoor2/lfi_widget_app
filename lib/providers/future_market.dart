@@ -12,6 +12,7 @@ class FutureMarket with ChangeNotifier {
   Map<String, String> headers = {
     'Content-type': 'application/json;charset=utf-8',
     'Accept': 'application/json',
+    'exchange-language': '',
   };
 
   Map _activeMarket = {
@@ -275,13 +276,16 @@ class FutureMarket with ChangeNotifier {
 
   Future<void> getUserConfiguration(ctx, auth, contractId) async {
     headers['exchange-token'] = auth.loginVerificationToken;
+    headers['exchange-language'] = 'en_US';
 
     var url = Uri.https(
       futApiUrl,
       '$futExApi/user/get_user_config',
     );
 
-    var postData = json.encode({'contractId': contractId});
+    var postData = json.encode({
+      'contractId': contractId,
+    });
 
     try {
       final response = await http.post(

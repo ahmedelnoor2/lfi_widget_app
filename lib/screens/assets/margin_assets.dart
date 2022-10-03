@@ -13,7 +13,8 @@ import 'package:provider/provider.dart';
 
 class MarginAssets extends StatefulWidget {
   static const routeName = '/margin_assets';
-  const MarginAssets({
+  double preceisionvalue=0.0;
+  MarginAssets({
     Key? key,
   }) : super(key: key);
 
@@ -40,6 +41,7 @@ class _MarginAssetsState extends State<MarginAssets> {
 
   String _availableBalanceFrom = '0.000';
   String _availableBalanceTo = '0.000';
+
 
   @override
   void initState() {
@@ -869,7 +871,11 @@ class _MarginAssetsState extends State<MarginAssets> {
                         children: [
                           InkWell(
                             onTap: () {
+
+
                               print('Select preceision');
+                              widget.preceisionvalue=25.0;
+                              print(widget.preceisionvalue);
                             },
                             child: Container(
                               width: width * 0.22,

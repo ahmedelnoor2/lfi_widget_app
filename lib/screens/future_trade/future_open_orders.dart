@@ -207,8 +207,8 @@ class _FutureOpenOrdersState extends State<FutureOpenOrders>
             IconButton(
               onPressed: () {
                 auth.isAuthenticated
-                ?snackAlert(context,SnackTypes.warning, 'Comming Soon')
-                   // ? Navigator.pushNamed(context, '/future_market_transaction')
+                // ?snackAlert(context,SnackTypes.warning, 'Comming Soon')
+                   ? Navigator.pushNamed(context, '/future_market_transaction')
                     : Navigator.pushNamed(context, '/authentication');
                 //  
               },

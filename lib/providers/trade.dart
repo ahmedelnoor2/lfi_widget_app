@@ -60,6 +60,7 @@ class Trading with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
+      
 
       if (responseData['code'] == 0) {
         _openOrders = responseData['data']['orders'];
@@ -358,14 +359,14 @@ class Trading with ChangeNotifier {
   }
 
   Future<void> futureOrderHistory(ctx, auth, formData) async {
-    print("i am calling...");
+    
     headers['exchange-token'] = auth.loginVerificationToken;
 
     var url = Uri.https(
       futApiUrl,
       '$futExApi/order/history_order_list',
     );
-    print(url);
+    
     var postData = json.encode(formData);
 
     try {
@@ -389,7 +390,7 @@ class Trading with ChangeNotifier {
       } else {
         _isFuturehistoruyloading = false;
         notifyListeners();
-        snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
+       print(getTranslate(responseData['msg']));
 
         return;
       }
@@ -401,6 +402,60 @@ class Trading with ChangeNotifier {
         SnackTypes.errors,
         'Server Error',
       );
+    }
+  }
+
+
+Map _funds={};
+
+Map get funds{
+  return _funds;
+}
+bool _isfundsLoading=true;
+
+
+bool get isfundsLoading{
+
+return _isfundsLoading;
+
+}
+  /// get funds///
+   Future<void> getFunds(ctx, auth, formData) async {
+    _isfundsLoading=true;
+
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/finance/v5/account_balance',
+    );
+
+    var postData = json.encode(formData);
+
+    try {
+      final response = await http.post(
+        url,
+        body: postData,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+     
+      if (responseData['code'] == "0") {
+        _funds = responseData['data'];
+        _isfundsLoading=false;
+        print(_funds);
+        return notifyListeners();
+      } else {
+        _funds = {};
+        _isfundsLoading=false;
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+    _isfundsLoading=false;
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return;
     }
   }
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/Number.utils.dart';
@@ -21,6 +23,19 @@ class OrderBook extends StatefulWidget {
 }
 
 class _OrderBookState extends State<OrderBook> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+   
+
+  }
+  var precsionitems = [   
+    '0.00001',
+    '0.001',
+    '0.1',
+  ];
+
   void setPriceField(public, value) {
     public.setAmountField(value);
   }
@@ -100,62 +115,70 @@ class _OrderBookState extends State<OrderBook> {
             ),
           ],
         ),
-        ListView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          padding: EdgeInsets.zero,
-          itemCount: asks.length,
-          itemBuilder: (BuildContext context, int index) {
-            return InkWell(
-              onTap: () {
-                setPriceField(public, asks[index][0]);
-              },
-              child: Stack(
-                children: <Widget>[
-                  Container(
-                    padding: const EdgeInsets.only(
-                      top: 1,
-                      bottom: 1,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          double.parse('${asks[index][0] ?? 0}')
-                              .toStringAsPrecision(7),
-                          style: TextStyle(
-                            color: redIndicator,
-                            fontSize: 15,
+        asks.isEmpty
+            ? CircularProgressIndicator()
+            : ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                padding: EdgeInsets.zero,
+                itemCount: asks.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return InkWell(
+                    onTap: () {
+                      setPriceField(public, asks[index][0]);
+                    },
+                    child: Stack(
+                      children: <Widget>[
+                        Container(
+                          padding: const EdgeInsets.only(
+                            top: 1,
+                            bottom: 1,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              FittedBox(
+                                fit: BoxFit.cover,
+                                child: Text(
+                                  double.parse('${asks[index][0] ?? 0}')
+                                      .toStringAsPrecision(7),
+                                  style: TextStyle(
+                                    color: redIndicator,
+                                   
+                                  ),
+                                ),
+                              ),
+                              FittedBox(
+                                fit: BoxFit.cover,
+                                child: Text(
+                                  double.parse('${asks[index][1] ?? 0}') > 10
+                                      ? double.parse('${asks[index][1] ?? 0}')
+                                          .toStringAsFixed(2)
+                                      : double.parse('${asks[index][1] ?? 0}')
+                                          .toStringAsPrecision(4),
+                                  style: TextStyle(fontSize: 15),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        Text(
-                          double.parse('${asks[index][1] ?? 0}') > 10
-                              ? double.parse('${asks[index][1] ?? 0}')
-                                  .toStringAsFixed(2)
-                              : double.parse('${asks[index][1] ?? 0}')
-                                  .toStringAsPrecision(4),
-                          style: TextStyle(fontSize: 15),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Container(
+                            color: Color.fromARGB(73, 175, 86, 76),
+                            // width: ((double.parse('${asks[index][1] ?? 0}') /
+                            //             double.parse('$askMax')) *
+                            //         2) *
+                            //     100,
+                            // width: width * 0.5,
+                            height: 21,
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Container(
-                      color: Color.fromARGB(73, 175, 86, 76),
-                      // width: ((double.parse('${asks[index][1] ?? 0}') /
-                      //             double.parse('$askMax')) *
-                      //         2) *
-                      //     100,
-                      // width: width * 0.5,
-                      height: 21,
-                    ),
-                  ),
-                ],
+                  );
+                },
               ),
-            );
-          },
-        ),
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -171,62 +194,72 @@ class _OrderBookState extends State<OrderBook> {
             ),
           ],
         ),
-        ListView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          padding: EdgeInsets.zero,
-          itemCount: bids.length,
-          itemBuilder: (BuildContext context, int index) {
-            return InkWell(
-              onTap: () {
-                setPriceField(public, bids[index][0] ?? 0);
-              },
-              child: Stack(
-                children: <Widget>[
-                  Container(
-                    padding: const EdgeInsets.only(
-                      top: 1,
-                      bottom: 1,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          double.parse('${bids[index][0] ?? 0}')
-                              .toStringAsPrecision(7),
-                          style: TextStyle(
-                            color: greenIndicator,
-                            fontSize: 15,
+        bids.isEmpty
+            ? CircularProgressIndicator()
+            : ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                padding: EdgeInsets.zero,
+                itemCount: bids.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return InkWell(
+                    onTap: () {
+                      setPriceField(public, bids[index][0] ?? 0);
+                    },
+                    child: Stack(
+                      children: <Widget>[
+                        Container(
+                          padding: const EdgeInsets.only(
+                            top: 1,
+                            bottom: 1,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              FittedBox(
+                                
+                      fit: BoxFit.cover,
+                                child: Text(
+                                  double.parse('${bids[index][0] ?? 0}')
+                                      .toStringAsPrecision(7),
+                                  style: TextStyle(
+                                    color: greenIndicator,
+                                
+                                  ),
+                                ),
+                              ),
+                              FittedBox(
+                                
+                      fit: BoxFit.cover,
+                                child: Text(
+                                  double.parse('${bids[index][1] ?? 0}') > 10
+                                      ? double.parse('${bids[index][1] ?? 0}')
+                                          .toStringAsFixed(2)
+                                      : double.parse('${bids[index][1] ?? 0}')
+                                          .toStringAsPrecision(4),
+                                  
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        Text(
-                          double.parse('${bids[index][1] ?? 0}') > 10
-                              ? double.parse('${bids[index][1] ?? 0}')
-                                  .toStringAsFixed(2)
-                              : double.parse('${bids[index][1] ?? 0}')
-                                  .toStringAsPrecision(4),
-                          style: TextStyle(fontSize: 15),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Container(
+                            color: Color.fromARGB(71, 72, 163, 65),
+                            // width: ((double.parse('${bids[index][1] ?? 0}') /
+                            //             double.parse('$bidMax')) *
+                            //         2) *
+                            //     100,
+                            // width: width * 0.5,
+                            height: 21,
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Container(
-                      color: Color.fromARGB(71, 72, 163, 65),
-                      // width: ((double.parse('${bids[index][1] ?? 0}') /
-                      //             double.parse('$bidMax')) *
-                      //         2) *
-                      //     100,
-                      // width: width * 0.5,
-                      height: 21,
-                    ),
-                  ),
-                ],
+                  );
+                },
               ),
-            );
-          },
-        ),
         Container(
           padding: EdgeInsets.only(top: 5),
           child: Row(
