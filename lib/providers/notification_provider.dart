@@ -201,11 +201,11 @@ class Notificationprovider extends ChangeNotifier {
       } else if (responseData['code'] == '10002') {
         auth.checkLoginSession(ctx);
       } else {
-        snackAlert(ctx, SnackTypes.errors,
-            getTranslate(responseData['msg'].toString()));
+        print(responseData['msg'].toString());
         return;
       }
     } catch (error) {
+      print(error);
       // snackAlert(ctx, SnackTypes.errors, 'Server Error.');
       return;
     }

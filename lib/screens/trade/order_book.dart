@@ -6,6 +6,7 @@ import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/Number.utils.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:provider/provider.dart';
+import 'package:skeletons/skeletons.dart';
 
 class OrderBook extends StatefulWidget {
   const OrderBook({
@@ -115,8 +116,20 @@ class _OrderBookState extends State<OrderBook> {
             ),
           ],
         ),
-        asks.isEmpty
-            ? CircularProgressIndicator()
+        asks.isEmpty                     //isloading
+            ? SkeletonParagraph( 
+                style: SkeletonParagraphStyle(
+                    lines: 6,
+                    spacing: 6,
+                    lineStyle: SkeletonLineStyle(
+                      randomLength: true,
+                      height: 10,
+                      borderRadius: BorderRadius.circular(8),
+                      minLength: MediaQuery.of(context).size.width / 6,
+                      maxLength: MediaQuery.of(context).size.width,
+                      
+                    )),
+              )
             : ListView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
@@ -195,7 +208,19 @@ class _OrderBookState extends State<OrderBook> {
           ],
         ),
         bids.isEmpty
-            ? CircularProgressIndicator()
+            ? SkeletonParagraph(                     //isloading
+                style: SkeletonParagraphStyle(
+                    lines: 6,
+                    spacing: 6,
+                    lineStyle: SkeletonLineStyle(
+                      randomLength: true,
+                      height: 10,
+                      borderRadius: BorderRadius.circular(8),
+                      minLength: MediaQuery.of(context).size.width / 6,
+                      maxLength: MediaQuery.of(context).size.width,
+                      
+                    )),
+              )
             : ListView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,

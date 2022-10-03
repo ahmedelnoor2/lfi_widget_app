@@ -15,6 +15,7 @@ import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:flutter_aliyun_captcha/flutter_aliyun_captcha.dart';
+import 'package:email_validator/email_validator.dart';
 // import 'package:g_recaptcha_v3/g_recaptcha_v3.dart';
 // import 'package:webview_flutter/webview_flutter.dart';
 // import 'package:slider_captcha/slider_capchar.dart';
@@ -124,6 +125,10 @@ class _Login extends State<Login> {
     }, auth.captchaData);
   }
 
+  bool isEmail(String input) => EmailValidator.validate(input);
+  bool isPhone(String input) =>
+      RegExp(r'(^(?:[+0]9)?[0-9]{9,12}$)').hasMatch(input);
+
   @override
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
@@ -166,46 +171,57 @@ class _Login extends State<Login> {
             children: [
               TextFormField(
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter email address';
+                  if (!isEmail(value!) && !isPhone(value)) {
+                    return 'Please enter a valid email or phone number.';
                   }
                   return null;
                 },
-                decoration: const InputDecoration(
-                  // border: OutlineInputBorder(),
-                  labelText: 'Email or phone number',
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.all(16.0),
+                  hintText: "Enter your phone number or email",
+                  filled: true,
+                  fillColor: Colors.grey.withOpacity(0.1),
                 ),
                 controller: _mobileNumber,
               ),
-              TextFormField(
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter password';
-                  }
-                  return null;
-                },
-                obscureText: _readPassword,
-                decoration: InputDecoration(
-                  // border: OutlineInputBorder(),
-                  labelText: 'Password',
-                  suffix: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: IconButton(
-                      padding: const EdgeInsets.all(0.0),
-                      onPressed: () {
-                        setState(() {
-                          _readPassword = !_readPassword;
-                        });
-                      },
-                      icon: Icon(
-                        _readPassword ? Icons.visibility : Icons.visibility_off,
-                        size: 20,
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter password';
+                    }
+                    return null;
+                  },
+                  obscureText: _readPassword,
+                  decoration: InputDecoration(
+                    // border: OutlineInputBorder(),
+                     hintText: "Password",
+                    contentPadding: const EdgeInsets.all(16.0),
+                    filled: true,
+                    fillColor: Colors.grey.withOpacity(0.1),
+                    suffix: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: IconButton(
+                        padding: const EdgeInsets.all(0.0),
+                        onPressed: () {
+                          setState(() {
+                            _readPassword = !_readPassword;
+                          });
+                        },
+                        icon: Icon(
+                          _readPassword
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          size: 20,
+                          color: linkColor,
+                        ),
                       ),
                     ),
                   ),
+                  controller: _loginPword,
                 ),
-                controller: _loginPword,
               ),
             ],
           ),
@@ -241,6 +257,8 @@ class _Login extends State<Login> {
             activeColor: linkColor,
             activeTextColor: Colors.black,
             onPressed: () {
+              isEmail(_mobileNumber.text);
+              print(isEmail(_mobileNumber.text));
               if (_formLoginKey.currentState!.validate()) {
                 setState(() {
                   _enableLogin = false;

@@ -1,9 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 import 'package:webviewx/webviewx.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -103,10 +105,23 @@ class _CarousalState extends State<Carousal> {
                               'assets/img/${slider['file']['link']}',
                               fit: BoxFit.fill,
                             )
-                          :Image.network(
-                              '${slider['file']['link']}',
-                              fit: BoxFit.fill,
-                            ),
+                          : CachedNetworkImage(
+                              imageUrl: '${slider['file']['link']}',
+                              placeholderFadeInDuration:Duration(milliseconds: 1000) ,
+                              imageBuilder: (context, imageProvider) =>
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                          image: imageProvider,
+                                          fit: BoxFit.cover,
+                                          colorFilter: ColorFilter.mode(
+                                              Colors.transparent,
+                                              BlendMode.colorBurn)),
+                                    ),
+                                  ),
+                              errorWidget: (context, url, error) =>
+                                  Icon(Icons.error),
+                             ),
                     ),
                   ),
                 );

@@ -19,6 +19,7 @@ import 'package:lyotrade/utils/Colors.utils.dart';
 
 import 'package:provider/provider.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SideBar extends StatefulWidget {
   const SideBar({Key? key}) : super(key: key);
@@ -103,6 +104,14 @@ class _SideBarState extends State<SideBar> {
       setState(() {
         _payWithLyoCred = auth.userInfo['useFeeCoinOpen'] == 1 ? true : false;
       });
+    }
+  }
+    _launchURL() async {
+    const url = 'https://docs.lyotrade.com/help-center/trading-fees#trading-fees';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
     }
   }
 
@@ -289,6 +298,9 @@ class _SideBarState extends State<SideBar> {
                     trailing: const Icon(Icons.chevron_right),
                   ),
                   ListTile(
+                    onTap: (() {
+                      _launchURL();
+                    }),
                     leading: const Icon(Icons.percent),
                     title: const Text('Trading Fee Level'),
                     trailing: Text(
