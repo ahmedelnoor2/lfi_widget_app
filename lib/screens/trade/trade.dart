@@ -44,12 +44,11 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
   ];
   late final TabController _tabController =
       TabController(length: _tabs.length, vsync: this);
-  
 
   @override
   void initState() {
     connectWebSocket();
-   
+
     super.initState();
   }
 
@@ -67,7 +66,6 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
     await Future.delayed(Duration(seconds: 2));
     return null;
   }
-  
 
   Future<void> connectWebSocket() async {
     var public = Provider.of<Public>(context, listen: false);
@@ -135,7 +133,7 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
     if (_tabController.index == 1) {
       var public = Provider.of<Public>(context, listen: false);
       public.setActiveMarket(public.activeMarginMarket);
-     
+
       updateMarket();
     }
     trading.clearOpenOrders();
@@ -182,8 +180,11 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            padding:
-                                EdgeInsets.only(top: 10, bottom: 10, left: 10),
+                            padding: EdgeInsets.only(
+                              top: 10,
+                              bottom: 10,
+                              left: 10,
+                            ),
                             width: width * 0.4,
                             child: OrderBook(
                               asks: public.asks,
@@ -203,7 +204,7 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
                       ),
                       SizedBox(
                         height: height,
-                        child:  OpenOrders(),
+                        child: OpenOrders(),
                       ),
                     ],
                   ),

@@ -5,7 +5,9 @@ Widget noData(text) {
     padding: EdgeInsets.only(top: 30),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.center,
-      children: [Text(text)],
+      children: [
+        Text(text),
+      ],
     ),
   );
 }
