@@ -7,10 +7,17 @@ Future<bool> onAndroidBackPress(context) async {
   return (await showDialog(
         context: context,
         builder: (context) => AlertDialog(
-    backgroundColor: Colors.white,
+          backgroundColor: Colors.white,
           titleTextStyle: TextStyle(),
-          title: const Text('Exit APP',style: TextStyle(fontSize: 16,color: Colors.black,fontWeight: FontWeight.w700),),
-          content: const Text('Do you want to exit an App?',style: TextStyle(color: Colors.black),),
+          title: const Text(
+            'Exit APP',
+            style: TextStyle(
+                fontSize: 16, color: Colors.black, fontWeight: FontWeight.w700),
+          ),
+          content: const Text(
+            'Do you want to exit an App?',
+            style: TextStyle(color: Colors.black),
+          ),
           actions: <Widget>[
             GestureDetector(
               onTap: () {
@@ -20,8 +27,7 @@ Future<bool> onAndroidBackPress(context) async {
                 width: 100,
                 height: 40,
                 decoration: BoxDecoration(
-                  
-                color: buttonBGColor,
+                  color: buttonBGColor,
                   borderRadius: BorderRadius.circular(4),
                   boxShadow: [
                     BoxShadow(
@@ -43,15 +49,15 @@ Future<bool> onAndroidBackPress(context) async {
                 ),
               ),
             ),
-             GestureDetector(
+            GestureDetector(
               onTap: () {
-                 exit(0);
+                exit(0);
               },
               child: Container(
                 width: 100,
                 height: 40,
                 decoration: BoxDecoration(
-                color: buttonBGColor,
+                  color: buttonBGColor,
                   borderRadius: BorderRadius.circular(4),
                   boxShadow: [
                     BoxShadow(
@@ -73,9 +79,43 @@ Future<bool> onAndroidBackPress(context) async {
                 ),
               ),
             ),
-          
           ],
         ),
       )) ??
       false;
+}
+
+Widget noAuth(context) {
+  return Container(
+    padding: EdgeInsets.only(top: 50),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        GestureDetector(
+          onTap: () {
+            Navigator.pushNamed(context, '/authentication');
+          },
+          child: Text(
+            'Sign In',
+            style: TextStyle(
+              color: linkColor,
+            ),
+          ),
+        ),
+        Text(' or '),
+        GestureDetector(
+          onTap: () {
+            Navigator.pushNamed(context, '/authentication');
+          },
+          child: Text(
+            'Sign Up',
+            style: TextStyle(
+              color: linkColor,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 }

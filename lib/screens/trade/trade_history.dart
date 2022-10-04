@@ -115,18 +115,21 @@ class _TradeHistoryState extends State<TradeHistory>
                 ),
               ],
             ),
-            TabBar(
-              indicatorSize: TabBarIndicatorSize.label,
-              isScrollable: true,
-              onTap: (value) => setState(() {
-                // _tabIndicatorColor = value == 0 ? Colors.green : Colors.red;
-              }),
-              tabs: <Tab>[
-                Tab(text: 'Open Orders'),
-                Tab(text: 'Order History'),
-                Tab(text: 'Transaction History'),
-              ],
-              controller: _tabTradeHistoryController,
+            SizedBox(
+              width: width,
+              child: TabBar(
+                indicatorSize: TabBarIndicatorSize.label,
+                isScrollable: true,
+                onTap: (value) => setState(() {
+                  // _tabIndicatorColor = value == 0 ? Colors.green : Colors.red;
+                }),
+                tabs: <Tab>[
+                  Tab(text: 'Open Orders'),
+                  Tab(text: 'Order History'),
+                  Tab(text: 'Transaction History'),
+                ],
+                controller: _tabTradeHistoryController,
+              ),
             ),
             Divider(
               height: 0,

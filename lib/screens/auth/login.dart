@@ -176,11 +176,9 @@ class _Login extends State<Login> {
                   }
                   return null;
                 },
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.all(16.0),
+                decoration: const InputDecoration(
+                  label: Text("Email or phone number"),
                   hintText: "Enter your phone number or email",
-                  filled: true,
-                  fillColor: Colors.grey.withOpacity(0.1),
                 ),
                 controller: _mobileNumber,
               ),
@@ -195,11 +193,8 @@ class _Login extends State<Login> {
                   },
                   obscureText: _readPassword,
                   decoration: InputDecoration(
-                    // border: OutlineInputBorder(),
-                     hintText: "Password",
-                    contentPadding: const EdgeInsets.all(16.0),
-                    filled: true,
-                    fillColor: Colors.grey.withOpacity(0.1),
+                    label: const Text("Password"),
+                    hintText: "Password",
                     suffix: SizedBox(
                       width: 20,
                       height: 20,

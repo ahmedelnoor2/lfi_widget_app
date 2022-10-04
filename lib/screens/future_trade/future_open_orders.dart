@@ -12,6 +12,7 @@ import 'package:lyotrade/screens/future_trade/common/leverage_level.dart';
 import 'package:lyotrade/screens/trade/common/percentage_indicator.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:lyotrade/utils/ScreenControl.utils.dart';
 import 'package:provider/provider.dart';
 
 class FutureOpenOrders extends StatefulWidget {
@@ -31,7 +32,7 @@ class _FutureOpenOrdersState extends State<FutureOpenOrders>
   final TextEditingController _priceField = TextEditingController();
 
   bool _isCancelling = false;
-  late Timer _timer;
+  Timer? _timer;
 
   @override
   void initState() {
@@ -47,7 +48,9 @@ class _FutureOpenOrdersState extends State<FutureOpenOrders>
     _leverageLevelField.dispose();
     _amountField.dispose();
     _priceField.dispose();
-    _timer.cancel();
+    if (_timer != null) {
+      _timer!.cancel();
+    }
     super.dispose();
   }
 
@@ -169,8 +172,6 @@ class _FutureOpenOrdersState extends State<FutureOpenOrders>
     var auth = Provider.of<Auth>(context, listen: true);
     var futureMarket = Provider.of<FutureMarket>(context, listen: true);
 
-    // print(futureMarket.triggerOrders);
-
     return Column(
       children: [
         Row(
@@ -207,10 +208,10 @@ class _FutureOpenOrdersState extends State<FutureOpenOrders>
             IconButton(
               onPressed: () {
                 auth.isAuthenticated
-                // ?snackAlert(context,SnackTypes.warning, 'Comming Soon')
-                   ? Navigator.pushNamed(context, '/future_market_transaction')
+                    // ?snackAlert(context,SnackTypes.warning, 'Comming Soon')
+                    ? Navigator.pushNamed(context, '/future_market_transaction')
                     : Navigator.pushNamed(context, '/authentication');
-                //  
+                //
               },
               icon: Icon(
                 Icons.insert_drive_file,
@@ -223,24 +224,27 @@ class _FutureOpenOrdersState extends State<FutureOpenOrders>
           height: 0,
           color: Color(0xff5E6292),
         ),
-        SizedBox(
-          height: height * 0.8,
-          child: TabBarView(
-            controller: _tabOpenOrderController,
-            children: [
-              futureMarket.openPositions.isEmpty
-                  ? noData('No Open Positions')
-                  : openPositions(
-                      futureMarket.openPositions['positionList'], futureMarket),
-              futureMarket.currentOrders.isEmpty
-                  ? noData('No limit orders')
-                  : limitOrders(futureMarket.currentOrders),
-              futureMarket.triggerOrders.isEmpty
-                  ? noData('No Stop Limit orders')
-                  : triggerOrders(futureMarket.triggerOrders),
-            ],
-          ),
-        ),
+        auth.isAuthenticated
+            ? SizedBox(
+                height: height * 0.8,
+                child: TabBarView(
+                  controller: _tabOpenOrderController,
+                  children: [
+                    futureMarket.openPositions.isEmpty
+                        ? noData('No Open Positions')
+                        : openPositions(
+                            futureMarket.openPositions['positionList'],
+                            futureMarket),
+                    futureMarket.currentOrders.isEmpty
+                        ? noData('No limit orders')
+                        : limitOrders(futureMarket.currentOrders),
+                    futureMarket.triggerOrders.isEmpty
+                        ? noData('No Stop Limit orders')
+                        : triggerOrders(futureMarket.triggerOrders),
+                  ],
+                ),
+              )
+            : noAuth(context),
       ],
     );
   }
@@ -248,307 +252,312 @@ class _FutureOpenOrdersState extends State<FutureOpenOrders>
   Widget openPositions(openPositions, futureMarket) {
     return Container(
       padding: EdgeInsets.all(9),
-      child: ListView.builder(
-        itemCount: openPositions.length,
-        itemBuilder: (BuildContext context, int index) {
-          var position = openPositions[index];
-          return Column(
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.only(right: 5),
-                    child: Text(
-                      '${position['orderSide']}',
-                      style: TextStyle(
-                          fontSize: 12,
-                          color: position['orderSide'] == 'SELL'
-                              ? redIndicator
-                              : greenIndicator),
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.only(right: 8),
-                    child: Text(
-                      '${position['contractOtherName']}',
-                      style: TextStyle(
-                        fontSize: 15,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    'Cross ${futureMarket.userConfiguration['nowLevel']}x',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: secondaryTextColor,
-                    ),
-                  ),
-                ],
-              ),
-              Container(
-                padding: EdgeInsets.only(top: 5, bottom: 5),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: openPositions.isEmpty
+          ? noData('No Open Positions')
+          : ListView.builder(
+              itemCount: openPositions.length,
+              itemBuilder: (BuildContext context, int index) {
+                var position = openPositions[index];
+                return Column(
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Unrealized PNL (USDT)',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: secondaryTextColor,
-                          ),
-                        ),
-                        Text(
-                          '${position['profitRealizedAmount']}',
-                          style: TextStyle(
-                            fontSize: 15,
-                            color: double.parse(
-                                        '${position['profitRealizedAmount']}') >
-                                    0
-                                ? greenIndicator
-                                : redIndicator,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          'ROI',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: secondaryTextColor,
-                          ),
-                        ),
-                        Text(
-                          '${(double.parse('${position['returnRate']}')).toStringAsFixed(2)}%',
-                          style: TextStyle(
-                            fontSize: 15,
-                            color: double.parse('${position['returnRate']}') > 0
-                                ? greenIndicator
-                                : redIndicator,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.only(top: 5, bottom: 5),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
                       children: [
                         Container(
-                          padding: EdgeInsets.only(bottom: 10),
-                          child: Column(
+                          padding: EdgeInsets.only(right: 5),
+                          child: Text(
+                            '${position['orderSide']}',
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: position['orderSide'] == 'SELL'
+                                    ? redIndicator
+                                    : greenIndicator),
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(right: 8),
+                          child: Text(
+                            '${position['contractOtherName']}',
+                            style: TextStyle(
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          'Cross ${futureMarket.userConfiguration['nowLevel']}x',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: secondaryTextColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      padding: EdgeInsets.only(top: 5, bottom: 5),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Size (${position['symbol'].split('-')[0]})',
+                                'Unrealized PNL (USDT)',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: secondaryTextColor,
                                 ),
                               ),
                               Text(
-                                '${position['positionVolume']}',
-                              ),
-                            ],
-                          ),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Entry Price',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: secondaryTextColor,
-                              ),
-                            ),
-                            Text(
-                              double.parse('${position['openAvgPrice']}')
-                                  .toStringAsFixed(4),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(bottom: 10),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Margin (${position['symbol'].split('-')[1]})',
+                                '${position['profitRealizedAmount']}',
                                 style: TextStyle(
-                                  fontSize: 12,
-                                  color: secondaryTextColor,
+                                  fontSize: 15,
+                                  color: double.parse(
+                                              '${position['profitRealizedAmount']}') >
+                                          0
+                                      ? greenIndicator
+                                      : redIndicator,
                                 ),
                               ),
-                              Text(
-                                double.parse('${position['holdAmount']}')
-                                    .toStringAsFixed(4),
-                              ),
                             ],
                           ),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Mark Price',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: secondaryTextColor,
-                              ),
-                            ),
-                            Text(
-                              double.parse('${position['indexPrice']}')
-                                  .toStringAsFixed(4),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(bottom: 10),
-                          child: Column(
+                          Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                'Position Balance',
+                                'ROI',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: secondaryTextColor,
                                 ),
                               ),
                               Text(
-                                double.parse('${position['positionBalance']}')
-                                    .toStringAsFixed(4),
+                                '${(double.parse('${position['returnRate']}')).toStringAsFixed(2)}%',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: double.parse(
+                                              '${position['returnRate']}') >
+                                          0
+                                      ? greenIndicator
+                                      : redIndicator,
+                                ),
                               ),
                             ],
                           ),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              'Liq. Price',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: secondaryTextColor,
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.only(top: 5, bottom: 5),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.only(bottom: 10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Size (${position['symbol'].split('-')[0]})',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: secondaryTextColor,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${position['positionVolume']}',
+                                    ),
+                                  ],
+                                ),
                               ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Entry Price',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: secondaryTextColor,
+                                    ),
+                                  ),
+                                  Text(
+                                    double.parse('${position['openAvgPrice']}')
+                                        .toStringAsFixed(4),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.only(bottom: 10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Margin (${position['symbol'].split('-')[1]})',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: secondaryTextColor,
+                                      ),
+                                    ),
+                                    Text(
+                                      double.parse('${position['holdAmount']}')
+                                          .toStringAsFixed(4),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Mark Price',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: secondaryTextColor,
+                                    ),
+                                  ),
+                                  Text(
+                                    double.parse('${position['indexPrice']}')
+                                        .toStringAsFixed(4),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.only(bottom: 10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      'Position Balance',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: secondaryTextColor,
+                                      ),
+                                    ),
+                                    Text(
+                                      double.parse(
+                                              '${position['positionBalance']}')
+                                          .toStringAsFixed(4),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    'Liq. Price',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: secondaryTextColor,
+                                    ),
+                                  ),
+                                  Text(
+                                    double.parse('${position['reducePrice']}')
+                                        .toStringAsFixed(4),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        OutlinedButton(
+                          onPressed: () {
+                            showModalBottomSheet<void>(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return StatefulBuilder(
+                                  builder: (BuildContext context,
+                                      StateSetter setState) {
+                                    return leverageLevel(
+                                      context,
+                                      _leverageLevelField,
+                                      updateLeverageLevel,
+                                      futureMarket,
+                                      setState,
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          },
+                          child: Text(
+                            'Adjust Leverage',
+                            style: TextStyle(
+                              fontSize: 12,
                             ),
-                            Text(
-                              double.parse('${position['reducePrice']}')
-                                  .toStringAsFixed(4),
+                          ),
+                        ),
+                        OutlinedButton(
+                          onPressed: () {
+                            showModalBottomSheet<void>(
+                              context: context,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(25.0))),
+                              isScrollControlled: true,
+                              builder: (BuildContext context) {
+                                return StatefulBuilder(
+                                  builder: (BuildContext context,
+                                      StateSetter setState) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 30),
+                                      child: stopProfitAndLoss(
+                                        context,
+                                        _formStopOrderKey,
+                                        _amountField,
+                                        _priceField,
+                                        futureMarket,
+                                        position,
+                                        setState,
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          },
+                          child: Text(
+                            'Stop Profit & Loss',
+                            style: TextStyle(
+                              fontSize: 12,
                             ),
-                          ],
+                          ),
+                        ),
+                        OutlinedButton(
+                          onPressed: () {
+                            createOrder(position, 2, true);
+                          },
+                          child: Text(
+                            'Close Position',
+                            style: TextStyle(
+                              fontSize: 12,
+                            ),
+                          ),
                         ),
                       ],
                     ),
+                    Divider(),
                   ],
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  OutlinedButton(
-                    onPressed: () {
-                      showModalBottomSheet<void>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return StatefulBuilder(
-                            builder:
-                                (BuildContext context, StateSetter setState) {
-                              return leverageLevel(
-                                context,
-                                _leverageLevelField,
-                                updateLeverageLevel,
-                                futureMarket,
-                                setState,
-                              );
-                            },
-                          );
-                        },
-                      );
-                    },
-                    child: Text(
-                      'Adjust Leverage',
-                      style: TextStyle(
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                  OutlinedButton(
-                    onPressed: () {
-                      showModalBottomSheet<void>(
-                        context: context,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(25.0))),
-                        isScrollControlled: true,
-                        builder: (BuildContext context) {
-                          return StatefulBuilder(
-                            builder:
-                                (BuildContext context, StateSetter setState) {
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 30),
-                                child: stopProfitAndLoss(
-                                  context,
-                                  _formStopOrderKey,
-                                  _amountField,
-                                  _priceField,
-                                  futureMarket,
-                                  position,
-                                  setState,
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      );
-                    },
-                    child: Text(
-                      'Stop Profit & Loss',
-                      style: TextStyle(
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                  OutlinedButton(
-                    onPressed: () {
-                      createOrder(position, 2, true);
-                    },
-                    child: Text(
-                      'Close Position',
-                      style: TextStyle(
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Divider(),
-            ],
-          );
-        },
-      ),
+                );
+              },
+            ),
     );
   }
 

@@ -6,6 +6,7 @@ import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/screens/trade/common/percentage_indicator.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:lyotrade/utils/ScreenControl.utils.dart';
 import 'package:provider/provider.dart';
 
 class OpenOrders extends StatefulWidget {
@@ -38,11 +39,13 @@ class _OpenOrdersState extends State<OpenOrders>
     var auth = Provider.of<Auth>(context, listen: false);
     var public = Provider.of<Public>(context, listen: false);
     var trading = Provider.of<Trading>(context, listen: false);
-    // print(public.activeMarket['showName'].replaceAll(new RegExp(r"\p{P}", unicode: true), ","),);
-  await  trading.getFunds(context, auth, {
-      "coinSymbols": public.activeMarket['showName']
-          .replaceAll(new RegExp(r"\p{P}", unicode: true), ","),
-    });
+
+    if (auth.isAuthenticated) {
+      await trading.getFunds(context, auth, {
+        "coinSymbols": public.activeMarket['showName']
+            .replaceAll(new RegExp(r"\p{P}", unicode: true), ","),
+      });
+    }
   }
 
   String getOrderType(orderType) {
@@ -209,80 +212,83 @@ class _OpenOrdersState extends State<OpenOrders>
                     : noAuth(context),
               ),
               //auth.isAuthenticated ? noData() : noAuth(context),
-              Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
+              auth.isAuthenticated
+                  ? Column(
                       children: [
-                        Text(
-                          'Cuurent Active pair',
-                          style: TextStyle(color: greyTextColor),
-                        )
-                      ],
-                    ),
-                  ),
-                Column(
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Row(
+                            children: [
+                              Text(
+                                'Cuurent active pair',
+                                style: TextStyle(color: greyTextColor),
+                              )
+                            ],
+                          ),
+                        ),
+                        Column(
                           children: [
-                      trading.isfundsLoading? CircularProgressIndicator():Container(
-                                child: ListTile(
-                                    leading: ClipOval(
-                                       
-                                        child: Image.network(public
-                                            .publicInfoMarket['market']
+                            trading.isfundsLoading
+                                ? CircularProgressIndicator()
+                                : Container(
+                                    child: ListTile(
+                                      leading: ClipOval(
+                                          child: Image.network(
+                                        public.publicInfoMarket['market']
                                                 ['coinList'][
                                                 '${public.activeMarket['showName'].split('/')[0]}']
                                                 ['icon']
                                             .toString(),
-                                            
-                                            width: 40,
-                                            height: 40,
-                                            fit: BoxFit.fill,
-                                            )
-                                            
-                                            ),
-                                    trailing: Text(
-                                      trading.funds['allCoinMap'][
-                                              '${public.activeMarket['showName'].split('/')[0]}']
-                                              ['normal_balance']
-                                          .toString(),
-                                      style: TextStyle(
-                                          color: Colors.green, fontSize: 15),
-                                    ),
-                                    title: Text(
-                                        '${public.activeMarket['showName'].split('/')[0]}'
-                                            .toString()))),
-                        trading.isfundsLoading? CircularProgressIndicator():Container(
-                                child: ListTile(
-                                    leading: ClipOval(
-                                       
-                                        child: Image.network(public
-                                            .publicInfoMarket['market']
-                                                ['coinList'][
-                                                '${public.activeMarket['showName'].split('/')[1]}']
-                                                ['icon']
+                                        width: 40,
+                                        height: 40,
+                                        fit: BoxFit.fill,
+                                      )),
+                                      trailing: Text(
+                                        trading.funds['allCoinMap'][
+                                                '${public.activeMarket['showName'].split('/')[0]}']
+                                                ['normal_balance']
                                             .toString(),
-                                             
-                                            width: 40,
-                                            height: 40,
-                                            fit: BoxFit.fill,
-                                            
-                                            )),
-                                    trailing: Text(
-                                      trading.funds['allCoinMap'][
-                                              '${public.activeMarket['showName'].split('/')[1]}']
-                                              ['normal_balance']??''
-                                          .toString(),
-                                      style: TextStyle(
-                                          color: Colors.green, fontSize: 15),
+                                        style: TextStyle(
+                                            color: Colors.green, fontSize: 15),
+                                      ),
+                                      title: Text(
+                                        '${public.activeMarket['showName'].split('/')[0]}'
+                                            .toString(),
+                                      ),
                                     ),
-                                    title: Text(
-                                        '${public.activeMarket['showName'].split('/')[1]}'
-                                            .toString())))
+                                  ),
+                            trading.isfundsLoading
+                                ? Container()
+                                : Container(
+                                    child: ListTile(
+                                        leading: ClipOval(
+                                            child: Image.network(
+                                          public.publicInfoMarket['market']
+                                                  ['coinList'][
+                                                  '${public.activeMarket['showName'].split('/')[1]}']
+                                                  ['icon']
+                                              .toString(),
+                                          width: 40,
+                                          height: 40,
+                                          fit: BoxFit.fill,
+                                        )),
+                                        trailing: Text(
+                                          trading.funds['allCoinMap'][
+                                                      '${public.activeMarket['showName'].split('/')[1]}']
+                                                  ['normal_balance'] ??
+                                              ''.toString(),
+                                          style: TextStyle(
+                                              color: Colors.green,
+                                              fontSize: 15),
+                                        ),
+                                        title: Text(
+                                            '${public.activeMarket['showName'].split('/')[1]}'
+                                                .toString())))
                           ],
                         )
-                ],
-              ),
+                      ],
+                    )
+                  : noAuth(context),
             ],
           ),
         ),
@@ -738,41 +744,6 @@ class _OpenOrdersState extends State<OpenOrders>
             );
           }
         },
-      ),
-    );
-  }
-
-  Widget noAuth(context) {
-    return Container(
-      padding: EdgeInsets.only(top: 50),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(context, '/authentication');
-            },
-            child: Text(
-              'Sign In',
-              style: TextStyle(
-                color: linkColor,
-              ),
-            ),
-          ),
-          Text(' or '),
-          GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(context, '/authentication');
-            },
-            child: Text(
-              'Sign Up',
-              style: TextStyle(
-                color: linkColor,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
