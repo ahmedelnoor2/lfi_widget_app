@@ -590,7 +590,7 @@ class _FutureHeaderDetailsState extends State<FutureHeaderDetails>
             children: [
               Text('Position Mode:'),
               Text(
-                'Note: Can not change when any position or oder exists',
+                'Note: Can not change when any position or order exists',
                 style: TextStyle(fontSize: 12, color: secondaryTextColor),
               )
             ],
@@ -698,7 +698,7 @@ class _FutureHeaderDetailsState extends State<FutureHeaderDetails>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Conrifm before place order:',
+                'Confirm before place order:',
                 style: TextStyle(
                   color: secondaryTextColor,
                 ),
@@ -706,7 +706,7 @@ class _FutureHeaderDetailsState extends State<FutureHeaderDetails>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Second Conrimation of order'),
+                  Text('Second Confirmation of order'),
                   Switch(
                     value: _secondOrderConfirmation,
                     onChanged: (value) {

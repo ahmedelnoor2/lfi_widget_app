@@ -252,6 +252,32 @@ class _personalverificationState extends State<personalverification>
     getKycTierList();
   }
 
+  bool getStatus(userInfoList, kycTier) {
+    if (kycTier['levelName'] == 'Tier2') {
+      if (userInfoList.containsKey('Tier1')) {
+        if ((userInfoList['Tier1']['reviewStatus'] == 1)) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    } else if (kycTier['levelName'] == 'Tier3') {
+      if (userInfoList.containsKey('Tier2')) {
+        if ((userInfoList['Tier2']['reviewStatus'] == 1)) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -264,6 +290,7 @@ class _personalverificationState extends State<personalverification>
         userInfoList[personalKyc['levelName']] = personalKyc;
       }
     }
+    print(userInfoList);
 
     return Scaffold(
       appBar: hiddenAppBar(),
@@ -511,7 +538,7 @@ class _personalverificationState extends State<personalverification>
                                                 1
                                             ? Container()
                                             : Divider()
-                                        : Container(),
+                                        : Divider(),
                                     (userInfoList
                                             .containsKey(kycTier['levelName']))
                                         ? userInfoList[kycTier['levelName']]
@@ -655,7 +682,30 @@ class _personalverificationState extends State<personalverification>
                                                 active: true,
                                                 isLoading: _processingSdk,
                                               )
-                                            : Container(),
+                                            : (getStatus(userInfoList, kycTier))
+                                                ? LyoButton(
+                                                    onPressed: () {
+                                                      startVerifictaion(
+                                                          kycTier['levelName']);
+                                                    },
+                                                    text: 'Start Now',
+                                                    active: true,
+                                                    isLoading: _processingSdk,
+                                                  )
+                                                : (getStatus(
+                                                        userInfoList, kycTier))
+                                                    ? LyoButton(
+                                                        onPressed: () {
+                                                          startVerifictaion(
+                                                              kycTier[
+                                                                  'levelName']);
+                                                        },
+                                                        text: 'Start Now',
+                                                        active: true,
+                                                        isLoading:
+                                                            _processingSdk,
+                                                      )
+                                                    : Container(),
                                   ],
                                 ),
                               ),

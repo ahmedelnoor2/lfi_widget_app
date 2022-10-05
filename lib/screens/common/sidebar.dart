@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -177,10 +178,11 @@ class _SideBarState extends State<SideBar> {
                                 radius:
                                     MediaQuery.of(context).size.width * 0.10,
                                 backgroundColor: Colors.white,
+                              
                                 backgroundImage: imageXFile == null &&
                                         auth.avatarrespons.isEmpty
                                     ? null
-                                    : NetworkImage(
+                                    : CachedNetworkImageProvider(
                                         "${auth.avatarrespons[0]['file']['link'] ?? FileImage(File(imageXFile!.path))}"),
                                 child: imageXFile == null &&
                                         auth.avatarrespons.isEmpty

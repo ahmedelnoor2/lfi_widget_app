@@ -238,67 +238,213 @@ class _ExchangeNowState extends State<ExchangeNow> {
     return dexProvider.processPayment.isNotEmpty
         ? sendingWidget(context, dexProvider)
         : Container(
-            padding: EdgeInsets.all(10),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  padding: EdgeInsets.only(top: 20),
-                  child: Container(
-                    width: width,
-                    padding: EdgeInsets.only(
-                        top: 15, bottom: 15, right: 15, left: 15),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      border: Border.all(
-                        width: 0.3,
-                        color: Color(0xff5E6292),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          flex: 3,
-                          child: InkWell(
-                            onTap: () {
-                              showModalBottomSheet<void>(
-                                isScrollControlled: true,
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return StatefulBuilder(
-                                    builder: (BuildContext context,
-                                        StateSetter setState) {
-                                      return selectCoins(
-                                        context,
-                                        'from',
-                                        dexProvider,
-                                        setState,
-                                        auth,
-                                        asset,
+                  padding: EdgeInsets.all(10),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: width,
+                        padding: EdgeInsets.only(
+                            top: 15, bottom: 15, right: 15, left: 15),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(
+                            width: 0.3,
+                            color: Color(0xff5E6292),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: InkWell(
+                                onTap: () {
+                                  showModalBottomSheet<void>(
+                                    isScrollControlled: true,
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return StatefulBuilder(
+                                        builder: (BuildContext context,
+                                            StateSetter setState) {
+                                          return selectCoins(
+                                            context,
+                                            'from',
+                                            dexProvider,
+                                            setState,
+                                            auth,
+                                            asset,
+                                          );
+                                        },
                                       );
                                     },
                                   );
                                 },
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 1,
+                                      child: Container(
+                                        padding: EdgeInsets.only(right: 10),
+                                        child: dexProvider
+                                                .fromActiveCurrency.isNotEmpty
+                                            ? SvgPicture.network(
+                                                '${dexProvider.fromActiveCurrency['image']}',
+                                                width: 35,
+                                              )
+                                            : Container(),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 5,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Container(
+                                                padding:
+                                                    EdgeInsets.only(right: 10),
+                                                child: Text(
+                                                  dexProvider.fromActiveCurrency
+                                                          .isNotEmpty
+                                                      ? dexProvider
+                                                          .fromActiveCurrency[
+                                                              'ticker']
+                                                          .toUpperCase()
+                                                      : '--',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                              Icon(Icons.keyboard_arrow_down),
+                                            ],
+                                          ),
+                                          Text(
+                                            dexProvider.fromActiveCurrency
+                                                    .isNotEmpty
+                                                ? dexProvider
+                                                    .fromActiveCurrency['name']
+                                                : '--',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              // width: width * 0.4,
+                              child: TextFormField(
+                                textAlign: TextAlign.end,
+                                controller: _fromAmountController,
+                                onChanged: (value) async {
+                                  if (value.isNotEmpty) {
+                                    if (double.parse(value) > 0 &&
+                                        (double.parse(value) >=
+                                            double.parse(_loadingExchnageRate
+                                                ? '--'
+                                                : '${dexProvider.minimumValue['minAmount']}'))) {
+                                      estimateRates();
+                                    }
+                                  }
+                                },
+                                style: const TextStyle(fontSize: 20),
+                                decoration: const InputDecoration(
+                                  contentPadding: EdgeInsets.zero,
+                                  isDense: true,
+                                  border: UnderlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  hintStyle: TextStyle(
+                                    fontSize: 15,
+                                  ),
+                                  hintText: "From Amount",
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          'Min amount required: ${_loadingExchnageRate ? '--' : dexProvider.minimumValue['minAmount']} ${dexProvider.fromActiveCurrency.isNotEmpty ? dexProvider.fromActiveCurrency['ticker'].toUpperCase() : '--'}',
+                          style: TextStyle(color: warningColor),
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(top: 10, bottom: 10),
+                        child: IconButton(
+                          onPressed: () async {
+                            togglePairs();
+                          },
+                          icon: Image.asset(
+                            'assets/img/transfer.png',
+                            width: 32,
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          showModalBottomSheet<void>(
+                            isScrollControlled: true,
+                            context: context,
+                            builder: (BuildContext context) {
+                              return StatefulBuilder(
+                                builder: (BuildContext context,
+                                    StateSetter setState) {
+                                  return selectCoins(
+                                    context,
+                                    'to',
+                                    dexProvider,
+                                    setState,
+                                    auth,
+                                    asset,
+                                  );
+                                },
                               );
                             },
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: Container(
+                          );
+                        },
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              top: 15, bottom: 15, right: 15, left: 15),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(
+                              width: 0.3,
+                              color: Color(0xff5E6292),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
                                     padding: EdgeInsets.only(right: 10),
-                                    child: dexProvider
-                                            .fromActiveCurrency.isNotEmpty
-                                        ? SvgPicture.network(
-                                            '${dexProvider.fromActiveCurrency['image']}',
-                                            width: 35,
-                                          )
-                                        : Container(),
+                                    child:
+                                        dexProvider.toActiveCurrency.isNotEmpty
+                                            ? SvgPicture.network(
+                                                '${dexProvider.toActiveCurrency['image']}',
+                                                width: 35,
+                                              )
+                                            : Container(),
                                   ),
-                                ),
-                                Expanded(
-                                  flex: 5,
-                                  child: Column(
+                                  Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
@@ -307,10 +453,10 @@ class _ExchangeNowState extends State<ExchangeNow> {
                                           Container(
                                             padding: EdgeInsets.only(right: 10),
                                             child: Text(
-                                              dexProvider.fromActiveCurrency
+                                              dexProvider.toActiveCurrency
                                                       .isNotEmpty
                                                   ? dexProvider
-                                                      .fromActiveCurrency[
+                                                      .toActiveCurrency[
                                                           'ticker']
                                                       .toUpperCase()
                                                   : '--',
@@ -324,10 +470,9 @@ class _ExchangeNowState extends State<ExchangeNow> {
                                         ],
                                       ),
                                       Text(
-                                        dexProvider
-                                                .fromActiveCurrency.isNotEmpty
+                                        dexProvider.toActiveCurrency.isNotEmpty
                                             ? dexProvider
-                                                .fromActiveCurrency['name']
+                                                .toActiveCurrency['name']
                                             : '--',
                                         style: TextStyle(
                                           fontSize: 12,
@@ -335,259 +480,131 @@ class _ExchangeNowState extends State<ExchangeNow> {
                                         ),
                                       ),
                                     ],
-                                  ),
+                                  )
+                                ],
+                              ),
+                              Text(
+                                dexProvider.estimateValue.isNotEmpty
+                                    ? getEstimateNumber(dexProvider
+                                        .estimateValue['estimatedAmount'])
+                                    : '0.00',
+                                style: TextStyle(
+                                  fontSize: 20,
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
-                        Expanded(
-                          flex: 1,
-                          // width: width * 0.4,
-                          child: TextFormField(
-                            textAlign: TextAlign.end,
-                            controller: _fromAmountController,
-                            onChanged: (value) async {
-                              if (value.isNotEmpty) {
-                                if (double.parse(value) > 0 &&
-                                    (double.parse(value) >=
-                                        double.parse(_loadingExchnageRate
-                                            ? '--'
-                                            : '${dexProvider.minimumValue['minAmount']}'))) {
-                                  estimateRates();
-                                }
-                              }
-                            },
-                            style: const TextStyle(fontSize: 20),
-                            decoration: const InputDecoration(
-                              contentPadding: EdgeInsets.zero,
-                              isDense: true,
-                              border: UnderlineInputBorder(
-                                borderSide: BorderSide.none,
-                              ),
-                              hintStyle: TextStyle(
-                                fontSize: 15,
-                              ),
-                              hintText: "From Amount",
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    'Min amount required: ${_loadingExchnageRate ? '--' : dexProvider.minimumValue['minAmount']} ${dexProvider.fromActiveCurrency.isNotEmpty ? dexProvider.fromActiveCurrency['ticker'].toUpperCase() : '--'}',
-                    style: TextStyle(color: warningColor),
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.only(top: 10, bottom: 10),
-                  child: IconButton(
-                    onPressed: () async {
-                      togglePairs();
-                    },
-                    icon: Image.asset(
-                      'assets/img/transfer.png',
-                      width: 32,
-                    ),
-                  ),
-                ),
-                InkWell(
-                  onTap: () {
-                    showModalBottomSheet<void>(
-                      isScrollControlled: true,
-                      context: context,
-                      builder: (BuildContext context) {
-                        return StatefulBuilder(
-                          builder:
-                              (BuildContext context, StateSetter setState) {
-                            return selectCoins(
-                              context,
-                              'to',
-                              dexProvider,
-                              setState,
-                              auth,
-                              asset,
-                            );
-                          },
-                        );
-                      },
-                    );
-                  },
-                  child: Container(
-                    padding: EdgeInsets.only(
-                        top: 15, bottom: 15, right: 15, left: 15),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      border: Border.all(
-                        width: 0.3,
-                        color: Color(0xff5E6292),
                       ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
+                      Container(
+                        padding: EdgeInsets.only(
+                          top: 20,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Container(
-                              padding: EdgeInsets.only(right: 10),
-                              child: dexProvider.toActiveCurrency.isNotEmpty
-                                  ? SvgPicture.network(
-                                      '${dexProvider.toActiveCurrency['image']}',
-                                      width: 35,
-                                    )
-                                  : Container(),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.only(right: 10),
-                                      child: Text(
-                                        dexProvider.toActiveCurrency.isNotEmpty
-                                            ? dexProvider
-                                                .toActiveCurrency['ticker']
-                                                .toUpperCase()
-                                            : '--',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  InkWell(
+                                    onTap: () {},
+                                    child: Container(
+                                      padding: EdgeInsets.only(right: 5),
+                                      child: Icon(
+                                        Icons.info,
+                                        size: 12,
                                       ),
                                     ),
-                                    Icon(Icons.keyboard_arrow_down),
-                                  ],
-                                ),
-                                Text(
-                                  dexProvider.toActiveCurrency.isNotEmpty
-                                      ? dexProvider.toActiveCurrency['name']
-                                      : '--',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.normal,
                                   ),
-                                ),
-                              ],
+                                  Text(
+                                    'Exchange rate (expected)',
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Text(
+                                '1 ${dexProvider.fromActiveCurrency.isNotEmpty ? dexProvider.fromActiveCurrency['ticker'].toUpperCase() : '--'} ~ ${dexProvider.estimateValue.isNotEmpty ? getEstimateNumber(dexProvider.estimateValue['estimatedAmount']) : '--'} ${dexProvider.toActiveCurrency.isNotEmpty ? dexProvider.toActiveCurrency['ticker'].toUpperCase() : '--'}',
+                                style: TextStyle(color: linkColor),
+                                textAlign: TextAlign.right,
+                                overflow: TextOverflow.visible,
+                              ),
                             )
                           ],
                         ),
-                        Text(
-                          dexProvider.estimateValue.isNotEmpty
-                              ? getEstimateNumber(
-                                  dexProvider.estimateValue['estimatedAmount'])
-                              : '0.00',
-                          style: TextStyle(
-                            fontSize: 20,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.only(top: 20, bottom: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          InkWell(
-                            onTap: () {},
-                            child: Container(
-                              padding: EdgeInsets.only(right: 5),
-                              child: Icon(
-                                Icons.info,
-                                size: 12,
-                              ),
-                            ),
-                          ),
-                          Text(
-                            'Exchange rate (expected)',
-                            style: TextStyle(fontSize: 12),
-                          ),
-                        ],
                       ),
-                      Row(
-                        children: [
-                          Text(
-                            '1 ${dexProvider.fromActiveCurrency.isNotEmpty ? dexProvider.fromActiveCurrency['ticker'].toUpperCase() : '--'} ~ ${dexProvider.estimateValue.isNotEmpty ? getEstimateNumber(dexProvider.estimateValue['estimatedAmount']) : '--'} ${dexProvider.toActiveCurrency.isNotEmpty ? dexProvider.toActiveCurrency['ticker'].toUpperCase() : '--'}',
-                            style: TextStyle(color: linkColor),
-                          ),
-                        ],
-                      )
                     ],
                   ),
                 ),
-                InkWell(
-                  onTap: (_loadingExchnageRate ||
-                          _fromAmountController.text.isEmpty)
-                      ? null
-                      : () {
-                          showModalBottomSheet<void>(
-                            isScrollControlled: true,
-                            context: context,
-                            builder: (BuildContext context) {
-                              return StatefulBuilder(
-                                builder: (BuildContext context,
-                                    StateSetter setState) {
-                                  return swapCoins(
-                                    context,
-                                    setState,
-                                    asset,
-                                  );
-                                },
-                              );
-                            },
-                          );
-                        },
-                  child: Container(
-                    width: width,
-                    padding: EdgeInsets.only(
-                      top: 10,
-                      bottom: 30,
-                    ),
+                Container(
+                  padding: EdgeInsets.only(left: 10, right: 10),
+                  child: InkWell(
+                    onTap: (_loadingExchnageRate ||
+                            _fromAmountController.text.isEmpty)
+                        ? null
+                        : () {
+                            showModalBottomSheet<void>(
+                              isScrollControlled: true,
+                              context: context,
+                              builder: (BuildContext context) {
+                                return StatefulBuilder(
+                                  builder: (BuildContext context,
+                                      StateSetter setState) {
+                                    return swapCoins(
+                                      context,
+                                      setState,
+                                      asset,
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          },
                     child: Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        // color: Color(0xff5E6292),
-                        color: (_loadingExchnageRate ||
-                                _fromAmountController.text.isEmpty)
-                            ? Color(0xff292C51)
-                            : Color(0xff5E6292),
-                        borderRadius: BorderRadius.circular(5),
-                        border: Border.all(
-                          // style: BorderStyle.solid,
-                          width: 0,
+                      width: width,
+                      padding: EdgeInsets.only(
+                        top: 10,
+                        bottom: 50,
+                      ),
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
                           // color: Color(0xff5E6292),
                           color: (_loadingExchnageRate ||
                                   _fromAmountController.text.isEmpty)
-                              ? Colors.transparent
+                              ? Color(0xff292C51)
                               : Color(0xff5E6292),
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(
+                            // style: BorderStyle.solid,
+                            width: 0,
+                            // color: Color(0xff5E6292),
+                            color: (_loadingExchnageRate ||
+                                    _fromAmountController.text.isEmpty)
+                                ? Colors.transparent
+                                : Color(0xff5E6292),
+                          ),
                         ),
-                      ),
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: (_loadingExchnageRate)
-                            ? SizedBox(
-                                child: CircularProgressIndicator.adaptive(
-                                    strokeWidth: 2),
-                                height: 25,
-                                width: 25,
-                              )
-                            : Text(
-                                'SWAP Now',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  color: (_loadingExchnageRate)
-                                      ? secondaryTextColor
-                                      : Colors.white,
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: (_loadingExchnageRate)
+                              ? SizedBox(
+                                  child: CircularProgressIndicator.adaptive(
+                                      strokeWidth: 2),
+                                  height: 25,
+                                  width: 25,
+                                )
+                              : Text(
+                                  'SWAP Now',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    color: (_loadingExchnageRate)
+                                        ? secondaryTextColor
+                                        : Colors.white,
+                                  ),
                                 ),
-                              ),
+                        ),
                       ),
                     ),
                   ),

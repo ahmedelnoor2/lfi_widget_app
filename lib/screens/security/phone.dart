@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
+import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/Country.utils.dart';
 import 'package:provider/provider.dart';
 
@@ -160,9 +161,12 @@ class _PhoneState extends State<Phone> {
                     }
                     return null;
                   },
+                  autofocus: false,
                   decoration: InputDecoration(
                     // border: OutlineInputBorder(),
-                    labelText: 'Phone verification code',
+
+                    hintText: 'Phone verification code',
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
                     suffix: TextButton(
                       onPressed: _startTimer
                           ? null
@@ -173,9 +177,12 @@ class _PhoneState extends State<Phone> {
                               startTimer();
                               print('Send code');
                             },
-                      child: Text(_startTimer
-                          ? '${_start}s Get it again'
-                          : 'Click to send'),
+                      child: Text(
+                        _startTimer
+                            ? '${_start}s Get it again'
+                            : 'Click to send',
+                        style: TextStyle(color: linkColor),
+                      ),
                     ),
                   ),
                   controller: _phoneVerificationCode,

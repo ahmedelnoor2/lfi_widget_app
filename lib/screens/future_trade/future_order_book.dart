@@ -25,7 +25,7 @@ class _FutureOrderBookState extends State<FutureOrderBook> {
   // void setPriceField(public, value) {
   //   public.setAmountField(value);
   // }
-
+  double _precessionValue = 0.1;
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
@@ -103,7 +103,6 @@ class _FutureOrderBookState extends State<FutureOrderBook> {
                       borderRadius: BorderRadius.circular(8),
                       minLength: MediaQuery.of(context).size.width / 6,
                       maxLength: MediaQuery.of(context).size.width,
-                      
                     )),
               )
             : ListView.builder(
@@ -187,7 +186,6 @@ class _FutureOrderBookState extends State<FutureOrderBook> {
                       borderRadius: BorderRadius.circular(8),
                       minLength: MediaQuery.of(context).size.width / 6,
                       maxLength: MediaQuery.of(context).size.width,
-                      
                     )),
               )
             : ListView.builder(
@@ -250,17 +248,18 @@ class _FutureOrderBookState extends State<FutureOrderBook> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              GestureDetector(
-                onTap: () {
-                  print('Select preceision');
-                },
+              PopupMenuButton(
                 child: Container(
-                  width: width * 0.31,
+                  width: width * 0.30,
+                  height: height * 0.04,
+                  margin: EdgeInsets.only(bottom: 2),
+                  padding:
+                      EdgeInsets.only(top: 6, bottom: 6, left: 10, right: 5),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Color.fromARGB(67, 118, 118, 118),
+                      color: Color(0xff292C51),
                     ),
-                    color: Color.fromARGB(67, 118, 118, 118),
+                    color: Color(0xff292C51),
                     borderRadius: BorderRadius.all(
                       Radius.circular(2),
                     ),
@@ -268,20 +267,27 @@ class _FutureOrderBookState extends State<FutureOrderBook> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Text(
-                          '0.1',
-                          style: TextStyle(fontSize: 15),
-                        ),
+                      Text(
+                        _precessionValue.toString(),
+                        style: TextStyle(fontSize: 16),
                       ),
                       Icon(
                         Icons.expand_more,
-                        size: 15,
+                        color: secondaryTextColor,
                       ),
                     ],
                   ),
                 ),
+                onSelected: (value) {
+                  setState(() {
+                    _precessionValue = double.parse(value.toString());
+                  });
+                },
+                itemBuilder: (ctx) => [
+                  _buildPercessionItem('0.1', 0.1),
+                  _buildPercessionItem('0.001', 0.001),
+                  _buildPercessionItem('0.00001', 0.00001),
+                ],
               ),
               GestureDetector(
                 onTap: () {
@@ -300,7 +306,7 @@ class _FutureOrderBookState extends State<FutureOrderBook> {
                   child: Icon(
                     Icons.dashboard,
                     color: secondaryTextColor,
-                    size: 19,
+                    size: 25,
                   ),
                 ),
               ),
@@ -308,6 +314,17 @@ class _FutureOrderBookState extends State<FutureOrderBook> {
           ),
         ),
       ],
+    );
+  }
+
+  PopupMenuItem _buildPercessionItem(String title, double position) {
+    return PopupMenuItem(
+      value: position,
+      child: Row(
+        children: [
+          Text(title),
+        ],
+      ),
     );
   }
 }

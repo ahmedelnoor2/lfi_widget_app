@@ -455,6 +455,8 @@ class _DepositAssetsState extends State<DepositAssets> {
                                     width: width * 0.8,
                                     child: Text(
                                       '${_defaultNetwork == 'XRP' ? asset.changeAddress['addressStr'].split('_')[0] : asset.changeAddress['addressStr']}',
+                                      style: TextStyle(
+                                          overflow: TextOverflow.ellipsis),
                                     ),
                                   ),
                                   GestureDetector(

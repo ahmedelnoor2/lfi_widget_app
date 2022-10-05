@@ -166,7 +166,8 @@ class _SecurityState extends State<Security> {
               ),
               trailing: TextButton(
                 onPressed: () {
-                  if (auth.userInfo['mobileNumber'].isEmpty) {
+                  print( auth.userInfo);
+                  if (auth.userInfo['mobileNumber'].isNotEmpty) {
                     Navigator.pushNamed(context, '/phone_number');
                   } else {
                     snackAlert(context, SnackTypes.warning, 'Coming Soon...');

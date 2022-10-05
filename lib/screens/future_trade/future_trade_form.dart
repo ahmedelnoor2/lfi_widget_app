@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:just_the_tooltip/just_the_tooltip.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/future_market.dart';
@@ -27,7 +28,7 @@ class FutureTradeForm extends StatefulWidget {
 }
 
 class _FutureTradeFormState extends State<FutureTradeForm> {
-  GlobalKey<FormState>  _formTradeKey3 = GlobalKey<FormState>();
+  GlobalKey<FormState> _formTradeKey3 = GlobalKey<FormState>();
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _amountField = TextEditingController();
   final TextEditingController _priceField = TextEditingController();
@@ -62,10 +63,19 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
 
   //TP/SL Options
   bool _tpSlOptions = false;
+final tooltipController = JustTheController();
 
   @override
   void initState() {
     setAvailalbePrice();
+     Future.delayed(const Duration(seconds: 1), () {
+    tooltipController.showTooltip(immediately: false);
+  });
+
+  tooltipController.addListener(() {
+    // Prints the enum value of [TooltipStatus.isShowing] or [TooltipStatus.isHiding]
+    print('controller: ${tooltipController.value}');
+  });
     super.initState();
   }
 
@@ -278,6 +288,8 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
   //   });
   //   calculateTotal('price');
   // }
+ 
+
 
   @override
   Widget build(BuildContext context) {
@@ -381,91 +393,104 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
             ],
           ),
           Container(
+            height: 40,
             padding: EdgeInsets.only(bottom: 2),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Avbl',
-                  style: TextStyle(color: secondaryTextColor),
+            child: JustTheTooltip(
+              backgroundColor: seconadarytextcolour,
+              content: const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  'Transfer assets into your Future wallet here',
                 ),
-                Row(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        setState(() {
-                          _amountController.clear();
-                        });
-                        if (auth.isAuthenticated) {
-                          showModalBottomSheet<void>(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return StatefulBuilder(
-                                builder: (BuildContext context,
-                                    StateSetter updateState) {
-                                  return transferAsset(
-                                    context,
-                                    futureMarket,
-                                    updateState,
-                                  );
-                                },
-                              );
-                            },
-                          );
-                        } else {
-                          Navigator.pushNamed(context, '/authentication');
-                        }
-                      },
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.only(right: 2),
-                            // child: Text(_availableBalance),
-                            child: Text(getFutureBalanceCoin(futureMarket)
-                                .toStringAsFixed(4)),
-                          ),
-                          Container(
-                            padding: EdgeInsets.only(right: 5),
-                            child:
-                                Text('${futureMarket.activeMarket['quote']}'),
-                          ),
-                        ],
+              ),
+              
+            preferredDirection: AxisDirection.down,
+              controller: tooltipController,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Avbl',
+                    style: TextStyle(color: secondaryTextColor),
+                  ),
+                  Row(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            _amountController.clear();
+                          });
+                          if (auth.isAuthenticated) {
+                            showModalBottomSheet<void>(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return StatefulBuilder(
+                                  builder: (BuildContext context,
+                                      StateSetter updateState) {
+                                    return transferAsset(
+                                      context,
+                                      futureMarket,
+                                      updateState,
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          } else {
+                            Navigator.pushNamed(context, '/authentication');
+                          }
+                        },
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.only(right: 2),
+                              // child: Text(_availableBalance),
+                              child: Text(getFutureBalanceCoin(futureMarket)
+                                  .toStringAsFixed(4)),
+                            ),
+                            Container(
+                              padding: EdgeInsets.only(right: 5),
+                              child:
+                                  Text('${futureMarket.activeMarket['quote']}'),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    InkWell(
-                      onTap: () {
-                        setState(() {
-                          _amountController.clear();
-                        });
-                        if (auth.isAuthenticated) {
-                          showModalBottomSheet<void>(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return StatefulBuilder(
-                                builder: (BuildContext context,
-                                    StateSetter updateState) {
-                                  return transferAsset(
-                                    context,
-                                    futureMarket,
-                                    updateState,
-                                  );
-                                },
-                              );
-                            },
-                          );
-                        } else {
-                          Navigator.pushNamed(context, '/authentication');
-                        }
-                      },
-                      child: Icon(
-                        Icons.swap_horiz,
-                        size: 15,
-                        color: linkColor,
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            _amountController.clear();
+                          });
+                          if (auth.isAuthenticated) {
+                            showModalBottomSheet<void>(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return StatefulBuilder(
+                                  builder: (BuildContext context,
+                                      StateSetter updateState) {
+                                    return transferAsset(
+                                      context,
+                                      futureMarket,
+                                      updateState,
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          } else {
+                            Navigator.pushNamed(context, '/authentication');
+                          }
+                        },
+                        child: Icon(
+                          Icons.swap_horiz,
+                          size: 15,
+                          color: linkColor,
+                        ),
                       ),
-                    ),
-                  ],
-                )
-              ],
+                    ],
+                  )
+                ],
+              ),
             ),
           ),
           (_orderType == 2)

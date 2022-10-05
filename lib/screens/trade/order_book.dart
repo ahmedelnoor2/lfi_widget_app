@@ -31,11 +31,8 @@ class _OrderBookState extends State<OrderBook> {
    
 
   }
-  var precsionitems = [   
-    '0.00001',
-    '0.001',
-    '0.1',
-  ];
+  double _precessionValue = 0.1;
+ 
 
   void setPriceField(public, value) {
     public.setAmountField(value);
@@ -290,17 +287,18 @@ class _OrderBookState extends State<OrderBook> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              GestureDetector(
-                onTap: () {
-                  print('Select preceision');
-                },
+             PopupMenuButton(
                 child: Container(
-                  width: width * 0.31,
+                  width: width * 0.30,
+                  height: height * 0.04,
+                  margin: EdgeInsets.only(bottom: 2),
+                  padding:
+                      EdgeInsets.only(top: 6, bottom: 6, left: 10, right: 5),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Color.fromARGB(67, 118, 118, 118),
+                      color: Color(0xff292C51),
                     ),
-                    color: Color.fromARGB(67, 118, 118, 118),
+                    color: Color(0xff292C51),
                     borderRadius: BorderRadius.all(
                       Radius.circular(2),
                     ),
@@ -308,20 +306,27 @@ class _OrderBookState extends State<OrderBook> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Text(
-                          '0.1',
-                          style: TextStyle(fontSize: 15),
-                        ),
+                      Text(
+                        _precessionValue.toString(),
+                        style: TextStyle(fontSize: 16),
                       ),
                       Icon(
                         Icons.expand_more,
-                        size: 15,
+                        color: secondaryTextColor,
                       ),
                     ],
                   ),
                 ),
+                onSelected: (value) {
+                  setState(() {
+                    _precessionValue = double.parse(value.toString());
+                  });
+                },
+                itemBuilder: (ctx) => [
+                  _buildPercessionItem('0.1', 0.1),
+                  _buildPercessionItem('0.001', 0.001),
+                  _buildPercessionItem('0.00001', 0.00001),
+                ],
               ),
               GestureDetector(
                 onTap: () {
@@ -340,7 +345,7 @@ class _OrderBookState extends State<OrderBook> {
                   child: Icon(
                     Icons.dashboard,
                     color: secondaryTextColor,
-                    size: 19,
+                    size: 25,
                   ),
                 ),
               ),
@@ -350,4 +355,16 @@ class _OrderBookState extends State<OrderBook> {
       ],
     );
   }
+  
+  PopupMenuItem _buildPercessionItem(String title, double position) {
+    return PopupMenuItem(
+      value: position,
+      child: Row(
+        children: [
+          Text(title),
+        ],
+      ),
+    );
+  }
+
 }

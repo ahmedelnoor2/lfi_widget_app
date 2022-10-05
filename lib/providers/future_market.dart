@@ -442,6 +442,7 @@ class FutureMarket with ChangeNotifier {
         snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
       }
     } catch (error) {
+      print(error);
       snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
       // throw error;
     }
@@ -480,6 +481,7 @@ class FutureMarket with ChangeNotifier {
         snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
       }
     } catch (error) {
+      print(error);
       snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
       // throw error;
     }
@@ -534,6 +536,7 @@ class FutureMarket with ChangeNotifier {
             ctx, SnackTypes.errors, '${getTranslate(responseData['msg'])}');
       }
     } catch (error) {
+      print(error);
       snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
       // throw error;
     }
@@ -574,6 +577,7 @@ class FutureMarket with ChangeNotifier {
         snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
       }
     } catch (error) {
+      print(error);
       snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
       // throw error;
     }
@@ -613,6 +617,7 @@ class FutureMarket with ChangeNotifier {
         return notifyListeners();
       }
     } catch (error) {
+      print(error);
       snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
       // throw error;
     }
@@ -652,7 +657,8 @@ class FutureMarket with ChangeNotifier {
         return notifyListeners();
       }
     } catch (error) {
-      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
+      print(error);
+    ///  snackAlert(ctx, SnackTypes.errors, 'Server error, please try again .........');
       // throw error;
     }
   }
