@@ -104,40 +104,44 @@ class _OpenOrdersState extends State<OpenOrders>
 
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            SizedBox(
-              // height: 100,
-              width: width * 0.5,
-              child: TabBar(
-                indicatorSize: TabBarIndicatorSize.label,
-                isScrollable: true,
-                onTap: (value) => setState(() {
-                  // _tabIndicatorColor = value == 0 ? Colors.green : Colors.red;
-                }),
-                tabs: <Tab>[
-                  Tab(text: 'Open Orders(${trading.openOrders.length})'),
-                  Tab(text: 'Funds'),
-                ],
-                controller: _tabOpenOrderController,
+        SizedBox(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                // height: 100,
+                width: width * 0.5,
+                child: TabBar(
+                  indicatorSize: TabBarIndicatorSize.label,
+                  isScrollable: true,
+                  onTap: (value) => setState(() {
+                    // _tabIndicatorColor = value == 0 ? Colors.green : Colors.red;
+                  }),
+                  tabs: <Tab>[
+                    Tab(text: 'Open Orders(${trading.openOrders.length})'),
+                    Tab(text: 'Funds'),
+                  ],
+                  controller: _tabOpenOrderController,
+                ),
               ),
-            ),
-            IconButton(
-              onPressed: () {
-                auth.isAuthenticated
-                    ? Navigator.pushNamed(context, '/trade_history')
-                    : Navigator.pushNamed(context, '/authentication');
-              },
-              icon: Icon(
-                Icons.insert_drive_file,
-                color: secondaryTextColor400,
-              ),
-            )
-          ],
+              IconButton(
+                onPressed: () {
+                  auth.isAuthenticated
+                      ? Navigator.pushNamed(context, '/trade_history')
+                      : Navigator.pushNamed(context, '/authentication');
+                },
+                icon: Icon(
+                  Icons.insert_drive_file,
+                  color: secondaryTextColor400,
+                ),
+              )
+            ],
+          ),
         ),
         Divider(height: 0),
-        Flexible(
+        Expanded(
+          // width: width,
+          // height: height,
           child: TabBarView(
             controller: _tabOpenOrderController,
             children: [
@@ -295,7 +299,7 @@ class _OpenOrdersState extends State<OpenOrders>
                                     ),
                                   )
                           ],
-                        )
+                        ),
                       ],
                     )
                   : noAuth(context),

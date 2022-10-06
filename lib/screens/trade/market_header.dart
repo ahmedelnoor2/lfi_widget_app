@@ -46,7 +46,15 @@ class _MarketHeaderState extends State<MarketHeader> {
                 ),
               ),
               InkWell(
-                onTap: () {
+                onTap: () async {
+                  for (var marketSort in public.publicInfoMarket['market']
+                      ['marketSort']) {
+                    await public.filterMarketSearchResults(
+                      '',
+                      public.allMarkets[marketSort],
+                      marketSort,
+                    );
+                  }
                   widget.scaffoldKey!.currentState.openDrawer();
                 },
                 child: Container(

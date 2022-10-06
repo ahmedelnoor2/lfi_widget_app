@@ -688,7 +688,7 @@ class Public with ChangeNotifier {
   }
 
   bool isfavloading = true;
-  var tabindex=0;
+  var tabindex = 0;
   Future<void> getFavMarketList(ctx, formData) async {
     var url = Uri.https(lyoApiUrl, '$getfavmarkert/favorite-market');
     var postData = json.encode(formData);
@@ -726,12 +726,13 @@ class Public with ChangeNotifier {
   Map get insertresponse {
     return _insertresponse;
   }
-bool isMyLoading=true;
+
+  bool isMyLoading = true;
   Future<void> createFavMarket(ctx, formData) async {
     var url = Uri.https(lyoApiUrl, '$getfavmarkert/favorite-market/create');
 
     var postData = json.encode(formData);
-  
+
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
@@ -741,7 +742,7 @@ bool isMyLoading=true;
         _insertresponse = responseData['data'];
 
         snackAlert(ctx, SnackTypes.success, getTranslate(responseData['msg']));
-          isMyLoading=false;
+        isMyLoading = false;
         notifyListeners();
         return;
       } else {
@@ -780,5 +781,4 @@ bool isMyLoading=true;
       // throw error;
     }
   }
- 
 }

@@ -30,7 +30,7 @@ class _MarketDrawerState extends State<MarketDrawer>
   final TextEditingController _searchController = TextEditingController();
 
   var _channel;
-  String _currentMarketSort = 'USDT';
+  String _currentMarketSort = 'ETF';
   bool _loadMarketChange = false;
 
   @override
@@ -224,16 +224,15 @@ class _MarketDrawerState extends State<MarketDrawer>
                                       .split(',')[0] ??
                                   '0.1'
                               : '0.1');
-                          trading.setMarketDepth(public
-                                                  .publicInfoMarket['market']
-                                              ['market']
-                                          [public.activeMarket['showName'].split('/')[1]]
+                          trading.setMarketDepth(public.publicInfoMarket['market']
+                                              ['market'][
+                                          public.activeMarket['showName']
+                                              .split('/')[1]]
                                       [public.activeMarket['showName']] !=
                                   null
                               ? public.publicInfoMarket['market']['market']
                                           [public.activeMarket['showName'].split('/')[1]]
-                                          [public.activeMarket['showName']]
-                                          ['depth']
+                                          [public.activeMarket['showName']]['depth']
                                       .split(',') ??
                                   ['0.1', '0.01', '0.001']
                               : ['0.1', '0.01', '0.001']);
