@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/screens/common/header.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Country.utils.dart';
 import 'package:provider/provider.dart';
@@ -38,11 +40,11 @@ class _SettingState extends State<Setting> {
   //    timer =
   //       Timer.periodic(Duration(seconds: 30), (Timer t) {
   //         print('calling');
-          
+
   //          getnotification();
-        
+
   //    });
-      
+
   //   }else{
   //     var notificationProvider =
   //       Provider.of<Notificationprovider>(context, listen: false);
@@ -54,7 +56,7 @@ class _SettingState extends State<Setting> {
   //       }
   //     print(" not turn on not calling");
   //   }
-   
+
   // }
 
   @override
@@ -99,6 +101,64 @@ class _SettingState extends State<Setting> {
                       }
                     },
                   ),
+                ),
+              ),
+              Card(
+                child: ListTile(
+                  leading: const Icon(Icons.language),
+                  title: const Text('Language choice'),
+                ),
+              ),
+              Card(
+                child: ListTile(
+                  leading: const Icon(Icons.color_lens),
+                  title: const Text('light/dark mode'),
+                  trailing: Switch(
+                    value: isNotification,
+                    onChanged: (val) async {
+                      if (auth.isAuthenticated) {
+                        setState(() {
+                          isNotification = val;
+                        });
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setBool('isnotification', isNotification);
+                        print('check notifcation');
+
+                        print(prefs.getBool('isnotification'));
+                      } else {
+                        Navigator.pushNamed(context, '/authentication');
+                      }
+                    },
+                  ),
+                ),
+              ),
+              Card(
+                child: ListTile(
+                  leading: const Icon(Icons.support),
+                  title: const Text('Help center/support'),
+                ),
+              ),
+              Card(
+                child: ListTile(
+                  leading: const Icon(Icons.policy),
+                  title: const Text('Privacy policy'),
+                ),
+              ),
+              Card(
+                child: ListTile(
+                  leading: const Icon(Icons.book),
+                  title: const Text('Terms and conditions'),
+                ),
+              ),
+              Card(
+                child: ListTile(
+                  onTap: (() {
+                    snackAlert(context,SnackTypes.success, 'Cache Clear SucessFully');
+                  }),
+                  leading: const Icon(Icons.cached),
+                  title: const Text('Clear cache'),
+                 
+                 
                 ),
               ),
             ],
