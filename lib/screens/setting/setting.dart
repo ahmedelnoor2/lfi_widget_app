@@ -9,6 +9,7 @@ import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Country.utils.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../utils/Colors.utils.dart';
 
@@ -103,49 +104,58 @@ class _SettingState extends State<Setting> {
                   ),
                 ),
               ),
-              Card(
-                child: ListTile(
-                  leading: const Icon(Icons.language),
-                  title: const Text('Language choice'),
-                ),
-              ),
-              Card(
-                child: ListTile(
-                  leading: const Icon(Icons.color_lens),
-                  title: const Text('light/dark mode'),
-                  trailing: Switch(
-                    value: isNotification,
-                    onChanged: (val) async {
-                      if (auth.isAuthenticated) {
-                        setState(() {
-                          isNotification = val;
-                        });
-                        final prefs = await SharedPreferences.getInstance();
-                        await prefs.setBool('isnotification', isNotification);
-                        print('check notifcation');
+              // Card(
+              //   child: ListTile(
+              //     leading: const Icon(Icons.language),
+              //     title: const Text('Language choice'),
+              //   ),
+              // ),
+              // Card(
+              //   child: ListTile(
+              //     leading: const Icon(Icons.color_lens),
+              //     title: const Text('light/dark mode'),
+              //     trailing: Switch(
+              //       value: isNotification,
+              //       onChanged: (val) async {
+              //         if (auth.isAuthenticated) {
+              //           setState(() {
+              //             isNotification = val;
+              //           });
+              //           final prefs = await SharedPreferences.getInstance();
+              //           await prefs.setBool('isnotification', isNotification);
+              //           print('check notifcation');
 
-                        print(prefs.getBool('isnotification'));
-                      } else {
-                        Navigator.pushNamed(context, '/authentication');
-                      }
-                    },
-                  ),
-                ),
-              ),
+              //           print(prefs.getBool('isnotification'));
+              //         } else {
+              //           Navigator.pushNamed(context, '/authentication');
+              //         }
+              //       },
+              //     ),
+              //   ),
+              // ),
               Card(
                 child: ListTile(
+                  onTap: (() {
+                    _launchHelpSupport();
+                  }),
                   leading: const Icon(Icons.support),
                   title: const Text('Help center/support'),
                 ),
               ),
               Card(
                 child: ListTile(
+                  onTap: (() {
+                    _launchPrivacy();
+                  }),
                   leading: const Icon(Icons.policy),
                   title: const Text('Privacy policy'),
                 ),
               ),
               Card(
                 child: ListTile(
+                  onTap: (() {
+                    _launchTermsAndConditons();
+                  }),
                   leading: const Icon(Icons.book),
                   title: const Text('Terms and conditions'),
                 ),
@@ -153,12 +163,11 @@ class _SettingState extends State<Setting> {
               Card(
                 child: ListTile(
                   onTap: (() {
-                    snackAlert(context,SnackTypes.success, 'Cache Clear SucessFully');
+                    snackAlert(
+                        context, SnackTypes.success, 'Cache Clear SucessFully');
                   }),
                   leading: const Icon(Icons.cached),
                   title: const Text('Clear cache'),
-                 
-                 
                 ),
               ),
             ],
@@ -166,5 +175,32 @@ class _SettingState extends State<Setting> {
         ),
       ),
     );
+  }
+
+  _launchHelpSupport() async {
+    const url = 'https://support.lyotrade.com/';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  _launchPrivacy() async {
+    const url = 'https://docs.lyotrade.com/terms/privacy-policy';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  _launchTermsAndConditons() async {
+    const url = 'https://docs.lyotrade.com/terms/terms-of-use';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 }
