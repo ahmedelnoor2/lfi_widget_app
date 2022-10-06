@@ -69,6 +69,7 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
 
   Future<void> connectWebSocket() async {
     var public = Provider.of<Public>(context, listen: false);
+    var trading = Provider.of<Trading>(context, listen: false);
 
     _channel = WebSocketChannel.connect(
       Uri.parse('${public.publicInfoMarket["market"]["wsUrl"]}'),
@@ -79,7 +80,8 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
     _channel.sink.add(jsonEncode({
       "event": "sub",
       "params": {
-        "channel": "market_${marketCoin}_depth_step0",
+        "channel":
+            "market_${marketCoin}_depth_step${trading.marketDepth.indexOf(trading.precessionValue)}",
         "cb_id": marketCoin
       }
     }));
@@ -98,6 +100,7 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
   }
 
   void extractStreamData(streamData, public) async {
+    var trading = Provider.of<Trading>(context, listen: false);
     String marketCoin = public.activeMarket['symbol'];
     if (streamData != null) {
       // var inflated = zlib.decode(streamData as List<int>);
@@ -106,7 +109,8 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
       var data = utf8.decode(inflated);
       if (json.decode(data)['channel'] != null) {
         var marketData = json.decode(data);
-        if (marketData['channel'] == 'market_${marketCoin}_depth_step0') {
+        if (marketData['channel'] ==
+            'market_${marketCoin}_depth_step${trading.marketDepth.indexOf(trading.precessionValue)}') {
           public.setAsksAndBids(marketData['tick']);
         }
         // if (marketData['channel'] == 'market_${marketCoin}_trade_ticker') {
@@ -190,6 +194,7 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
                               asks: public.asks,
                               bids: public.bids,
                               lastPrice: public.lastPrice,
+                              updateMarket: updateMarket,
                             ),
                           ),
                           Container(

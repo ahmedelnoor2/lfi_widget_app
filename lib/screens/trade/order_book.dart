@@ -14,10 +14,12 @@ class OrderBook extends StatefulWidget {
     this.asks,
     this.bids,
     this.lastPrice,
+    this.updateMarket,
   }) : super(key: key);
   final List? asks;
   final List? bids;
   final String? lastPrice;
+  final updateMarket;
 
   @override
   State<OrderBook> createState() => _OrderBookState();
@@ -27,12 +29,36 @@ class _OrderBookState extends State<OrderBook> {
   @override
   void initState() {
     // TODO: implement initState
+    setPrecessionValue();
     super.initState();
-   
-
   }
-  double _precessionValue = 0.1;
- 
+
+  void setPrecessionValue() {
+    var public = Provider.of<Public>(context, listen: false);
+    var trading = Provider.of<Trading>(context, listen: false);
+
+    trading.setPrecessionValue(public.publicInfoMarket['market']['market']
+                    [public.activeMarket['showName'].split('/')[1]]
+                [public.activeMarket['showName']] !=
+            null
+        ? public.publicInfoMarket['market']['market']
+                    [public.activeMarket['showName'].split('/')[1]]
+                    [public.activeMarket['showName']]['depth']
+                .split(',')[0] ??
+            '0.1'
+        : '0.1');
+
+    trading.setMarketDepth(public.publicInfoMarket['market']['market']
+                    [public.activeMarket['showName'].split('/')[1]]
+                [public.activeMarket['showName']] !=
+            null
+        ? public.publicInfoMarket['market']['market']
+                    [public.activeMarket['showName'].split('/')[1]]
+                    [public.activeMarket['showName']]['depth']
+                .split(',') ??
+            ['0.1', '0.01', '0.001']
+        : ['0.1', '0.01', '0.001']);
+  }
 
   void setPriceField(public, value) {
     public.setAmountField(value);
@@ -43,6 +69,7 @@ class _OrderBookState extends State<OrderBook> {
     width = MediaQuery.of(context).size.width;
 
     var public = Provider.of<Public>(context, listen: true);
+    var trading = Provider.of<Trading>(context, listen: true);
 
     List? rasks = widget.asks!.isNotEmpty
         ? widget.asks!.length > 6
@@ -69,6 +96,17 @@ class _OrderBookState extends State<OrderBook> {
                 ? current
                 : next)[1])
         : 0;
+
+    var depthList = public.publicInfoMarket['market']['market']
+                    [public.activeMarket['showName'].split('/')[1]]
+                [public.activeMarket['showName']] !=
+            null
+        ? public.publicInfoMarket['market']['market']
+                    [public.activeMarket['showName'].split('/')[1]]
+                    [public.activeMarket['showName']]['depth']
+                .split(',') ??
+            ['0.1', '0.01', '0.001']
+        : ['0.1', '0.01', '0.001'];
 
     return Column(
       children: [
@@ -113,8 +151,8 @@ class _OrderBookState extends State<OrderBook> {
             ),
           ],
         ),
-        asks.isEmpty                     //isloading
-            ? SkeletonParagraph( 
+        asks.isEmpty //isloading
+            ? SkeletonParagraph(
                 style: SkeletonParagraphStyle(
                     lines: 6,
                     spacing: 6,
@@ -124,7 +162,6 @@ class _OrderBookState extends State<OrderBook> {
                       borderRadius: BorderRadius.circular(8),
                       minLength: MediaQuery.of(context).size.width / 6,
                       maxLength: MediaQuery.of(context).size.width,
-                      
                     )),
               )
             : ListView.builder(
@@ -154,7 +191,6 @@ class _OrderBookState extends State<OrderBook> {
                                       .toStringAsPrecision(7),
                                   style: TextStyle(
                                     color: redIndicator,
-                                   
                                   ),
                                 ),
                               ),
@@ -205,7 +241,8 @@ class _OrderBookState extends State<OrderBook> {
           ],
         ),
         bids.isEmpty
-            ? SkeletonParagraph(                     //isloading
+            ? SkeletonParagraph(
+                //isloading
                 style: SkeletonParagraphStyle(
                     lines: 6,
                     spacing: 6,
@@ -215,7 +252,6 @@ class _OrderBookState extends State<OrderBook> {
                       borderRadius: BorderRadius.circular(8),
                       minLength: MediaQuery.of(context).size.width / 6,
                       maxLength: MediaQuery.of(context).size.width,
-                      
                     )),
               )
             : ListView.builder(
@@ -239,27 +275,23 @@ class _OrderBookState extends State<OrderBook> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               FittedBox(
-                                
-                      fit: BoxFit.cover,
+                                fit: BoxFit.cover,
                                 child: Text(
                                   double.parse('${bids[index][0] ?? 0}')
                                       .toStringAsPrecision(7),
                                   style: TextStyle(
                                     color: greenIndicator,
-                                
                                   ),
                                 ),
                               ),
                               FittedBox(
-                                
-                      fit: BoxFit.cover,
+                                fit: BoxFit.cover,
                                 child: Text(
                                   double.parse('${bids[index][1] ?? 0}') > 10
                                       ? double.parse('${bids[index][1] ?? 0}')
                                           .toStringAsFixed(2)
                                       : double.parse('${bids[index][1] ?? 0}')
                                           .toStringAsPrecision(4),
-                                  
                                 ),
                               ),
                             ],
@@ -287,46 +319,48 @@ class _OrderBookState extends State<OrderBook> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-             PopupMenuButton(
+              Expanded(
                 child: Container(
-                  width: width * 0.30,
-                  height: height * 0.04,
-                  margin: EdgeInsets.only(bottom: 2),
-                  padding:
-                      EdgeInsets.only(top: 6, bottom: 6, left: 10, right: 5),
+                  margin: EdgeInsets.only(right: 5),
+                  padding: EdgeInsets.only(left: 5),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Color(0xff292C51),
+                      color: Color.fromARGB(67, 118, 118, 118),
                     ),
-                    color: Color(0xff292C51),
+                    color: Color.fromARGB(67, 118, 118, 118),
                     borderRadius: BorderRadius.all(
                       Radius.circular(2),
                     ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        _precessionValue.toString(),
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      Icon(
-                        Icons.expand_more,
-                        color: secondaryTextColor,
-                      ),
-                    ],
+                  child: DropdownButton<String>(
+                    isDense: true,
+                    isExpanded: true,
+                    value: trading.precessionValue,
+                    icon: const Icon(
+                      Icons.keyboard_arrow_down,
+                      color: Colors.white,
+                    ),
+                    style: const TextStyle(fontSize: 13),
+                    underline: Container(
+                      height: 0,
+                    ),
+                    onChanged: (newValue) {
+                      trading.setPrecessionValue(newValue.toString());
+                      widget.updateMarket();
+                    },
+                    items: depthList.map<DropdownMenuItem<String>>((value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(
+                          '$value',
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ),
-                onSelected: (value) {
-                  setState(() {
-                    _precessionValue = double.parse(value.toString());
-                  });
-                },
-                itemBuilder: (ctx) => [
-                  _buildPercessionItem('0.1', 0.1),
-                  _buildPercessionItem('0.001', 0.001),
-                  _buildPercessionItem('0.00001', 0.00001),
-                ],
               ),
               GestureDetector(
                 onTap: () {
@@ -355,7 +389,7 @@ class _OrderBookState extends State<OrderBook> {
       ],
     );
   }
-  
+
   PopupMenuItem _buildPercessionItem(String title, double position) {
     return PopupMenuItem(
       value: position,
@@ -366,5 +400,4 @@ class _OrderBookState extends State<OrderBook> {
       ),
     );
   }
-
 }

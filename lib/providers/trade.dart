@@ -28,6 +28,28 @@ class Trading with ChangeNotifier {
     return _transactionHistory;
   }
 
+  String _precessionValue = '0.1';
+
+  String get precessionValue {
+    return _precessionValue;
+  }
+
+  void setPrecessionValue(value) {
+    _precessionValue = value;
+    return notifyListeners();
+  }
+
+  List _marketDepth = ['0.1', '0.01', '0.001'];
+
+  List get marketDepth {
+    return _marketDepth;
+  }
+
+  void setMarketDepth(value) {
+    _marketDepth = value;
+    return notifyListeners();
+  }
+
   void clearOpenOrders() {
     _openOrders = [];
     notifyListeners();
@@ -60,7 +82,6 @@ class Trading with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-      
 
       if (responseData['code'] == 0) {
         _openOrders = responseData['data']['orders'];
@@ -359,14 +380,13 @@ class Trading with ChangeNotifier {
   }
 
   Future<void> futureOrderHistory(ctx, auth, formData) async {
-    
     headers['exchange-token'] = auth.loginVerificationToken;
 
     var url = Uri.https(
       futApiUrl,
       '$futExApi/order/history_order_list',
     );
-    
+
     var postData = json.encode(formData);
 
     try {
@@ -390,7 +410,7 @@ class Trading with ChangeNotifier {
       } else {
         _isFuturehistoruyloading = false;
         notifyListeners();
-       print(getTranslate(responseData['msg']));
+        print(getTranslate(responseData['msg']));
 
         return;
       }
@@ -405,23 +425,21 @@ class Trading with ChangeNotifier {
     }
   }
 
+  Map _funds = {};
 
-Map _funds={};
+  Map get funds {
+    return _funds;
+  }
 
-Map get funds{
-  return _funds;
-}
-bool _isfundsLoading=true;
+  bool _isfundsLoading = true;
 
+  bool get isfundsLoading {
+    return _isfundsLoading;
+  }
 
-bool get isfundsLoading{
-
-return _isfundsLoading;
-
-}
   /// get funds///
-   Future<void> getFunds(ctx, auth, formData) async {
-    _isfundsLoading=true;
+  Future<void> getFunds(ctx, auth, formData) async {
+    _isfundsLoading = true;
 
     headers['exchange-token'] = auth.loginVerificationToken;
 
@@ -440,20 +458,20 @@ return _isfundsLoading;
       );
 
       final responseData = json.decode(response.body);
-     
+
       if (responseData['code'] == "0") {
         _funds = responseData['data'];
-        _isfundsLoading=false;
+        _isfundsLoading = false;
         print(_funds);
         return notifyListeners();
       } else {
         _funds = {};
-        _isfundsLoading=false;
+        _isfundsLoading = false;
         return notifyListeners();
       }
     } catch (error) {
       print(error);
-    _isfundsLoading=false;
+      _isfundsLoading = false;
       // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
       return;
     }

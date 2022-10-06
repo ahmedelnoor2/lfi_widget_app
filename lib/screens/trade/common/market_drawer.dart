@@ -31,6 +31,7 @@ class _MarketDrawerState extends State<MarketDrawer>
 
   var _channel;
   String _currentMarketSort = 'USDT';
+  bool _loadMarketChange = false;
 
   @override
   void initState() {
@@ -184,6 +185,11 @@ class _MarketDrawerState extends State<MarketDrawer>
                   ),
                 )
               : Container(),
+          _loadMarketChange
+              ? Center(
+                  child: LinearProgressIndicator(),
+                )
+              : Container(),
           SizedBox(
             height: height * 0.76,
             child: ListView.builder(
@@ -198,15 +204,47 @@ class _MarketDrawerState extends State<MarketDrawer>
                         : public.allMarkets[_currentMarketSort][index];
 
                 return ListTile(
-                  onTap: () async {
-                    await public.setActiveMarket(_market);
-                    widget.updateMarket();
-                    await trading.getFunds(context, auth, {
-                      "coinSymbols": public.activeMarket['showName']
-                          .replaceAll(new RegExp(r"\p{P}", unicode: true), ","),
-                    });
-                    Navigator.pop(context);
-                  },
+                  onTap: _loadMarketChange
+                      ? () {}
+                      : () async {
+                          setState(() {
+                            _loadMarketChange = true;
+                          });
+                          await public.setActiveMarket(_market);
+                          trading.setPrecessionValue(public
+                                                  .publicInfoMarket['market']
+                                              ['market']
+                                          [public.activeMarket['showName'].split('/')[1]]
+                                      [public.activeMarket['showName']] !=
+                                  null
+                              ? public.publicInfoMarket['market']['market']
+                                          [public.activeMarket['showName'].split('/')[1]]
+                                          [public.activeMarket['showName']]
+                                          ['depth']
+                                      .split(',')[0] ??
+                                  '0.1'
+                              : '0.1');
+                          trading.setMarketDepth(public
+                                                  .publicInfoMarket['market']
+                                              ['market']
+                                          [public.activeMarket['showName'].split('/')[1]]
+                                      [public.activeMarket['showName']] !=
+                                  null
+                              ? public.publicInfoMarket['market']['market']
+                                          [public.activeMarket['showName'].split('/')[1]]
+                                          [public.activeMarket['showName']]
+                                          ['depth']
+                                      .split(',') ??
+                                  ['0.1', '0.01', '0.001']
+                              : ['0.1', '0.01', '0.001']);
+                          widget.updateMarket();
+                          await trading.getFunds(context, auth, {
+                            "coinSymbols": public.activeMarket['showName']
+                                .replaceAll(
+                                    new RegExp(r"\p{P}", unicode: true), ","),
+                          });
+                          Navigator.pop(context);
+                        },
                   title: Row(
                     children: [
                       Text(

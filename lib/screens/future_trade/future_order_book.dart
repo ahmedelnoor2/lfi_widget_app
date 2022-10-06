@@ -25,7 +25,8 @@ class _FutureOrderBookState extends State<FutureOrderBook> {
   // void setPriceField(public, value) {
   //   public.setAmountField(value);
   // }
-  double _precessionValue = 0.1;
+  String _precessionValue = '0.1';
+
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
@@ -248,46 +249,50 @@ class _FutureOrderBookState extends State<FutureOrderBook> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              PopupMenuButton(
+              Expanded(
                 child: Container(
-                  width: width * 0.30,
-                  height: height * 0.04,
-                  margin: EdgeInsets.only(bottom: 2),
-                  padding:
-                      EdgeInsets.only(top: 6, bottom: 6, left: 10, right: 5),
+                  margin: EdgeInsets.only(right: 5),
+                  padding: EdgeInsets.only(left: 5),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Color(0xff292C51),
+                      color: Color.fromARGB(67, 118, 118, 118),
                     ),
-                    color: Color(0xff292C51),
+                    color: Color.fromARGB(67, 118, 118, 118),
                     borderRadius: BorderRadius.all(
                       Radius.circular(2),
                     ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        _precessionValue.toString(),
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      Icon(
-                        Icons.expand_more,
-                        color: secondaryTextColor,
-                      ),
-                    ],
+                  child: DropdownButton<String>(
+                    isDense: true,
+                    isExpanded: true,
+                    value: '${_precessionValue}',
+                    icon: const Icon(
+                      Icons.keyboard_arrow_down,
+                      color: Colors.white,
+                    ),
+                    style: const TextStyle(fontSize: 13),
+                    underline: Container(
+                      height: 0,
+                    ),
+                    onChanged: (newValue) {
+                      setState(() {
+                        _precessionValue = newValue.toString();
+                      });
+                    },
+                    items: ['0.1', '0.001', '0.0001']
+                        .map<DropdownMenuItem<String>>((value) {
+                      return DropdownMenuItem<String>(
+                        value: '${value}',
+                        child: Text(
+                          '$value',
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ),
-                onSelected: (value) {
-                  setState(() {
-                    _precessionValue = double.parse(value.toString());
-                  });
-                },
-                itemBuilder: (ctx) => [
-                  _buildPercessionItem('0.1', 0.1),
-                  _buildPercessionItem('0.001', 0.001),
-                  _buildPercessionItem('0.00001', 0.00001),
-                ],
               ),
               GestureDetector(
                 onTap: () {
