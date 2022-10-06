@@ -12,6 +12,9 @@ import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/common/no_data.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/notification/widget.dart/notification_detail.dart';
+import 'package:lyotrade/screens/notification/widget.dart/painter.dart';
+import 'package:lyotrade/utils/AppConstant.utils.dart';
 
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
@@ -209,7 +212,7 @@ class _NotificationsscreenState extends State<Notificationsscreen>
                               notificationProvider.userMessageList.length,
                           physics: const AlwaysScrollableScrollPhysics(),
                           itemBuilder: (context, index) {
-                            print(notificationProvider.userMessageList[index]);
+                            
                             var item =
                                 notificationProvider.userMessageList[index];
                             return Column(
@@ -257,9 +260,21 @@ class _NotificationsscreenState extends State<Notificationsscreen>
                                           : Colors.transparent,
                                       child: ListTile(
                                         onTap: () {
-                                          _buildNotificationDetailBottomSheet(
-                                            context,
-                                          );
+                                          showModalBottomSheet(
+                                              isScrollControlled: true,
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.only(
+                                                          topLeft:
+                                                              Radius.circular(
+                                                                  5),
+                                                          topRight:
+                                                              Radius.circular(
+                                                                  5))),
+                                              context: context,
+                                              builder: (context) {
+                                                return NotificationDetail(item,getnotification);
+                                              });
                                           if (notificationProvider.selectedItems
                                               .contains(item)) {
                                             notificationProvider.selectedItems
@@ -364,43 +379,6 @@ class _NotificationsscreenState extends State<Notificationsscreen>
     }
 
     return defaultColor;
-  }
-
-  Future _buildNotificationDetailBottomSheet(
-    BuildContext context,
-  ) {
-    return showModalBottomSheet(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        backgroundColor: bottombuttoncolour,
-        context: context,
-        builder: (builder) {
-          return Container(
-            padding: EdgeInsets.only(top: 20),
-            color: bottombuttoncolour,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  padding: EdgeInsets.only(
-                    bottom: 30,
-                    left: 15,
-                    right: 15,
-                  ),
-                  child: LyoButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    text: 'Cancel',
-                    active: true,
-                    isLoading: false,
-                  ),
-                ),
-              ],
-            ),
-          );
-        });
   }
 
   Future _buildBottomSheet(

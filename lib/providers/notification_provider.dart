@@ -168,6 +168,37 @@ class Notificationprovider extends ChangeNotifier {
     }
   }
 
+    Future<void> readNotification(ctx, auth,id) async {
+    headers['exchange-token'] = auth.loginVerificationToken;
+
+    var url = Uri.https(
+      apiUrl,
+      '$exApi/message/message_update_status',
+    );
+
+    var data = {"id": id};
+
+    var body = jsonEncode(data);
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+      print(response.statusCode);
+      print(response.body);
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == '0') {
+       
+        return;
+      } else {
+        snackAlert(ctx, SnackTypes.errors,
+            getTranslate(responseData['msg'].toString()));
+        return;
+      }
+    } catch (error) {
+     print(error);
+      return;
+    }
+  }
+
   bool _readCountResponse = false;
 
   bool get readCountResponse {
