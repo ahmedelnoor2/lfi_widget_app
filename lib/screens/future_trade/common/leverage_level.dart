@@ -119,8 +119,10 @@ Widget leverageLevel(
           ),
         ),
         SfSlider(
-          min: double.parse('${futureMarket.userConfiguration['minLevel']}'),
-          max: double.parse('${futureMarket.userConfiguration['maxLevel']}'),
+          min: double.parse(
+              '${futureMarket.userConfiguration['minLevel'] ?? 0.00}'),
+          max: double.parse(
+              '${futureMarket.userConfiguration['maxLevel'] ?? 125.00}'),
           value: leverageLevelField.text.isEmpty
               ? 1.0
               : double.parse(leverageLevelField.text),
@@ -139,12 +141,12 @@ Widget leverageLevel(
           padding: EdgeInsets.only(top: 15),
           child: Row(
             children: [
-              Text('Max holding amount is about ',
-                  style: TextStyle(fontSize: 15)),
-              Text(
-                '${futureMarket.userConfiguration['leverCeiling']['${leverageLevelField.text}']} Cont.',
-                style: TextStyle(fontSize: 15, color: Colors.amber),
-              )
+              // Text('Max holding amount is about ',
+              //     style: TextStyle(fontSize: 15)),
+              // Text(
+              //   '${futureMarket.userConfiguration['leverCeiling']['${leverageLevelField.text}'] ?? 0} Cont.',
+              //   style: TextStyle(fontSize: 15, color: Colors.amber),
+              // )
             ],
           ),
         ),

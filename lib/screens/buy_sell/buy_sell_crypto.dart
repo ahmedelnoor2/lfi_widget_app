@@ -54,7 +54,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
 
   String _defaultOnrampNetwork = 'BTC';
   String _currentOnrampAddress = '';
-  bool _selectorFalse = false;
+  bool _selectorFalse = true;
   bool _validate = false;
 
   @override

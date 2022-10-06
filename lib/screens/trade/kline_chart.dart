@@ -322,7 +322,7 @@ class _KlineChartState extends State<KlineChart>
                                 children: [
                                   Text(
                                     public.activeMarketTick.isNotEmpty
-                                        ? '${getNumberString(context, double.parse('${public.activeMarketTick['close']}'))}'
+                                        ? '${double.parse('${public.activeMarketTick['close']}')}'
                                         : '0.00',
                                     style: TextStyle(
                                       fontSize: 25,
