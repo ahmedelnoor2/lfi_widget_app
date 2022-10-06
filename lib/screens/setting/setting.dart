@@ -139,7 +139,7 @@ class _SettingState extends State<Setting> {
                     _launchHelpSupport();
                   }),
                   leading: const Icon(Icons.support),
-                  title: const Text('Help center/support'),
+                  title: const Text('Help Center / Support'),
                 ),
               ),
               Card(
@@ -148,7 +148,7 @@ class _SettingState extends State<Setting> {
                     _launchPrivacy();
                   }),
                   leading: const Icon(Icons.policy),
-                  title: const Text('Privacy policy'),
+                  title: const Text('Privacy Policy'),
                 ),
               ),
               Card(
@@ -157,17 +157,17 @@ class _SettingState extends State<Setting> {
                     _launchTermsAndConditons();
                   }),
                   leading: const Icon(Icons.book),
-                  title: const Text('Terms and conditions'),
+                  title: const Text('Terms And Conditions'),
                 ),
               ),
               Card(
                 child: ListTile(
                   onTap: (() {
-                    snackAlert(
-                        context, SnackTypes.success, 'Cache Clear SucessFully');
+                    snackAlert(context, SnackTypes.success,
+                        'Cache cleared successfully');
                   }),
                   leading: const Icon(Icons.cached),
-                  title: const Text('Clear cache'),
+                  title: const Text('Clear Cache'),
                 ),
               ),
             ],
