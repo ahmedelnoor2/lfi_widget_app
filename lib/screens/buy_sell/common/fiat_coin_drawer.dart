@@ -104,6 +104,9 @@ class _FiatCoinDrawerState extends State<FiatCoinDrawer> {
                   SizedBox(
                     width: width * 0.75,
                     child: TextFormField(
+                      onChanged: (val) {
+                        payments.filterFiatSearchResults(val);
+                      },
                       controller: _searchController,
                       style: const TextStyle(fontSize: 15),
                       decoration: const InputDecoration(
@@ -132,7 +135,9 @@ class _FiatCoinDrawerState extends State<FiatCoinDrawer> {
                   ? payments.fiatSearchCurrencies.length
                   : payments.fiatCurrencies.length,
               itemBuilder: (context, index) {
-                var _fiatCurrency = payments.fiatSearchCurrencies[index];
+                var _fiatCurrency = payments.fiatSearchCurrencies.isNotEmpty
+                    ? payments.fiatSearchCurrencies[index]
+                    : payments.fiatCurrencies[index];
 
                 return Column(
                   children: [

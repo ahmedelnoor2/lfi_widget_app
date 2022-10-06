@@ -70,6 +70,26 @@ class Payments with ChangeNotifier {
     return _fiatSearchCurrencies;
   }
 
+  Future<void> filterFiatSearchResults(query) async {
+    if (query.isNotEmpty) {
+      List dummyListData = [];
+      for (var item in _fiatCurrencies) {
+        if ((item['ticker'].toLowerCase()).contains(query.toLowerCase())) {
+          dummyListData.add(item);
+          notifyListeners();
+        }
+      }
+      _fiatSearchCurrencies.clear();
+      _fiatSearchCurrencies.addAll(dummyListData);
+
+      return notifyListeners();
+    } else {
+      _fiatSearchCurrencies.clear();
+      _fiatSearchCurrencies.addAll(_fiatCurrencies);
+      return notifyListeners();
+    }
+  }
+
   Future<void> getFiatCurrencies(ctx, auth) async {
     headers['exchange-token'] = auth.loginVerificationToken;
 
@@ -88,7 +108,6 @@ class Payments with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         _fiatCurrencies = responseData['data'];
-        _fiatSearchCurrencies = responseData['data'];
         _selectedFiatCurrency =
             responseData['data'].firstWhere((item) => item['ticker'] == 'gbp');
         return notifyListeners();
@@ -120,10 +139,10 @@ class Payments with ChangeNotifier {
     return _cryptoSearchCurrencies;
   }
 
-  Future<void> filterSearchResults(query, _allCurrencies) async {
+  Future<void> filterSearchResults(query) async {
     if (query.isNotEmpty) {
       List dummyListData = [];
-      for (var item in _allCurrencies) {
+      for (var item in _cryptoCurrencies) {
         if ((item['ticker'].toLowerCase()).contains(query.toLowerCase())) {
           dummyListData.add(item);
           notifyListeners();
@@ -135,7 +154,7 @@ class Payments with ChangeNotifier {
       return notifyListeners();
     } else {
       _cryptoSearchCurrencies.clear();
-      _cryptoSearchCurrencies.addAll(_allCurrencies);
+      _cryptoSearchCurrencies.addAll(_cryptoCurrencies);
       return notifyListeners();
     }
   }
@@ -158,7 +177,6 @@ class Payments with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         _cryptoCurrencies = responseData['data'];
-        _cryptoSearchCurrencies = responseData['data'];
         _selectedCryptoCurrency = responseData['data']
             .firstWhere((item) => item['ticker'] == 'usdttrc20');
         return notifyListeners();

@@ -124,148 +124,160 @@ class _MarketState extends State<Market> {
                                 vol = '${data['vol'] ?? '0.00'}';
                               }
                               //  print(data);
-                              return Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  color: cardcolor,
-                                ),
-                                width: 178,
-                                margin: EdgeInsets.all(5),
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              kIsWeb
-                                                  ? Container()
-                                                  : Stack(
-                                                      children: [
-                                                        Container(
-                                                          padding:
-                                                              EdgeInsets.only(
-                                                                  left: 10),
-                                                          child: Image.network(
-                                                            '${public.publicInfoMarket['market']['coinList']['${public.marketrecoomendsymbol[index].split('/')[1]}']['icon']}',
+                              return InkWell(
+                                onTap: () async {
+                                  // await public.setActiveMarket(_market);
+                                  // Navigator.pushNamed(context, '/kline_chart');
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    color: cardcolor,
+                                  ),
+                                  width: 178,
+                                  margin: EdgeInsets.all(5),
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                kIsWeb
+                                                    ? Container()
+                                                    : Stack(
+                                                        children: [
+                                                          Container(
+                                                            padding:
+                                                                EdgeInsets.only(
+                                                                    left: 10),
+                                                            child:
+                                                                Image.network(
+                                                              '${public.publicInfoMarket['market']['coinList']['${public.marketrecoomendsymbol[index].split('/')[1]}']['icon']}',
+                                                              width: 16,
+                                                            ),
+                                                          ),
+                                                          Image.network(
+                                                            '${public.publicInfoMarket['market']['coinList']['${public.marketrecoomendsymbol[index].split('/')[0]}']['icon']}',
                                                             width: 16,
                                                           ),
-                                                        ),
-                                                        Image.network(
-                                                          '${public.publicInfoMarket['market']['coinList']['${public.marketrecoomendsymbol[index].split('/')[0]}']['icon']}',
-                                                          width: 16,
-                                                        ),
-                                                      ],
-                                                    ),
-                                              Container(
-                                                padding:
-                                                    EdgeInsets.only(left: 5),
-                                                child: Text(
-                                                  '${getMarketName(public.marketrecoomendsymbol[index])}',
-                                                  // public.activeMarginMarket[public.marketrecoomendsymbol.replaceAll('/', '')],
-                                                  style: TextStyle(),
+                                                        ],
+                                                      ),
+                                                Container(
+                                                  padding:
+                                                      EdgeInsets.only(left: 5),
+                                                  child: Text(
+                                                    '${getMarketName(public.marketrecoomendsymbol[index])}',
+                                                    // public.activeMarginMarket[public.marketrecoomendsymbol.replaceAll('/', '')],
+                                                    style: TextStyle(),
+                                                  ),
                                                 ),
+                                              ],
+                                            ),
+                                            Text(
+                                              public.activeMarketAllTicks
+                                                      .isNotEmpty
+                                                  ? '${double.parse(rose) > 0 ? '+' : ''}${(double.parse(rose) * 100).toStringAsFixed(2)} %'
+                                                  : '--%',
+                                              style: TextStyle(
+                                                color: public
+                                                        .activeMarketAllTicks
+                                                        .isEmpty
+                                                    ? secondaryTextColor
+                                                    : double.parse(rose) > 0
+                                                        ? greenIndicator
+                                                        : redIndicator,
+                                                fontSize: 12,
                                               ),
-                                            ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.only(
+                                                left: 10, bottom: 5),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  public.activeMarketAllTicks
+                                                          .isNotEmpty
+                                                      ? '${close.toString()}'
+                                                      : '--',
+                                                  style: TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: public
+                                                            .activeMarketAllTicks
+                                                            .isEmpty
+                                                        ? secondaryTextColor
+                                                        : double.parse(rose) > 0
+                                                            ? greenIndicator
+                                                            : redIndicator,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "≈ ${getNumberFormat(context, public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()]['${public.marketrecoomendsymbol[index].split('/')[0]}'])}",
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                          Text(
-                                            public.activeMarketAllTicks
-                                                    .isNotEmpty
-                                                ? '${double.parse(rose) > 0 ? '+' : ''}${(double.parse(rose) * 100).toStringAsFixed(2)} %'
-                                                : '--%',
-                                            style: TextStyle(
-                                              color: public.activeMarketAllTicks
-                                                      .isEmpty
-                                                  ? secondaryTextColor
-                                                  : double.parse(rose) > 0
-                                                      ? greenIndicator
-                                                      : redIndicator,
-                                              fontSize: 12,
+                                          Container(
+                                            padding: EdgeInsets.only(
+                                                left: 10, right: 10, bottom: 5),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Container(
+                                                  child: Text(
+                                                    '24H Vol: ${public.activeMarketAllTicks.isNotEmpty ? getNumberString(context, double.parse('${vol}')) : '--'}',
+                                                    style: TextStyle(
+                                                      color: secondaryTextColor,
+                                                      fontSize: 11,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Container(
+                                                  alignment: Alignment.center,
+                                                  height: 20,
+                                                  width: 20,
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color:
+                                                        secondaryTextColor400,
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.navigate_next,
+                                                    color: Colors.black,
+                                                    size: 20,
+                                                  ),
+                                                )
+                                              ],
                                             ),
                                           ),
                                         ],
                                       ),
-                                    ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Container(
-                                          padding: EdgeInsets.only(
-                                              left: 10, bottom: 5),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                public.activeMarketAllTicks
-                                                        .isNotEmpty
-                                                    ? '${close.toString()}'
-                                                    : '--',
-                                                style: TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: public
-                                                          .activeMarketAllTicks
-                                                          .isEmpty
-                                                      ? secondaryTextColor
-                                                      : double.parse(rose) > 0
-                                                          ? greenIndicator
-                                                          : redIndicator,
-                                                ),
-                                              ),
-                                              Text(
-                                                "≈ ${getNumberFormat(context, public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()]['${public.marketrecoomendsymbol[index].split('/')[0]}'])}",
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          padding: EdgeInsets.only(
-                                              left: 10, right: 10, bottom: 5),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Container(
-                                                child: Text(
-                                                  '24H Vol: ${public.activeMarketAllTicks.isNotEmpty ? getNumberString(context, double.parse('${vol}')) : '--'}',
-                                                  style: TextStyle(
-                                                    color: secondaryTextColor,
-                                                    fontSize: 11,
-                                                  ),
-                                                ),
-                                              ),
-                                              Container(
-                                                alignment: Alignment.center,
-                                                height: 20,
-                                                width: 20,
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color: secondaryTextColor400,
-                                                ),
-                                                child: Icon(
-                                                  Icons.navigate_next,
-                                                  color: Colors.black,
-                                                  size: 20,
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               );
                             }),

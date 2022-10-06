@@ -26,8 +26,6 @@ class _CryptoCoinDrawerState extends State<CryptoCoinDrawer> {
   Future<void> changeCryptoCoin(payments, currency) async {
     var auth = Provider.of<Auth>(context, listen: false);
 
-    print(currency);
-
     payments.setSelectedCryptoCurrency(currency);
     Navigator.pop(context);
     await payments.getEstimateRate(context, auth, {
@@ -109,8 +107,7 @@ class _CryptoCoinDrawerState extends State<CryptoCoinDrawer> {
                     width: width * 0.75,
                     child: TextFormField(
                       onChanged: (val) {
-                        payments.filterSearchResults(
-                            val, payments.cryptoCurrencies);
+                        payments.filterSearchResults(val);
                       },
                       controller: _searchController,
                       style: const TextStyle(fontSize: 15),
@@ -140,7 +137,10 @@ class _CryptoCoinDrawerState extends State<CryptoCoinDrawer> {
                   ? payments.cryptoSearchCurrencies.length
                   : payments.cryptoCurrencies.length,
               itemBuilder: (context, index) {
-                var _cryptoCurrency = payments.cryptoSearchCurrencies[index];
+                var _cryptoCurrency = payments.cryptoSearchCurrencies.isNotEmpty
+                    ? payments.cryptoSearchCurrencies[index]
+                    : payments.cryptoCurrencies[index];
+
                 return Column(
                   children: [
                     ListTile(
