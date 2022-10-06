@@ -715,7 +715,7 @@ class Public with ChangeNotifier {
       _favMarketList = [];
       _favMarketNameList.clear();
       notifyListeners();
-      snackAlert(ctx, SnackTypes.errors, 'Server Error!');
+      // snackAlert(ctx, SnackTypes.errors, 'Server Error!');
       return;
       // throw error;
     }

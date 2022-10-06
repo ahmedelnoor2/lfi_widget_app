@@ -618,7 +618,7 @@ class FutureMarket with ChangeNotifier {
       }
     } catch (error) {
       print(error);
-      snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
+      // snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
       // throw error;
     }
   }
@@ -658,7 +658,8 @@ class FutureMarket with ChangeNotifier {
       }
     } catch (error) {
       print(error);
-    ///  snackAlert(ctx, SnackTypes.errors, 'Server error, please try again .........');
+
+      ///  snackAlert(ctx, SnackTypes.errors, 'Server error, please try again .........');
       // throw error;
     }
   }
