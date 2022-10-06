@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/src/animation/animation_controller.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -31,6 +32,7 @@ class _AnnouncementDetailsState extends State<AnnouncementDetails>
   @override
   void initState() {
     super.initState();
+
     _controller = AnimationController(vsync: this);
   }
 
@@ -46,17 +48,20 @@ class _AnnouncementDetailsState extends State<AnnouncementDetails>
     width = MediaQuery.of(context).size.width;
 
     var public = Provider.of<Public>(context, listen: true);
-
     return Scaffold(
       appBar: appBar(context, null),
       body: WebViewX(
         key: const ValueKey('webviewx'),
         height: height,
         width: width,
-        initialContent: '<!DOCTYPE html> <html> <head> <meta charset="utf-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0;">${public.selectedAnnouncement['content']}',
+        initialContent:
+            '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><style>img{max-width: 100%;height: auto;}</style></head><body>${public.selectedAnnouncement['content']} </body> </html>',
         initialSourceType: SourceType.html,
         onWebViewCreated: (controller) async {
           // _controller = _webController;
+          controller.loadContent(
+              '<!DOCTYPE html> <html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><style>img{max-width: 100%;height: auto;}</style></head><body>${public.selectedAnnouncement['content']} </body> </html>',
+              SourceType.html);
         },
         onPageStarted: (src) =>
             debugPrint('A new page has started loading: $src\n'),

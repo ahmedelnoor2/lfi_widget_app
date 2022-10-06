@@ -31,6 +31,7 @@ class _AnnouncementState extends State<Announcement> {
           enlargeCenterPage: true,
           autoPlay: true,
         ),
+
         items: public.noticeInfo.map((notice) {
           // var slider = _sliderFrames[i];
           return Builder(
