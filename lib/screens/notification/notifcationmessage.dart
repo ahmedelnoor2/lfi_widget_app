@@ -29,8 +29,6 @@ class Notificationsscreen extends StatefulWidget {
 
 class _NotificationsscreenState extends State<Notificationsscreen>
     with SingleTickerProviderStateMixin {
-  
-
   String dropdownValue = 'All';
 
   bool _isselected = false;
@@ -49,9 +47,6 @@ class _NotificationsscreenState extends State<Notificationsscreen>
     super.initState();
   }
 
-
-
-
   Future<void> getnotification() async {
     var notificationProvider =
         Provider.of<Notificationprovider>(context, listen: false);
@@ -67,8 +62,6 @@ class _NotificationsscreenState extends State<Notificationsscreen>
     var notificationProvider =
         Provider.of<Notificationprovider>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: false);
-
-   
 
     return Scaffold(
       appBar: hiddenAppBar(),
@@ -216,48 +209,14 @@ class _NotificationsscreenState extends State<Notificationsscreen>
                               notificationProvider.userMessageList.length,
                           physics: const AlwaysScrollableScrollPhysics(),
                           itemBuilder: (context, index) {
+                            print(notificationProvider.userMessageList[index]);
                             var item =
                                 notificationProvider.userMessageList[index];
                             return Column(
                               children: [
                                 Slidable(
                                   enabled: true,
-                                  // Specify a key if the Slidable is dismissible.
                                   key: const ValueKey(0),
-
-                                  // The start action pane is the one at the left or the top side.
-                                  // startActionPane: ActionPane(
-                                  //   // A motion is a widget used to control how the pane animates.
-                                  //   motion: const ScrollMotion(),
-                                  //   extentRatio: 0.2,
-                                  //   // A pane can dismiss the Slidable.
-                                  //   // dismissible: DismissiblePane(onDismissed: () {}),
-
-                                  //   // All actions are defined in the children parameter.
-                                  //   children: [
-                                  //     // A SlidableAction can have an icon and/or a label.
-                                  //     SlidableAction(
-                                  //       // An action can be bigger than the others.
-                                  //       flex: 2,
-                                  //       autoClose: true,
-                                  //       onPressed: (value) {
-                                  //         print('object');
-                                  //       },
-                                  //       backgroundColor: item['status'] == 2
-                                  //           ? successColor
-                                  //           : seconadarytextcolour,
-                                  //       foregroundColor: Colors.white,
-                                  //       icon: item['status'] == 2
-                                  //           ? Icons.email
-                                  //           : Icons.drafts,
-                                  //       label: item['status'] == 2
-                                  //           ? 'Unread'
-                                  //           : 'Read',
-                                  //     ),
-                                  //   ],
-                                  // ),
-
-                                  // The end action pane is the one at the right or the bottom side.
                                   endActionPane: ActionPane(
                                     extentRatio: 0.2,
                                     motion: ScrollMotion(),
@@ -298,6 +257,9 @@ class _NotificationsscreenState extends State<Notificationsscreen>
                                           : Colors.transparent,
                                       child: ListTile(
                                         onTap: () {
+                                          _buildNotificationDetailBottomSheet(
+                                            context,
+                                          );
                                           if (notificationProvider.selectedItems
                                               .contains(item)) {
                                             notificationProvider.selectedItems
@@ -402,6 +364,43 @@ class _NotificationsscreenState extends State<Notificationsscreen>
     }
 
     return defaultColor;
+  }
+
+  Future _buildNotificationDetailBottomSheet(
+    BuildContext context,
+  ) {
+    return showModalBottomSheet(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        backgroundColor: bottombuttoncolour,
+        context: context,
+        builder: (builder) {
+          return Container(
+            padding: EdgeInsets.only(top: 20),
+            color: bottombuttoncolour,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: EdgeInsets.only(
+                    bottom: 30,
+                    left: 15,
+                    right: 15,
+                  ),
+                  child: LyoButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    text: 'Cancel',
+                    active: true,
+                    isLoading: false,
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
   }
 
   Future _buildBottomSheet(
