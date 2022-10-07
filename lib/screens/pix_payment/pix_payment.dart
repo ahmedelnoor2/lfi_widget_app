@@ -65,6 +65,7 @@ class _PixPaymentState extends State<PixPayment>
     _nameController.clear();
     _emailController.clear();
     _cpfController.clear();
+    getminimumWithDrawalAmount();
     getExchangeRate();
     getUserAddress();
     _controller = AnimationController(vsync: this);
@@ -296,7 +297,13 @@ class _PixPaymentState extends State<PixPayment>
       _reRequestKYCAuth = false;
     });
   }
+// get minimum with drawal amount
+Future<void> getminimumWithDrawalAmount()async{
+var payment=Provider.of<Payments>(context,listen: false);
 
+await payment.getminimumWithDrawalAmount();
+
+}
   @override
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
@@ -443,7 +450,7 @@ class _PixPaymentState extends State<PixPayment>
                                 } else if (double.parse(value) < 100) {
                                   return '${getPortugeseTrans(
                                     'Minimum',
-                                  )} 100 BRL';
+                                  )} ${payments.minimumWithdarwalAmt['minimunWithdrawalAmount'].toString()+" BRL"}';
                                 }
                                 return null;
                               },

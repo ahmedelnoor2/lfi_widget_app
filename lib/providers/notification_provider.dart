@@ -168,7 +168,7 @@ class Notificationprovider extends ChangeNotifier {
     }
   }
 
-    Future<void> readNotification(ctx, auth,id) async {
+  Future<void> readNotification(ctx, auth, id) async {
     headers['exchange-token'] = auth.loginVerificationToken;
 
     var url = Uri.https(
@@ -182,11 +182,10 @@ class Notificationprovider extends ChangeNotifier {
     try {
       final response = await http.post(url, headers: headers, body: body);
       print(response.statusCode);
-      print(response.body);
+
       final responseData = json.decode(response.body);
 
       if (responseData['code'] == '0') {
-       
         return;
       } else {
         snackAlert(ctx, SnackTypes.errors,
@@ -194,7 +193,7 @@ class Notificationprovider extends ChangeNotifier {
         return;
       }
     } catch (error) {
-     print(error);
+      print(error);
       return;
     }
   }

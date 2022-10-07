@@ -1044,4 +1044,32 @@ class Payments with ChangeNotifier {
       return notifyListeners();
     }
   }
+
+  /////pix payment minimum with drawal amount
+  Map _minimumWithdarwalAmt = {};
+
+  Map get minimumWithdarwalAmt {
+    return _minimumWithdarwalAmt;
+  }
+
+  Future<void> getminimumWithDrawalAmount() async {
+    /// url//
+    var url = Uri.https(lyoApiUrl, '/payment_gateway/pix-setting');
+    try {
+      final response = await http.get(url, headers: headers);
+      print(response.statusCode);
+      final responseData = json.decode(response.body);
+    
+      if (responseData['code'] == '200') {
+        _minimumWithdarwalAmt = responseData['data'];
+        notifyListeners();
+      } else {
+        _minimumWithdarwalAmt = {};
+
+        return notifyListeners();
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
 }
