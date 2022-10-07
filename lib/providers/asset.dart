@@ -437,7 +437,7 @@ class Asset with ChangeNotifier {
         _changeAddress = responseData['data'];
       } else {
         _changeAddress = {};
-        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+        // snackAlert(ctx, SnackTypes.errors, responseData['msg']);
         auth.checkResponseCode(ctx, responseData['code']);
       }
       return notifyListeners();

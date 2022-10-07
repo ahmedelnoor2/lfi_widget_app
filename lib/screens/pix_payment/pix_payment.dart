@@ -92,9 +92,11 @@ class _PixPaymentState extends State<PixPayment>
         public.publicInfoMarket['market']['followCoinList']['USDT']
             .forEach((key, value) async {
           await asset.getChangeAddress(context, auth, key);
-          setState(() {
-            _userAddresses[key] = asset.changeAddress['addressStr'];
-          });
+          if (asset.changeAddress.isNotEmpty) {
+            setState(() {
+              _userAddresses[key] = asset.changeAddress['addressStr'];
+            });
+          }
         });
       }
     }
@@ -297,13 +299,14 @@ class _PixPaymentState extends State<PixPayment>
       _reRequestKYCAuth = false;
     });
   }
+
 // get minimum with drawal amount
-Future<void> getminimumWithDrawalAmount()async{
-var payment=Provider.of<Payments>(context,listen: false);
+  Future<void> getminimumWithDrawalAmount() async {
+    var payment = Provider.of<Payments>(context, listen: false);
 
-await payment.getminimumWithDrawalAmount();
+    await payment.getminimumWithDrawalAmount();
+  }
 
-}
   @override
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
@@ -450,7 +453,7 @@ await payment.getminimumWithDrawalAmount();
                                 } else if (double.parse(value) < 100) {
                                   return '${getPortugeseTrans(
                                     'Minimum',
-                                  )} ${payments.minimumWithdarwalAmt['minimunWithdrawalAmount'].toString()+" BRL"}';
+                                  )} ${payments.minimumWithdarwalAmt['minimunWithdrawalAmount'].toString() + " BRL"}';
                                 }
                                 return null;
                               },

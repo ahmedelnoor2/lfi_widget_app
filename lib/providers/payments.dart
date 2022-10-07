@@ -1057,9 +1057,8 @@ class Payments with ChangeNotifier {
     var url = Uri.https(lyoApiUrl, '/payment_gateway/pix-setting');
     try {
       final response = await http.get(url, headers: headers);
-      print(response.statusCode);
       final responseData = json.decode(response.body);
-    
+
       if (responseData['code'] == '200') {
         _minimumWithdarwalAmt = responseData['data'];
         notifyListeners();
