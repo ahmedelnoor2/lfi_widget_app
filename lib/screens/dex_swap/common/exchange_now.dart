@@ -32,6 +32,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
   List _allNetworks = [];
   List _allAvailableCurrency = [];
   Map _getAddressCoins = {};
+  bool _processSelectCoin = false;
 
   @override
   void initState() {
@@ -355,7 +356,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                                     if (double.parse(value) > 0 &&
                                         (double.parse(value) >=
                                             double.parse(_loadingExchnageRate
-                                                ? '--'
+                                                ? '0'
                                                 : '${dexProvider.minimumValue['minAmount']}'))) {
                                       estimateRates();
                                     }
@@ -619,100 +620,118 @@ class _ExchangeNowState extends State<ExchangeNow> {
 
     return Scaffold(
       appBar: hiddenAppBarWithDefaultHeight(),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: EdgeInsets.only(
-            right: 15,
-            left: 15,
-            bottom: 15,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Container(
+      body: _processSelectCoin
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : SingleChildScrollView(
+              child: Container(
                 padding: EdgeInsets.only(
-                  bottom: 10,
+                  right: 15,
+                  left: 15,
+                  bottom: 15,
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(right: 10),
-                          child: IconButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            icon: Icon(Icons.chevron_left),
+                    Container(
+                      padding: EdgeInsets.only(
+                        bottom: 10,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.only(right: 10),
+                                child: IconButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  icon: Icon(Icons.chevron_left),
+                                ),
+                              ),
+                              Text(
+                                'Select Coin',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        Text(
-                          'Select Coin',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+                          Divider(),
+                        ],
+                      ),
                     ),
-                    Divider(),
+                    Column(
+                      children: allCurrencies.map<Widget>((currency) {
+                        return ((currency['ticker'] ==
+                                        dexProvider
+                                            .fromActiveCurrency['ticker'] ||
+                                    currency['ticker'] ==
+                                        dexProvider
+                                            .toActiveCurrency['ticker']) ||
+                                (!_allAvailableCurrency
+                                    .contains(currency['ticker'])))
+                            ? Container()
+                            : ListTile(
+                                onTap: () async {
+                                  setState(() {
+                                    _processSelectCoin = true;
+                                  });
+                                  if (type == 'from') {
+                                    dexProvider.setFromActiveCurrency(currency);
+                                    estimateRates();
+                                  } else {
+                                    dexProvider.setToActiveCurrency(currency);
+                                    setState(() {
+                                      _defaultNetwork = _getAddressCoins[
+                                          dexProvider
+                                              .toActiveCurrency['ticker']];
+                                    });
+                                    await asset.getChangeAddress(
+                                        context,
+                                        auth,
+                                        _getAddressCoins[dexProvider
+                                            .toActiveCurrency['ticker']]);
+                                    dexProvider.validateAddress(context, auth, {
+                                      'currency': dexProvider
+                                          .toActiveCurrency['ticker'],
+                                      'address':
+                                          asset.changeAddress['addressStr'],
+                                    });
+                                  }
+                                  setState(() {
+                                    _toAddressController.text =
+                                        asset.changeAddress['addressStr'];
+                                  });
+                                  setState(() {
+                                    _processSelectCoin = false;
+                                  });
+                                  Navigator.pop(context);
+                                },
+                                leading: CircleAvatar(
+                                  radius: 12,
+                                  child: SvgPicture.network(
+                                    '${currency['image']}',
+                                    width: 50,
+                                    placeholderBuilder:
+                                        (BuildContext context) =>
+                                            const CircularProgressIndicator
+                                                .adaptive(),
+                                  ),
+                                ),
+                                title:
+                                    Text('${currency['ticker'].toUpperCase()}'),
+                              );
+                      }).toList(),
+                    ),
                   ],
                 ),
               ),
-              Column(
-                children: allCurrencies.map<Widget>((currency) {
-                  return ((currency['ticker'] ==
-                                  dexProvider.fromActiveCurrency['ticker'] ||
-                              currency['ticker'] ==
-                                  dexProvider.toActiveCurrency['ticker']) ||
-                          (!_allAvailableCurrency.contains(currency['ticker'])))
-                      ? Container()
-                      : ListTile(
-                          onTap: () async {
-                            if (type == 'from') {
-                              dexProvider.setFromActiveCurrency(currency);
-                              estimateRates();
-                            } else {
-                              dexProvider.setToActiveCurrency(currency);
-                              setState(() {
-                                _defaultNetwork = _getAddressCoins[
-                                    dexProvider.toActiveCurrency['ticker']];
-                              });
-                              await asset.getChangeAddress(
-                                  context,
-                                  auth,
-                                  _getAddressCoins[
-                                      dexProvider.toActiveCurrency['ticker']]);
-                              dexProvider.validateAddress(context, auth, {
-                                'currency':
-                                    dexProvider.toActiveCurrency['ticker'],
-                                'address': asset.changeAddress['addressStr'],
-                              });
-                            }
-                            setState(() {
-                              _toAddressController.text =
-                                  asset.changeAddress['addressStr'];
-                            });
-                            Navigator.pop(context);
-                          },
-                          leading: CircleAvatar(
-                            radius: 12,
-                            child: SvgPicture.network(
-                              '${currency['image']}',
-                              width: 50,
-                              placeholderBuilder: (BuildContext context) =>
-                                  const CircularProgressIndicator.adaptive(),
-                            ),
-                          ),
-                          title: Text('${currency['ticker'].toUpperCase()}'),
-                        );
-                }).toList(),
-              ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 
@@ -794,9 +813,11 @@ class _ExchangeNowState extends State<ExchangeNow> {
                       SizedBox(
                         width: width * 0.69,
                         child: TextFormField(
-                          enabled: false,
+                          // enabled: false,
                           validator: (value) {
-                            if (value == null || value.isEmpty) {
+                            if (value == null) {
+                              return 'Please enter wallet address';
+                            } else if (value.isEmpty) {
                               return 'Please enter wallet address';
                             }
                             return null;
@@ -853,15 +874,19 @@ class _ExchangeNowState extends State<ExchangeNow> {
                   ),
                 ),
               ),
-              dexProvider.verifyAddress.isNotEmpty
-                  ? !dexProvider.verifyAddress['result']
-                      ? Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            '${dexProvider.verifyAddress['message']}',
-                            style: TextStyle(color: errorColor),
-                          ),
-                        )
+              dexProvider.verifyAddress != null
+                  ? dexProvider.verifyAddress.isNotEmpty
+                      ? dexProvider.verifyAddress['result'] != null
+                          ? !dexProvider.verifyAddress['result']
+                              ? Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Text(
+                                    '${dexProvider.verifyAddress['message']}',
+                                    style: TextStyle(color: errorColor),
+                                  ),
+                                )
+                              : Container()
+                          : Container()
                       : Container()
                   : Container(),
               Container(
