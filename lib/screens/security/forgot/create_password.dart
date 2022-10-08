@@ -51,7 +51,7 @@ class _CreatepasswordState extends State<Createpassword>
 
     await auth.resetForgotPasswordStepThree(context, {
       'loginPword': _loginpasswordcontroller.text,
-      'token': auth.forgotStepOne['data']['token'],
+      'token': auth.forgotStepOne['token'],
     });
   }
 
@@ -180,7 +180,8 @@ class _CreatepasswordState extends State<Createpassword>
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please enter Confirm password';
-                                      } else if (value != _loginpasswordcontroller.text) {
+                                      } else if (value !=
+                                          _loginpasswordcontroller.text) {
                                         return 'Password missmatch';
                                       }
                                       return null;

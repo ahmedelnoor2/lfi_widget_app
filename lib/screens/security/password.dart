@@ -25,6 +25,7 @@ class _PasswordState extends State<Password> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   final TextEditingController _authCodeController = TextEditingController();
+  final TextEditingController _smsCodeController = TextEditingController();
   final TextEditingController _mobileNumber = TextEditingController();
   final TextEditingController _phoneVerificationCode = TextEditingController();
 
@@ -105,15 +106,15 @@ class _PasswordState extends State<Password> {
       _processAjax = true;
     });
     var auth = Provider.of<Auth>(context, listen: false);
-    var postData = auth.googleAuth
+    var postData = (auth.googleAuth && auth.userInfo['mobileNumber'].isEmpty)
         ? {
             "googleCode": _authCodeController.text,
             "loginPword": _initialPasswordController.text,
             "newLoginPword": _newPasswordController.text
           }
         : {
-            "googleCode": "",
-            "smsAuthCode": _authCodeController.text,
+            "googleCode": _authCodeController.text,
+            "smsAuthCode": _smsCodeController.text,
             "loginPword": _initialPasswordController.text,
             "newLoginPword": _newPasswordController.text
           };
@@ -385,7 +386,7 @@ class _PasswordState extends State<Password> {
                             },
                             keyboardType: TextInputType.number,
                             controller: _authCodeController,
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               contentPadding: EdgeInsets.zero,
                               isDense: true,
                               border: UnderlineInputBorder(
@@ -394,64 +395,108 @@ class _PasswordState extends State<Password> {
                               hintStyle: TextStyle(
                                 fontSize: 14,
                               ),
-                              hintText: auth.googleAuth
-                                  ? 'Google verification code'
-                                  : 'SMS verification code',
+                              hintText: 'Google verification code',
                             ),
                           ),
                         ),
                         Expanded(
-                          flex: auth.googleAuth ? 1 : 2,
-                          child: auth.googleAuth
-                              ? InkWell(
-                                  onTap: () async {
-                                    ClipboardData? data =
-                                        await Clipboard.getData(
-                                      Clipboard.kTextPlain,
-                                    );
-                                    _authCodeController.text = '${data!.text}';
-                                  },
-                                  child: Icon(
-                                    Icons.copy,
-                                    size: 18,
-                                    color: secondaryTextColor,
-                                  ),
-                                )
-                              : !_startTimer
-                                  ? InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          _start = 90;
-                                        });
-                                        startTimer();
-                                      },
-                                      child: Text(
-                                        'Click to send',
-                                        style: TextStyle(
-                                          color: secondaryTextColor,
-                                        ),
-                                      ),
-                                    )
-                                  : Container(),
-                        ),
+                            flex: 1,
+                            child: InkWell(
+                              onTap: () async {
+                                ClipboardData? data = await Clipboard.getData(
+                                  Clipboard.kTextPlain,
+                                );
+                                _authCodeController.text = '${data!.text}';
+                              },
+                              child: Icon(
+                                Icons.copy,
+                                size: 18,
+                                color: secondaryTextColor,
+                              ),
+                            )),
                       ],
                     ),
                   ),
                 ),
-                Container(
-                  padding: EdgeInsets.only(bottom: 10),
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: _startTimer
-                        ? Text(
-                            '${_start}s Get it again',
-                            style: TextStyle(
-                              color: secondaryTextColor,
+                (auth.userInfo['mobileNumber'].isNotEmpty)
+                    ? Container(
+                        padding: EdgeInsets.only(top: 5, bottom: 10),
+                        child: Container(
+                          padding: EdgeInsets.all(15),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(
+                              style: BorderStyle.solid,
+                              width: 0.3,
+                              color: Color(0xff5E6292),
                             ),
-                          )
-                        : Container(),
-                  ),
-                ),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 6,
+                                child: TextFormField(
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter sms auth code';
+                                    }
+                                    return null;
+                                  },
+                                  keyboardType: TextInputType.number,
+                                  controller: _smsCodeController,
+                                  decoration: const InputDecoration(
+                                    contentPadding: EdgeInsets.zero,
+                                    isDense: true,
+                                    border: UnderlineInputBorder(
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    hintStyle: TextStyle(
+                                      fontSize: 14,
+                                    ),
+                                    hintText: 'SMS verification code',
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: !_startTimer
+                                    ? InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            _start = 90;
+                                          });
+                                          startTimer();
+                                        },
+                                        child: Text(
+                                          'Click to send',
+                                          style: TextStyle(
+                                            color: secondaryTextColor,
+                                          ),
+                                        ),
+                                      )
+                                    : Container(),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : Container(),
+                auth.userInfo['mobileNumber'].isNotEmpty
+                    ? Container(
+                        padding: EdgeInsets.only(bottom: 10),
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: _startTimer
+                              ? Text(
+                                  '${_start}s Get it again',
+                                  style: TextStyle(
+                                    color: secondaryTextColor,
+                                  ),
+                                )
+                              : Container(),
+                        ),
+                      )
+                    : Container(),
                 LyoButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {

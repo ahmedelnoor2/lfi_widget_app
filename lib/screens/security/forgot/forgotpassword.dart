@@ -54,9 +54,8 @@ class _ForgotpasswordState extends State<Forgotpassword>
     var auth = Provider.of<Auth>(context, listen: true);
 
     return Scaffold(
-      resizeToAvoidBottomInset:true ,
+      resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
-        
         child: Container(
           height: height,
           padding: EdgeInsets.only(top: width * 0.2),
@@ -105,8 +104,8 @@ class _ForgotpasswordState extends State<Forgotpassword>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
-                              padding:
-                                  EdgeInsets.only(bottom: 0, left: width * 0.05),
+                              padding: EdgeInsets.only(
+                                  bottom: 0, left: width * 0.05),
                               child: const Text(
                                 'Reset password',
                                 style: TextStyle(
@@ -116,8 +115,8 @@ class _ForgotpasswordState extends State<Forgotpassword>
                               ),
                             ),
                             Container(
-                              padding:
-                                  EdgeInsets.only(bottom: 0, left: width * 0.05),
+                              padding: EdgeInsets.only(
+                                  bottom: 0, left: width * 0.05),
                               child: Text(
                                 'It is forbidden to withdraw coins within 48\nhours after resetting the login password',
                                 style: TextStyle(

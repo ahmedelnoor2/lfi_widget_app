@@ -20,6 +20,7 @@ class Forgotphoneform extends StatefulWidget {
 
 class _ForgotphoneformState extends State<Forgotphoneform> {
   final GlobalKey<FormState> _formLoginKey = GlobalKey<FormState>();
+  final TextEditingController _gauthController = TextEditingController();
   final TextEditingController _phonecontroller = TextEditingController();
   final TextEditingController _smscontroller = TextEditingController();
 
@@ -34,6 +35,7 @@ class _ForgotphoneformState extends State<Forgotphoneform> {
 
   @override
   void dispose() {
+    _gauthController.dispose();
     _phonecontroller.dispose();
     _smscontroller.dispose();
 
@@ -81,7 +83,7 @@ class _ForgotphoneformState extends State<Forgotphoneform> {
     await auth.smsValidCode(context, {
       'operationType': '24',
       'smsType': '0',
-      'token': auth.forgotStepOne['data']['token'],
+      'token': auth.forgotStepOne['token'],
     });
   }
 
@@ -89,10 +91,11 @@ class _ForgotphoneformState extends State<Forgotphoneform> {
     var auth = Provider.of<Auth>(context, listen: false);
 
     await auth.resetForgotPasswordStepTwo(context, {
-      'certifcateNumber': '12345',
-      'googleCode': '',
+      'certifcateNumber': '123456',
+      'googleCode':
+          _gauthController.text.isNotEmpty ? _gauthController.text : '',
       'smsCode': _smscontroller.text,
-      'token': auth.forgotStepOne['data']['token'],
+      'token': auth.forgotStepOne['token'],
     });
     _timer.cancel();
   }
@@ -126,7 +129,7 @@ class _ForgotphoneformState extends State<Forgotphoneform> {
                       labelText: 'Mobile Number',
                     ),
                   ),
-                  auth.forgotStepOne['code'] == '0'
+                  auth.forgotStepOne.isNotEmpty
                       ? TextFormField(
                           controller: _smscontroller,
                           validator: (value) {
@@ -166,6 +169,7 @@ class _ForgotphoneformState extends State<Forgotphoneform> {
                       : Container(),
                   auth.forgotStepOne['isGoogleAuth'] == '1'
                       ? TextFormField(
+                          controller: _gauthController,
                           validator: (value) {
                             // if (value == null || value.isEmpty) {
                             //   return 'Please enter Mobilr Number';

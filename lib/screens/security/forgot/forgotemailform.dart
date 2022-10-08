@@ -20,6 +20,7 @@ class Forgotemailform extends StatefulWidget {
 class _ForgotemailformState extends State<Forgotemailform> {
   final GlobalKey<FormState> _formLoginKey = GlobalKey<FormState>();
 
+  final TextEditingController _gauthController = TextEditingController();
   final TextEditingController _emailcontroller = TextEditingController();
   final TextEditingController _smscontroller = TextEditingController();
 
@@ -34,6 +35,7 @@ class _ForgotemailformState extends State<Forgotemailform> {
 
   @override
   void dispose() {
+    _gauthController.dispose();
     _emailcontroller.dispose();
     _smscontroller.dispose();
 
@@ -80,7 +82,7 @@ class _ForgotemailformState extends State<Forgotemailform> {
 
     await auth.emailValidCode(context, {
       'operationType': '3',
-      'token': auth.forgotStepOne['data']['token'],
+      'token': auth.forgotStepOne['token'],
     });
   }
 
@@ -89,9 +91,10 @@ class _ForgotemailformState extends State<Forgotemailform> {
 
     await auth.resetForgotPasswordStepTwo(context, {
       'certifcateNumber': '',
-      'googleCode': '',
+      'googleCode':
+          _gauthController.text.isNotEmpty ? _gauthController.text : '',
       'emailCode': _smscontroller.text,
-      'token': auth.forgotStepOne['data']['token'],
+      'token': auth.forgotStepOne['token'],
     });
     _timer.cancel();
   }
@@ -99,6 +102,7 @@ class _ForgotemailformState extends State<Forgotemailform> {
   @override
   Widget build(BuildContext context) {
     var auth = Provider.of<Auth>(context, listen: true);
+
     return SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.max,
@@ -125,14 +129,14 @@ class _ForgotemailformState extends State<Forgotemailform> {
                       labelText: 'Email Address',
                     ),
                   ),
-                  auth.forgotStepOne['code'] == '0'
+                  auth.forgotStepOne.isNotEmpty
                       ? TextFormField(
                           controller: _smscontroller,
                           validator: (value) {
-                            // if (value == null || value.isEmpty) {
-                            //   return 'Please enter Mobilr Number';
-                            // }
-                            // return null;
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter email verifiacation code';
+                            }
+                            return null;
                           },
                           decoration: InputDecoration(
                               // border: OutlineInputBorder(),
@@ -165,11 +169,12 @@ class _ForgotemailformState extends State<Forgotemailform> {
                       : Container(),
                   auth.forgotStepOne['isGoogleAuth'] == '1'
                       ? TextFormField(
+                          controller: _gauthController,
                           validator: (value) {
-                            // if (value == null || value.isEmpty) {
-                            //   return 'Please enter Mobilr Number';
-                            // }
-                            // return null;
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter google auth';
+                            }
+                            return null;
                           },
                           decoration: InputDecoration(
                             labelText: 'Google Auth',

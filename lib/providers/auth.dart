@@ -732,7 +732,7 @@ class Auth with ChangeNotifier {
 
       final responseData = json.decode(response.body);
       if (responseData['code'] == '0') {
-        _forgotStepOne = responseData;
+        _forgotStepOne = responseData['data'];
         snackAlert(ctx, SnackTypes.success, 'Please enter verification code');
         isforgotloader = false;
         notifyListeners();
@@ -820,12 +820,15 @@ class Auth with ChangeNotifier {
 
     var postData = json.encode(formData);
 
+    print(postData);
+
     isforgotloader = true;
     notifyListeners();
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
+      print(responseData);
       if (responseData['code'] == '0') {
         _resetResponseStepTwo = responseData;
         snackAlert(ctx, SnackTypes.success, 'Verification Successfull');
