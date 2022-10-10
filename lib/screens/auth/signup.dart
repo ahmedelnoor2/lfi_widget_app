@@ -108,6 +108,8 @@ class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
   }
 
   void checkVerificationMethod() {
+    var auth  =Provider.of<Auth>(context, listen: false);
+    auth.setGoogleAuth(false);
     var public = Provider.of<Public>(context, listen: false);
 
     if (public.publicInfo.isNotEmpty) {

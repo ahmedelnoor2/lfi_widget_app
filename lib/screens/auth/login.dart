@@ -79,8 +79,9 @@ class _Login extends State<Login> {
     }
     super.dispose();
   }
-
   void checkVerificationMethod() {
+    var auth  =Provider.of<Auth>(context, listen: false);
+    auth.setGoogleAuth(false);
     var public = Provider.of<Public>(context, listen: false);
 
     if (public.publicInfo.isNotEmpty) {

@@ -264,6 +264,7 @@ class _AuthenticationState extends State<Authentication> {
                           children: [
                             IconButton(
                               onPressed: () {
+                                auth.setGoogleAuth(false);
                                 auth.setLoginCreds({});
                                 Navigator.pushNamedAndRemoveUntil(
                                   context,

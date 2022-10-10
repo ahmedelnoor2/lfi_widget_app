@@ -55,6 +55,11 @@ class Auth with ChangeNotifier {
     return _googleAuth;
   }
 
+  void setGoogleAuth(value) {
+    _googleAuth = value;
+    return notifyListeners();
+  }
+
   // loing creds
   Map _loginCreds = {};
 
