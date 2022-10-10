@@ -26,6 +26,8 @@ class OrderBook extends StatefulWidget {
 }
 
 class _OrderBookState extends State<OrderBook> {
+  RegExp regex = RegExp(r'([.]*0)(?!.*\d)');
+
   @override
   void initState() {
     // TODO: implement initState
@@ -188,7 +190,8 @@ class _OrderBookState extends State<OrderBook> {
                                 fit: BoxFit.cover,
                                 child: Text(
                                   double.parse('${asks[index][0] ?? 0}')
-                                      .toStringAsPrecision(7),
+                                      .toStringAsPrecision(7)
+                                      .replaceAll(regex, ''),
                                   style: TextStyle(
                                     color: redIndicator,
                                   ),
@@ -229,7 +232,9 @@ class _OrderBookState extends State<OrderBook> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Text(
-              double.parse('${widget.lastPrice}').toStringAsPrecision(7),
+              double.parse('${widget.lastPrice}')
+                  .toStringAsPrecision(7)
+                  .replaceAll(regex, ''),
               style: TextStyle(
                 fontSize: 16,
               ),
@@ -278,7 +283,8 @@ class _OrderBookState extends State<OrderBook> {
                                 fit: BoxFit.cover,
                                 child: Text(
                                   double.parse('${bids[index][0] ?? 0}')
-                                      .toStringAsPrecision(7),
+                                      .toStringAsPrecision(7)
+                                      .replaceAll(regex, ''),
                                   style: TextStyle(
                                     color: greenIndicator,
                                   ),

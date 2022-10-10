@@ -235,9 +235,13 @@ class _MarginOpenOrdersState extends State<MarginOpenOrders>
                                           : Container()),
                                   trailing: Text(
                                     trading.funds['allCoinMap'][
-                                            '${public.activeMarket['showName'].split('/')[0]}']
-                                            ['normal_balance']
-                                        .toString(),
+                                                '${public.activeMarket['showName'].split('/')[0]}'] !=
+                                            null
+                                        ? trading.funds['allCoinMap'][
+                                                '${public.activeMarket['showName'].split('/')[0]}']
+                                                ['normal_balance']
+                                            .toString()
+                                        : '',
                                     style: TextStyle(fontSize: 15),
                                   ),
                                   title: Text(

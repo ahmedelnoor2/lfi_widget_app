@@ -136,12 +136,39 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
     var trading = Provider.of<Trading>(context, listen: false);
     if (_tabController.index == 1) {
       var public = Provider.of<Public>(context, listen: false);
-      public.setActiveMarket(public.activeMarginMarket);
-
+      await public.setActiveMarket(public.activeMarginMarket);
+      setPrecessionValue();
       updateMarket();
     }
     trading.clearOpenOrders();
     // await trading.getOpenOrders();
+  }
+
+  void setPrecessionValue() {
+    var public = Provider.of<Public>(context, listen: false);
+    var trading = Provider.of<Trading>(context, listen: false);
+
+    trading.setPrecessionValue(public.publicInfoMarket['market']['market']
+                    [public.activeMarket['showName'].split('/')[1]]
+                [public.activeMarket['showName']] !=
+            null
+        ? public.publicInfoMarket['market']['market']
+                    [public.activeMarket['showName'].split('/')[1]]
+                    [public.activeMarket['showName']]['depth']
+                .split(',')[0] ??
+            '0.1'
+        : '0.1');
+
+    trading.setMarketDepth(public.publicInfoMarket['market']['market']
+                    [public.activeMarket['showName'].split('/')[1]]
+                [public.activeMarket['showName']] !=
+            null
+        ? public.publicInfoMarket['market']['market']
+                    [public.activeMarket['showName'].split('/')[1]]
+                    [public.activeMarket['showName']]['depth']
+                .split(',') ??
+            ['0.1', '0.01', '0.001']
+        : ['0.1', '0.01', '0.001']);
   }
 
   @override

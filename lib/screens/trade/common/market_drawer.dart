@@ -238,7 +238,7 @@ class _MarketDrawerState extends State<MarketDrawer>
                               : ['0.1', '0.01', '0.001']);
                           widget.updateMarket();
                           await trading.getFunds(context, auth, {
-                            "coinSymbols": public.activeMarket['showName']
+                            "coinSymbols": public.activeMarket['name']
                                 .replaceAll(
                                     new RegExp(r"\p{P}", unicode: true), ","),
                           });

@@ -42,7 +42,7 @@ class _OpenOrdersState extends State<OpenOrders>
 
     if (auth.isAuthenticated) {
       await trading.getFunds(context, auth, {
-        "coinSymbols": public.activeMarket['showName']
+        "coinSymbols": public.activeMarket['name']
             .replaceAll(new RegExp(r"\p{P}", unicode: true), ","),
       });
     }
@@ -101,6 +101,8 @@ class _OpenOrdersState extends State<OpenOrders>
     var auth = Provider.of<Auth>(context, listen: true);
     var trading = Provider.of<Trading>(context, listen: true);
     var public = Provider.of<Public>(context, listen: true);
+
+    print(public.activeMarket['name']);
 
     return Column(
       children: [
@@ -217,90 +219,100 @@ class _OpenOrdersState extends State<OpenOrders>
               ),
               //auth.isAuthenticated ? noData() : noAuth(context),
               auth.isAuthenticated
-                  ? Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Row(
-                            children: [
-                              Text(
-                                'Current active pair',
-                                style: TextStyle(color: greyTextColor),
-                              )
-                            ],
+                  ? SizedBox(
+                      height: height * 0.5,
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'Current active pair',
+                                  style: TextStyle(color: greyTextColor),
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                        Column(
-                          children: [
-                            trading.isfundsLoading
-                                ? CircularProgressIndicator()
-                                : Container(
-                                    child: ListTile(
-                                      leading: ClipOval(
+                          Column(
+                            children: [
+                              trading.isfundsLoading
+                                  ? CircularProgressIndicator()
+                                  : Container(
+                                      child: ListTile(
+                                        leading: ClipOval(
                                           child: public.publicInfoMarket[
                                                           'market']['coinList'][
-                                                      '${public.activeMarket['showName'].split('/')[0]}'] !=
+                                                      '${public.activeMarket['name'].split('/')[0]}'] !=
                                                   null
                                               ? Image.network(
                                                   public.publicInfoMarket[
                                                           'market']['coinList'][
-                                                          '${public.activeMarket['showName'].split('/')[0]}']
+                                                          '${public.activeMarket['name'].split('/')[0]}']
                                                           ['icon']
                                                       .toString(),
                                                   width: width * 0.09,
                                                   height: width * 0.09,
                                                   fit: BoxFit.fill,
                                                 )
-                                              : Container()),
-                                      trailing: Text(
-                                        trading.funds['allCoinMap'][
-                                                '${public.activeMarket['showName'].split('/')[0]}']
-                                                ['normal_balance']
-                                            .toString(),
-                                        style: TextStyle(fontSize: 15),
-                                      ),
-                                      title: Text(
-                                        '${public.activeMarket['showName'].split('/')[0]}'
-                                            .toString(),
-                                      ),
-                                      subtitle: Text(
-                                        '${public.publicInfoMarket['market']['coinList'][public.activeMarket['name'].split('/')[0]]['longName']}',
+                                              : Container(),
+                                        ),
+                                        trailing: Text(
+                                          trading.funds['allCoinMap'][
+                                                      '${public.activeMarket['name'].split('/')[0]}'] !=
+                                                  null
+                                              ? trading.funds['allCoinMap'][
+                                                      '${public.activeMarket['name'].split('/')[0]}']
+                                                      ['normal_balance']
+                                                  .toString()
+                                              : '',
+                                          style: TextStyle(fontSize: 15),
+                                        ),
+                                        title: Text(
+                                          '${public.activeMarket['showName'].split('/')[0]}'
+                                              .toString(),
+                                        ),
+                                        subtitle: Text(
+                                          '${public.publicInfoMarket['market']['coinList'][public.activeMarket['name'].split('/')[0]]['longName']}',
+                                        ),
                                       ),
                                     ),
-                                  ),
-                            trading.isfundsLoading
-                                ? Container()
-                                : Container(
-                                    child: ListTile(
-                                      leading: ClipOval(
+                              trading.isfundsLoading
+                                  ? Container()
+                                  : Container(
+                                      child: ListTile(
+                                        leading: ClipOval(
                                           child: Image.network(
-                                        public.publicInfoMarket['market']
-                                                ['coinList'][
-                                                '${public.activeMarket['showName'].split('/')[1]}']
-                                                ['icon']
-                                            .toString(),
-                                        width: width * 0.09,
-                                        height: width * 0.09,
-                                        fit: BoxFit.fill,
-                                      )),
-                                      trailing: Text(
-                                        trading.funds['allCoinMap'][
+                                            public.publicInfoMarket['market']
+                                                    ['coinList'][
                                                     '${public.activeMarket['showName'].split('/')[1]}']
-                                                ['normal_balance'] ??
-                                            ''.toString(),
-                                        style: TextStyle(fontSize: 15),
-                                      ),
-                                      title: Text(
+                                                    ['icon']
+                                                .toString(),
+                                            width: width * 0.09,
+                                            height: width * 0.09,
+                                            fit: BoxFit.fill,
+                                          ),
+                                        ),
+                                        trailing: Text(
+                                          trading.funds['allCoinMap'][
+                                                      '${public.activeMarket['showName'].split('/')[1]}']
+                                                  ['normal_balance'] ??
+                                              ''.toString(),
+                                          style: TextStyle(fontSize: 15),
+                                        ),
+                                        title: Text(
                                           '${public.activeMarket['showName'].split('/')[1]}'
-                                              .toString()),
-                                      subtitle: Text(
-                                        '${public.publicInfoMarket['market']['coinList'][public.activeMarket['name'].split('/')[1]]['longName']}',
+                                              .toString(),
+                                        ),
+                                        subtitle: Text(
+                                          '${public.publicInfoMarket['market']['coinList'][public.activeMarket['name'].split('/')[1]]['longName']}',
+                                        ),
                                       ),
-                                    ),
-                                  )
-                          ],
-                        ),
-                      ],
+                                    )
+                            ],
+                          ),
+                        ],
+                      ),
                     )
                   : noAuth(context),
             ],
