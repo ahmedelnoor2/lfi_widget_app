@@ -215,74 +215,78 @@ class _MarginOpenOrdersState extends State<MarginOpenOrders>
                       children: [
                         trading.isfundsLoading
                             ? CircularProgressIndicator()
-                            : Container(
-                                child: ListTile(
-                                  leading: ClipOval(
-                                      child: public.publicInfoMarket['market']
-                                                      ['coinList'][
-                                                  '${public.activeMarket['showName'].split('/')[0]}'] !=
-                                              null
-                                          ? Image.network(
-                                              public.publicInfoMarket['market']
-                                                      ['coinList'][
-                                                      '${public.activeMarket['showName'].split('/')[0]}']
-                                                      ['icon']
-                                                  .toString(),
-                                              width: width * 0.09,
-                                              height: width * 0.09,
-                                              fit: BoxFit.fill,
-                                            )
-                                          : Container()),
-                                  trailing: Text(
-                                    trading.funds['allCoinMap'][
-                                                '${public.activeMarket['showName'].split('/')[0]}'] !=
-                                            null
-                                        ? trading.funds['allCoinMap'][
-                                                '${public.activeMarket['showName'].split('/')[0]}']
-                                                ['normal_balance']
-                                            .toString()
-                                        : '',
-                                    style: TextStyle(fontSize: 15),
-                                  ),
-                                  title: Text(
-                                    '${public.activeMarket['showName'].split('/')[0]}'
-                                        .toString(),
-                                  ),
-                                  subtitle: Text(
-                                    '${public.publicInfoMarket['market']['coinList'][public.activeMarket['name'].split('/')[0]]['longName']}',
-                                  ),
-                                ),
-                              ),
+                            : auth.isAuthenticated
+                                ? Container(
+                                    child: ListTile(
+                                      leading: ClipOval(
+                                          child: public.publicInfoMarket[
+                                                          'market']['coinList'][
+                                                      '${public.activeMarket['showName'].split('/')[0]}'] !=
+                                                  null
+                                              ? Image.network(
+                                                  public.publicInfoMarket[
+                                                          'market']['coinList'][
+                                                          '${public.activeMarket['showName'].split('/')[0]}']
+                                                          ['icon']
+                                                      .toString(),
+                                                  width: width * 0.09,
+                                                  height: width * 0.09,
+                                                  fit: BoxFit.fill,
+                                                )
+                                              : Container()),
+                                      trailing: Text(
+                                        trading.funds['allCoinMap'][
+                                                    '${public.activeMarket['showName'].split('/')[0]}'] !=
+                                                null
+                                            ? trading.funds['allCoinMap'][
+                                                    '${public.activeMarket['showName'].split('/')[0]}']
+                                                    ['normal_balance']
+                                                .toString()
+                                            : '',
+                                        style: TextStyle(fontSize: 15),
+                                      ),
+                                      title: Text(
+                                        '${public.activeMarket['showName'].split('/')[0]}'
+                                            .toString(),
+                                      ),
+                                      subtitle: Text(
+                                        '${public.publicInfoMarket['market']['coinList'][public.activeMarket['name'].split('/')[0]]['longName']}',
+                                      ),
+                                    ),
+                                  )
+                                : noAuth(context),
                         trading.isfundsLoading
                             ? Container()
-                            : Container(
-                                child: ListTile(
-                                  leading: ClipOval(
-                                      child: Image.network(
-                                    public.publicInfoMarket['market']
-                                            ['coinList'][
-                                            '${public.activeMarket['showName'].split('/')[1]}']
-                                            ['icon']
-                                        .toString(),
-                                    width: width * 0.09,
-                                    height: width * 0.09,
-                                    fit: BoxFit.fill,
-                                  )),
-                                  trailing: Text(
-                                    trading.funds['allCoinMap'][
+                            : auth.isAuthenticated
+                                ? Container(
+                                    child: ListTile(
+                                      leading: ClipOval(
+                                          child: Image.network(
+                                        public.publicInfoMarket['market']
+                                                ['coinList'][
                                                 '${public.activeMarket['showName'].split('/')[1]}']
-                                            ['normal_balance'] ??
-                                        ''.toString(),
-                                    style: TextStyle(fontSize: 15),
-                                  ),
-                                  title: Text(
-                                      '${public.activeMarket['showName'].split('/')[1]}'
-                                          .toString()),
-                                  subtitle: Text(
-                                    '${public.publicInfoMarket['market']['coinList'][public.activeMarket['name'].split('/')[1]]['longName']}',
-                                  ),
-                                ),
-                              )
+                                                ['icon']
+                                            .toString(),
+                                        width: width * 0.09,
+                                        height: width * 0.09,
+                                        fit: BoxFit.fill,
+                                      )),
+                                      trailing: Text(
+                                        trading.funds['allCoinMap'][
+                                                    '${public.activeMarket['showName'].split('/')[1]}']
+                                                ['normal_balance'] ??
+                                            ''.toString(),
+                                        style: TextStyle(fontSize: 15),
+                                      ),
+                                      title: Text(
+                                          '${public.activeMarket['showName'].split('/')[1]}'
+                                              .toString()),
+                                      subtitle: Text(
+                                        '${public.publicInfoMarket['market']['coinList'][public.activeMarket['name'].split('/')[1]]['longName']}',
+                                      ),
+                                    ),
+                                  )
+                                : Container()
                       ],
                     ),
                   ],
