@@ -102,8 +102,6 @@ class _OpenOrdersState extends State<OpenOrders>
     var trading = Provider.of<Trading>(context, listen: true);
     var public = Provider.of<Public>(context, listen: true);
 
-    print(public.activeMarket['name']);
-
     return Column(
       children: [
         SizedBox(
