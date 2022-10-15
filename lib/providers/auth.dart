@@ -21,10 +21,12 @@ class Auth with ChangeNotifier {
     'Content-type': 'application/json;charset=utf-8',
     'Accept': 'application/json',
     'exchange-token': '',
+    'exchange-language': 'en_US',
   };
   Map<String, String> headers1 = {
     'Content-type': 'application/json;charset=utf-8',
     'Accept': 'application/json',
+    'exchange-language': 'en_US',
   };
 
   String _emailVerificationToken = '';
@@ -260,7 +262,10 @@ class Auth with ChangeNotifier {
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
+      print(headers);
+
       final responseData = json.decode(response.body);
+      print(responseData);
       isLoginloader = false;
       if (responseData['code'] == 0) {
         if (responseData['data']['googleAuth'] == '1') {

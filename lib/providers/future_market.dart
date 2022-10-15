@@ -12,7 +12,7 @@ class FutureMarket with ChangeNotifier {
   Map<String, String> headers = {
     'Content-type': 'application/json;charset=utf-8',
     'Accept': 'application/json',
-    'exchange-language': '',
+    'exchange-language': 'en_US',
   };
 
   Map _activeMarket = {

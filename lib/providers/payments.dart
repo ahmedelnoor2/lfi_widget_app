@@ -14,6 +14,7 @@ class Payments with ChangeNotifier {
     'Content-type': 'application/json',
     'Accept': 'application/json',
     'exchange-token': '',
+    'exchange-language': 'en_US',
   };
 
   // Change language

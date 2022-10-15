@@ -12,6 +12,7 @@ class Notificationprovider extends ChangeNotifier {
     'Content-type': 'application/json;charset=UTF-8',
     'Accept': 'application/json',
     'exchange-token': '',
+    'exchange-language': 'en_US',
   };
 
   // List<dynamic> allnotification = [
