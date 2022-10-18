@@ -14,7 +14,6 @@ class DexProvider with ChangeNotifier {
     'exchange-token': '',
     'exchange-language': 'en_US',
   };
-
   // Active currency
   Map _fromActiveCurrency = {};
 
@@ -240,7 +239,7 @@ class DexProvider with ChangeNotifier {
 
     try {
       final response = await http.post(url, body: postData, headers: headers);
-
+      print(response.body);
       final responseData = json.decode(response.body);
 
       if (responseData.isNotEmpty) {
@@ -258,6 +257,47 @@ class DexProvider with ChangeNotifier {
       print(error);
       _processPayment = {};
       snackAlert(ctx, SnackTypes.errors, 'Server Error.');
+      return;
+    }
+  }
+
+  //// Sawp payement status //
+  ///
+  Map _paymentStatus = {};
+
+  Map get paymentStatus {
+    return _paymentStatus;
+  }
+
+  Future<void> swapPaymentStatus(ctx, id) async {
+    final queryParameters = {
+  'api_key': dexApiKey,
+};
+    var url = Uri.https(
+      dexSwapApi,
+      '$exDexSwap/v1/transactions/$id/a4643d07a4ae7c79183e95e53da2fa17c3f2307e901c1b440083b1f0c9a32cc5',
+      queryParameters
+    );
+    print(url);
+
+    try {
+      final response = await http.get(url, headers: headers);
+      print(response.body);
+      final responseData = json.decode(response.body);
+
+      if (responseData.isNotEmpty) {
+        _paymentStatus = responseData;
+
+        return notifyListeners();
+      } else {
+        _paymentStatus = {};
+
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      _paymentStatus = {};
+
       return;
     }
   }

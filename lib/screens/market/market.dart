@@ -1,4 +1,5 @@
 import 'package:buttons_tabbar/buttons_tabbar.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
@@ -139,8 +140,6 @@ class _MarketState extends State<Market> {
                                   child: Column(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
                                     children: [
                                       Container(
                                         padding: const EdgeInsets.all(8.0),
@@ -199,6 +198,9 @@ class _MarketState extends State<Market> {
                                             ),
                                           ],
                                         ),
+                                      ),
+                                      Expanded(
+                                        child: LineChart(mainData()),
                                       ),
                                       Column(
                                         crossAxisAlignment:
@@ -302,7 +304,7 @@ class _MarketState extends State<Market> {
                                 height: height * 0.043,
                                 radius: 2,
                                 contentPadding:
-                                    EdgeInsets.only(left: 10, right: 10),
+                                    EdgeInsets.only(left: 10, right: 0),
                                 backgroundColor: linkColor,
                                 splashColor: linkColor,
                                 unselectedBackgroundColor: Colors.transparent,
@@ -410,6 +412,56 @@ class _MarketState extends State<Market> {
         bottomNavigationBar:
             _currentRoute == '/market' ? bottomNav(context, auth) : null,
       ),
+    );
+  }
+
+  LineChartData mainData() {
+    var public = Provider.of<Public>(context, listen: false);
+
+    return LineChartData(
+      gridData: FlGridData(
+        show: false,
+        drawVerticalLine: false,
+      ),
+      titlesData: FlTitlesData(
+        show: false,
+      ),
+      borderData: FlBorderData(
+        show: false,
+      ),
+      minX: 0,
+      maxX: 11,
+      minY: 0,
+      maxY: 6,
+      lineBarsData: [
+        LineChartBarData(
+          color: Color.fromARGB(155, 155, 144, 255),
+          spots:  [
+            FlSpot(0, 3),
+            FlSpot(2.6, 2),
+            FlSpot(4.9, 5),
+            FlSpot(6.8, 3.1),
+            FlSpot(8, 4),
+            FlSpot(9.5, 3),
+            FlSpot(11, 4),
+          ],
+          isCurved: true,
+          barWidth: 1,
+          isStrokeCapRound: false,
+          dotData: FlDotData(
+            show: false,
+          ),
+          belowBarData: BarAreaData(
+            gradient: LinearGradient(
+              // stops: [0,0.5],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [marketcharcolor1, cardcolor],
+            ),
+            show: true,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -49,16 +49,19 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 ? noData("No Favourite")
                 : ListView.separated(
                     separatorBuilder: (context, index) {
-                     
                       return Divider();
                     },
-                    
                     shrinkWrap: true,
                     itemCount: public.favMarketList.length,
                     itemBuilder: (context, index) {
-                      var _market = public.favMarketList[index]['marketDetails'];
+                      var _market =
+                          public.favMarketList[index]['marketDetails'];
 
                       return ListTile(
+                        onTap: () async {
+                          await public.setActiveMarket(_market);
+                          Navigator.pushNamed(context, '/kline_chart');
+                        },
                         leading: InkWell(
                           onTap: (() async {
                             if (public.favMarketNameList
@@ -66,14 +69,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                               await public.deleteFavMarket(context, {
                                 'token': "${auth.loginVerificationToken}",
                                 'userId': "${auth.userInfo['id']}",
-                                "marketName":_market['symbol'],
+                                "marketName": _market['symbol'],
                               }).whenComplete(() async {
                                 await public.getFavMarketList(context, {
                                   'token': "${auth.loginVerificationToken}",
                                   'userId': "${auth.userInfo['id']}",
                                 });
                               });
-                            } 
+                            }
                           }),
                           child: Icon(
                             Icons.star,

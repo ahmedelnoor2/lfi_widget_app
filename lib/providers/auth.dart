@@ -265,7 +265,6 @@ class Auth with ChangeNotifier {
       print(headers);
 
       final responseData = json.decode(response.body);
-      print(responseData);
       isLoginloader = false;
       if (responseData['code'] == 0) {
         if (responseData['data']['googleAuth'] == '1') {

@@ -11,6 +11,7 @@ import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:provider/provider.dart';
 import 'package:lyotrade/utils/Number.utils.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class DigitalAssets extends StatefulWidget {
   static const routeName = '/digital_assets';
@@ -485,8 +486,18 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                                         padding: EdgeInsets.only(right: 8),
                                         child: CircleAvatar(
                                           radius: 15,
-                                          child: Image.network(
-                                            '${public.publicInfoMarket['market']['coinList'][assets['coin']]['icon']}',
+                                          child: FadeInImage.assetNetwork(
+                                            placeholder:
+                                                'assets/img/loader.gif',
+                                            image:
+                                                '${public.publicInfoMarket['market']['coinList'][assets['coin']]['icon']}',
+                                            imageErrorBuilder:
+                                                (context, error, stackTrace) {
+                                              return Icon(
+                                                Icons.hourglass_empty,
+                                                color: Colors.white,
+                                              );
+                                            },
                                           ),
                                         ),
                                       ),
@@ -501,11 +512,15 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 16),
                                           ),
-                                          Text(
-                                            '${public.publicInfoMarket['market']['coinList'][assets['coin']]['longName']}',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: secondaryTextColor,
+                                          Container(
+                                            width: 80,
+                                            child: Text(
+                                              '${public.publicInfoMarket['market']['coinList'][assets['coin']]['longName']}',
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: secondaryTextColor,
+                                              ),
                                             ),
                                           ),
                                         ],
