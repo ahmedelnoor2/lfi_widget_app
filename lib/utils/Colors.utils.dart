@@ -105,7 +105,8 @@ var listselectcolor = Color(0xFF484D87);
 var listcolorinner = Color(0xFF3B3F72);
 var neturalcolor = Color(0xFFF6F9FC);
 var cardcolor = Color(0xFF292C51);
-
+var marketcharcolor1=Color(0xff3F4374);
+var marketcharcolor2=Color(0xff3F4374);
 // Referral
 var clipCircle = {
   'in_1': Color(0xffF6B708),

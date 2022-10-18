@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -11,6 +13,7 @@ import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
+import 'dart:math' as math;
 
 class ExchangeNow extends StatefulWidget {
   const ExchangeNow({Key? key}) : super(key: key);
@@ -33,6 +36,8 @@ class _ExchangeNowState extends State<ExchangeNow> {
   List _allAvailableCurrency = [];
   Map _getAddressCoins = {};
   bool _processSelectCoin = false;
+  bool _minimumvalue = false;
+  Timer? _timer = null;
 
   @override
   void initState() {
@@ -40,6 +45,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
     //   _fromAmountController.text = '1';
     // });
     getDigitalBalance();
+
     super.initState();
   }
 
@@ -47,6 +53,9 @@ class _ExchangeNowState extends State<ExchangeNow> {
   void dispose() async {
     _fromAmountController.dispose();
     _toAddressController.dispose();
+    if (_timer != null) {
+      _timer!.cancel();
+    }
     super.dispose();
   }
 
@@ -227,6 +236,21 @@ class _ExchangeNowState extends State<ExchangeNow> {
       _acceptTermsAndConditions = false;
       _processSwap = false;
     });
+    paymentStatusFetch();
+  }
+
+  paymentStatusFetch() {
+    _timer = Timer.periodic(Duration(seconds:2), (timer) {
+      paymentStatus();
+    });
+  }
+
+
+  Future<void> paymentStatus() async {
+    var dexProvider = Provider.of<DexProvider>(context, listen: false);
+
+    await dexProvider.swapPaymentStatus(
+        context, dexProvider.processPayment['id']);
   }
 
   @override
@@ -238,7 +262,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
 
     return dexProvider.processPayment.isNotEmpty
         ? sendingWidget(context, dexProvider)
-        : Container(
+        : SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -360,6 +384,16 @@ class _ExchangeNowState extends State<ExchangeNow> {
                                                 : '${dexProvider.minimumValue['minAmount']}'))) {
                                       estimateRates();
                                     }
+                                    if (double.parse(value) <
+                                        dexProvider.minimumValue['minAmount']) {
+                                      setState(() {
+                                        _minimumvalue = true;
+                                      });
+                                    } else {
+                                      setState(() {
+                                        _minimumvalue = false;
+                                      });
+                                    }
                                   }
                                 },
                                 style: const TextStyle(fontSize: 20),
@@ -381,10 +415,12 @@ class _ExchangeNowState extends State<ExchangeNow> {
                       ),
                       Align(
                         alignment: Alignment.centerRight,
-                        child: Text(
-                          'Min amount required: ${_loadingExchnageRate ? '--' : dexProvider.minimumValue['minAmount']} ${dexProvider.fromActiveCurrency.isNotEmpty ? dexProvider.fromActiveCurrency['ticker'].toUpperCase() : '--'}',
-                          style: TextStyle(color: warningColor),
-                        ),
+                        child: _minimumvalue
+                            ? Text(
+                                'Min amount required: ${_loadingExchnageRate ? '--' : dexProvider.minimumValue['minAmount']} ${dexProvider.fromActiveCurrency.isNotEmpty ? dexProvider.fromActiveCurrency['ticker'].toUpperCase() : '--'}',
+                                style: TextStyle(color: warningColor),
+                              )
+                            : Container(),
                       ),
                       Container(
                         padding: EdgeInsets.only(top: 10, bottom: 10),
@@ -542,7 +578,8 @@ class _ExchangeNowState extends State<ExchangeNow> {
                   padding: EdgeInsets.only(left: 10, right: 10),
                   child: InkWell(
                     onTap: (_loadingExchnageRate ||
-                            _fromAmountController.text.isEmpty)
+                            _fromAmountController.text.isEmpty ||
+                            _minimumvalue == true)
                         ? null
                         : () {
                             showModalBottomSheet<void>(
@@ -1023,168 +1060,258 @@ class _ExchangeNowState extends State<ExchangeNow> {
   }
 
   Widget sendingWidget(context, dexProvider) {
+    // print(dexProvider.toActiveCurrency);
+    var dexProvider = Provider.of<DexProvider>(context, listen: false);
+    var size = MediaQuery.of(context).size;
     return SingleChildScrollView(
       padding: EdgeInsets.all(10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: EdgeInsets.only(bottom: 20),
-            child: Text(
-              'Sending',
-              style: TextStyle(fontSize: 20),
+            margin: EdgeInsets.only(
+              left: 10,
             ),
-          ),
-          Container(
             padding: EdgeInsets.only(bottom: 10),
-            child: Text('Waiting'),
-          ),
-          Row(
-            children: [
-              dexProvider.fromActiveCurrency.isNotEmpty
-                  ? SvgPicture.network(
-                      '${dexProvider.fromActiveCurrency['image']}',
-                      width: 35,
-                    )
-                  : Container(),
-              Container(
-                padding: EdgeInsets.only(left: 10),
-                child: Text(
-                  '${_fromAmountController.text} ${dexProvider.fromActiveCurrency['ticker']}'
-                      .toUpperCase(),
-                  style: TextStyle(
-                    fontSize: 20,
-                  ),
-                ),
-              ),
-            ],
+            child: Text(dexProvider.paymentStatus['status'].toString()),
           ),
           Container(
-            padding: EdgeInsets.only(top: 10, bottom: 10),
-            child: Text('Address'),
-          ),
-          Container(
-            padding: EdgeInsets.only(top: 15, bottom: 15, right: 15, left: 15),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(5),
-              border: Border.all(
-                width: 0.3,
-                color: Color(0xff5E6292),
-              ),
-            ),
-            child: Row(
+            margin: EdgeInsets.only(left: 8, right: 16, bottom: 15),
+            child: Stack(
               children: [
-                SizedBox(
-                  width: width * 0.8,
-                  child: Text(
-                    '${dexProvider.processPayment['payinAddress']}',
-                  ),
+                Container(
+                  width: size.width,
+                  height: 16,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(width: 0.5),
+                      color: Colors.white),
+                  child: Container(),
                 ),
-                GestureDetector(
-                  onTap: () {
-                    Clipboard.setData(
-                      ClipboardData(
-                        text: dexProvider.processPayment['payinAddress'],
+                Container(
+                  padding: EdgeInsets.only(top: 0.5),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(10),
+                    ),
+                    child: Container(
+                      width: dexProvider.paymentStatus['status'] == 'confirming'
+                          ? size.width * 0.3
+                          : dexProvider.paymentStatus['status'] == 'exchanging'
+                              ? size.width * 0.75
+                              : dexProvider.paymentStatus['status'] == 'sending'
+                                  ? size.width * 1.0
+                                  : size.width * 0.3,
+                      height: 15,
+                      child: LinearProgressIndicator(
+                        backgroundColor: Colors.green.shade500,
+                        color: Colors.green.shade700,
                       ),
-                    );
-                    snackAlert(context, SnackTypes.success, 'Copied');
-                  },
-                  child: Image.asset(
-                    'assets/img/copy.png',
-                    width: 18,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          Align(
-            alignment: Alignment.center,
+          Card(
             child: Container(
-              width: 150,
-              margin: EdgeInsets.only(top: 10),
-              padding: EdgeInsets.only(top: 2, bottom: 2, right: 2, left: 2),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(
-                  width: 0.3,
-                  color: Color(0xff5E6292),
-                ),
-              ),
-              child: Image.network(
-                'https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${dexProvider.processPayment['payinAddress']}&choe=UTF-8',
-              ),
-            ),
-          ),
-          Align(
-            alignment: Alignment.center,
-            child: Container(
-              padding: EdgeInsets.only(top: 20, bottom: 20),
-              child: Icon(
-                Icons.keyboard_double_arrow_down,
-                size: 30,
-              ),
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.only(bottom: 10),
-            child: Text('Receive'),
-          ),
-          Row(
-            children: [
-              dexProvider.toActiveCurrency.isNotEmpty
-                  ? SvgPicture.network(
-                      '${dexProvider.toActiveCurrency['image']}',
-                      width: 35,
-                    )
-                  : Container(),
-              Container(
-                padding: EdgeInsets.only(left: 10),
-                child: Text(
-                  '${dexProvider.processPayment['amount']} ${dexProvider.toActiveCurrency['ticker']}'
-                      .toUpperCase(),
-                  style: TextStyle(
-                    fontSize: 20,
+              padding: EdgeInsets.all(10),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      dexProvider.fromActiveCurrency.isNotEmpty
+                          ? Row(
+                              children: [
+                                SvgPicture.network(
+                                  '${dexProvider.fromActiveCurrency['image']}',
+                                  width: 35,
+                                ),
+                                Container(
+                                  padding: EdgeInsets.only(left: 10),
+                                  child: Text(
+                                    '${_fromAmountController.text} ${dexProvider.fromActiveCurrency['ticker']}'
+                                        .toUpperCase(),
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Container(),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: OutlinedButton(
+                          onPressed: () {},
+                          child: Text('Send'),
+                          style: OutlinedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
                   ),
-                ),
-              ),
-            ],
-          ),
-          Container(
-            padding: EdgeInsets.only(top: 10, bottom: 10),
-            child: Text('Address'),
-          ),
-          Container(
-            padding: EdgeInsets.only(top: 15, bottom: 15, right: 15, left: 15),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(5),
-              border: Border.all(
-                width: 0.3,
-                color: Color(0xff5E6292),
-              ),
-            ),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: width * 0.8,
-                  child: Text(
-                    '${dexProvider.processPayment['payoutAddress']}',
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Clipboard.setData(
-                      ClipboardData(
-                        text: dexProvider.processPayment['payoutAddress'],
+                  Align(
+                    alignment: Alignment.center,
+                    child: Container(
+                      width: 150,
+                      margin: EdgeInsets.only(top: 10),
+                      padding:
+                          EdgeInsets.only(top: 2, bottom: 2, right: 2, left: 2),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(
+                          width: 0.3,
+                          color: Color(0xff5E6292),
+                        ),
                       ),
-                    );
-                    snackAlert(context, SnackTypes.success, 'Copied');
-                  },
-                  child: Image.asset(
-                    'assets/img/copy.png',
-                    width: 18,
+                      child: Image.network(
+                        'https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${dexProvider.processPayment['payinAddress']}&choe=UTF-8',
+                      ),
+                    ),
                   ),
+                  Container(
+                    margin: EdgeInsets.only(top: 10),
+                    padding: EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(
+                        width: 0.3,
+                        color: Color(0xff5E6292),
+                      ),
+                    ),
+                    child: InkWell(
+                      onTap: () {
+                        Clipboard.setData(
+                          ClipboardData(
+                            text: dexProvider.processPayment['payinAddress'],
+                          ),
+                        );
+                        snackAlert(context, SnackTypes.success, 'Copied');
+                      },
+                      child: Row(
+                        children: [
+                          Container(
+                            width: width * 0.70,
+                            child: Text(
+                              '${dexProvider.processPayment['payinAddress']}',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(left: 8),
+                            child: Image.asset(
+                              'assets/img/copy.png',
+                              width: 18,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Align(
+            alignment: Alignment.center,
+            child: RotatedBox(
+              quarterTurns: 1,
+              child: Container(
+                //padding: EdgeInsets.only(top: 20, bottom: 20),
+                child: Image.asset(
+                  "assets/img/transfer.gif",
+                  width: 70.0,
                 ),
-              ],
+              ),
+            ),
+          ),
+          Card(
+            child: Container(
+              padding: EdgeInsets.all(10),
+              child: Column(
+                children: [
+                  Container(
+                    child: Text(
+                      'Receive',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                  Divider(),
+                  Container(
+                    child: dexProvider.toActiveCurrency.isNotEmpty
+                        ? SvgPicture.network(
+                            '${dexProvider.toActiveCurrency['image']}',
+                            width: 40,
+                          )
+                        : Container(),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(top: 5),
+                    child: Text(
+                      '${dexProvider.processPayment['amount']}'.toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(top: 5, bottom: 10),
+                    child: Text(
+                      '${dexProvider.toActiveCurrency['name']} (${dexProvider.toActiveCurrency['ticker']})'
+                          .toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(
+                        top: 15, bottom: 15, right: 15, left: 15),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(
+                        width: 0.3,
+                        color: Color(0xff5E6292),
+                      ),
+                    ),
+                    child: InkWell(
+                      onTap: () {
+                        Clipboard.setData(
+                          ClipboardData(
+                            text: dexProvider.processPayment['payoutAddress'],
+                          ),
+                        );
+                        snackAlert(context, SnackTypes.success, 'Copied');
+                      },
+                      child: Row(
+                        children: [
+                          Container(
+                            width: width * 0.70,
+                            child: Text(
+                              '${dexProvider.processPayment['payoutAddress']}',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          GestureDetector(
+                            child: Container(
+                              padding: EdgeInsets.only(left: 8),
+                              child: Image.asset(
+                                'assets/img/copy.png',
+                                width: 18,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

@@ -130,7 +130,6 @@ class _ExchangeScreenState extends State<ExchangeScreen>
 
     var public = Provider.of<Public>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
-    
 
     return Scaffold(
       appBar: hiddenAppBar(),
@@ -175,6 +174,10 @@ class _ExchangeScreenState extends State<ExchangeScreen>
                     : public.allMarkets[widget.currentMarketSort][index];
 
                 return ListTile(
+                  onTap: (() async {
+                    await public.setActiveMarket(_market);
+                    Navigator.pushNamed(context, '/kline_chart');
+                  }),
                   leading: InkWell(
                     onTap: (() async {
                       if (auth.isAuthenticated) {

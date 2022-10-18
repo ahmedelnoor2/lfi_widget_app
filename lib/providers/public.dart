@@ -516,6 +516,9 @@ class Public with ChangeNotifier {
 
       final responseData = json.decode(response.body);
       _klineData = responseData;
+      print('kline data.......');
+
+      print(_klineData);
       return notifyListeners();
     } catch (error) {
       // throw error;
