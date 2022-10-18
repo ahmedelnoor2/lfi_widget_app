@@ -6,6 +6,8 @@ import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
+import 'package:lyotrade/screens/common/widget/loading_dialog.dart';
+import 'package:lyotrade/screens/common/widget/progress_bar.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/Translate.utils.dart';
@@ -39,9 +41,8 @@ class _ExchangeScreenState extends State<ExchangeScreen>
   @override
   void initState() {
     connectWebSocket();
-
-    super.initState();
     getFavouriteMarket();
+    super.initState();
   }
 
   @override
@@ -174,15 +175,28 @@ class _ExchangeScreenState extends State<ExchangeScreen>
                     : public.allMarkets[widget.currentMarketSort][index];
 
                 return ListTile(
-                  onTap: (() async {
-                    await public.setActiveMarket(_market);
-                    Navigator.pushNamed(context, '/kline_chart');
-                  }),
                   leading: InkWell(
                     onTap: (() async {
                       if (auth.isAuthenticated) {
                         if (public.favMarketNameList
                             .contains(_market['symbol'])) {
+                          showDialog(
+                            context: context,
+                            builder: (c) {
+                              return AlertDialog(
+                                backgroundColor: Colors.transparent,
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    CircularProgressIndicator(),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
                           await public.deleteFavMarket(context, {
                             'token': "${auth.loginVerificationToken}",
                             'userId': "${auth.userInfo['id']}",
@@ -194,6 +208,23 @@ class _ExchangeScreenState extends State<ExchangeScreen>
                             });
                           });
                         } else {
+                          showDialog(
+                            context: context,
+                            builder: (c) {
+                              return AlertDialog(
+                                backgroundColor: Colors.transparent,
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    CircularProgressIndicator(),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
                           await public.createFavMarket(context, {
                             'token': "${auth.loginVerificationToken}",
                             'userId': "${auth.userInfo['id']}",
@@ -210,83 +241,98 @@ class _ExchangeScreenState extends State<ExchangeScreen>
                         Navigator.pushNamed(context, '/authentication');
                       }
                     }),
-                    child: Icon(
-                      Icons.star,
-                      size: 20,
-                      color: public.favMarketNameList.isNotEmpty
-                          ? public.favMarketNameList.contains(_market['symbol'])
-                              ? linkColor
-                              : secondaryTextColor
-                          : secondaryTextColor,
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      child: Icon(
+                        Icons.star,
+                        size: 20,
+                        color: public.favMarketNameList.isNotEmpty
+                            ? public.favMarketNameList
+                                    .contains(_market['symbol'])
+                                ? linkColor
+                                : secondaryTextColor
+                            : secondaryTextColor,
+                      ),
                     ),
                   ),
                   minLeadingWidth: 5,
-                  title: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            '${_market['showName'].split('/')[0]}',
-                            style: TextStyle(
-                              fontSize: 18,
-                            ),
-                          ),
-                          Text(
-                            ' /${_market['showName'].split('/')[1]}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: secondaryTextColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          InkWell(
-                            onTap: () async {
-                              await public.setActiveMarket(_market);
-                              Navigator.pushNamed(context, '/trade');
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.only(
-                                top: 5,
-                                bottom: 5,
-                                right: 10,
+                  title: InkWell(
+                    onTap: (() async {
+                      await public.setActiveMarket(_market);
+
+                      Navigator.pushNamed(context, '/kline_chart');
+                    }),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              '${_market['showName'].split('/')[0]}',
+                              style: TextStyle(
+                                fontSize: 18,
                               ),
-                              child: Text(
-                                'Trade',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: linkColor,
+                            ),
+                            Text(
+                              ' /${_market['showName'].split('/')[1]}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: secondaryTextColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        InkWell(
+                          onTap: () {
+                            public.setActiveMarket(_market);
+                            Navigator.pushNamed(context, '/trade');
+                          },
+                          child: Row(
+                            children: [
+                              Container(
+                                height: 30,
+                                width: 60,
+                                padding: const EdgeInsets.only(
+                                  top: 5,
+                                  bottom: 5,
+                                  right: 10,
+                                ),
+                                child: Text(
+                                  'Trade',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: linkColor,
+                                  ),
                                 ),
                               ),
-                            ),
+
+                              // InkWell(
+                              //   onTap: () async {
+                              //     await public.setActiveMarket(_market);
+                              //     Navigator.pushNamed(context, '/kline_chart');
+                              //   },
+                              //   child: Container(
+                              //     padding: const EdgeInsets.only(
+                              //       top: 5,
+                              //       bottom: 5,
+                              //       left: 10,
+                              //       right: 10,
+                              //     ),
+                              //     child: Text(
+                              //       'Info',
+                              //       style: TextStyle(
+                              //         fontSize: 14,
+                              //         color: linkColor,
+                              //       ),
+                              //     ),
+                              //   ),
+                              // ),
+                            ],
                           ),
-                          InkWell(
-                            onTap: () async {
-                              await public.setActiveMarket(_market);
-                              Navigator.pushNamed(context, '/kline_chart');
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.only(
-                                top: 5,
-                                bottom: 5,
-                                left: 10,
-                                right: 10,
-                              ),
-                              child: Text(
-                                'Info',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: linkColor,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                    ],
+                        )
+                      ],
+                    ),
                   ),
                   trailing: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,

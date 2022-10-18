@@ -53,9 +53,9 @@ class _ExchangeNowState extends State<ExchangeNow> {
   void dispose() async {
     _fromAmountController.dispose();
     _toAddressController.dispose();
-    if (_timer != null) {
-      _timer!.cancel();
-    }
+
+    _timer!.cancel();
+
     super.dispose();
   }
 
@@ -240,11 +240,10 @@ class _ExchangeNowState extends State<ExchangeNow> {
   }
 
   paymentStatusFetch() {
-    _timer = Timer.periodic(Duration(seconds:2), (timer) {
+    _timer = Timer.periodic(Duration(seconds: 2), (timer) {
       paymentStatus();
     });
   }
-
 
   Future<void> paymentStatus() async {
     var dexProvider = Provider.of<DexProvider>(context, listen: false);
