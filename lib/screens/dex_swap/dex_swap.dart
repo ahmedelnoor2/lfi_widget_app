@@ -53,7 +53,7 @@ class _DexSwapState extends State<DexSwap> {
         return onAndroidBackPress(context);
       },
       child: DefaultTabController(
-        length: 2,
+        length: 1,
         child: Scaffold(
           appBar: AppBar(
             leading: IconButton(
@@ -73,15 +73,15 @@ class _DexSwapState extends State<DexSwap> {
                     ),
                   ),
                 ),
-                Container(
-                  padding: EdgeInsets.all(10),
-                  child: Text(
-                    'Fixed Rate',
-                    style: TextStyle(
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
+                // Container(
+                //   padding: EdgeInsets.all(10),
+                //   child: Text(
+                //     'Fixed Rate',
+                //     style: TextStyle(
+                //       fontSize: 18,
+                //     ),
+                //   ),
+                // ),
               ],
             ),
             title: Text(
@@ -95,9 +95,9 @@ class _DexSwapState extends State<DexSwap> {
           body: TabBarView(
             children: [
               ExchangeNow(),
-              Center(
-                child: Text('Coming Soon...'),
-              ),
+              // Center(
+              //   child: Text('Coming Soon...'),
+              // ),
             ],
           ),
         ),
