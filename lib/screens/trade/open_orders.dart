@@ -271,7 +271,14 @@ class _OpenOrdersState extends State<OpenOrders>
                                               .toString(),
                                         ),
                                         subtitle: Text(
-                                          '${public.publicInfoMarket['market']['coinList'][public.activeMarket['name'].split('/')[0]]['longName']}',
+                                          public.publicInfoMarket['market']
+                                                          ['coinList'][
+                                                      public
+                                                          .activeMarket['name']
+                                                          .split('/')[0]] !=
+                                                  null
+                                              ? '${public.publicInfoMarket['market']['coinList'][public.activeMarket['name'].split('/')[0]]['longName']}'
+                                              : '',
                                         ),
                                       ),
                                     ),
