@@ -112,3 +112,67 @@ Widget assetsSkull(context) {
     },
   );
 }
+
+Widget marketFeedSkull(context) {
+  width = MediaQuery.of(context).size.width;
+  var list = List<int>.generate(3, (i) => i + 1);
+
+  return Column(
+    mainAxisAlignment: MainAxisAlignment.start,
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Container(
+        padding: EdgeInsets.only(left: 5, bottom: 5),
+        child: Text(
+          'Markets',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      SizedBox(
+        height: width * 0.26,
+        width: width,
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: list.length,
+          scrollDirection: Axis.horizontal,
+          itemBuilder: (context, index) {
+            return InkWell(
+              onTap: () {
+                print('object');
+              },
+              child: Container(
+                width: width * 0.32,
+                padding: EdgeInsets.all(5),
+                child: SkeletonLine(
+                  style: SkeletonLineStyle(
+                    height: width * 0.26,
+                    width: width * 0.30,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    ],
+  );
+}
+
+Widget priceSkull(context) {
+  width = MediaQuery.of(context).size.width;
+
+  return SizedBox(
+    width: width * 0.1,
+    child: SkeletonLine(
+      style: SkeletonLineStyle(
+        height: 10,
+        width: width,
+        borderRadius: BorderRadius.circular(8),
+      ),
+    ),
+  );
+}
