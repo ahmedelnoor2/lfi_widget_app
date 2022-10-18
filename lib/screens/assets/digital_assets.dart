@@ -447,7 +447,7 @@ class _DigitalAssetsState extends State<DigitalAssets> {
               ),
             ),
             SizedBox(
-              height: height * 0.48,
+              height: height * 0.46,
               child: asset.digitalAssets.isEmpty
                   ? assetsSkull(context)
                   : ListView.builder(
@@ -469,142 +469,149 @@ class _DigitalAssetsState extends State<DigitalAssets> {
                             asset.setSelectedAsset(assets);
                             Navigator.pushNamed(context, '/asset_details');
                           },
-                          child: Container(
-                            padding: EdgeInsets.only(
-                              bottom: 8,
-                              left: 5,
-                              right: 5,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                SizedBox(
-                                  width: width * 0.33,
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        padding: EdgeInsets.only(right: 8),
-                                        child: CircleAvatar(
-                                          radius: 15,
-                                          child: FadeInImage.assetNetwork(
-                                            placeholder:
-                                                'assets/img/loader.gif',
-                                            image:
-                                                '${public.publicInfoMarket['market']['coinList'][assets['coin']]['icon']}',
-                                            imageErrorBuilder:
-                                                (context, error, stackTrace) {
-                                              return Icon(
-                                                Icons.hourglass_empty,
-                                                color: Colors.white,
-                                              );
-                                            },
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.only(
+                                  bottom: 8,
+                                  left: 5,
+                                  right: 5,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    SizedBox(
+                                      width: width * 0.33,
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.only(right: 8),
+                                            child: CircleAvatar(
+                                              radius: 15,
+                                              child: FadeInImage.assetNetwork(
+                                                placeholder:
+                                                    'assets/img/loader.gif',
+                                                image:
+                                                    '${public.publicInfoMarket['market']['coinList'][assets['coin']]['icon']}',
+                                                imageErrorBuilder: (context,
+                                                    error, stackTrace) {
+                                                  return Icon(
+                                                    Icons.hourglass_empty,
+                                                    color: Colors.white,
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                getCoinName(
+                                                    '${public.publicInfoMarket['market']['coinList'][assets['coin']]['showName']}'),
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 16),
+                                              ),
+                                              Container(
+                                                width: 80,
+                                                child: Text(
+                                                  '${public.publicInfoMarket['market']['coinList'][assets['coin']]['longName'].isNotEmpty ? public.publicInfoMarket['market']['coinList'][assets['coin']]['longName'] : public.publicInfoMarket['market']['coinList'][assets['coin']]['name']}',
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: secondaryTextColor,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: width * 0.27,
+                                      child: Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                          '${_hideBalances ? _hideBalanceString : double.parse(assets['values']['normal_balance']).toStringAsFixed(4)}',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
                                           ),
                                         ),
                                       ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            getCoinName(
-                                                '${public.publicInfoMarket['market']['coinList'][assets['coin']]['showName']}'),
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16),
+                                    ),
+                                    SizedBox(
+                                      width: width * 0.13,
+                                      child: Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                          _hideBalances
+                                              ? _hideBalanceString
+                                              : double.parse(assets['values']
+                                                      ['lock_balance'])
+                                                  .toStringAsFixed(4),
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
                                           ),
-                                          Container(
-                                            width: 80,
-                                            child: Text(
-                                              '${public.publicInfoMarket['market']['coinList'][assets['coin']]['longName']}',
-                                              overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: secondaryTextColor,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: width * 0.27,
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                      '${_hideBalances ? _hideBalanceString : double.parse(assets['values']['normal_balance']).toStringAsFixed(4)}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: width * 0.13,
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                      _hideBalances
-                                          ? _hideBalanceString
-                                          : double.parse(assets['values']
-                                                  ['lock_balance'])
-                                              .toStringAsFixed(4),
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                    width: width * 0.19,
-                                    child: Align(
-                                        alignment: Alignment.centerRight,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.end,
-                                          children: [
-                                            Text(
-                                              _hideBalances
-                                                  ? _hideBalanceString
-                                                  : double.parse(
-                                                          assets['values']
+                                    SizedBox(
+                                        width: width * 0.19,
+                                        child: Align(
+                                            alignment: Alignment.centerRight,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              children: [
+                                                Text(
+                                                  _hideBalances
+                                                      ? _hideBalanceString
+                                                      : double.parse(assets[
+                                                                  'values']
                                                               ['total_balance'])
-                                                      .toStringAsFixed(4),
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            Text(
-                                              _hideBalances
-                                                  ? _hideBalanceString
-                                                  : getNumberFormat(
-                                                      context,
-                                                      public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()]
-                                                                  [assets[
-                                                                      'coin']] !=
-                                                              null
-                                                          ? (double.parse(
-                                                                  assets['values'][
-                                                                      'total_balance'])) *
-                                                              public.rate[public
+                                                          .toStringAsFixed(4),
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  _hideBalances
+                                                      ? _hideBalanceString
+                                                      : getNumberFormat(
+                                                          context,
+                                                          public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()]
+                                                                      [assets[
+                                                                          'coin']] !=
+                                                                  null
+                                                              ? (double.parse(
+                                                                      assets['values']
+                                                                          [
+                                                                          'total_balance'])) *
+                                                                  public.rate[public
                                                                       .activeCurrency[
                                                                           'fiat_symbol']
-                                                                      .toUpperCase()]
-                                                                  [assets['coin']]
-                                                          : 0,
-                                                    ),
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: secondaryTextColor,
-                                              ),
-                                            )
-                                          ],
-                                        ))),
-                              ],
-                            ),
+                                                                      .toUpperCase()][assets['coin']]
+                                                              : 0,
+                                                        ),
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: secondaryTextColor,
+                                                  ),
+                                                )
+                                              ],
+                                            ))),
+                                  ],
+                                ),
+                              ),
+                              Divider(),
+                            ],
                           ),
                         );
                       },
