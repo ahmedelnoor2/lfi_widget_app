@@ -80,7 +80,7 @@ void main() async {
   initScreen = await preferences.getInt('initScreen');
   await preferences.setInt('initScreen', 1);
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-      overlays: [SystemUiOverlay.top]).then((_) => runApp(const MyApp()));
+      overlays: [SystemUiOverlay.bottom,SystemUiOverlay.top]).then((_) => runApp(const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
