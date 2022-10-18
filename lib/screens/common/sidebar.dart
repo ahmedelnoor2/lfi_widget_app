@@ -283,6 +283,7 @@ class _SideBarState extends State<SideBar> {
                       trailing: Icon(Icons.verified_user),
                     ),
                   ),
+              
             Card(
               child: Column(
                 children: [
@@ -389,13 +390,22 @@ class _SideBarState extends State<SideBar> {
                       }).toList(),
                     ),
                   ),
-                   ListTile(
+                    ListTile(
                     onTap: () {
                       Navigator.pushNamed(context, '/setting');
                     },
                     leading: Icon(Icons.settings),
                     title: Text('Settings'),
                   ),
+                  
+                   ListTile(
+                    onTap: () {
+                     _supportAndFaqs();
+                    },
+                    leading: Icon(Icons.support),
+                    title: Text('Support & FAQ'),
+                  ),
+
                 ],
               ),
             ),
@@ -434,5 +444,13 @@ class _SideBarState extends State<SideBar> {
         ),
       ),
     );
+  }
+   _supportAndFaqs() async {
+    const url = 'https://docs.lyotrade.com/introduction/what-is-lyotrade';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 }

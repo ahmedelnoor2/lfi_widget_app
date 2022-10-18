@@ -10,6 +10,7 @@ class Trading with ChangeNotifier {
   Map<String, String> headers = {
     'Content-type': 'application/json;charset=utf-8',
     'Accept': 'application/json',
+    'exchange-language': 'en_US',
   };
 
   List _openOrders = [];

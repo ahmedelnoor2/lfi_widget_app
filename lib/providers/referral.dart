@@ -13,6 +13,7 @@ class ReferralProvider with ChangeNotifier {
     'Content-type': 'application/json;charset=utf-8',
     'Accept': 'application/json',
     'exchange-token': '',
+    'exchange-language': 'en_US',
   };
 
   var _referralinvitationdata;

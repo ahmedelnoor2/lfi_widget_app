@@ -12,6 +12,7 @@ class Staking with ChangeNotifier {
   Map<String, String> headers = {
     'Content-type': 'application/json;charset=utf-8',
     'Accept': 'application/json',
+    'exchange-language': 'en_US',
   };
 
   // Get Active Stake Info

@@ -14,12 +14,14 @@ class Public with ChangeNotifier {
   Map<String, String> headers = {
     'Content-type': 'application/json;charset=utf-8',
     'Accept': 'application/json',
+    'exchange-language': 'en_US',
   };
   Map<String, String> headers1 = {
     'Content-type': 'application/json;charset=utf-8',
     'Accept': 'application/json',
     'exchange-token':
-        'c5fa97c1140aafea1ef1e84b67503d5e0db18d0ca0ff4819a0ca3f24722407df'
+        'c5fa97c1140aafea1ef1e84b67503d5e0db18d0ca0ff4819a0ca3f24722407df',
+    'exchange-language': 'en_US',
   };
   Map _rate = {};
   Map _publicInfoMarket = {};
