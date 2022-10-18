@@ -99,6 +99,8 @@ class FutureMarket with ChangeNotifier {
 
   Future<void> setActiveMarketTick(tick) async {
     _activeMarketTick = tick;
+    print('chekotspot response...........');
+    print(_activeMarket);
     notifyListeners();
   }
 

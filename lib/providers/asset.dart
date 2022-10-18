@@ -877,18 +877,13 @@ class Asset with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-
-      if (responseData['code'] == '0') {
-        // if (responseData['msg'] == 'Failure to transfer leveraged funds！') {
-        //   snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
-        // } else if (responseData['msg'] == 'Insufficient Balance') {
-        //   snackAlert(ctx, SnackTypes.errors, 'Insufficient Balance');
-        // } else {
-        // }
-        snackAlert(
-            ctx, SnackTypes.success, 'Successfully created withdraw request');
-      } else if (responseData['code'] == 10002) {
-        snackAlert(ctx, SnackTypes.warning, 'Please login to access');
+      print(responseData);
+      if (responseData['code'] == '4') {
+        snackAlert(ctx, SnackTypes.errors, 'Insuffient Balance');
+        print('check');
+      } else if (responseData['code'] == '10009') {
+        print('call2');
+        snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
       } else {
         snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
       }

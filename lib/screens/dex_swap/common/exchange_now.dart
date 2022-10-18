@@ -7,9 +7,11 @@ import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/dex_provider.dart';
 import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/screens/common/alert.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
+import 'package:lyotrade/screens/dex_swap/common/dexBottimSheet.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
@@ -241,7 +243,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
 
   paymentStatusFetch() {
     _timer = Timer.periodic(Duration(seconds: 2), (timer) {
-      paymentStatus();
+    paymentStatus();
     });
   }
 
@@ -1143,7 +1145,19 @@ class _ExchangeNowState extends State<ExchangeNow> {
                       Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: OutlinedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            showModalBottomSheet<void>(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return StatefulBuilder(
+                                  builder: (BuildContext context,
+                                      StateSetter setState) {
+                                    return dexBottimSheet(_fromAmountController.text,dexProvider.processPayment['payinAddress'],dexProvider.fromActiveCurrency['ticker']);
+                                  },
+                                );
+                              },
+                            );
+                          },
                           child: Text('Send'),
                           style: OutlinedButton.styleFrom(
                             shape: RoundedRectangleBorder(

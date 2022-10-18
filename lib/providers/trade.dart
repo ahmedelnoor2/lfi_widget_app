@@ -86,6 +86,7 @@ class Trading with ChangeNotifier {
 
       if (responseData['code'] == 0) {
         _openOrders = responseData['data']['orders'];
+        
         return notifyListeners();
       } else {
         _openOrders = [];
@@ -463,7 +464,7 @@ class Trading with ChangeNotifier {
       if (responseData['code'] == "0") {
         _funds = responseData['data'];
         _isfundsLoading = false;
-        print(_funds);
+        //print(_funds);
         return notifyListeners();
       } else {
         _funds = {};
