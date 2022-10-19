@@ -11,27 +11,31 @@ import 'package:lyotrade/providers/dex_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/alert.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/Coins.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 
 import '../../../utils/AppConstant.utils.dart';
 
-class dexBottimSheet extends StatefulWidget {
-  dexBottimSheet(
-    this.fromAmount,
-    this.paymentAddress,
-    this.symbol, {
+class DexBottimSheet extends StatefulWidget {
+  DexBottimSheet({
     Key? key,
+    required this.fromAmount,
+    required this.paymentAddress,
+    required this.symbol,
+    required this.walletCoin,
   }) : super(key: key);
   final fromAmount;
   final paymentAddress;
   final symbol;
+  final walletCoin;
   @override
-  State<dexBottimSheet> createState() => _dexBottimSheetState();
+  State<DexBottimSheet> createState() => _DexBottimSheetState();
 }
 
-class _dexBottimSheetState extends State<dexBottimSheet> {
+class _DexBottimSheetState extends State<DexBottimSheet> {
   final _formEmailVeriKey = GlobalKey<FormState>();
 
   final TextEditingController _emailVeirficationCode = TextEditingController();
@@ -48,7 +52,6 @@ class _dexBottimSheetState extends State<dexBottimSheet> {
   @override
   void initState() {
     super.initState();
-    checkCoins();
   }
 
   @override
@@ -58,47 +61,6 @@ class _dexBottimSheetState extends State<dexBottimSheet> {
     _emailVeirficationCode.dispose();
     _smsVeirficationCode.dispose();
     _googleVeirficationCode.dispose();
-  }
-
-  void checkCoins() {
-    var public = Provider.of<Public>(context, listen: false);
-    public.publicInfoMarket['market'].keys.forEach((coinKey) {
-      if (coinKey == 'followCoinList') {
-        public.publicInfoMarket['market'][coinKey].keys.forEach((mCoin) {
-          public.publicInfoMarket['market'][coinKey][mCoin].values
-              .forEach((vCoin) {
-            String coinTyp = findCommonCoinType(
-              vCoin['mainChainName'].toLowerCase(),
-              widget.symbol,
-            );
-
-            if (vCoin['mainChainName'].toLowerCase() == coinTyp) {
-              if (widget.symbol ==
-                  '${vCoin['mainChainSymbol']}${vCoin['mainChainName']}'
-                      .toLowerCase()) {
-                // print(coinTyp);
-                // print(vCoin);
-              }
-            }
-          });
-        });
-      } else if (coinKey == 'coinList') {
-        public.publicInfoMarket['market'][coinKey].values.forEach((mCoin) {
-          String coinTyp = findCommonCoinType(
-            mCoin['mainChainName'].toLowerCase(),
-            widget.symbol,
-          );
-
-          if (mCoin['mainChainName'].toLowerCase() == coinTyp) {
-            if (widget.symbol == '${mCoin['showName']}'.toLowerCase()) {
-              print(mCoin);
-              // print(coinTyp);
-              // print(vCoin);
-            }
-          }
-        });
-      }
-    });
   }
 
   void startTimer() {
@@ -183,7 +145,7 @@ class _dexBottimSheetState extends State<dexBottimSheet> {
       "emailValidCode": _emailVeirficationCode.text,
       "fee": '${asset.getCost['defaultFee']}',
       "googleCode": _googleVeirficationCode.text,
-      "symbol": widget.symbol,
+      "symbol": widget.walletCoin ?? widget.symbol,
       "trustType": 0,
     };
 
@@ -193,21 +155,11 @@ class _dexBottimSheetState extends State<dexBottimSheet> {
 
     await asset.processWithdrawal(context, auth, _postData);
     Navigator.pop(context);
-    print(asset.getCost['defaultFee']);
-    // getDigitalBalance();
-    // setState(() {
-    //   _addressController.clear();
-    //   _amountController.clear();
-    //   _verifyAddress = false;
-    // });
   }
 
   @override
   Widget build(BuildContext context) {
     var auth = Provider.of<Auth>(context, listen: true);
-    var dexProvider = Provider.of<DexProvider>(context, listen: true);
-
-    // print(dexProvider.fromActiveCurrency);
 
     return Form(
       key: _formEmailVeriKey,
@@ -421,21 +373,23 @@ class _dexBottimSheetState extends State<dexBottimSheet> {
                     ],
                   ),
                 ),
-                Container(
-                  padding: EdgeInsets.only(top: 40),
-                  child: LyoButton(
-                    text: 'Send',
-                    active: true,
-                    isLoading: false,
-                    activeColor: linkColor,
-                    activeTextColor: Colors.black,
-                    onPressed: () async {
-                      if (_formEmailVeriKey.currentState!.validate()) {
-                        processWithdrawAmount();
-                      }
-                    },
-                  ),
-                ),
+                widget.walletCoin != null
+                    ? Container(
+                        padding: EdgeInsets.only(top: 40),
+                        child: LyoButton(
+                          text: 'Send',
+                          active: true,
+                          isLoading: false,
+                          activeColor: linkColor,
+                          activeTextColor: Colors.black,
+                          onPressed: () async {
+                            if (_formEmailVeriKey.currentState!.validate()) {
+                              processWithdrawAmount();
+                            }
+                          },
+                        ),
+                      )
+                    : Container(),
               ],
             ),
           ),

@@ -13,6 +13,7 @@ import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/screens/dex_swap/common/dexBottimSheet.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
+import 'package:lyotrade/utils/Coins.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 import 'dart:math' as math;
@@ -40,6 +41,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
   bool _processSelectCoin = false;
   bool _minimumvalue = false;
   Timer? _timer = null;
+  String? _walletCoin = null;
 
   @override
   void initState() {
@@ -69,7 +71,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
     var asset = Provider.of<Asset>(context, listen: false);
     await asset.getAccountBalance(context, auth, "");
     getCoinAddress(_defaultCoin);
-    estimateRates();
+    await estimateRates();
   }
 
   Future<void> getCoinAddress(netwrkType) async {
@@ -183,6 +185,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
     setState(() {
       _loadingExchnageRate = false;
     });
+    return;
   }
 
   Future<void> togglePairs() async {
@@ -217,10 +220,52 @@ class _ExchangeNowState extends State<ExchangeNow> {
     }
   }
 
-  Future<void> processTransaction() async {
-    setState(() {
-      _processSwap = true;
+  Future<void> checkCoins() async {
+    var public = Provider.of<Public>(context, listen: false);
+    var dexProvider = Provider.of<DexProvider>(context, listen: false);
+    public.publicInfoMarket['market'].keys.forEach((coinKey) {
+      if (coinKey == 'followCoinList') {
+        public.publicInfoMarket['market'][coinKey].keys.forEach((mCoin) {
+          public.publicInfoMarket['market'][coinKey][mCoin].values
+              .forEach((vCoin) {
+            String coinTyp = findCommonCoinType(
+              vCoin['mainChainName'].toLowerCase(),
+              dexProvider.fromActiveCurrency['ticker'],
+            );
+
+            if (vCoin['mainChainName'].toLowerCase() == coinTyp) {
+              if (dexProvider.fromActiveCurrency['ticker'] ==
+                  '${vCoin['mainChainSymbol']}${vCoin['mainChainName']}'
+                      .toLowerCase()) {
+                setState(() {
+                  _walletCoin = vCoin['name'];
+                });
+              }
+            }
+          });
+        });
+      } else if (coinKey == 'coinList') {
+        public.publicInfoMarket['market'][coinKey].values.forEach((mCoin) {
+          String coinTyp = findCommonCoinType(
+            mCoin['mainChainName'].toLowerCase(),
+            dexProvider.fromActiveCurrency['ticker'],
+          );
+
+          if (mCoin['mainChainName'].toLowerCase() == coinTyp) {
+            if (dexProvider.fromActiveCurrency['ticker'] ==
+                '${mCoin['showName']}'.toLowerCase()) {
+              setState(() {
+                _walletCoin = mCoin['name'];
+              });
+              // print(coinTyp);
+            }
+          }
+        });
+      }
     });
+  }
+
+  Future<void> processTransaction() async {
     var dexProvider = Provider.of<DexProvider>(context, listen: false);
     var postData = {
       "address": _toAddressController.text,
@@ -1007,7 +1052,11 @@ class _ExchangeNowState extends State<ExchangeNow> {
                         !dexProvider.verifyAddress['result'] ||
                         _processSwap)
                     ? null
-                    : () {
+                    : () async {
+                        setState(() {
+                          _processSwap = true;
+                        });
+                        await checkCoins();
                         processTransaction();
                       },
                 child: Container(
@@ -1072,6 +1121,9 @@ class _ExchangeNowState extends State<ExchangeNow> {
     // print(dexProvider.toActiveCurrency);
     var dexProvider = Provider.of<DexProvider>(context, listen: false);
     var size = MediaQuery.of(context).size;
+
+    print(_walletCoin);
+
     return SingleChildScrollView(
       padding: EdgeInsets.all(10),
       child: Column(
@@ -1082,7 +1134,9 @@ class _ExchangeNowState extends State<ExchangeNow> {
               left: 10,
             ),
             padding: EdgeInsets.only(bottom: 10),
-            child: Text(dexProvider.paymentStatus['status']==null?'':dexProvider.paymentStatus['status'].toUpperCase()),
+            child: Text(dexProvider.paymentStatus['status'] == null
+                ? ''
+                : dexProvider.paymentStatus['status'].toUpperCase()),
           ),
           Container(
             margin: EdgeInsets.only(left: 8, right: 16, bottom: 15),
@@ -1150,41 +1204,47 @@ class _ExchangeNowState extends State<ExchangeNow> {
                               ],
                             )
                           : Container(),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: OutlinedButton(
-                          onPressed: () async {
-                            await changeCoinType(
-                                dexProvider.fromActiveCurrency['ticker']);
-                            showModalBottomSheet<void>(
-                              context: context,
-                              isScrollControlled: true,
-                              builder: (BuildContext context) {
-                                return StatefulBuilder(
-                                  builder: (BuildContext context,
-                                      StateSetter setState) {
-                                    return FractionallySizedBox(
-                                      heightFactor: 0.9,
-                                      child: dexBottimSheet(
-                                          _fromAmountController.text,
-                                          dexProvider
-                                              .processPayment['payinAddress'],
-                                          dexProvider
-                                              .fromActiveCurrency['ticker']),
-                                    );
-                                  },
-                                );
-                              },
-                            );
-                          },
-                          child: Text('Send'),
-                          style: OutlinedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        ),
-                      )
+                      _walletCoin != null
+                          ? Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: OutlinedButton(
+                                onPressed: () async {
+                                  await changeCoinType(
+                                      dexProvider.fromActiveCurrency['ticker']);
+                                  showModalBottomSheet<void>(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    builder: (BuildContext context) {
+                                      return StatefulBuilder(
+                                        builder: (BuildContext context,
+                                            StateSetter setState) {
+                                          return FractionallySizedBox(
+                                            heightFactor: 0.9,
+                                            child: DexBottimSheet(
+                                              fromAmount:
+                                                  _fromAmountController.text,
+                                              paymentAddress:
+                                                  dexProvider.processPayment[
+                                                      'payinAddress'],
+                                              symbol: dexProvider
+                                                  .fromActiveCurrency['ticker'],
+                                              walletCoin: _walletCoin,
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
+                                child: Text('Send'),
+                                style: OutlinedButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Container(),
                     ],
                   ),
                   Align(
