@@ -463,10 +463,13 @@ class Auth with ChangeNotifier {
       'operationType': formData['operationType'],
     });
 
+    print(formData);
+
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
+      print(responseData);
       if (responseData['code'] == '0') {
         snackAlert(
             ctx, SnackTypes.success, 'Verification code sent to your email.');

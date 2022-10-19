@@ -388,7 +388,7 @@ class Public with ChangeNotifier {
 
       if (responseData['code'] == "0") {
         _publicInfoMarket = responseData['data'];
-
+      
         var _allMarketsMap =
             Map<String, dynamic>.from(responseData['data']['market']['market']);
 

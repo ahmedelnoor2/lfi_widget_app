@@ -278,11 +278,11 @@ class DexProvider with ChangeNotifier {
       '$exDexSwap/v1/transactions/$id/a4643d07a4ae7c79183e95e53da2fa17c3f2307e901c1b440083b1f0c9a32cc5',
       queryParameters
     );
-    print(url);
+   // print(url);
 
     try {
       final response = await http.get(url, headers: headers);
-      print(response.body);
+     // print(response.body);
       final responseData = json.decode(response.body);
 
       if (responseData.isNotEmpty) {

@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:archive/archive_io.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
@@ -148,6 +147,21 @@ class _AssetDetailsState extends State<AssetDetails> {
     var auth = Provider.of<Auth>(context, listen: true);
     var public = Provider.of<Public>(context, listen: true);
     var asset = Provider.of<Asset>(context, listen: true);
+    int _currentIndex = 0;
+
+    List cardList = [
+      Item1(),
+      Item1(),
+      Item1(),
+    ];
+
+    List<T> map<T>(List list, Function handler) {
+      List<T> result = [];
+      for (var i = 0; i < list.length; i++) {
+        result.add(handler(i, list[i]));
+      }
+      return result;
+    }
 
     return Scaffold(
       appBar: hiddenAppBar(),
@@ -359,6 +373,44 @@ class _AssetDetailsState extends State<AssetDetails> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class Item1 extends StatelessWidget {
+  const Item1({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            stops: [
+              0.3,
+              1
+            ],
+            colors: [
+              Color(0xffff4000),
+              Color(0xffffcc66),
+            ]),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text("Data",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22.0,
+                  fontWeight: FontWeight.bold)),
+          Text("Data",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 17.0,
+                  fontWeight: FontWeight.w600)),
+        ],
       ),
     );
   }

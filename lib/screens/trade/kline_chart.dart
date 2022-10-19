@@ -279,7 +279,7 @@ class _KlineChartState extends State<KlineChart>
                 ? current
                 : next)[1])
         : 0;
-
+print(public.activeMarketTick);
     return Scaffold(
       key: _scaffoldKey,
       drawer: MarketDrawer(

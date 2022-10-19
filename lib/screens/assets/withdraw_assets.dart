@@ -146,7 +146,6 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
 
   Future<void> sendVerificationCode() async {
     var auth = Provider.of<Auth>(context, listen: false);
-
     await auth.sendEmailValidCode(context, {
       'token': '',
       'email': '',
