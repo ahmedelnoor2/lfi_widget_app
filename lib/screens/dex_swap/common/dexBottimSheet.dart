@@ -7,8 +7,11 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/dex_provider.dart';
+import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/alert.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
+import 'package:lyotrade/utils/Coins.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 
@@ -41,7 +44,13 @@ class _dexBottimSheetState extends State<dexBottimSheet> {
   late Timer _timerSms;
   int _startSms = 90;
   bool _startTimerSms = false;
+
   @override
+  void initState() {
+    super.initState();
+    checkCoins();
+  }
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -49,6 +58,47 @@ class _dexBottimSheetState extends State<dexBottimSheet> {
     _emailVeirficationCode.dispose();
     _smsVeirficationCode.dispose();
     _googleVeirficationCode.dispose();
+  }
+
+  void checkCoins() {
+    var public = Provider.of<Public>(context, listen: false);
+    public.publicInfoMarket['market'].keys.forEach((coinKey) {
+      if (coinKey == 'followCoinList') {
+        public.publicInfoMarket['market'][coinKey].keys.forEach((mCoin) {
+          public.publicInfoMarket['market'][coinKey][mCoin].values
+              .forEach((vCoin) {
+            String coinTyp = findCommonCoinType(
+              vCoin['mainChainName'].toLowerCase(),
+              widget.symbol,
+            );
+
+            if (vCoin['mainChainName'].toLowerCase() == coinTyp) {
+              if (widget.symbol ==
+                  '${vCoin['mainChainSymbol']}${vCoin['mainChainName']}'
+                      .toLowerCase()) {
+                // print(coinTyp);
+                // print(vCoin);
+              }
+            }
+          });
+        });
+      } else if (coinKey == 'coinList') {
+        public.publicInfoMarket['market'][coinKey].values.forEach((mCoin) {
+          String coinTyp = findCommonCoinType(
+            mCoin['mainChainName'].toLowerCase(),
+            widget.symbol,
+          );
+
+          if (mCoin['mainChainName'].toLowerCase() == coinTyp) {
+            if (widget.symbol == '${mCoin['showName']}'.toLowerCase()) {
+              print(mCoin);
+              // print(coinTyp);
+              // print(vCoin);
+            }
+          }
+        });
+      }
+    });
   }
 
   void startTimer() {
@@ -154,7 +204,10 @@ class _dexBottimSheetState extends State<dexBottimSheet> {
 
   @override
   Widget build(BuildContext context) {
-    var auth = Provider.of<Auth>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: true);
+    var dexProvider = Provider.of<DexProvider>(context, listen: true);
+
+    // print(dexProvider.fromActiveCurrency);
 
     return Form(
       key: _formEmailVeriKey,

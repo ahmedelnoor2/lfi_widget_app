@@ -33,3 +33,15 @@ String getMarketName(String coinName) {
   }
 }
 
+String findCommonCoinType(firstCoin, secondCoin) {
+  var str = firstCoin;
+  var str2 = secondCoin;
+
+  Set<String> uniqueList = {};
+  for (int i = 0; i < str.length; i++) {
+    if (str2.contains(str[i])) {
+      uniqueList.add(str[i]);
+    }
+  }
+  return uniqueList.join();
+}
