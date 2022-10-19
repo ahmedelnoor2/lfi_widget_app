@@ -215,11 +215,11 @@ class _OrderBookState extends State<OrderBook> {
                           alignment: Alignment.centerRight,
                           child: Container(
                             color: Color.fromARGB(73, 175, 86, 76),
-                            // width: ((double.parse('${asks[index][1] ?? 0}') /
-                            //             double.parse('$askMax')) *
-                            //         2) *
-                            //     100,
-                            // width: width * 0.5,
+                            width: ((double.parse(
+                                            '${asks[index] != null ? asks[index][1] : 0}') /
+                                        double.parse('$askMax')) *
+                                    2) *
+                                100,
                             height: 21,
                           ),
                         ),
@@ -307,11 +307,11 @@ class _OrderBookState extends State<OrderBook> {
                           alignment: Alignment.centerRight,
                           child: Container(
                             color: Color.fromARGB(71, 72, 163, 65),
-                            // width: ((double.parse('${bids[index][1] ?? 0}') /
-                            //             double.parse('$bidMax')) *
-                            //         2) *
-                            //     100,
-                            // width: width * 0.5,
+                            width: ((double.parse(
+                                            '${bids[index] != null ? bids[index][1] : 0}') /
+                                        double.parse('$bidMax')) *
+                                    2) *
+                                100,
                             height: 21,
                           ),
                         ),
