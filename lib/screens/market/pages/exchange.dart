@@ -8,8 +8,10 @@ import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/screens/common/widget/loading_dialog.dart';
 import 'package:lyotrade/screens/common/widget/progress_bar.dart';
+import 'package:lyotrade/screens/market/market.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:lyotrade/utils/Number.utils.dart';
 import 'package:lyotrade/utils/Translate.utils.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -174,6 +176,8 @@ class _ExchangeScreenState extends State<ExchangeScreen>
                     ? public.allSearchMarket[widget.currentMarketSort][index]
                     : public.allMarkets[widget.currentMarketSort][index];
 
+                // print(public.activeMarketAllTicks[_market['symbol']]['vol']);
+
                 return ListTile(
                   leading: InkWell(
                     onTap: (() async {
@@ -181,6 +185,7 @@ class _ExchangeScreenState extends State<ExchangeScreen>
                         if (public.favMarketNameList
                             .contains(_market['symbol'])) {
                           showDialog(
+                            barrierDismissible: false,
                             context: context,
                             builder: (c) {
                               return AlertDialog(
@@ -206,6 +211,16 @@ class _ExchangeScreenState extends State<ExchangeScreen>
                               'token': "${auth.loginVerificationToken}",
                               'userId': "${auth.userInfo['id']}",
                             });
+                            Navigator.pushReplacement(
+                              context,
+                              PageRouteBuilder(
+                                settings: RouteSettings(name: Market.routeName),
+                                pageBuilder:
+                                    (context, animation1, animation2) =>
+                                        Market(),
+                                transitionDuration: Duration(seconds: 0),
+                              ),
+                            );
                           });
                         } else {
                           showDialog(
@@ -283,97 +298,72 @@ class _ExchangeScreenState extends State<ExchangeScreen>
                             ),
                           ],
                         ),
-                        InkWell(
-                          onTap: () {
-                            public.setActiveMarket(_market);
-                            Navigator.pushNamed(context, '/trade');
-                          },
-                          child: Row(
-                            children: [
-                              Container(
-                                height: 30,
-                                width: 60,
-                                padding: const EdgeInsets.only(
-                                  top: 5,
-                                  bottom: 5,
-                                  right: 10,
-                                ),
-                                child: Text(
-                                  'Trade',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: linkColor,
-                                  ),
-                                ),
-                              ),
-
-                              // InkWell(
-                              //   onTap: () async {
-                              //     await public.setActiveMarket(_market);
-                              //     Navigator.pushNamed(context, '/kline_chart');
-                              //   },
-                              //   child: Container(
-                              //     padding: const EdgeInsets.only(
-                              //       top: 5,
-                              //       bottom: 5,
-                              //       left: 10,
-                              //       right: 10,
-                              //     ),
-                              //     child: Text(
-                              //       'Info',
-                              //       style: TextStyle(
-                              //         fontSize: 14,
-                              //         color: linkColor,
-                              //       ),
-                              //     ),
-                              //   ),
-                              // ),
-                            ],
+                        Container(
+                          height: 30,
+                          width: 100,
+                          padding: const EdgeInsets.only(
+                            top: 5,
+                            bottom: 5,
+                            right: 10,
                           ),
-                        )
+                          child: Text(
+                            'Vol: ${getNumberString(context, double.parse('${public.activeMarketAllTicks[_market['symbol']] != null ? public.activeMarketAllTicks[_market['symbol']]['vol'] : 0}'))}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: secondaryTextColor,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                  trailing: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '${public.activeMarketAllTicks[_market['symbol']] != null ? public.activeMarketAllTicks[_market['symbol']]['close'] : '--'}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: public.activeMarketAllTicks[
-                                      _market['symbol']] !=
-                                  null
-                              ? (((double.parse('${public.activeMarketAllTicks[_market['symbol']]['open']}') -
-                                              double.parse(
-                                                  '${public.activeMarketAllTicks[_market['symbol']]['close']}')) /
-                                          double.parse(
-                                              '${public.activeMarketAllTicks[_market['symbol']]['open']}')) >
-                                      0)
-                                  ? greenlightchartColor
-                                  : errorColor
-                              : Colors.white,
+                  trailing: InkWell(
+                    onTap: (() async {
+                      await public.setActiveMarket(_market);
+
+                      Navigator.pushNamed(context, '/kline_chart');
+                    }),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '${public.activeMarketAllTicks[_market['symbol']] != null ? public.activeMarketAllTicks[_market['symbol']]['close'] : '--'}',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: public.activeMarketAllTicks[
+                                        _market['symbol']] !=
+                                    null
+                                ? (((double.parse('${public.activeMarketAllTicks[_market['symbol']]['open']}') -
+                                                double.parse(
+                                                    '${public.activeMarketAllTicks[_market['symbol']]['close']}')) /
+                                            double.parse(
+                                                '${public.activeMarketAllTicks[_market['symbol']]['open']}')) >
+                                        0)
+                                    ? greenlightchartColor
+                                    : errorColor
+                                : Colors.white,
+                          ),
                         ),
-                      ),
-                      Text(
-                        '${public.activeMarketAllTicks[_market['symbol']] != null ? (double.parse(public.activeMarketAllTicks[_market['symbol']]['rose']) * 100).toStringAsFixed(2) : '--'}%',
-                        style: TextStyle(
-                          color:
-                              public.activeMarketAllTicks[_market['symbol']] !=
-                                      null
-                                  ? double.parse(public.activeMarketAllTicks[
-                                                  _market['symbol']]['rose'] ??
-                                              '0') >
-                                          0
-                                      ? greenlightchartColor
-                                      : errorColor
-                                  : secondaryTextColor,
-                          fontSize: 14,
+                        Text(
+                          '${public.activeMarketAllTicks[_market['symbol']] != null ? (double.parse(public.activeMarketAllTicks[_market['symbol']]['rose']) * 100).toStringAsFixed(2) : '--'}%',
+                          style: TextStyle(
+                            color: public.activeMarketAllTicks[
+                                        _market['symbol']] !=
+                                    null
+                                ? double.parse(public.activeMarketAllTicks[
+                                                _market['symbol']]['rose'] ??
+                                            '0') >
+                                        0
+                                    ? greenlightchartColor
+                                    : errorColor
+                                : secondaryTextColor,
+                            fontSize: 14,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               },
