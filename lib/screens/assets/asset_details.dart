@@ -1,4 +1,5 @@
-import 'package:carousel_slider/carousel_slider.dart';
+import 'dart:convert';
+import 'package:archive/archive_io.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/container.dart';
@@ -6,6 +7,8 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/screens/assets/common/market_feeds.dart';
+import 'package:lyotrade/screens/assets/skeleton/assets_skull.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
@@ -14,6 +17,7 @@ import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/Number.utils.dart';
 import 'package:provider/provider.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class AssetDetails extends StatefulWidget {
   static const routeName = '/asset_details';
@@ -24,6 +28,117 @@ class AssetDetails extends StatefulWidget {
 }
 
 class _AssetDetailsState extends State<AssetDetails> {
+  bool _loadingMarket = true;
+  bool _loadingMarketData = true;
+  List _availableMarkets = [];
+  var _channel;
+  Map _marketData = {};
+
+  @override
+  void initState() {
+    super.initState();
+    getMarkets();
+  }
+
+  @override
+  void dispose() async {
+    if (_channel != null) {
+      _channel.sink.close();
+    }
+    super.dispose();
+  }
+
+  Future<void> getMarkets() async {
+    setState(() {
+      _loadingMarket = true;
+    });
+
+    var public = Provider.of<Public>(context, listen: false);
+    var asset = Provider.of<Asset>(context, listen: false);
+
+    String currentAsset = asset.selectedAsset['coin'];
+    if (public.publicInfoMarket['market'] != null) {
+      public.publicInfoMarket['market']['market'].keys.forEach((k) {
+        if (public.publicInfoMarket['market']['market']['$k'] != null) {
+          if (k == 'ETF') {
+            if (public.publicInfoMarket['market']['market']['$k']
+                    ['$currentAsset/USDT'] !=
+                null) {
+              _availableMarkets.add(public.publicInfoMarket['market']['market']
+                  ['$k']['$currentAsset/USDT']);
+            }
+          } else {
+            if (public.publicInfoMarket['market']['market']['$k']
+                    ['$currentAsset/$k'] !=
+                null) {
+              _availableMarkets.add(public.publicInfoMarket['market']['market']
+                  ['$k']['$currentAsset/$k']);
+            }
+          }
+        }
+      });
+    }
+
+    setState(() {
+      _loadingMarket = false;
+    });
+    connectWebSocket();
+  }
+
+  Future<void> connectWebSocket() async {
+    setState(() {
+      _loadingMarketData = true;
+    });
+    var public = Provider.of<Public>(context, listen: false);
+
+    _channel = WebSocketChannel.connect(
+      Uri.parse('${public.publicInfoMarket["market"]["wsUrl"]}'),
+    );
+
+    for (var amarket in _availableMarkets) {
+      String marketCoin = amarket['symbol'].toLowerCase();
+
+      _channel.sink.add(jsonEncode({
+        "event": "sub",
+        "params": {
+          "channel": "market_${marketCoin}_ticker",
+          "cb_id": marketCoin,
+        }
+      }));
+    }
+
+    _channel.stream.listen((message) {
+      setState(() {
+        _loadingMarketData = false;
+      });
+      extractStreamData(message, public);
+    });
+  }
+
+  void extractStreamData(streamData, public) async {
+    if (streamData != null) {
+      var inflated =
+          GZipDecoder().decodeBytes(streamData as List<int>, verify: false);
+      // var inflated = zlib.decode(streamData as List<int>);
+      var data = utf8.decode(inflated);
+      var marketData = json.decode(data);
+      if (marketData['channel'] != null) {
+        // print(marketData['channel']);
+        // print(marketData);
+        setState(() {
+          _marketData['${marketData['channel'].split('_')[1]}'] = {
+            'price': marketData['tick']['close'],
+            'change': (((double.parse('${marketData['tick']['open']}') -
+                            double.parse('${marketData['tick']['close']}')) /
+                        double.parse('${marketData['tick']['open']}')) *
+                    100)
+                .toStringAsFixed(2),
+          };
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
@@ -52,8 +167,8 @@ class _AssetDetailsState extends State<AssetDetails> {
       appBar: hiddenAppBar(),
       body: Container(
         padding: EdgeInsets.only(
-          right: 15,
-          left: 15,
+          right: 10,
+          left: 10,
           bottom: 15,
         ),
         child: Column(
@@ -78,7 +193,7 @@ class _AssetDetailsState extends State<AssetDetails> {
                         ),
                       ),
                       Text(
-                        '${public.publicInfoMarket['market']['coinList'][asset.selectedAsset['coin']]['longName']}',
+                        '${public.publicInfoMarket['market']['coinList'][asset.selectedAsset['coin']]['longName'].isNotEmpty ? public.publicInfoMarket['market']['coinList'][asset.selectedAsset['coin']]['longName'] : public.publicInfoMarket['market']['coinList'][asset.selectedAsset['coin']]['name']}',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -194,63 +309,15 @@ class _AssetDetailsState extends State<AssetDetails> {
                           ),
                         ),
                         Divider(),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Spot Trade'),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Column(
-                      children: <Widget>[
-                        CarouselSlider(
-                          options: CarouselOptions(
-                            height: 140.0,
-                            autoPlay: true,
-                            autoPlayInterval: Duration(seconds: 3),
-                            autoPlayAnimationDuration:
-                                Duration(milliseconds: 800),
-                            autoPlayCurve: Curves.fastOutSlowIn,
-                            pauseAutoPlayOnTouch: true,
-                            aspectRatio: 2.0,
-                            onPageChanged: (index, reason) {
-                              setState(() {
-                                _currentIndex = index;
-                              });
-                            },
-                          ),
-                          items: cardList.map((card) {
-                            return Builder(builder: (BuildContext context) {
-                              return Container(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.20,
-                                width: MediaQuery.of(context).size.width,
-                                child: Card(
-                                  color: Colors.blueAccent,
-                                  child: card,
+                        Container(
+                          alignment: Alignment.centerLeft,
+                          child: _loadingMarket
+                              ? marketFeedSkull(context)
+                              : MarketFeeds(
+                                  availableMarkets: _availableMarkets,
+                                  marketData: _marketData,
+                                  loadingMarketData: _loadingMarketData,
                                 ),
-                              );
-                            });
-                          }).toList(),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: map<Widget>(cardList, (index, url) {
-                            return Container(
-                              width: 10.0,
-                              height: 10.0,
-                              margin: EdgeInsets.symmetric(
-                                  vertical: 10.0, horizontal: 2.0),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: _currentIndex == index
-                                    ? Colors.blueAccent
-                                    : Colors.grey,
-                              ),
-                            );
-                          }),
                         ),
                       ],
                     ),

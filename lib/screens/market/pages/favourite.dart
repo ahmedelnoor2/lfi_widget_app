@@ -5,8 +5,10 @@ import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/no_data.dart';
+import 'package:lyotrade/screens/market/market.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:lyotrade/utils/Number.utils.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -46,7 +48,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         children: <Widget>[
           Expanded(
             child: public.favMarketList.isEmpty
-                ? noData("No Favourite")
+                ? Center(child: noData("No Favourite"))
                 : ListView.separated(
                     separatorBuilder: (context, index) {
                       return Divider();
@@ -58,12 +60,25 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                           public.favMarketList[index]['marketDetails'];
 
                       return ListTile(
-                        onTap: () async {
-                          await public.setActiveMarket(_market);
-                          Navigator.pushNamed(context, '/kline_chart');
-                        },
                         leading: InkWell(
                           onTap: (() async {
+                            showDialog(
+                              context: context,
+                              builder: (c) {
+                                return AlertDialog(
+                                  backgroundColor: Colors.transparent,
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      CircularProgressIndicator(),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
                             if (public.favMarketNameList
                                 .contains(_market['symbol'])) {
                               await public.deleteFavMarket(context, {
@@ -75,6 +90,17 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                   'token': "${auth.loginVerificationToken}",
                                   'userId': "${auth.userInfo['id']}",
                                 });
+                                Navigator.pushReplacement(
+                                  context,
+                                  PageRouteBuilder(
+                                    settings:
+                                        RouteSettings(name: Market.routeName),
+                                    pageBuilder:
+                                        (context, animation1, animation2) =>
+                                            Market(),
+                                    transitionDuration: Duration(seconds: 0),
+                                  ),
+                                );
                               });
                             }
                           }),
@@ -90,115 +116,98 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                           ),
                         ),
                         minLeadingWidth: 5,
-                        title: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  '${_market['showName'].split('/')[0]}',
-                                  style: TextStyle(
-                                    fontSize: 18,
+                        title: InkWell(
+                          onTap: () async {
+                            await public.setActiveMarket(_market);
+                            Navigator.pushNamed(context, '/kline_chart');
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    '${_market['showName'].split('/')[0]}',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                    ),
                                   ),
+                                  Text(
+                                    ' /${_market['showName'].split('/')[1]}',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: secondaryTextColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Container(
+                                height: 30,
+                                width: 100,
+                                padding: const EdgeInsets.only(
+                                  top: 5,
+                                  bottom: 5,
+                                  right: 10,
                                 ),
-                                Text(
-                                  ' /${_market['showName'].split('/')[1]}',
+                                child: Text(
+                                  'Vol: ${getNumberString(context, double.parse('${public.activeMarketAllTicks[_market['symbol']]['vol']}'))}',
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 14,
                                     color: secondaryTextColor,
                                   ),
                                 ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                InkWell(
-                                  onTap: () async {
-                                    await public.setActiveMarket(_market);
-                                    Navigator.pushNamed(context, '/trade');
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.only(
-                                      top: 5,
-                                      bottom: 5,
-                                      right: 10,
-                                    ),
-                                    child: Text(
-                                      'Trade',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: linkColor,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () async {
-                                    await public.setActiveMarket(_market);
-                                    Navigator.pushNamed(
-                                        context, '/kline_chart');
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.only(
-                                      top: 5,
-                                      bottom: 5,
-                                      left: 10,
-                                      right: 10,
-                                    ),
-                                    child: Text(
-                                      'Info',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: linkColor,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )
-                          ],
+                              ),
+                            ],
+                          ),
                         ),
-                        trailing: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              '${public.activeMarketAllTicks[_market['symbol']] != null ? public.activeMarketAllTicks[_market['symbol']]['close'] : '--'}',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: public.activeMarketAllTicks[
-                                            _market['symbol']] !=
-                                        null
-                                    ? (((double.parse('${public.activeMarketAllTicks[_market['symbol']]['open']}') -
-                                                    double.parse(
-                                                        '${public.activeMarketAllTicks[_market['symbol']]['close']}')) /
-                                                double.parse(
-                                                    '${public.activeMarketAllTicks[_market['symbol']]['open']}')) >
-                                            0)
-                                        ? greenlightchartColor
-                                        : errorColor
-                                    : Colors.white,
+                        trailing: InkWell(
+                          onTap: () async {
+                            await public.setActiveMarket(_market);
+                            Navigator.pushNamed(context, '/kline_chart');
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                '${public.activeMarketAllTicks[_market['symbol']] != null ? public.activeMarketAllTicks[_market['symbol']]['close'] : '--'}',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: public.activeMarketAllTicks[
+                                              _market['symbol']] !=
+                                          null
+                                      ? (((double.parse('${public.activeMarketAllTicks[_market['symbol']]['open']}') -
+                                                      double.parse(
+                                                          '${public.activeMarketAllTicks[_market['symbol']]['close']}')) /
+                                                  double.parse(
+                                                      '${public.activeMarketAllTicks[_market['symbol']]['open']}')) >
+                                              0)
+                                          ? greenlightchartColor
+                                          : errorColor
+                                      : Colors.white,
+                                ),
                               ),
-                            ),
-                            Text(
-                              '${public.activeMarketAllTicks[_market['symbol']] != null ? (double.parse(public.activeMarketAllTicks[_market['symbol']]['rose']) * 100).toStringAsFixed(2) : '--'}%',
-                              style: TextStyle(
-                                color: public.activeMarketAllTicks[
-                                            _market['symbol']] !=
-                                        null
-                                    ? double.parse(public.activeMarketAllTicks[
-                                                        _market['symbol']]
-                                                    ['rose'] ??
-                                                '0') >
-                                            0
-                                        ? greenlightchartColor
-                                        : errorColor
-                                    : secondaryTextColor,
-                                fontSize: 14,
+                              Text(
+                                '${public.activeMarketAllTicks[_market['symbol']] != null ? (double.parse(public.activeMarketAllTicks[_market['symbol']]['rose']) * 100).toStringAsFixed(2) : '--'}%',
+                                style: TextStyle(
+                                  color: public.activeMarketAllTicks[
+                                              _market['symbol']] !=
+                                          null
+                                      ? double.parse(
+                                                  public.activeMarketAllTicks[
+                                                              _market['symbol']]
+                                                          ['rose'] ??
+                                                      '0') >
+                                              0
+                                          ? greenlightchartColor
+                                          : errorColor
+                                      : secondaryTextColor,
+                                  fontSize: 14,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       );
                     },

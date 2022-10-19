@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/bottomnav.dart';
+import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/trade/common/header.dart';
 import 'package:lyotrade/screens/trade/common/market_drawer.dart';
+import 'package:lyotrade/screens/trade/trade.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/Number.utils.dart';
@@ -584,7 +586,7 @@ print(public.activeMarketTick);
                               ),
                             ),
                             SizedBox(
-                              height: width * 0.87,
+                              height: width * 0.75,
                               child: _loadingChart
                                   ? Center(
                                       child:
@@ -633,7 +635,7 @@ print(public.activeMarketTick);
                   ),
                 ),
                 SizedBox(
-                  height: height * 0.83,
+                  height: height,
                   child: Card(
                     margin: EdgeInsets.zero,
                     child: Column(
@@ -649,7 +651,7 @@ print(public.activeMarketTick);
                           ],
                         ),
                         SizedBox(
-                          height: height * 0.758,
+                          height: height * 0.9,
                           child: TabBarView(
                             controller: _tabController,
                             children: [
@@ -944,8 +946,55 @@ print(public.activeMarketTick);
           ),
         ),
       ),
-      bottomNavigationBar:
-          _currentRoute == '/market' ? bottomNav(context, auth) : null,
+      bottomNavigationBar: _currentRoute == '/market'
+          ? bottomNav(context, auth)
+          : BottomNavigationBar(
+              items: [
+                BottomNavigationBarItem(
+                  icon: Container(
+                    padding: EdgeInsets.only(left: 10, right: 10),
+                    child: LyoButton(
+                      onPressed: () {
+                        PageRouteBuilder(
+                          settings: RouteSettings(name: Trade.routeName),
+                          pageBuilder: (context, animation1, animation2) =>
+                              Trade(),
+                          transitionDuration: Duration(seconds: 0),
+                        );
+                      },
+                      text: 'Buy',
+                      active: true,
+                      activeColor: greenIndicator,
+                      isLoading: false,
+                    ),
+                  ),
+                  label: '',
+                ),
+                BottomNavigationBarItem(
+                  icon: Container(
+                    padding: EdgeInsets.only(left: 10, right: 10),
+                    child: LyoButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            settings: RouteSettings(name: Trade.routeName),
+                            pageBuilder: (context, animation1, animation2) =>
+                                Trade(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
+                      },
+                      text: 'Sell',
+                      active: true,
+                      activeColor: redIndicator,
+                      isLoading: false,
+                    ),
+                  ),
+                  label: '',
+                ),
+              ],
+            ),
     );
   }
 }

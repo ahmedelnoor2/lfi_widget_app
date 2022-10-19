@@ -518,9 +518,6 @@ class Public with ChangeNotifier {
 
       final responseData = json.decode(response.body);
       _klineData = responseData;
-      print('kline data.......');
-
-      print(_klineData);
       return notifyListeners();
     } catch (error) {
       // throw error;
@@ -745,7 +742,6 @@ class Public with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         _insertresponse = responseData['data'];
-        Navigator.of(ctx).pop();
         snackAlert(ctx, SnackTypes.success, getTranslate(responseData['msg']));
 
         isMyLoading = false;
@@ -773,7 +769,6 @@ class Public with ChangeNotifier {
       final responseData = json.decode(response.body);
 
       if (responseData['code'] == '0') {
-        Navigator.of(ctx).pop();
         snackAlert(ctx, SnackTypes.success, getTranslate(responseData['msg']));
 
         notifyListeners();
