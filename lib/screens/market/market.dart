@@ -304,7 +304,7 @@ class _MarketState extends State<Market> {
                                 height: height * 0.043,
                                 radius: 2,
                                 contentPadding:
-                                    EdgeInsets.only(left: 10, right: 0),
+                                    EdgeInsets.only(left: 10, right: 10),
                                 backgroundColor: linkColor,
                                 splashColor: linkColor,
                                 unselectedBackgroundColor: Colors.transparent,
@@ -436,7 +436,7 @@ class _MarketState extends State<Market> {
       lineBarsData: [
         LineChartBarData(
           color: Color.fromARGB(155, 155, 144, 255),
-          spots:  [
+          spots: [
             FlSpot(0, 3),
             FlSpot(2.6, 2),
             FlSpot(4.9, 5),

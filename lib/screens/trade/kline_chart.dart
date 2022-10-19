@@ -635,7 +635,7 @@ class _KlineChartState extends State<KlineChart>
                   ),
                 ),
                 SizedBox(
-                  height: height * 0.83,
+                  height: height,
                   child: Card(
                     margin: EdgeInsets.zero,
                     child: Column(
@@ -651,7 +651,7 @@ class _KlineChartState extends State<KlineChart>
                           ],
                         ),
                         SizedBox(
-                          height: height * 0.758,
+                          height: height * 0.9,
                           child: TabBarView(
                             controller: _tabController,
                             children: [
@@ -948,51 +948,53 @@ class _KlineChartState extends State<KlineChart>
       ),
       bottomNavigationBar: _currentRoute == '/market'
           ? bottomNav(context, auth)
-          : BottomNavigationBar(items: [
-              BottomNavigationBarItem(
-                icon: Container(
-                  padding: EdgeInsets.only(left: 10, right: 10),
-                  child: LyoButton(
-                    onPressed: () {
-                      PageRouteBuilder(
-                        settings: RouteSettings(name: Trade.routeName),
-                        pageBuilder: (context, animation1, animation2) =>
-                            Trade(),
-                        transitionDuration: Duration(seconds: 0),
-                      );
-                    },
-                    text: 'Buy',
-                    active: true,
-                    activeColor: greenIndicator,
-                    isLoading: false,
-                  ),
-                ),
-                label: '',
-              ),
-              BottomNavigationBarItem(
-                icon: Container(
-                  padding: EdgeInsets.only(left: 10, right: 10),
-                  child: LyoButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
+          : BottomNavigationBar(
+              items: [
+                BottomNavigationBarItem(
+                  icon: Container(
+                    padding: EdgeInsets.only(left: 10, right: 10),
+                    child: LyoButton(
+                      onPressed: () {
                         PageRouteBuilder(
                           settings: RouteSettings(name: Trade.routeName),
                           pageBuilder: (context, animation1, animation2) =>
                               Trade(),
                           transitionDuration: Duration(seconds: 0),
-                        ),
-                      );
-                    },
-                    text: 'Sell',
-                    active: true,
-                    activeColor: redIndicator,
-                    isLoading: false,
+                        );
+                      },
+                      text: 'Buy',
+                      active: true,
+                      activeColor: greenIndicator,
+                      isLoading: false,
+                    ),
                   ),
+                  label: '',
                 ),
-                label: '',
-              ),
-            ]),
+                BottomNavigationBarItem(
+                  icon: Container(
+                    padding: EdgeInsets.only(left: 10, right: 10),
+                    child: LyoButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            settings: RouteSettings(name: Trade.routeName),
+                            pageBuilder: (context, animation1, animation2) =>
+                                Trade(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
+                        );
+                      },
+                      text: 'Sell',
+                      active: true,
+                      activeColor: redIndicator,
+                      isLoading: false,
+                    ),
+                  ),
+                  label: '',
+                ),
+              ],
+            ),
     );
   }
 }
