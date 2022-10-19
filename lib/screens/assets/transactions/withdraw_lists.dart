@@ -5,7 +5,7 @@ import 'package:lyotrade/utils/Coins.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 
-Widget withdrawList(context, width, height, allWithdrawals) {
+Widget withdrawList(context, width, height, allWithdrawals, public) {
   return Column(
     children: [
       Row(
@@ -61,7 +61,15 @@ Widget withdrawList(context, width, height, allWithdrawals) {
                           padding: EdgeInsets.only(right: 10),
                           child: CircleAvatar(
                             radius: 15,
-                            child: Icon(Icons.person),
+                            child: public.publicInfoMarket['market']['coinList']
+                                        [withdrawal['symbol']] !=
+                                    null
+                                ? Image.network(
+                                    '${public.publicInfoMarket['market']['coinList'][withdrawal['symbol']]['icon']}')
+                                : Icon(
+                                    Icons.hourglass_empty,
+                                    color: Colors.white,
+                                  ),
                           ),
                         ),
                         Container(
@@ -69,7 +77,9 @@ Widget withdrawList(context, width, height, allWithdrawals) {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('${getCoinName(withdrawal['symbol'])}'),
+                              Text(
+                                '${getCoinName('${public.publicInfoMarket['market']['coinList'][withdrawal['symbol']]['showName']}')}',
+                              ),
                               Text(
                                 '${DateFormat('dd-MM-y H:mm').format(DateTime.parse(withdrawal['createdAt']))}',
                                 style: TextStyle(

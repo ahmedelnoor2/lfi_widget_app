@@ -955,11 +955,14 @@ print(public.activeMarketTick);
                     padding: EdgeInsets.only(left: 10, right: 10),
                     child: LyoButton(
                       onPressed: () {
-                        PageRouteBuilder(
-                          settings: RouteSettings(name: Trade.routeName),
-                          pageBuilder: (context, animation1, animation2) =>
-                              Trade(),
-                          transitionDuration: Duration(seconds: 0),
+                        Navigator.pushReplacement(
+                          context,
+                          PageRouteBuilder(
+                            settings: RouteSettings(name: Trade.routeName),
+                            pageBuilder: (context, animation1, animation2) =>
+                                Trade(),
+                            transitionDuration: Duration(seconds: 0),
+                          ),
                         );
                       },
                       text: 'Buy',

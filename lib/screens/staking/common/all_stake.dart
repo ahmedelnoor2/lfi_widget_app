@@ -26,6 +26,7 @@ class _AllStakeState extends State<AllStake> {
   String _activeStakeId = '';
   String _prospectiveEarnings = "0";
   bool _isProcess = false;
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -40,6 +41,9 @@ class _AllStakeState extends State<AllStake> {
   }
 
   Future<void> getAllStakes() async {
+    setState(() {
+      _isLoading = true;
+    });
     var public = Provider.of<Public>(context, listen: false);
     await public.getStakeLists();
     List _currentProcessing = [];
@@ -57,6 +61,9 @@ class _AllStakeState extends State<AllStake> {
       snackAlert(
           context, SnackTypes.warning, 'Active projects are not availalbe');
     }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Future<void> getStakeInfo(stakeId) async {
@@ -135,34 +142,38 @@ class _AllStakeState extends State<AllStake> {
         ),
         SizedBox(
           height: height * 0.76,
-          child: ListView.builder(
-            padding: EdgeInsets.zero,
-            itemCount: public.stakeLists.length,
-            itemBuilder: (BuildContext context, int index) {
-              var stake = public.stakeLists[index];
-              if (_filterType == 'Processing') {
-                if (stake['status'] == 1) {
-                  return _stakeItem(public, stake);
-                } else {
-                  return Container();
-                }
-              } else if (_filterType == 'Pending') {
-                if (stake['status'] == 2) {
-                  return _stakeItem(public, stake);
-                } else {
-                  return Container();
-                }
-              } else if (_filterType == 'Finished') {
-                if (stake['status'] == 3) {
-                  return _stakeItem(public, stake);
-                } else {
-                  return Container();
-                }
-              } else {
-                return _stakeItem(public, stake);
-              }
-            },
-          ),
+          child: _isLoading
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : ListView.builder(
+                  padding: EdgeInsets.zero,
+                  itemCount: public.stakeLists.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    var stake = public.stakeLists[index];
+                    if (_filterType == 'Processing') {
+                      if (stake['status'] == 1) {
+                        return _stakeItem(public, stake);
+                      } else {
+                        return Container();
+                      }
+                    } else if (_filterType == 'Pending') {
+                      if (stake['status'] == 2) {
+                        return _stakeItem(public, stake);
+                      } else {
+                        return Container();
+                      }
+                    } else if (_filterType == 'Finished') {
+                      if (stake['status'] == 3) {
+                        return _stakeItem(public, stake);
+                      } else {
+                        return Container();
+                      }
+                    } else {
+                      return _stakeItem(public, stake);
+                    }
+                  },
+                ),
         ),
       ],
     );

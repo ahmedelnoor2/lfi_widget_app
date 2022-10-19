@@ -5,7 +5,7 @@ import 'package:lyotrade/utils/Coins.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 
-Widget depositList(context, width, height, allDeposits) {
+Widget depositList(context, width, height, allDeposits, public) {
   return Column(
     children: [
       Row(
@@ -61,7 +61,15 @@ Widget depositList(context, width, height, allDeposits) {
                           padding: EdgeInsets.only(right: 10),
                           child: CircleAvatar(
                             radius: 15,
-                            child: Icon(Icons.person),
+                            child: public.publicInfoMarket['market']['coinList']
+                                        [deposit['symbol']] !=
+                                    null
+                                ? Image.network(
+                                    '${public.publicInfoMarket['market']['coinList'][deposit['symbol']]['icon']}')
+                                : Icon(
+                                    Icons.hourglass_empty,
+                                    color: Colors.white,
+                                  ),
                           ),
                         ),
                         Container(
@@ -69,7 +77,8 @@ Widget depositList(context, width, height, allDeposits) {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('${getCoinName(deposit['symbol'])}'),
+                              Text(
+                                  '${getCoinName('${public.publicInfoMarket['market']['coinList'][deposit['symbol']]['showName']}')}'),
                               Text(
                                 '${DateFormat('dd-MM-y H:mm').format(DateTime.parse(deposit['createdAt']))}',
                                 style: TextStyle(

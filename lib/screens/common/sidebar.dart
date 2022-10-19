@@ -107,8 +107,10 @@ class _SideBarState extends State<SideBar> {
       });
     }
   }
-    _launchURL() async {
-    const url = 'https://docs.lyotrade.com/help-center/trading-fees#trading-fees';
+
+  _launchURL() async {
+    const url =
+        'https://docs.lyotrade.com/help-center/trading-fees#trading-fees';
     if (await canLaunch(url)) {
       await launch(url);
     } else {
@@ -132,7 +134,7 @@ class _SideBarState extends State<SideBar> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             SizedBox(
-              height: kIsWeb ? 120 : width * 0.46,
+              height: kIsWeb ? 120 : width * 0.5,
               child: DrawerHeader(
                 padding: EdgeInsets.zero,
                 child: Column(
@@ -178,7 +180,6 @@ class _SideBarState extends State<SideBar> {
                                 radius:
                                     MediaQuery.of(context).size.width * 0.10,
                                 backgroundColor: Colors.white,
-                              
                                 backgroundImage: imageXFile == null &&
                                         auth.avatarrespons.isEmpty
                                     ? null
@@ -283,7 +284,6 @@ class _SideBarState extends State<SideBar> {
                       trailing: Icon(Icons.verified_user),
                     ),
                   ),
-              
             Card(
               child: Column(
                 children: [
@@ -390,22 +390,20 @@ class _SideBarState extends State<SideBar> {
                       }).toList(),
                     ),
                   ),
-                    ListTile(
+                  ListTile(
                     onTap: () {
                       Navigator.pushNamed(context, '/setting');
                     },
                     leading: Icon(Icons.settings),
                     title: Text('Settings'),
                   ),
-                  
-                   ListTile(
+                  ListTile(
                     onTap: () {
-                     _supportAndFaqs();
+                      _supportAndFaqs();
                     },
                     leading: Icon(Icons.support),
                     title: Text('Support & FAQ'),
                   ),
-
                 ],
               ),
             ),
@@ -445,7 +443,8 @@ class _SideBarState extends State<SideBar> {
       ),
     );
   }
-   _supportAndFaqs() async {
+
+  _supportAndFaqs() async {
     const url = 'https://docs.lyotrade.com/introduction/what-is-lyotrade';
     if (await canLaunch(url)) {
       await launch(url);

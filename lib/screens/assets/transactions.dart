@@ -300,7 +300,7 @@ class _TransactionsState extends State<Transactions>
               ),
             ),
             SizedBox(
-              height: height * 0.8,
+              height: height * 0.79,
               child: TabBarView(
                 controller: _tabTxHistoryController,
                 children: [
@@ -315,7 +315,12 @@ class _TransactionsState extends State<Transactions>
                           : asset.depositLists.isEmpty
                               ? noData('No Transactions')
                               : depositList(
-                                  context, width, height, asset.depositLists),
+                                  context,
+                                  width,
+                                  height,
+                                  asset.depositLists,
+                                  public,
+                                ),
                     ),
                   ),
                   Tab(
@@ -329,7 +334,12 @@ class _TransactionsState extends State<Transactions>
                           : asset.withdrawLists.isEmpty
                               ? noData('No Transactions')
                               : withdrawList(
-                                  context, width, height, asset.withdrawLists),
+                                  context,
+                                  width,
+                                  height,
+                                  asset.withdrawLists,
+                                  public,
+                                ),
                     ),
                   ),
                   Tab(

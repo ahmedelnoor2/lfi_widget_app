@@ -54,16 +54,18 @@ class _MarketFeedsState extends State<MarketFeeds>
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          padding: EdgeInsets.only(left: 5, bottom: 5),
-          child: Text(
-            'Markets',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
+        widget.availableMarkets.isNotEmpty
+            ? Container(
+                padding: EdgeInsets.only(left: 5, bottom: 5),
+                child: Text(
+                  'Markets',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              )
+            : Container(),
         SizedBox(
           height: width * 0.26,
           width: width,

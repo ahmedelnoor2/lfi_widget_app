@@ -356,7 +356,7 @@ class _OtcAssetsState extends State<OtcAssets> {
               ),
             ),
             SizedBox(
-              height: height * 0.48,
+              height: width * 1,
               child: _p2pAssets.isEmpty
                   ? assetsSkull(context)
                   : ListView.builder(
@@ -369,112 +369,120 @@ class _OtcAssetsState extends State<OtcAssets> {
                             ? _smallBalancesp2plAssets[index]
                             : _p2pAssets[index];
 
-                        return Container(
-                          padding: EdgeInsets.only(
-                            bottom: 8,
-                            left: 5,
-                            right: 5,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              SizedBox(
-                                width: width * 0.33,
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.only(right: 8),
-                                      child: CircleAvatar(
-                                        radius: 15,
-                                        child: Image.network(
-                                          '${public.publicInfoMarket['market']['coinList'][assetObj['coinSymbol']]['icon']}',
-                                        ),
-                                      ),
-                                    ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                        return Column(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.only(
+                                bottom: 8,
+                                left: 5,
+                                right: 5,
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  SizedBox(
+                                    width: width * 0.33,
+                                    child: Row(
                                       children: [
-                                        Text(
-                                          '${getCoinName(assetObj['coinSymbol'])}',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
+                                        Container(
+                                          padding: EdgeInsets.only(right: 8),
+                                          child: CircleAvatar(
+                                            radius: 15,
+                                            child: Image.network(
+                                              '${public.publicInfoMarket['market']['coinList'][assetObj['coinSymbol']]['icon']}',
+                                            ),
                                           ),
                                         ),
-                                        Text(
-                                          '${public.publicInfoMarket['market']['coinList'][assetObj['coin']] != null ? public.publicInfoMarket['market']['coinList'][assetObj['coin']]['longName'] : getCoinName(assetObj['coinSymbol'])}',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: secondaryTextColor,
-                                          ),
-                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '${getCoinName(assetObj['coinSymbol'])}',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                            Text(
+                                              '${public.publicInfoMarket['market']['coinList'][assetObj['coin']] != null ? public.publicInfoMarket['market']['coinList'][assetObj['coin']]['longName'] : getCoinName(assetObj['coinSymbol'])}',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: secondaryTextColor,
+                                              ),
+                                            ),
+                                          ],
+                                        )
                                       ],
-                                    )
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                width: width * 0.27,
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    _hideBalances
-                                        ? _hideBalanceString
-                                        : '${double.parse('${assetObj['normal']}').toStringAsFixed(4)}',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
                                     ),
                                   ),
-                                ),
-                              ),
-                              SizedBox(
-                                width: width * 0.13,
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    _hideBalances
-                                        ? _hideBalanceString
-                                        : double.parse('${assetObj['lock']}')
-                                            .toStringAsFixed(4),
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                width: width * 0.19,
-                                child: Align(
-                                  alignment: Alignment.centerRight,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () async {
-                                          await asset.setDefaultCoin(
-                                              '${assetObj['coinSymbol']}');
-                                          Navigator.pushNamed(
-                                            context,
-                                            '/transfer_assets',
-                                          );
-                                        },
-                                        child: Text(
-                                          'Transfer',
-                                          style: TextStyle(
-                                            color: linkColor,
-                                            fontSize: 16,
-                                          ),
+                                  SizedBox(
+                                    width: width * 0.27,
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        _hideBalances
+                                            ? _hideBalanceString
+                                            : '${double.parse('${assetObj['normal']}').toStringAsFixed(4)}',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
                                         ),
                                       ),
-                                    ],
+                                    ),
                                   ),
-                                ),
+                                  SizedBox(
+                                    width: width * 0.13,
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        _hideBalances
+                                            ? _hideBalanceString
+                                            : double.parse(
+                                                    '${assetObj['lock']}')
+                                                .toStringAsFixed(4),
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: width * 0.19,
+                                    child: Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () async {
+                                              await asset.setDefaultCoin(
+                                                  '${assetObj['coinSymbol']}');
+                                              Navigator.pushNamed(
+                                                context,
+                                                '/transfer_assets',
+                                              );
+                                            },
+                                            child: Text(
+                                              'Transfer',
+                                              style: TextStyle(
+                                                color: linkColor,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                            Divider(),
+                          ],
                         );
                       },
                     ),

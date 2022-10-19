@@ -13,7 +13,7 @@ import 'package:provider/provider.dart';
 
 class MarginAssets extends StatefulWidget {
   static const routeName = '/margin_assets';
-  double preceisionvalue=0.0;
+  double preceisionvalue = 0.0;
   MarginAssets({
     Key? key,
   }) : super(key: key);
@@ -41,7 +41,6 @@ class _MarginAssetsState extends State<MarginAssets> {
 
   String _availableBalanceFrom = '0.000';
   String _availableBalanceTo = '0.000';
-
 
   @override
   void initState() {
@@ -384,7 +383,7 @@ class _MarginAssetsState extends State<MarginAssets> {
               ),
             ),
             SizedBox(
-              height: height * 0.48,
+              height: width * 1,
               child: _marginAssets.isEmpty
                   ? assetsSkull(context)
                   : ListView.builder(
@@ -396,136 +395,150 @@ class _MarginAssetsState extends State<MarginAssets> {
                         var asset = _hideSmallBalances
                             ? _smallBalancesMarginAssets[index]
                             : _marginAssets[index];
-                        return Container(
-                          padding: EdgeInsets.only(
-                            bottom: 10,
-                            left: 5,
-                            right: 5,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              SizedBox(
-                                width: width * 0.33,
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.only(right: 8),
-                                      child: CircleAvatar(
-                                        radius: 15,
-                                        child: Image.network(
-                                          '${public.publicInfoMarket['market']['coinList'][asset['values']['baseCoin']]['icon']}',
+                        return Column(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.only(
+                                bottom: 10,
+                                left: 5,
+                                right: 5,
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  SizedBox(
+                                    width: width * 0.33,
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.only(right: 8),
+                                          child: CircleAvatar(
+                                            radius: 15,
+                                            child: Image.network(
+                                              '${public.publicInfoMarket['market']['coinList'][asset['values']['baseCoin']]['icon']}',
+                                            ),
+                                          ),
                                         ),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '${getCoinName(asset['values']['name'])}',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: width * 0.21,
+                                              child: Text(
+                                                '${public.publicInfoMarket['market']['coinList'][asset['values']['baseCoin']]['longName']}',
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: secondaryTextColor,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: width * 0.27,
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Text(
+                                            '${_hideBalances ? _hideBalanceString : asset['values']['baseExNormalBalance'].toStringAsFixed(4)}',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text(
+                                            '${_hideBalances ? _hideBalanceString : asset['values']['quoteEXNormalBalance'].toStringAsFixed(4)}',
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '${getCoinName(asset['values']['name'])}',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
+                                  ),
+                                  SizedBox(
+                                    width: width * 0.12,
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Text(
+                                            _hideBalances
+                                                ? _hideBalanceString
+                                                : double.parse(
+                                                        '${asset['values']['baseLockBalance']}')
+                                                    .toStringAsFixed(4),
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
-                                        ),
-                                        Text(
-                                          '${public.publicInfoMarket['market']['coinList'][asset['values']['baseCoin']]['longName']}',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: secondaryTextColor,
+                                          Text(
+                                            _hideBalances
+                                                ? _hideBalanceString
+                                                : '${double.parse('${asset['values']['quoteLockBalance']}').toStringAsFixed(4)}',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
-                                        ),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                width: width * 0.27,
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        '${_hideBalances ? _hideBalanceString : asset['values']['baseExNormalBalance'].toStringAsFixed(4)}',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                        ],
                                       ),
-                                      Text(
-                                        '${_hideBalances ? _hideBalanceString : asset['values']['quoteEXNormalBalance'].toStringAsFixed(4)}',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                              ),
-                              SizedBox(
-                                width: width * 0.12,
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        _hideBalances
-                                            ? _hideBalanceString
-                                            : double.parse(
-                                                    '${asset['values']['baseLockBalance']}')
-                                                .toStringAsFixed(4),
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                  SizedBox(
+                                    width: width * 0.19,
+                                    child: Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Text(
+                                            _hideBalances
+                                                ? _hideBalanceString
+                                                : double.parse(
+                                                        '${asset['values']['baseTotalBalance']}')
+                                                    .toStringAsFixed(4),
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text(
+                                            _hideBalances
+                                                ? _hideBalanceString
+                                                : double.parse(
+                                                        '${asset['values']['quoteTotalBalance']}')
+                                                    .toStringAsFixed(4),
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      Text(
-                                        _hideBalances
-                                            ? _hideBalanceString
-                                            : '${double.parse('${asset['values']['quoteLockBalance']}').toStringAsFixed(4)}',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
-                              SizedBox(
-                                width: width * 0.19,
-                                child: Align(
-                                  alignment: Alignment.centerRight,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        _hideBalances
-                                            ? _hideBalanceString
-                                            : double.parse(
-                                                    '${asset['values']['baseTotalBalance']}')
-                                                .toStringAsFixed(4),
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      Text(
-                                        _hideBalances
-                                            ? _hideBalanceString
-                                            : double.parse(
-                                                    '${asset['values']['quoteTotalBalance']}')
-                                                .toStringAsFixed(4),
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                            Divider(),
+                          ],
                         );
                       },
                     ),
@@ -871,10 +884,8 @@ class _MarginAssetsState extends State<MarginAssets> {
                         children: [
                           InkWell(
                             onTap: () {
-
-
                               print('Select preceision');
-                              widget.preceisionvalue=25.0;
+                              widget.preceisionvalue = 25.0;
                               print(widget.preceisionvalue);
                             },
                             child: Container(
