@@ -878,11 +878,10 @@ class Asset with ChangeNotifier {
 
       final responseData = json.decode(response.body);
       print(responseData);
-      if (responseData['code'] == '4') {
+      if (responseData['code'] == 4) {
         snackAlert(ctx, SnackTypes.errors, 'Insuffient Balance');
         print('check');
       } else if (responseData['code'] == '10009') {
-        print('call2');
         snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
       } else {
         snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');

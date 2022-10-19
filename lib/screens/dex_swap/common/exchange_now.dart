@@ -243,7 +243,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
 
   paymentStatusFetch() {
     _timer = Timer.periodic(Duration(seconds: 2), (timer) {
-    paymentStatus();
+      paymentStatus();
     });
   }
 
@@ -252,6 +252,14 @@ class _ExchangeNowState extends State<ExchangeNow> {
 
     await dexProvider.swapPaymentStatus(
         context, dexProvider.processPayment['id']);
+  }
+
+  Future<void> changeCoinType(netwrk) async {
+    var auth = Provider.of<Auth>(context, listen: false);
+    var asset = Provider.of<Asset>(context, listen: false);
+    var dexProvider = Provider.of<DexProvider>(context, listen: false);
+    await asset.getCoinCosts(auth, netwrk);
+    // await asset.getChangeAddress(context, auth, netwrk['showName']);
   }
 
   @override
@@ -1074,7 +1082,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
               left: 10,
             ),
             padding: EdgeInsets.only(bottom: 10),
-            child: Text(dexProvider.paymentStatus['status'].toString()),
+            child: Text(dexProvider.paymentStatus['status']==null?'':dexProvider.paymentStatus['status'].toUpperCase()),
           ),
           Container(
             margin: EdgeInsets.only(left: 8, right: 16, bottom: 15),
@@ -1145,14 +1153,25 @@ class _ExchangeNowState extends State<ExchangeNow> {
                       Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: OutlinedButton(
-                          onPressed: () {
+                          onPressed: () async {
+                            await changeCoinType(
+                                dexProvider.fromActiveCurrency['ticker']);
                             showModalBottomSheet<void>(
                               context: context,
+                              isScrollControlled: true,
                               builder: (BuildContext context) {
                                 return StatefulBuilder(
                                   builder: (BuildContext context,
                                       StateSetter setState) {
-                                    return dexBottimSheet(_fromAmountController.text,dexProvider.processPayment['payinAddress'],dexProvider.fromActiveCurrency['ticker']);
+                                    return FractionallySizedBox(
+                                      heightFactor: 0.9,
+                                      child: dexBottimSheet(
+                                          _fromAmountController.text,
+                                          dexProvider
+                                              .processPayment['payinAddress'],
+                                          dexProvider
+                                              .fromActiveCurrency['ticker']),
+                                    );
                                   },
                                 );
                               },

@@ -18,8 +18,7 @@ class dexBottimSheet extends StatefulWidget {
   dexBottimSheet(
     this.fromAmount,
     this.paymentAddress,
-    this.symbol,
-     {
+    this.symbol, {
     Key? key,
   }) : super(key: key);
   final fromAmount;
@@ -42,7 +41,7 @@ class _dexBottimSheetState extends State<dexBottimSheet> {
   late Timer _timerSms;
   int _startSms = 90;
   bool _startTimerSms = false;
-
+  @override
   @override
   void dispose() {
     // TODO: implement dispose
@@ -132,17 +131,19 @@ class _dexBottimSheetState extends State<dexBottimSheet> {
       "addressId": "",
       "amount": widget.fromAmount,
       "emailValidCode": _emailVeirficationCode.text,
-      "fee": '20.3',
+      "fee": '${asset.getCost['defaultFee']}',
       "googleCode": _googleVeirficationCode.text,
       "symbol": widget.symbol,
       "trustType": 0,
     };
-    print(_postData);
+
     if (auth.userInfo['mobileNumber'].isNotEmpty) {
       _postData['smsValidCode'] = _smsVeirficationCode.text;
     }
 
-  await   asset.processWithdrawal(context, auth, _postData);
+    await asset.processWithdrawal(context, auth, _postData);
+    Navigator.pop(context);
+    print(asset.getCost['defaultFee']);
     // getDigitalBalance();
     // setState(() {
     //   _addressController.clear();
@@ -154,6 +155,7 @@ class _dexBottimSheetState extends State<dexBottimSheet> {
   @override
   Widget build(BuildContext context) {
     var auth = Provider.of<Auth>(context, listen: false);
+
     return Form(
       key: _formEmailVeriKey,
       child: Wrap(
@@ -367,7 +369,7 @@ class _dexBottimSheetState extends State<dexBottimSheet> {
                   ),
                 ),
                 Container(
-                  padding: EdgeInsets.only(top: 10),
+                  padding: EdgeInsets.only(top: 40),
                   child: LyoButton(
                     text: 'Send',
                     active: true,
@@ -376,10 +378,6 @@ class _dexBottimSheetState extends State<dexBottimSheet> {
                     activeTextColor: Colors.black,
                     onPressed: () async {
                       if (_formEmailVeriKey.currentState!.validate()) {
-                        // if (!auth.googleAuth) {
-                        //   _timer.cancel();
-                        // }
-                       Navigator.pop(context);
                         processWithdrawAmount();
                       }
                     },
