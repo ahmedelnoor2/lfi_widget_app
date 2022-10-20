@@ -1159,7 +1159,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                     ),
                     child: Container(
                       width: dexProvider.paymentStatus['status'] == 'confirming'
-                          ? size.width * 0.3
+                          ? size.width * 0.5
                           : dexProvider.paymentStatus['status'] == 'exchanging'
                               ? size.width * 0.75
                               : dexProvider.paymentStatus['status'] == 'sending'
@@ -1261,7 +1261,6 @@ class _ExchangeNowState extends State<ExchangeNow> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                
                                 Image.asset(
                                   'assets/img/approved.png',
                                   width: size.width * 0.4,
@@ -1279,7 +1278,6 @@ class _ExchangeNowState extends State<ExchangeNow> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    
                                     Image.asset(
                                       'assets/img/approved.png',
                                       width: size.width * 0.4,
@@ -1299,7 +1297,6 @@ class _ExchangeNowState extends State<ExchangeNow> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
                                       children: [
-                                        
                                         Image.asset(
                                           'assets/img/approved.png',
                                           width: size.width * 0.4,
