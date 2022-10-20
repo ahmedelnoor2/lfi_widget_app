@@ -1207,121 +1207,205 @@ class _ExchangeNowState extends State<ExchangeNow> {
                       _walletCoin != null
                           ? Padding(
                               padding: const EdgeInsets.only(right: 8),
-                              child: OutlinedButton(
-                                onPressed: () async {
-                                  await changeCoinType(
-                                      dexProvider.fromActiveCurrency['ticker']);
-                                  showModalBottomSheet<void>(
-                                    context: context,
-                                    isScrollControlled: true,
-                                    builder: (BuildContext context) {
-                                      return StatefulBuilder(
-                                        builder: (BuildContext context,
-                                            StateSetter setState) {
-                                          return FractionallySizedBox(
-                                            heightFactor: 0.9,
-                                            child: DexBottimSheet(
-                                              fromAmount:
-                                                  _fromAmountController.text,
-                                              paymentAddress:
-                                                  dexProvider.processPayment[
-                                                      'payinAddress'],
-                                              symbol: dexProvider
-                                                  .fromActiveCurrency['ticker'],
-                                              walletCoin: _walletCoin,
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    },
-                                  );
-                                },
-                                child: Text('Send'),
-                                style: OutlinedButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                              ),
+                              child: dexProvider.paymentStatus['status'] ==
+                                      'waiting'
+                                  ? OutlinedButton(
+                                      onPressed: () async {
+                                        await changeCoinType(dexProvider
+                                            .fromActiveCurrency['ticker']);
+                                        showModalBottomSheet<void>(
+                                          context: context,
+                                          isScrollControlled: true,
+                                          builder: (BuildContext context) {
+                                            return StatefulBuilder(
+                                              builder: (BuildContext context,
+                                                  StateSetter setState) {
+                                                return FractionallySizedBox(
+                                                  heightFactor: 0.9,
+                                                  child: DexBottimSheet(
+                                                    fromAmount:
+                                                        _fromAmountController
+                                                            .text,
+                                                    paymentAddress: dexProvider
+                                                            .processPayment[
+                                                        'payinAddress'],
+                                                    symbol: dexProvider
+                                                            .fromActiveCurrency[
+                                                        'ticker'],
+                                                    walletCoin: _walletCoin,
+                                                  ),
+                                                );
+                                              },
+                                            );
+                                          },
+                                        );
+                                      },
+                                      child: Text('Send'),
+                                      style: OutlinedButton.styleFrom(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                    )
+                                  : Container(),
                             )
                           : Container(),
                     ],
                   ),
-                  Align(
-                    alignment: Alignment.center,
-                    child: Container(
-                      width: 150,
-                      margin: EdgeInsets.only(top: 10),
-                      padding:
-                          EdgeInsets.only(top: 2, bottom: 2, right: 2, left: 2),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        border: Border.all(
-                          width: 0.3,
-                          color: Color(0xff5E6292),
-                        ),
-                      ),
-                      child: Image.network(
-                        'https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${dexProvider.processPayment['payinAddress']}&choe=UTF-8',
-                      ),
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(top: 10),
-                    padding: EdgeInsets.all(15),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      border: Border.all(
-                        width: 0.3,
-                        color: Color(0xff5E6292),
-                      ),
-                    ),
-                    child: InkWell(
-                      onTap: () {
-                        Clipboard.setData(
-                          ClipboardData(
-                            text: dexProvider.processPayment['payinAddress'],
-                          ),
-                        );
-                        snackAlert(context, SnackTypes.success, 'Copied');
-                      },
-                      child: Row(
-                        children: [
-                          Container(
-                            width: width * 0.70,
-                            child: Text(
-                              '${dexProvider.processPayment['payinAddress']}',
-                              overflow: TextOverflow.ellipsis,
+                  dexProvider.paymentStatus['status'] == 'confirming'
+                      ? Center(
+                          child: Padding(
+                            padding: EdgeInsets.only(top: 50),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                
+                                Image.asset(
+                                  'assets/img/approved.png',
+                                  width: size.width * 0.4,
+                                  height: size.width * 0.4,
+                                ),
+                              ],
                             ),
                           ),
-                          Container(
-                            padding: EdgeInsets.only(left: 8),
-                            child: Image.asset(
-                              'assets/img/copy.png',
-                              width: 18,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                        )
+                      : dexProvider.paymentStatus['status'] == 'exchanging'
+                          ? Center(
+                              child: Padding(
+                                padding: EdgeInsets.only(top: 50),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    
+                                    Image.asset(
+                                      'assets/img/approved.png',
+                                      width: size.width * 0.4,
+                                      height: size.width * 0.4,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          : dexProvider.paymentStatus['status'] == 'sending'
+                              ? Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.only(top: 50),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        
+                                        Image.asset(
+                                          'assets/img/approved.png',
+                                          width: size.width * 0.4,
+                                          height: size.width * 0.4,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              : Container(
+                                  child: Column(
+                                    children: [
+                                      Align(
+                                        alignment: Alignment.center,
+                                        child: Container(
+                                          width: 150,
+                                          margin: EdgeInsets.only(top: 10),
+                                          padding: EdgeInsets.only(
+                                              top: 2,
+                                              bottom: 2,
+                                              right: 2,
+                                              left: 2),
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(5),
+                                            border: Border.all(
+                                              width: 0.3,
+                                              color: Color(0xff5E6292),
+                                            ),
+                                          ),
+                                          child: Image.network(
+                                            'https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${dexProvider.processPayment['payinAddress']}&choe=UTF-8',
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        margin: EdgeInsets.only(top: 10),
+                                        padding: EdgeInsets.all(15),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          border: Border.all(
+                                            width: 0.3,
+                                            color: Color(0xff5E6292),
+                                          ),
+                                        ),
+                                        child: InkWell(
+                                          onTap: () {
+                                            Clipboard.setData(
+                                              ClipboardData(
+                                                text:
+                                                    dexProvider.processPayment[
+                                                        'payinAddress'],
+                                              ),
+                                            );
+                                            snackAlert(context,
+                                                SnackTypes.success, 'Copied');
+                                          },
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                width: width * 0.70,
+                                                child: Text(
+                                                  '${dexProvider.processPayment['payinAddress']}',
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                              Container(
+                                                padding:
+                                                    EdgeInsets.only(left: 8),
+                                                child: Image.asset(
+                                                  'assets/img/copy.png',
+                                                  width: 18,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
                 ],
               ),
             ),
           ),
-          Align(
-            alignment: Alignment.center,
-            child: RotatedBox(
-              quarterTurns: 1,
-              child: Container(
-                //padding: EdgeInsets.only(top: 20, bottom: 20),
-                child: Image.asset(
-                  "assets/img/transfer.gif",
-                  width: 70.0,
+          dexProvider.paymentStatus['status'] == 'sending'
+              ? Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                      'Amount will be transfer to your wallet within 10 min to 30 min'),
+                )
+              : Align(
+                  alignment: Alignment.center,
+                  child: RotatedBox(
+                    quarterTurns: 1,
+                    child: Container(
+                      //padding: EdgeInsets.only(top: 20, bottom: 20),
+                      child: Image.asset(
+                        "assets/img/transfer.gif",
+                        width: 70.0,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ),
           Card(
             child: Container(
               padding: EdgeInsets.all(10),
