@@ -209,6 +209,12 @@ class Payments with ChangeNotifier {
     return _estimateRate;
   }
 
+  Map _estimateMessage = {};
+
+  Map get estimateMessage {
+    return _estimateMessage;
+  }
+
   Future<void> getEstimateRate(ctx, auth, formData) async {
     _estimateLoader = true;
     notifyListeners();
@@ -220,18 +226,25 @@ class Payments with ChangeNotifier {
     );
 
     var postData = json.encode(formData);
-
+    print(postData);
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
 
+      print(responseData);
+      print('...................');
+
       if (responseData['code'] == '0') {
         _estimateRate = responseData['data'];
-        print(_estimateRate);
+
+        //print(_estimateRate);
         _estimateLoader = false;
         return notifyListeners();
       } else if (responseData['code'] == '4000') {
+        _estimateMessage = responseData['msg'];
+        print(_estimateMessage);
+
         snackAlert(ctx, SnackTypes.errors, responseData['msg']['message']);
         _estimateLoader = false;
         return notifyListeners();

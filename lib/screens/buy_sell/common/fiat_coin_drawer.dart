@@ -26,6 +26,7 @@ class _FiatCoinDrawerState extends State<FiatCoinDrawer> {
     var auth = Provider.of<Auth>(context, listen: false);
 
     payments.setSelectedFiatCurrency(currency);
+
     Navigator.pop(context);
     await payments.getEstimateRate(context, auth, {
       'from_currency': payments.selectedFiatCurrency['ticker'],
@@ -127,10 +128,9 @@ class _FiatCoinDrawerState extends State<FiatCoinDrawer> {
             ),
           ),
           Divider(),
-          SizedBox(
-            height: height * 0.716,
+          Expanded(
             child: ListView.builder(
-              // shrinkWrap: true,
+              shrinkWrap: true,
               itemCount: payments.fiatSearchCurrencies.isNotEmpty
                   ? payments.fiatSearchCurrencies.length
                   : payments.fiatCurrencies.length,
@@ -143,6 +143,7 @@ class _FiatCoinDrawerState extends State<FiatCoinDrawer> {
                   children: [
                     ListTile(
                       onTap: () async {
+                        print(_fiatCurrency);
                         changeFiatCoin(payments, _fiatCurrency);
                       },
                       leading: CircleAvatar(

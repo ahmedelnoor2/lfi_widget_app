@@ -251,6 +251,15 @@ class _ExchangeScreenState extends State<ExchangeScreen>
                                   'userId': "${auth.userInfo['id']}",
                                 })
                               });
+                          Navigator.pushReplacement(
+                            context,
+                            PageRouteBuilder(
+                              settings: RouteSettings(name: Market.routeName),
+                              pageBuilder: (context, animation1, animation2) =>
+                                  Market(),
+                              transitionDuration: Duration(seconds: 0),
+                            ),
+                          );
                         }
                       } else {
                         Navigator.pushNamed(context, '/authentication');

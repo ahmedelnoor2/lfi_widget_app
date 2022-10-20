@@ -233,7 +233,8 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
     var auth = Provider.of<Auth>(context, listen: false);
     await payments.getEstimateRate(context, auth, {
       'from_currency': payments.selectedFiatCurrency['ticker'],
-      'from_amount': _fiatController.text,
+      'from_amount':
+          _fiatController.text.isNotEmpty ? _fiatController.text : '0',
       'to_currency': payments.selectedCryptoCurrency['current_ticker'],
       'to_network': payments.selectedCryptoCurrency['network'],
       'to_amount': _cryptoController.text,
@@ -494,7 +495,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
     for (var key in _textControllers.keys) {
       data[key] = _textControllers[key]!.text;
     }
-    print('check.......');
+
     print(jsonEncode(data));
 
     await payments.callOnrampForm(context, {
@@ -796,6 +797,15 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                                 ),
                                               ),
                                             ),
+                                            Text(
+                                              payments.estimateMessage[
+                                                      'message'] ??
+                                                  '',
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                color: Colors.red,
+                                              ),
+                                            ),
                                           ],
                                         ),
                                         SizedBox(
@@ -1001,8 +1011,11 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                   ),
                                   payments.estimateRate.isEmpty
                                       ? Container()
-                                      : Text(
-                                          '1 ${payments.selectedCryptoCurrency['current_ticker'] != null ? payments.selectedCryptoCurrency['current_ticker'].toUpperCase() : ''} ~ ${(double.parse(_fiatController.text) / double.parse('${payments.estimateRate['value'] ?? 0.00}')).toStringAsFixed(4)} ${payments.selectedFiatCurrency['ticker'].toUpperCase()}'),
+                                      : Text('1 ${payments.selectedCryptoCurrency['current_ticker'] != null ? payments.selectedCryptoCurrency['current_ticker'].toUpperCase() : ''} ~ ${(double.parse(
+                                            _fiatController.text.isNotEmpty
+                                                ? _fiatController.text
+                                                : '0',
+                                          ) / double.parse('${payments.estimateRate['value'] ?? 0.00}')).toStringAsFixed(4)} ${payments.selectedFiatCurrency['ticker'].toUpperCase()}'),
                                 ],
                               ),
                             ),

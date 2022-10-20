@@ -129,10 +129,10 @@ class _CryptoCoinDrawerState extends State<CryptoCoinDrawer> {
             ),
           ),
           Divider(),
-          SizedBox(
-            height: height * 0.7,
+          Expanded(
+            
             child: ListView.builder(
-              // shrinkWrap: true,
+               shrinkWrap: true,
               itemCount: payments.cryptoSearchCurrencies.isNotEmpty
                   ? payments.cryptoSearchCurrencies.length
                   : payments.cryptoCurrencies.length,
