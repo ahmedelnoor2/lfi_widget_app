@@ -329,7 +329,6 @@ class _ExchangeScreenState extends State<ExchangeScreen>
                   trailing: InkWell(
                     onTap: (() async {
                       await public.setActiveMarket(_market);
-
                       Navigator.pushNamed(context, '/kline_chart');
                     }),
                     child: Column(

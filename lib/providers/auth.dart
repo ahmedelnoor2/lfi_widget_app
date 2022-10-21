@@ -74,6 +74,9 @@ class Auth with ChangeNotifier {
     notifyListeners();
   }
 
+
+
+
   // Get Captcha
   Map _captchaData = {};
 
