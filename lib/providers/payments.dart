@@ -226,25 +226,27 @@ class Payments with ChangeNotifier {
     );
 
     var postData = json.encode(formData);
-    print(postData);
+   
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
 
-      print(responseData);
-      print('...................');
+    
+      _estimateMessage = responseData;
 
+      print(_estimateMessage);
+       
       if (responseData['code'] == '0') {
         _estimateRate = responseData['data'];
-
+       _estimateMessage={};
         //print(_estimateRate);
         _estimateLoader = false;
         return notifyListeners();
       } else if (responseData['code'] == '4000') {
-        _estimateMessage = responseData['msg'];
-        print(_estimateMessage);
-
+        
+    
+     
         snackAlert(ctx, SnackTypes.errors, responseData['msg']['message']);
         _estimateLoader = false;
         return notifyListeners();

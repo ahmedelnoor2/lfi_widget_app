@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:archive/archive.dart';
+import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
@@ -42,8 +43,6 @@ class _DashboardState extends State<Dashboard> {
   final GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
   var _channel;
   final Uri _url = Uri.parse('https://flutter.dev');
-  
-  bool canVibrate = false;
 
   _handleDrawer() async {
     _key.currentState?.openDrawer();
@@ -56,14 +55,13 @@ class _DashboardState extends State<Dashboard> {
 
     getAssetsRate();
     checkLoginStatus();
-    _checkIfVibrate();
 
     timer = Timer.periodic(Duration(seconds: 15), (Timer t) {
       readCount();
     });
     super.initState();
   }
- 
+
   @override
   void dispose() async {
     if (_channel != null) {
@@ -71,12 +69,6 @@ class _DashboardState extends State<Dashboard> {
     }
     timer?.cancel();
     super.dispose();
-  }
- _checkIfVibrate() async {
-    // check if device can vibrate
-    var auth=Provider.of<Auth>(context, listen: false);
-    canVibrate = (await Vibration.hasVibrator())!;
-    
   }
 
   Future<void> readCount() async {
@@ -259,6 +251,7 @@ class _DashboardState extends State<Dashboard> {
           ),
         ),
         bottomNavigationBar: bottomNav(context, auth),
+      
       ),
     );
   }

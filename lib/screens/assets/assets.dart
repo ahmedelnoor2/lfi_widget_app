@@ -498,7 +498,7 @@ class _AssetsState extends State<Assets> {
                       ),
                     ),
                   ),
-        bottomNavigationBar: bottomNav(context, auth),
+        bottomNavigationBar: bottomNav(context, auth,),
       ),
     );
   }

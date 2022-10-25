@@ -389,7 +389,7 @@ class Public with ChangeNotifier {
 
       if (responseData['code'] == "0") {
         _publicInfoMarket = responseData['data'];
-      
+
         var _allMarketsMap =
             Map<String, dynamic>.from(responseData['data']['market']['market']);
 
@@ -784,7 +784,6 @@ class Public with ChangeNotifier {
       // throw error;
     }
   }
-
   void vibrateOn() async {
     bool? canVibrate = await Vibration.hasVibrator();
     if (canVibrate != null) {

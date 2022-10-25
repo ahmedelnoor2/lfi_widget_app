@@ -238,6 +238,8 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
       'to_currency': payments.selectedCryptoCurrency['current_ticker'],
       'to_network': payments.selectedCryptoCurrency['network'],
       'to_amount': _cryptoController.text,
+      'source': 'widget',
+      'linkId': '38e0f8626aee4b'
     });
     getDigitalBalance();
     return;
@@ -797,13 +799,19 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                                 ),
                                               ),
                                             ),
-                                            Text(
-                                              payments.estimateMessage[
-                                                      'message'] ??
-                                                  '',
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.red,
+                                            Container(
+                                              width: 220,
+                                              child: Text(
+                                                payments.estimateMessage[
+                                                            'code'] ==
+                                                        '4000'
+                                                    ? payments.estimateMessage[
+                                                        'msg']['message']
+                                                    : '',
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.red,
+                                                ),
                                               ),
                                             ),
                                           ],
@@ -1441,7 +1449,8 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                     )
                   : Container(),
               InkWell(
-                onTap: _loadingCoins
+                onTap: _loadingCoins ||
+                        payments.estimateMessage['code'] == '4000'
                     ? null
                     : () {
                         setState(() {
@@ -1501,7 +1510,9 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                 style: TextStyle(
                                   fontSize: 20,
                                   color:
-                                      (_loadingCoins || payments.estimateLoader)
+                                      (_loadingCoins || payments.estimateLoader|| payments.estimateMessage[
+                                                            'code'] ==
+                                                        '4000')
                                           ? secondaryTextColor
                                           : Colors.white,
                                 ),
