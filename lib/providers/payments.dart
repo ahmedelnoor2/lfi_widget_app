@@ -236,7 +236,7 @@ class Payments with ChangeNotifier {
       _estimateMessage = responseData;
 
       print(_estimateMessage);
-       
+    
       if (responseData['code'] == '0') {
         _estimateRate = responseData['data'];
        _estimateMessage={};

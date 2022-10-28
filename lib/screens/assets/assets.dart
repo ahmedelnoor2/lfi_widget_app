@@ -233,7 +233,7 @@ class _AssetsState extends State<Assets> {
                                                       padding: EdgeInsets.only(
                                                           right: 10),
                                                       child: Text(
-                                                        '${_hideBalances ? _hideBalanceString : asset.totalAccountBalance['totalbalance']} $_totalBalanceSymbol',
+                                                        '${_hideBalances ? _hideBalanceString : asset.totalAccountBalance['totalbalance'] ??''} $_totalBalanceSymbol',
                                                         style: TextStyle(
                                                             fontSize: 20,
                                                             fontWeight:
