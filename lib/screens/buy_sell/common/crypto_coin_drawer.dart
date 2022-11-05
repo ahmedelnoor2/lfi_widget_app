@@ -23,8 +23,9 @@ class CryptoCoinDrawer extends StatefulWidget {
 class _CryptoCoinDrawerState extends State<CryptoCoinDrawer> {
   final TextEditingController _searchController = TextEditingController();
 
-  Future<void> changeCryptoCoin(payments, currency) async {
+  Future<void> changeCryptoCoin( currency) async {
     var auth = Provider.of<Auth>(context, listen: false);
+    var payments = Provider.of<Payments>(context, listen: false);
 
     payments.setSelectedCryptoCurrency(currency);
     Navigator.pop(context);
@@ -145,7 +146,7 @@ class _CryptoCoinDrawerState extends State<CryptoCoinDrawer> {
                   children: [
                     ListTile(
                       onTap: () async {
-                        changeCryptoCoin(payments, _cryptoCurrency);
+                        changeCryptoCoin(_cryptoCurrency);
                       },
                       leading: CircleAvatar(
                         radius: 18,

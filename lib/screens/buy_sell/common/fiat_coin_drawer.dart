@@ -28,12 +28,16 @@ class _FiatCoinDrawerState extends State<FiatCoinDrawer> {
     payments.setSelectedFiatCurrency(currency);
 
     Navigator.pop(context);
+      print(payments.selectedCryptoCurrency['ticker']);
     await payments.getEstimateRate(context, auth, {
+    
       'from_currency': payments.selectedFiatCurrency['ticker'],
       'from_amount': widget.fiatController.text,
-      'to_currency': payments.selectedCryptoCurrency['ticker'],
+      'to_currency': payments.selectedCryptoCurrency['current_ticker'],
       'to_network': payments.selectedCryptoCurrency['network'],
       'to_amount': '1',
+      'source':'widget',
+      'linkId':'38e0f8626aee4b'
     });
   }
 

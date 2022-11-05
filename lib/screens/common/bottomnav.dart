@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/assets/assets.dart';
 import 'package:lyotrade/screens/auth/authentication.dart';
 import 'package:lyotrade/screens/dashboard.dart';
 import 'package:lyotrade/screens/future_trade/future_trade.dart';
 import 'package:lyotrade/screens/market/market.dart';
 import 'package:lyotrade/screens/trade/trade.dart';
+import 'package:provider/provider.dart';
+ import 'package:vibration/vibration.dart';
 
 bottomNav(context, auth) {
   var _currentRoute = ModalRoute.of(context)!.settings.name;
-
+  var public = Provider.of<Public>(context, listen: false);
+  
   return BottomNavigationBar(
     items: <BottomNavigationBarItem>[
       BottomNavigationBarItem(
@@ -64,6 +69,7 @@ bottomNav(context, auth) {
     onTap: (value) {
       switch (value) {
         case 0:
+          public.vibrateOn();
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
@@ -74,6 +80,7 @@ bottomNav(context, auth) {
           );
           break;
         case 1:
+          public.vibrateOn();
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
@@ -84,6 +91,7 @@ bottomNav(context, auth) {
           );
           break;
         case 2:
+          public.vibrateOn();
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
@@ -94,6 +102,7 @@ bottomNav(context, auth) {
           );
           break;
         case 3:
+          public.vibrateOn();
           Navigator.pushNamedAndRemoveUntil(
             context,
             '/future_trade',
@@ -109,6 +118,7 @@ bottomNav(context, auth) {
           );
           break;
         case 4:
+          public.vibrateOn();
           auth.isAuthenticated
               ? Navigator.pushReplacement(
                   context,

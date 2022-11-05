@@ -176,6 +176,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.1.0"
+  easy_dynamic_theme:
+    dependency: "direct main"
+    description:
+      name: easy_dynamic_theme
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.2.0"
   email_validator:
     dependency: "direct main"
     description:
@@ -436,6 +443,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.1"
+  lite_rolling_switch:
+    dependency: "direct main"
+    description:
+      name: lite_rolling_switch
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
   mailto:
     dependency: "direct main"
     description:
@@ -938,6 +952,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.2"
+  vibration:
+    dependency: "direct main"
+    description:
+      name: vibration
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.7.6"
   web_socket_channel:
     dependency: "direct main"
     description:

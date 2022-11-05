@@ -9,6 +9,7 @@ import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:k_chart/entity/k_line_entity.dart';
 import 'package:lyotrade/utils/Translate.utils.dart';
+import 'package:vibration/vibration.dart';
 
 class Public with ChangeNotifier {
   Map<String, String> headers = {
@@ -388,7 +389,7 @@ class Public with ChangeNotifier {
 
       if (responseData['code'] == "0") {
         _publicInfoMarket = responseData['data'];
-      
+
         var _allMarketsMap =
             Map<String, dynamic>.from(responseData['data']['market']['market']);
 
@@ -781,6 +782,14 @@ class Public with ChangeNotifier {
       print(error);
       return;
       // throw error;
+    }
+  }
+  void vibrateOn() async {
+    bool? canVibrate = await Vibration.hasVibrator();
+    if (canVibrate != null) {
+      if (canVibrate) {
+        Vibration.vibrate(duration: 100);
+      }
     }
   }
 }
