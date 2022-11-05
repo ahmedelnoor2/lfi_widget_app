@@ -1509,12 +1509,12 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                                 'Buy',
                                 style: TextStyle(
                                   fontSize: 20,
-                                  color:
-                                      (_loadingCoins || payments.estimateLoader|| payments.estimateMessage[
-                                                            'code'] ==
-                                                        '4000')
-                                          ? secondaryTextColor
-                                          : Colors.white,
+                                  color: (_loadingCoins ||
+                                          payments.estimateLoader ||
+                                          payments.estimateMessage['code'] ==
+                                              '4000')
+                                      ? secondaryTextColor
+                                      : Colors.white,
                                 ),
                               ),
                             ),

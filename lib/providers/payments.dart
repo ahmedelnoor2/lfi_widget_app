@@ -245,8 +245,6 @@ class Payments with ChangeNotifier {
         return notifyListeners();
       } else if (responseData['code'] == '4000') {
         
-    
-     
         snackAlert(ctx, SnackTypes.errors, responseData['msg']['message']);
         _estimateLoader = false;
         return notifyListeners();
