@@ -579,7 +579,7 @@ class _MarginAssetsState extends State<MarginAssets> {
                       },
                       child: Text('Loans'),
                     ),
-                  ),
+                  ), 
                   SizedBox(
                     width: width * 0.28,
                     child: ElevatedButton(
