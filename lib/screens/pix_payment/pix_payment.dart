@@ -19,6 +19,7 @@ import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/Translate.utils.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
 
 import 'package:qr_flutter/qr_flutter.dart';
@@ -57,6 +58,11 @@ class _PixPaymentState extends State<PixPayment>
   Map _userAddresses = {};
 
   String _transactionType = 'bank_transfer';
+
+  MaskTextInputFormatter? formatter;
+  FormFieldValidator<String>? validator;
+  String? hint;
+  bool isMinmum = false;
 
   @override
   void initState() {
@@ -199,8 +205,7 @@ class _PixPaymentState extends State<PixPayment>
     await payments.requestKyc(context, {
       "client_id": '${auth.userInfo['id']}',
       "email": _email,
-      "cpf":
-          '${_cpf.substring(0, 3)}.${_cpf.substring(3, 6)}.${_cpf.substring(6, 9)}-${_cpf.substring(9, 11)}',
+      "cpf": _cpfController.text,
       "name": _name,
     });
 
@@ -255,8 +260,7 @@ class _PixPaymentState extends State<PixPayment>
     await payments.reRequestKyc(context, {
       'uuid': payments.pixKycClients['client_uuid'],
       'userId': '${auth.userInfo['id']}',
-      "cpf":
-          '${_cpf.substring(0, 3)}.${_cpf.substring(3, 6)}.${_cpf.substring(6, 9)}-${_cpf.substring(9, 11)}',
+      "cpf": _cpfController.text,
     });
 
     if (payments.newKyc.isNotEmpty) {
@@ -451,6 +455,9 @@ class _PixPaymentState extends State<PixPayment>
                                     'Please enter amount',
                                   );
                                 } else if (double.parse(value) < 100) {
+                                  setState(() {
+                                    _processTransaction = false;
+                                  });
                                   return '${getPortugeseTrans(
                                     'Minimum',
                                   )} ${payments.minimumWithdarwalAmt['minimunWithdrawalAmount'].toString() + " BRL"}';
@@ -1473,16 +1480,14 @@ class _PixPaymentState extends State<PixPayment>
                                   }
                                   return null;
                                 },
-                                onChanged: (value) {
-                                  setState(() {
-                                    _cpf = value;
-                                  });
-                                },
                                 keyboardType:
                                     const TextInputType.numberWithOptions(
                                   decimal: true,
                                 ),
                                 controller: _cpfController,
+                                inputFormatters: [
+                                  MaskTextInputFormatter(mask: "###.###.###-##")
+                                ],
                                 decoration: InputDecoration(
                                   contentPadding: EdgeInsets.zero,
                                   isDense: true,
@@ -1641,7 +1646,7 @@ class _PixPaymentState extends State<PixPayment>
                     child: LyoButton(
                       onPressed: ((_name.isEmpty && !_reRequestKYCAuth) ||
                               (_email.isEmpty && !_reRequestKYCAuth) ||
-                              _cpf.isEmpty ||
+                              _cpfController.text.isEmpty ||
                               _loading)
                           ? null
                           : () {
@@ -1661,11 +1666,9 @@ class _PixPaymentState extends State<PixPayment>
                                 }
                               }
 
-                              if (_cpf.length < 11 || _cpf.length > 11) {
-                                setState(() {
-                                  _fieldErrors['cpf'] = 'Invalid cpf account';
-                                });
-                              } else if (double.tryParse(_cpf) == null) {
+                              print(_cpfController.text.length);
+
+                              if (_cpfController.text.length < 14) {
                                 setState(() {
                                   _fieldErrors['cpf'] = 'Invalid cpf account';
                                 });
@@ -1689,7 +1692,7 @@ class _PixPaymentState extends State<PixPayment>
                       isLoading: _processKyc,
                       activeColor: ((_name.isEmpty && !_reRequestKYCAuth) ||
                               (_email.isEmpty && !_reRequestKYCAuth) ||
-                              _cpf.isEmpty ||
+                              _cpfController.text.isEmpty ||
                               _loading)
                           ? Color(0xff5E6292)
                           : linkColor,

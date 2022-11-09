@@ -99,11 +99,13 @@ class _DepositAssetsState extends State<DepositAssets> {
 
       public.publicInfoMarket['market']['followCoinList'][netwrkType]
           .forEach((k, v) {
-        setState(() {
-          _allNetworks.add(v);
-          _defaultCoin = netwrkType;
-          _defaultNetwork = '${v['name']}';
-        });
+        if (v['followCoinWithdrawOpen'] == 1) {
+          setState(() {
+            _allNetworks.add(v);
+            _defaultCoin = netwrkType;
+            _defaultNetwork = '${v['name']}';
+          });
+        }
       });
     } else {
       setState(() {
@@ -342,35 +344,39 @@ class _DepositAssetsState extends State<DepositAssets> {
                         itemCount: _allNetworks.length,
                         itemBuilder: (BuildContext context, int index) {
                           var network = _allNetworks[index];
-                          return GestureDetector(
-                            onTap: () {
-                              changeCoinType(network);
-                            },
-                            child: Container(
-                              padding: EdgeInsets.only(right: 10),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: (network['name'] == _defaultNetwork)
-                                      ? Color(0xff01FEF5)
-                                      : Color(0xff5E6292),
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
-                                child: Container(
-                                  width: 62,
-                                  child: Align(
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      "${network['mainChainName']}",
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.w600,
+                          return network['followCoinDepositOpen'] == 1 &&
+                                  network['followCoinWithdrawOpen'] == 1
+                              ? GestureDetector(
+                                  onTap: () {
+                                    changeCoinType(network);
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.only(right: 10),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color:
+                                            (network['name'] == _defaultNetwork)
+                                                ? Color(0xff01FEF5)
+                                                : Color(0xff5E6292),
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                      child: Container(
+                                        width: 62,
+                                        child: Align(
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            "${network['mainChainName']}",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ),
-                            ),
-                          );
+                                )
+                              : Container();
                         }),
                   ),
                   Container(

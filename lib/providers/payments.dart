@@ -539,6 +539,8 @@ class Payments with ChangeNotifier {
   }
 
   Future<void> requestKyc(ctx, postData) async {
+    print('check,....');
+    print(postData);
     var url = Uri.https(
       lyoApiUrl,
       '/payment_gateway/pix/kyc',
@@ -576,7 +578,7 @@ class Payments with ChangeNotifier {
       lyoApiUrl,
       '/payment_gateway/pix/kyc',
     );
-
+print(postData);
     try {
       final response = await http.put(
         url,
@@ -585,7 +587,7 @@ class Payments with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-
+print(responseData);
       if (responseData['code'] == '0') {
         _newKyc = responseData['data'];
         snackAlert(ctx, SnackTypes.success, 'Resent KYC verifcation');

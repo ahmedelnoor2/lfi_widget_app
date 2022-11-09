@@ -195,12 +195,15 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
 
       public.publicInfoMarket['market']['followCoinList'][netwrkType]
           .forEach((k, v) {
-        setState(() {
-          _allNetworks.add(v);
-          _defaultCoin = netwrkType;
-          _defaultNetwork = '${v['name']}';
-          _coinShowName = '${v['name']}';
-        });
+   
+        if (v['followCoinWithdrawOpen'] == 1) {
+          setState(() {
+            _allNetworks.add(v);
+            _defaultCoin = netwrkType;
+            _defaultNetwork = '${v['name']}';
+            _coinShowName = '${v['name']}';
+          });
+        }
       });
     } else {
       setState(() {
@@ -566,43 +569,51 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                     itemBuilder:
                                         (BuildContext context, int index) {
                                       var network = _allNetworks[index];
-                                      return GestureDetector(
-                                        onTap: () {
-                                          _formVeriKey.currentState!.reset();
-                                          _addressController.clear();
-                                          _amountController.clear();
-                                          _emailVeirficationCode.clear();
-                                          _smsVeirficationCode.clear();
-                                          _googleVeirficationCode.clear();
-                                          changeCoinType(network);
-                                        },
-                                        child: Container(
-                                          padding: EdgeInsets.only(right: 10),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: (network['name'] ==
-                                                      _defaultNetwork)
-                                                  ? Color(0xff01FEF5)
-                                                  : Color(0xff5E6292),
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                            ),
-                                            child: Container(
-                                              width: 62,
-                                              child: Align(
-                                                alignment: Alignment.center,
-                                                child: Text(
-                                                  "${network['mainChainName']}",
-                                                  style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontWeight: FontWeight.w600,
+
+                                      return 
+                                           GestureDetector(
+                                              onTap: () {
+                                                _formVeriKey.currentState!
+                                                    .reset();
+                                                _addressController.clear();
+                                                _amountController.clear();
+                                                _emailVeirficationCode.clear();
+                                                _smsVeirficationCode.clear();
+                                                _googleVeirficationCode.clear();
+                                                changeCoinType(network);
+                                              },
+                                              child: Container(
+                                                padding:
+                                                    EdgeInsets.only(right: 10),
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    color: (network['name'] ==
+                                                            _defaultNetwork)
+                                                        ? Color(0xff01FEF5)
+                                                        : Color(0xff5E6292),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                  ),
+                                                  child: Container(
+                                                    width: 62,
+                                                    child: Align(
+                                                      alignment:
+                                                          Alignment.center,
+                                                      child: Text(
+                                                        "${network['mainChainName']}",
+                                                        style: TextStyle(
+                                                          color: Colors.black,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
-                                          ),
-                                        ),
-                                      );
+                                            );
+                                         
                                     }),
                               ),
                               Container(
