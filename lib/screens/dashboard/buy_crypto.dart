@@ -45,7 +45,7 @@ class _BuyCryptoState extends State<BuyCrypto> {
           },
           child: SizedBox(
             width: width * 0.325,
-            height: height * 0.12,
+            height:height* 0.15,
             child: Card(
               child: Container(
                 padding: EdgeInsets.all(10),
@@ -60,18 +60,24 @@ class _BuyCryptoState extends State<BuyCrypto> {
                         width: 24,
                       ),
                     ),
-                    Text(
-                      'Buy Crypto',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                    FittedBox(
+                      fit: BoxFit.fitWidth, 
+                      child: Text(
+                        'Buy Crypto',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
-                    Text(
-                      'SEPA, VISA, MC',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: secondaryTextColor,
+                    FittedBox(
+                       fit: BoxFit.fitWidth, 
+                      child: Text(
+                        'SEPA, VISA, MC',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: secondaryTextColor,
+                        ),
                       ),
                     ),
                   ],
@@ -99,7 +105,7 @@ class _BuyCryptoState extends State<BuyCrypto> {
           },
           child: SizedBox(
             width: width * 0.325,
-            height: height * 0.12,
+            height: height * 0.15,
             child: Card(
               child: Container(
                 padding: EdgeInsets.all(10),
@@ -140,7 +146,7 @@ class _BuyCryptoState extends State<BuyCrypto> {
           },
           child: SizedBox(
             width: width * 0.32,
-            height: height * 0.12,
+            height: height * 0.15,
             child: Card(
               child: Container(
                 padding: EdgeInsets.all(10),

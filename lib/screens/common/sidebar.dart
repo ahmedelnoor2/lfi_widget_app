@@ -1,10 +1,13 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lite_rolling_switch/lite_rolling_switch.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/user.dart';
@@ -40,6 +43,7 @@ class _SideBarState extends State<SideBar> {
     checkVersion();
     checkFeeCoinStatus();
     getProfileImage();
+
     super.initState();
   }
 
@@ -118,6 +122,13 @@ class _SideBarState extends State<SideBar> {
     }
   }
 
+  IconData _getIcon(BuildContext context) {
+    var themeMode = EasyDynamicTheme.of(context).themeMode;
+    return themeMode == ThemeMode.dark
+        ? Icons.brightness_high
+        : Icons.brightness_low;
+  }
+
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
@@ -151,6 +162,35 @@ class _SideBarState extends State<SideBar> {
                             },
                             icon: const Icon(Icons.close),
                           ),
+                          Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  height: 40,
+                                  child: LiteRollingSwitch(
+                                    //initial value
+                                    value: Theme.of(context).brightness ==
+                                        Brightness.dark,
+                                    textOn: 'Dark',
+                                    textOff: 'Light',
+                                    colorOn: Colors.blueGrey,
+                                    colorOff: Colors.blue,
+                                    iconOn: Icons.dark_mode,
+                                    iconOff: Icons.sunny,
+                                    textSize: 16.0,
+                                    onChanged: (bool value) =>
+                                        EasyDynamicTheme.of(context)
+                                            .changeTheme(dark: value),
+
+                                    onTap: () {},
+                                    onDoubleTap: () {},
+                                    onSwipe: () {},
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
                         ],
                       ),
                     ),
@@ -171,6 +211,7 @@ class _SideBarState extends State<SideBar> {
                               Icons.chevron_right,
                             ),
                           )
+                          
                         : ListTile(
                             leading: InkWell(
                               onTap: () {
@@ -373,7 +414,7 @@ class _SideBarState extends State<SideBar> {
                       isDense: true,
                       underline: Container(),
                       value: public.activeCurrency['fiat_symbol'],
-                      // icon: const Icon(Icons.arrow_downward),
+                    // icon: const Icon(Icons.arrow_downward),
                       elevation: 16,
                       onChanged: (newCurrency) async {
                         await public.changeCurrency(newCurrency);

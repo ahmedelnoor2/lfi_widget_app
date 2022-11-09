@@ -127,7 +127,6 @@ class Auth with ChangeNotifier {
     await checkLoginSession(ctx);
     notifyListeners();
   }
-
   Future<bool> checkLoginSession(ctx) async {
     final prefs = await SharedPreferences.getInstance();
     final String? catchedAuthToken = prefs.getString('authToken');

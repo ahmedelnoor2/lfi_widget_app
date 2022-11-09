@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:archive/archive.dart';
+import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/notification_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/user.dart';
@@ -23,6 +25,7 @@ import 'package:lyotrade/screens/dashboard/top_gateway.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/ScreenControl.utils.dart';
 import 'package:provider/provider.dart';
+import 'package:vibration/vibration.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -248,6 +251,7 @@ class _DashboardState extends State<Dashboard> {
           ),
         ),
         bottomNavigationBar: bottomNav(context, auth),
+      
       ),
     );
   }
