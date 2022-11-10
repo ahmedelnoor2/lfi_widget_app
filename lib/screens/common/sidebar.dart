@@ -162,35 +162,35 @@ class _SideBarState extends State<SideBar> {
                             },
                             icon: const Icon(Icons.close),
                           ),
-                          Row(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  height: 40,
-                                  child: LiteRollingSwitch(
-                                    //initial value
-                                    value: Theme.of(context).brightness ==
-                                        Brightness.dark,
-                                    textOn: 'Dark',
-                                    textOff: 'Light',
-                                    colorOn: Colors.blueGrey,
-                                    colorOff: Colors.blue,
-                                    iconOn: Icons.dark_mode,
-                                    iconOff: Icons.sunny,
-                                    textSize: 16.0,
-                                    onChanged: (bool value) =>
-                                        EasyDynamicTheme.of(context)
-                                            .changeTheme(dark: value),
+                          // Row(
+                          //   children: [
+                          //     Padding(
+                          //       padding: const EdgeInsets.all(8.0),
+                          //       child: Container(
+                          //         height: 40,
+                          //         child: LiteRollingSwitch(
+                          //           //initial value
+                          //           value: Theme.of(context).brightness ==
+                          //               Brightness.dark,
+                          //           textOn: 'Light',
+                          //           textOff: 'Dark',
+                          //           colorOn: Colors.blueGrey,
+                          //           colorOff: Colors.blue,
+                          //           iconOn: Icons.dark_mode,
+                          //           iconOff: Icons.sunny,
+                          //           textSize: 16.0,
+                          //           onChanged: (bool value) =>
+                          //               EasyDynamicTheme.of(context)
+                          //                   .changeTheme(dark: value),
 
-                                    onTap: () {},
-                                    onDoubleTap: () {},
-                                    onSwipe: () {},
-                                  ),
-                                ),
-                              ),
-                            ],
-                          )
+                          //           onTap: () {},
+                          //           onDoubleTap: () {},
+                          //           onSwipe: () {},
+                          //         ),
+                          //       ),
+                          //     ),
+                          //   ],
+                          // )
                         ],
                       ),
                     ),
@@ -211,7 +211,6 @@ class _SideBarState extends State<SideBar> {
                               Icons.chevron_right,
                             ),
                           )
-                          
                         : ListTile(
                             leading: InkWell(
                               onTap: () {
@@ -414,7 +413,7 @@ class _SideBarState extends State<SideBar> {
                       isDense: true,
                       underline: Container(),
                       value: public.activeCurrency['fiat_symbol'],
-                    // icon: const Icon(Icons.arrow_downward),
+                      // icon: const Icon(Icons.arrow_downward),
                       elevation: 16,
                       onChanged: (newCurrency) async {
                         await public.changeCurrency(newCurrency);
