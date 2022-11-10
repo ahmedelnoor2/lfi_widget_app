@@ -59,6 +59,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
   List _allNetworks = [];
   bool _verifyAddress = false;
   bool _validateEmailProcess = false;
+  bool _tagType = true;
 
   late Timer _timer;
   int _start = 90;
@@ -195,7 +196,6 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
 
       public.publicInfoMarket['market']['followCoinList'][netwrkType]
           .forEach((k, v) {
-   
         if (v['followCoinWithdrawOpen'] == 1) {
           setState(() {
             _allNetworks.add(v);
@@ -570,50 +570,43 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                         (BuildContext context, int index) {
                                       var network = _allNetworks[index];
 
-                                      return 
-                                           GestureDetector(
-                                              onTap: () {
-                                                _formVeriKey.currentState!
-                                                    .reset();
-                                                _addressController.clear();
-                                                _amountController.clear();
-                                                _emailVeirficationCode.clear();
-                                                _smsVeirficationCode.clear();
-                                                _googleVeirficationCode.clear();
-                                                changeCoinType(network);
-                                              },
-                                              child: Container(
-                                                padding:
-                                                    EdgeInsets.only(right: 10),
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                    color: (network['name'] ==
-                                                            _defaultNetwork)
-                                                        ? Color(0xff01FEF5)
-                                                        : Color(0xff5E6292),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5),
-                                                  ),
-                                                  child: Container(
-                                                    width: 62,
-                                                    child: Align(
-                                                      alignment:
-                                                          Alignment.center,
-                                                      child: Text(
-                                                        "${network['mainChainName']}",
-                                                        style: TextStyle(
-                                                          color: Colors.black,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                    ),
+                                      return GestureDetector(
+                                        onTap: () {
+                                          _formVeriKey.currentState!.reset();
+                                          _addressController.clear();
+                                          _amountController.clear();
+                                          _emailVeirficationCode.clear();
+                                          _smsVeirficationCode.clear();
+                                          _googleVeirficationCode.clear();
+                                          changeCoinType(network);
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.only(right: 10),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: (network['name'] ==
+                                                      _defaultNetwork)
+                                                  ? Color(0xff01FEF5)
+                                                  : Color(0xff5E6292),
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                            ),
+                                            child: Container(
+                                              width: 62,
+                                              child: Align(
+                                                alignment: Alignment.center,
+                                                child: Text(
+                                                  "${network['mainChainName']}",
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w600,
                                                   ),
                                                 ),
                                               ),
-                                            );
-                                         
+                                            ),
+                                          ),
+                                        ),
+                                      );
                                     }),
                               ),
                               Container(
@@ -720,6 +713,82 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                   ),
                                 ),
                               ),
+
+                              ///Tag memo
+                              _tagType == false
+                                  ? Container()
+                                  : Container(
+                                      padding: EdgeInsets.only(
+                                        top: 10,
+                                        bottom: 10,
+                                      ),
+                                      child: Text('Tag(Memo)'),
+                                    ),
+                              _tagType == false
+                                  ? Container()
+                                  : Container(
+                                      width: width,
+                                      padding: EdgeInsets.only(
+                                        top: 5,
+                                        bottom: 5,
+                                      ),
+                                      child: InkWell(
+                                        onTap: () {
+                                          Clipboard.setData(
+                                            ClipboardData(
+                                                text: asset
+                                                    .changeAddress['addressStr']
+                                                    .split('_')[1]),
+                                          );
+                                          snackAlert(context,
+                                              SnackTypes.success, 'Copied');
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              style: BorderStyle.solid,
+                                              width: 0.3,
+                                              color: Color(0xff5E6292),
+                                            ),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              SizedBox(
+                                                width: width * 0.8,
+                                                child: Text(
+                                                  'hello',
+                                                  style: TextStyle(
+                                                      overflow: TextOverflow
+                                                          .ellipsis),
+                                                ),
+                                              ),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  Clipboard.setData(
+                                                    ClipboardData(
+                                                        text: asset
+                                                            .changeAddress[
+                                                                'addressStr']
+                                                            .split('_')[1]),
+                                                  );
+                                                  snackAlert(
+                                                      context,
+                                                      SnackTypes.success,
+                                                      'Copied');
+                                                },
+                                                child: Image.asset(
+                                                  'assets/img/copy.png',
+                                                  width: 18,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+
+                              //
                               Container(
                                 padding: EdgeInsets.only(top: 10, bottom: 10),
                                 child: Row(

@@ -433,9 +433,10 @@ class Asset with ChangeNotifier {
         headers: headers,
       );
       final responseData = json.decode(response.body);
-
+   print(responseData);
       if (responseData['code'] == '0') {
         _changeAddress = responseData['data'];
+        print(_changeAddress);
       } else {
         _changeAddress = {};
         // snackAlert(ctx, SnackTypes.errors, responseData['msg']);
