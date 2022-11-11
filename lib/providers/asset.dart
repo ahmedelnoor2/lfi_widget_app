@@ -890,12 +890,12 @@ class Asset with ChangeNotifier {
       final responseData = json.decode(response.body);
       print(responseData);
       if (responseData['code'] == 4) {
-        snackAlert(ctx, SnackTypes.errors, 'Insuffient Balance');
+        snackAlert(ctx, SnackTypes.success, 'Insuffient Balance');
         print('check');
       } else if (responseData['code'] == '10009') {
         snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
       } else {
-        snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
+        snackAlert(ctx, SnackTypes.success, '${responseData['msg']}');
       }
     } catch (error) {
       snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');

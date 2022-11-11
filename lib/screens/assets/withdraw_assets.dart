@@ -191,7 +191,6 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
 
     if (public.publicInfoMarket['market']['followCoinList'][netwrkType] !=
         null) {
-   
       setState(() {
         _allNetworks.clear();
       });
@@ -219,7 +218,6 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
         }
       });
     } else {
-     
       if (public.publicInfoMarket['market']['coinList'][netwrkType]
               ['tagType'] ==
           0) {
@@ -1174,62 +1172,64 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                     child: CircularProgressIndicator(),
                   )
                 : Container(),
-            Container(
-              margin: EdgeInsets.only(top: 20),
-              padding: EdgeInsets.only(top: 15, bottom: 15, left: 15),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(
-                  style: BorderStyle.solid,
-                  width: 0.3,
-                  color: Color(0xff5E6292),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SizedBox(
-                    width: width * 0.49,
-                    child: TextFormField(
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter Email verification code';
-                        }
-                        return null;
-                      },
-                      controller: _emailVeirficationCode,
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.zero,
-                        isDense: true,
-                        border: UnderlineInputBorder(
-                          borderSide: BorderSide.none,
-                        ),
-                        hintStyle: TextStyle(
-                          fontSize: 14,
-                        ),
-                        hintText: 'Email verification code',
+            auth.userInfo['email'].isEmpty
+                ? Container()
+                : Container(
+                    margin: EdgeInsets.only(top: 20),
+                    padding: EdgeInsets.only(top: 15, bottom: 15, left: 15),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(
+                        style: BorderStyle.solid,
+                        width: 0.3,
+                        color: Color(0xff5E6292),
                       ),
                     ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.only(right: 10),
-                    child: TextButton(
-                      onPressed: _startTimer
-                          ? null
-                          : () {
-                              setState(() {
-                                _start = 90;
-                              });
-                              startTimer();
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(
+                          width: width * 0.49,
+                          child: TextFormField(
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter Email verification code';
+                              }
+                              return null;
                             },
-                      child: Text(_startTimer
-                          ? '${_start}s Get it again'
-                          : 'Click to send'),
+                            controller: _emailVeirficationCode,
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.zero,
+                              isDense: true,
+                              border: UnderlineInputBorder(
+                                borderSide: BorderSide.none,
+                              ),
+                              hintStyle: TextStyle(
+                                fontSize: 14,
+                              ),
+                              hintText: 'Email verification code',
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(right: 10),
+                          child: TextButton(
+                            onPressed: _startTimer
+                                ? null
+                                : () {
+                                    setState(() {
+                                      _start = 90;
+                                    });
+                                    startTimer();
+                                  },
+                            child: Text(_startTimer
+                                ? '${_start}s Get it again'
+                                : 'Click to send'),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
             auth.userInfo['mobileNumber'].isEmpty
                 ? Container()
                 : Container(
