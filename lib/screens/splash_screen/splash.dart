@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/dashboard.dart';
+import 'package:lyotrade/utils/responsive_layout.dart';
 import 'package:provider/provider.dart';
 
 class SpashScreen extends StatefulWidget {
@@ -110,8 +111,15 @@ class _SpashScreenState extends State<SpashScreen>
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
 
-    return Scaffold(
-      body: Container(
+    if (MediaQuery.of(context).size.width >= 550) {
+      webPortalURL();
+    }
+    
+
+    return MediaQuery.of(context).size.width >= 500
+        ? Container()
+        : Scaffold(
+      body:Container(
         constraints: const BoxConstraints.expand(),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,

@@ -4,6 +4,7 @@ import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/dashboard.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:lyotrade/utils/responsive_layout.dart';
 
 class IntroScreen extends StatefulWidget {
   @override
@@ -38,71 +39,77 @@ class _IntroScreenState extends State<IntroScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 50, right: 30),
-            child: InkWell(
-              onTap: () {
-                goHomepage(context);
-              },
-              child: const Text(
-                'Skip',
-                style: const TextStyle(color: Colors.white),
-              ),
-            ),
-          ),
-          Expanded(
-            child: PageView.builder(
-                scrollDirection: Axis.horizontal,
-                onPageChanged: (value) {
-                  setState(() {
-                    currentIndex = value;
-                  });
-                },
-                itemCount: slides.length,
-                itemBuilder: (context, index) {
-                  // contents of slider
-                  return Slider(
-                    image: slides[index].getImage(),
-                    title: slides[index].getTitle(),
-                    description: slides[index].getDescription(),
-                  );
-                }),
-          ),
-          Container(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                slides.length,
-                (index) => buildDot(index, context),
-              ),
-            ),
-          ),
-          currentIndex == slides.length - 1
-              ? Container(
-                  height: height,
-                  margin: EdgeInsets.all(30),
-                  width: double.infinity,
-                  color: linkColor,
-                  child: LyoButton(
-                    text: 'Get Started',
-                    active: true,
-                    activeColor: linkColor,
-                    activeTextColor: Colors.black,
-                    onPressed: () {
+    final width = MediaQuery.of(context).size.width;
+    if (MediaQuery.of(context).size.width >= 550) {
+      webPortalURL();
+    }
+    return MediaQuery.of(context).size.width >= 550
+        ? Container()
+        : Scaffold(
+            body: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 50, right: 30),
+                  child: InkWell(
+                    onTap: () {
                       goHomepage(context);
                     },
+                    child: const Text(
+                      'Skip',
+                      style: const TextStyle(color: Colors.white),
+                    ),
                   ),
-                )
-              : Container(
-                  height: 40,
                 ),
-        ],
-      ),
-    );
+                Expanded(
+                  child: PageView.builder(
+                      scrollDirection: Axis.horizontal,
+                      onPageChanged: (value) {
+                        setState(() {
+                          currentIndex = value;
+                        });
+                      },
+                      itemCount: slides.length,
+                      itemBuilder: (context, index) {
+                        // contents of slider
+                        return Slider(
+                          image: slides[index].getImage(),
+                          title: slides[index].getTitle(),
+                          description: slides[index].getDescription(),
+                        );
+                      }),
+                ),
+                Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      slides.length,
+                      (index) => buildDot(index, context),
+                    ),
+                  ),
+                ),
+                currentIndex == slides.length - 1
+                    ? Container(
+                        height: height,
+                        margin: EdgeInsets.all(30),
+                        width: double.infinity,
+                        color: linkColor,
+                        child: LyoButton(
+                          text: 'Get Started',
+                          active: true,
+                          activeColor: linkColor,
+                          activeTextColor: Colors.black,
+                          onPressed: () {
+                            goHomepage(context);
+                          },
+                        ),
+                      )
+                    : Container(
+                        height: 40,
+                      ),
+              ],
+            ),
+          );
   }
 
   // container created for dots

@@ -423,7 +423,7 @@ class Asset with ChangeNotifier {
   }
 
   Future<void> getChangeAddress(ctx, auth, coin) async {
-    _isloadingChangeAddress=true;
+    _isloadingChangeAddress = true;
     headers['exchange-token'] = auth.loginVerificationToken;
 
     var url = Uri.https(
@@ -442,18 +442,18 @@ class Asset with ChangeNotifier {
       final responseData = json.decode(response.body);
       print(responseData);
       if (responseData['code'] == '0') {
-        _isloadingChangeAddress=false;
+        _isloadingChangeAddress = false;
         _changeAddress = responseData['data'];
         print(_changeAddress);
       } else {
         _changeAddress = {};
-        _isloadingChangeAddress=false;
+        _isloadingChangeAddress = false;
         // snackAlert(ctx, SnackTypes.errors, responseData['msg']);
         auth.checkResponseCode(ctx, responseData['code']);
       }
       return notifyListeners();
     } catch (error) {
-      _isloadingChangeAddress=false;
+      _isloadingChangeAddress = false;
       return notifyListeners();
       // throw error;
     }
@@ -896,7 +896,7 @@ class Asset with ChangeNotifier {
         snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
       } else {
         snackAlert(ctx, SnackTypes.success, '${responseData['msg']}');
-      }
+      } 
     } catch (error) {
       snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
       // throw error;
