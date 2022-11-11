@@ -116,7 +116,7 @@ class _SpashScreenState extends State<SpashScreen>
     }
     
 
-    return MediaQuery.of(context).size.width >= 500
+    return MediaQuery.of(context).size.width >= 550
         ? Container()
         : Scaffold(
       body:Container(
