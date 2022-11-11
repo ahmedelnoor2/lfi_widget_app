@@ -39,6 +39,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _tagController = TextEditingController();
 
   final TextEditingController _emailVeirficationCode = TextEditingController();
   final TextEditingController _smsVeirficationCode = TextEditingController();
@@ -59,7 +60,6 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
   List _allNetworks = [];
   bool _verifyAddress = false;
   bool _validateEmailProcess = false;
-  bool _tagType = true;
 
   late Timer _timer;
   int _start = 90;
@@ -68,6 +68,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
   late Timer _timerSms;
   int _startSms = 90;
   bool _startTimerSms = false;
+  bool _tagType = false;
 
   @override
   void initState() {
@@ -190,6 +191,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
 
     if (public.publicInfoMarket['market']['followCoinList'][netwrkType] !=
         null) {
+   
       setState(() {
         _allNetworks.clear();
       });
@@ -203,9 +205,34 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
             _defaultNetwork = '${v['name']}';
             _coinShowName = '${v['name']}';
           });
+          print(v['tagType']);
+          if (v['tagType'] == 0) {
+            print(v['tagType']);
+            setState(() {
+              _tagType = false;
+            });
+          } else {
+            setState(() {
+              _tagType = true;
+            });
+          }
         }
       });
     } else {
+     
+      if (public.publicInfoMarket['market']['coinList'][netwrkType]
+              ['tagType'] ==
+          0) {
+        print(public.publicInfoMarket['market']['coinList'][netwrkType]
+            ['tagType']);
+        setState(() {
+          _tagType = false;
+        });
+      } else {
+        setState(() {
+          _tagType = true;
+        });
+      }
       setState(() {
         _allNetworks.clear();
         _allNetworks
@@ -241,7 +268,16 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
       _defaultNetwork = netwrk['name'];
       _coinShowName = '${netwrk['name']}';
     });
-
+    if (netwrk['tagType'] == 0) {
+      print(netwrk['tagType']);
+      setState(() {
+        _tagType = false;
+      });
+    } else {
+      setState(() {
+        _tagType = true;
+      });
+    }
     await asset.getCoinCosts(auth, netwrk['name']);
     // await asset.getChangeAddress(context, auth, netwrk['showName']);
   }
@@ -369,7 +405,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
     var asset = Provider.of<Asset>(context, listen: false);
 
     var _postData = {
-      "address": _addressController.text,
+      "address": "${_addressController.text}_${_tagController.text}",
       "addressId": "",
       "amount": _amountController.text,
       "emailValidCode": _emailVeirficationCode.text,
@@ -718,72 +754,52 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                               _tagType == false
                                   ? Container()
                                   : Container(
-                                      padding: EdgeInsets.only(
-                                        top: 10,
-                                        bottom: 10,
-                                      ),
-                                      child: Text('Tag(Memo)'),
-                                    ),
-                              _tagType == false
-                                  ? Container()
-                                  : Container(
-                                      width: width,
-                                      padding: EdgeInsets.only(
-                                        top: 5,
-                                        bottom: 5,
-                                      ),
-                                      child: InkWell(
-                                        onTap: () {
-                                          Clipboard.setData(
-                                            ClipboardData(
-                                                text: asset
-                                                    .changeAddress['addressStr']
-                                                    .split('_')[1]),
-                                          );
-                                          snackAlert(context,
-                                              SnackTypes.success, 'Copied');
-                                        },
-                                        child: Container(
-                                          padding: EdgeInsets.all(10),
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                              style: BorderStyle.solid,
-                                              width: 0.3,
-                                              color: Color(0xff5E6292),
-                                            ),
+                                      padding:
+                                          EdgeInsets.only(top: 5, bottom: 10),
+                                      child: Container(
+                                        padding: EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          border: Border.all(
+                                            style: BorderStyle.solid,
+                                            width: 0.3,
+                                            color: Color(0xff5E6292),
                                           ),
-                                          child: Row(
-                                            children: [
-                                              SizedBox(
-                                                width: width * 0.8,
-                                                child: Text(
-                                                  'hello',
-                                                  style: TextStyle(
-                                                      overflow: TextOverflow
-                                                          .ellipsis),
-                                                ),
-                                              ),
-                                              GestureDetector(
-                                                onTap: () {
-                                                  Clipboard.setData(
-                                                    ClipboardData(
-                                                        text: asset
-                                                            .changeAddress[
-                                                                'addressStr']
-                                                            .split('_')[1]),
-                                                  );
-                                                  snackAlert(
-                                                      context,
-                                                      SnackTypes.success,
-                                                      'Copied');
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            SizedBox(
+                                              width: width * 0.69,
+                                              child: TextFormField(
+                                                validator: (value) {
+                                                  if (value == null ||
+                                                      value.isEmpty) {
+                                                    return 'Please enter Tag';
+                                                  }
+                                                  return null;
                                                 },
-                                                child: Image.asset(
-                                                  'assets/img/copy.png',
-                                                  width: 18,
+                                                controller: _tagController,
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                decoration:
+                                                    const InputDecoration(
+                                                  contentPadding:
+                                                      EdgeInsets.zero,
+                                                  isDense: true,
+                                                  border: UnderlineInputBorder(
+                                                    borderSide: BorderSide.none,
+                                                  ),
+                                                  hintStyle: TextStyle(
+                                                    fontSize: 14,
+                                                  ),
+                                                  hintText: "Tag 000",
                                                 ),
                                               ),
-                                            ],
-                                          ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ),

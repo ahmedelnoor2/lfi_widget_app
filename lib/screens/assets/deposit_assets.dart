@@ -120,6 +120,20 @@ class _DepositAssetsState extends State<DepositAssets> {
         }
       });
     } else {
+      print('check....');
+      if (public.publicInfoMarket['market']['coinList'][netwrkType]
+              ['tagType'] ==
+          0) {
+        print(public.publicInfoMarket['market']['coinList'][netwrkType]
+            ['tagType']);
+        setState(() {
+          _tagType = false;
+        });
+      } else {
+        setState(() {
+          _tagType = true;
+        });
+      }
       setState(() {
         _allNetworks.clear();
         _allNetworks
@@ -173,8 +187,6 @@ class _DepositAssetsState extends State<DepositAssets> {
   }
 
   Future<void> changeCoinType(netwrk) async {
-    
-
     setState(() {
       _loadingAddress = true;
     });
@@ -517,128 +529,146 @@ class _DepositAssetsState extends State<DepositAssets> {
                   ///Tag memo
                   _tagType == false
                       ? Container()
-                      : Container(
-                          padding: EdgeInsets.only(
-                            top: 10,
-                            bottom: 10,
-                          ),
-                          child: Text('Tag(Memo)'),
-                        ),
+                      : _loadingAddress
+                          ? CircularProgressIndicator()
+                          : Container(
+                              padding: EdgeInsets.only(
+                                top: 10,
+                                bottom: 10,
+                              ),
+                              child: Text('Tag(Memo)'),
+                            ),
                   _tagType == false
                       ? Container()
-                      : Container(
-                          width: width,
-                          padding: EdgeInsets.only(
-                            top: 5,
-                            bottom: 5,
-                          ),
-                          child: InkWell(
-                            onTap: () {
-                              Clipboard.setData(
-                                ClipboardData(
-                                    text: asset.changeAddress['addressStr']
-                                        .split('_')[1]),
-                              );
-                              snackAlert(context, SnackTypes.success, 'Copied');
-                            },
-                            child: Container(
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  style: BorderStyle.solid,
-                                  width: 0.3,
-                                  color: Color(0xff5E6292),
+                      : _loadingAddress
+                          ? Container()
+                          : Container(
+                              width: width,
+                              padding: EdgeInsets.only(
+                                top: 5,
+                                bottom: 5,
+                              ),
+                              child: InkWell(
+                                onTap: () {
+                                  Clipboard.setData(
+                                    ClipboardData(
+                                        text: asset.changeAddress['addressStr']
+                                            .split('_')[1]),
+                                  );
+                                  snackAlert(
+                                      context, SnackTypes.success, 'Copied');
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      style: BorderStyle.solid,
+                                      width: 0.3,
+                                      color: Color(0xff5E6292),
+                                    ),
+                                  ),
+                                  child: _loadingAddress
+                                      ? depositAddressSkull(context)
+                                      : Row(
+                                          children: [
+                                            SizedBox(
+                                              width: width * 0.8,
+                                              child: Text(
+                                                asset
+                                                    .changeAddress['addressStr']
+                                                    .split('_')[1],
+                                                style: TextStyle(
+                                                    overflow:
+                                                        TextOverflow.ellipsis),
+                                              ),
+                                            ),
+                                            GestureDetector(
+                                              onTap: () {
+                                                Clipboard.setData(
+                                                  ClipboardData(
+                                                      text: asset.changeAddress[
+                                                              'addressStr']
+                                                          .split('_')[1]),
+                                                );
+                                                snackAlert(
+                                                    context,
+                                                    SnackTypes.success,
+                                                    'Copied');
+                                              },
+                                              child: Image.asset(
+                                                'assets/img/copy.png',
+                                                width: 18,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                 ),
                               ),
-                              child: _loadingAddress
-                                  ? depositAddressSkull(context)
-                                  : Row(
-                                      children: [
-                                        SizedBox(
-                                          width: width * 0.8,
-                                          child: Text(
-                                            asset.changeAddress['addressStr']
-                                                .split('_')[1],
-                                            style: TextStyle(
-                                                overflow:
-                                                    TextOverflow.ellipsis),
-                                          ),
-                                        ),
-                                        GestureDetector(
-                                          onTap: () {
-                                            Clipboard.setData(
-                                              ClipboardData(
-                                                  text: asset.changeAddress[
-                                                          'addressStr']
-                                                      .split('_')[1]),
-                                            );
-                                            snackAlert(context,
-                                                SnackTypes.success, 'Copied');
-                                          },
-                                          child: Image.asset(
-                                            'assets/img/copy.png',
-                                            width: 18,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
                             ),
-                          ),
-                        ),
 
-                  //
-                  _defaultNetwork == 'XRP'
-                      ? Container(
-                          width: width,
-                          height: height * 0.09,
-                          padding: EdgeInsets.only(
-                            top: 5,
-                            bottom: 5,
-                          ),
-                          child: Container(
-                            padding: EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                style: BorderStyle.solid,
-                                width: 0.3,
-                                color: Color(0xff5E6292),
-                              ),
-                            ),
-                            child: _loadingAddress
-                                ? depositAddressSkull(context)
-                                : Row(
-                                    children: [
-                                      SizedBox(
-                                        width: width * 0.8,
-                                        child: Text(
-                                          '${_defaultNetwork == 'XRP' ? asset.changeAddress['addressStr'].split('_')[1] : asset.changeAddress['addressStr']}',
-                                        ),
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Clipboard.setData(
-                                            ClipboardData(
-                                              text: _defaultNetwork == 'XRP'
-                                                  ? asset.changeAddress[
-                                                          'addressStr']
-                                                      .split('_')[1]
-                                                  : asset.changeAddress[
-                                                      'addressStr'],
-                                            ),
-                                          );
-                                          snackAlert(context,
-                                              SnackTypes.success, 'Copied');
-                                        },
-                                        child: Image.asset(
-                                          'assets/img/copy.png',
-                                          width: 18,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                          ),
-                        )
-                      : Container(),
+                  // //
+                  // _defaultNetwork == 'XRP'
+                  //     ? Container(
+                  //         width: width,
+                  //         height: height * 0.09,
+                  //         padding: EdgeInsets.only(
+                  //           top: 5,
+                  //           bottom: 5,
+                  //         ),
+                  //         child: Row(mainAxisAlignment: MainAxisAlignment.start,
+                  //           children: [
+                  //             Column(
+                  //               crossAxisAlignment: CrossAxisAlignment.start,
+                  //               children: [
+                  //                 Text('Tag(Memo'),
+                  //                 Container(
+                  //                   padding: EdgeInsets.all(10),
+                  //                   decoration: BoxDecoration(
+                  //                     border: Border.all(
+                  //                       style: BorderStyle.solid,
+                  //                       width: 0.3,
+                  //                       color: Color(0xff5E6292),
+                  //                     ),
+                  //                   ),
+                  //                   child: _loadingAddress
+                  //                       ? depositAddressSkull(context)
+                  //                       : Row(
+                  //                           children: [
+                  //                             SizedBox(
+                  //                               width: width * 0.8,
+                  //                               child: Text(
+                  //                                 '${_defaultNetwork == 'XRP' ? asset.changeAddress['addressStr'].split('_')[1] : asset.changeAddress['addressStr']}',
+                  //                               ),
+                  //                             ),
+                  //                             GestureDetector(
+                  //                               onTap: () {
+                  //                                 Clipboard.setData(
+                  //                                   ClipboardData(
+                  //                                     text: _defaultNetwork == 'XRP'
+                  //                                         ? asset.changeAddress[
+                  //                                                 'addressStr']
+                  //                                             .split('_')[1]
+                  //                                         : asset.changeAddress[
+                  //                                             'addressStr'],
+                  //                                   ),
+                  //                                 );
+                  //                                 snackAlert(context,
+                  //                                     SnackTypes.success, 'Copied');
+                  //                               },
+                  //                               child: Image.asset(
+                  //                                 'assets/img/copy.png',
+                  //                                 width: 18,
+                  //                               ),
+                  //                             ),
+                  //                           ],
+                  //                         ),
+                  //                 ),
+                  //               ],
+                  //             ),
+                  //           ],
+                  //         ),
+                  //       )
+                  //     : Container(),
                   Container(
                     padding: EdgeInsets.only(
                       top: 20,

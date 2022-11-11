@@ -416,7 +416,14 @@ class Asset with ChangeNotifier {
     }
   }
 
+  bool _isloadingChangeAddress = false;
+
+  bool get isloadingChangeAddress {
+    return _isloadingChangeAddress;
+  }
+
   Future<void> getChangeAddress(ctx, auth, coin) async {
+    _isloadingChangeAddress=true;
     headers['exchange-token'] = auth.loginVerificationToken;
 
     var url = Uri.https(
@@ -433,17 +440,20 @@ class Asset with ChangeNotifier {
         headers: headers,
       );
       final responseData = json.decode(response.body);
-   print(responseData);
+      print(responseData);
       if (responseData['code'] == '0') {
+        _isloadingChangeAddress=false;
         _changeAddress = responseData['data'];
         print(_changeAddress);
       } else {
         _changeAddress = {};
+        _isloadingChangeAddress=false;
         // snackAlert(ctx, SnackTypes.errors, responseData['msg']);
         auth.checkResponseCode(ctx, responseData['code']);
       }
       return notifyListeners();
     } catch (error) {
+      _isloadingChangeAddress=false;
       return notifyListeners();
       // throw error;
     }
