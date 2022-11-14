@@ -4,7 +4,7 @@ import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/dashboard.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
-import 'package:lyotrade/utils/responsive_layout.dart';
+import 'package:lyotrade/utils/web_url.dart';
 
 class IntroScreen extends StatefulWidget {
   @override

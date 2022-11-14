@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/dashboard.dart';
-import 'package:lyotrade/utils/responsive_layout.dart';
+import 'package:lyotrade/utils/web_url.dart';
 import 'package:provider/provider.dart';
 
 class SpashScreen extends StatefulWidget {

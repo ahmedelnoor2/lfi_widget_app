@@ -78,17 +78,15 @@ int? initScreen;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences preferences = await SharedPreferences.getInstance();
-
   initScreen = await preferences.getInt('initScreen');
   await preferences.setInt('initScreen', 1);
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
           overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top])
-      .then((_) => runApp(EasyDynamicThemeWidget (child: const MyApp())));
+      .then((_) => runApp(EasyDynamicThemeWidget(child: const MyApp())));
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
