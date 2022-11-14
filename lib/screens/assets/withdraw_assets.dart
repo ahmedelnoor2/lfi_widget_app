@@ -401,9 +401,15 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
     });
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
+    var tag = '';
+    if (_tagController.text.isNotEmpty) {
+      setState(() {
+        tag = '_' + _tagController.text;
+      });
+    }
 
     var _postData = {
-      "address": "${_addressController.text}_${_tagController.text}",
+      "address": "${_addressController.text}$tag",
       "addressId": "",
       "amount": _amountController.text,
       "emailValidCode": _emailVeirficationCode.text,
@@ -412,6 +418,8 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
       "symbol": _coinShowName,
       "trustType": 0,
     };
+
+    print(_postData);
     if (auth.userInfo['mobileNumber'].isNotEmpty) {
       _postData['smsValidCode'] = _smsVeirficationCode.text;
     }
