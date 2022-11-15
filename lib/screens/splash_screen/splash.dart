@@ -5,6 +5,7 @@ import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/dashboard.dart';
 import 'package:lyotrade/utils/web_url.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/foundation.dart';
 
 class SpashScreen extends StatefulWidget {
   static const routeName = '/splashScreen';
@@ -114,49 +115,48 @@ class _SpashScreenState extends State<SpashScreen>
     if (MediaQuery.of(context).size.width >= 550) {
       webPortalURL();
     }
-    
 
     return MediaQuery.of(context).size.width >= 550
         ? Container()
         : Scaffold(
-      body:Container(
-        constraints: const BoxConstraints.expand(),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Container(
-              padding: EdgeInsets.only(
-                top: height * 0.20,
-                left: 20,
-                right: 20,
-              ),
-              child: Stack(
-                alignment: Alignment.bottomCenter,
+            body: Container(
+              constraints: const BoxConstraints.expand(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Image.asset(
-                    'assets/img/splash.png',
-                    width: 300,
-                    height: 280,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 40),
-                    child: Text(
-                      'LYOTRADE',
-                      style: const TextStyle(
-                          fontSize: 32, fontWeight: FontWeight.w500),
+                  Container(
+                    padding: EdgeInsets.only(
+                      top: height * 0.20,
+                      left: 20,
+                      right: 20,
                     ),
-                  )
+                    child: Stack(
+                      alignment: Alignment.bottomCenter,
+                      children: [
+                        Image.asset(
+                          'assets/img/splash.png',
+                          width: 300,
+                          height: 280,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 40),
+                          child: Text(
+                            'LYOTRADE',
+                            style: const TextStyle(
+                                fontSize: 32, fontWeight: FontWeight.w500),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  const Spacer(),
+                  Container(
+                    padding: EdgeInsets.only(bottom: height * 0.2),
+                    child: CircularProgressIndicator(),
+                  ),
                 ],
               ),
             ),
-            const Spacer(),
-            Container(
-              padding: EdgeInsets.only(bottom: height * 0.2),
-              child: CircularProgressIndicator(),
-            ),
-          ],
-        ),
-      ),
-    );
+          );
   }
 }
