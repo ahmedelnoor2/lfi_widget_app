@@ -312,7 +312,16 @@ class _PixPaymentState extends State<PixPayment>
     var auth = Provider.of<Auth>(context, listen: false);
     await payment
         .getminimumWithDrawalAmount(auth, {"uaTime": "2022-11-23 11:20:07"});
-    _cpfController.text = await payment.minimumWithdarwalAmt['cpf'] ?? '';
+
+    if (payment.minimumWithdarwalAmt['cpfStatus'] == 1) {
+      setState(() {
+        payment.setCpfStatus(true);
+      });
+    } else {
+      setState(() {
+        payment.setCpfStatus(false);
+      });
+    }
   }
 
   @override
@@ -330,7 +339,7 @@ class _PixPaymentState extends State<PixPayment>
         FocusManager.instance.primaryFocus?.unfocus();
       },
       child: Scaffold(
-        resizeToAvoidBottomInset: true,
+        resizeToAvoidBottomInset: false,
         appBar: hiddenAppBar(),
         body: Container(
           padding: EdgeInsets.all(15),
@@ -889,88 +898,137 @@ class _PixPaymentState extends State<PixPayment>
         FocusManager.instance.primaryFocus?.unfocus();
       },
       child: Container(
-              padding: EdgeInsets.only(right: 10, left: 10),
-              height: height * 0.9,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Column(
+        padding: EdgeInsets.only(right: 10, left: 10),
+        height: height * 0.9,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      getPortugeseTrans('Verify your CPF'),
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: Icon(
+                        Icons.close,
+                        size: 20,
+                      ),
+                    )
+                  ],
+                ),
+                Divider(),
+                Container(
+                  child: Text(
+                    getPortugeseTrans(
+                        'Kindly type your own CPF to continue with the deposit. Putting other users CPF will cancel the transaction'),
+                    style: TextStyle(
+                      color: secondaryTextColor,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.only(top: 15, bottom: 5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
+                      Text('CPF'),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(
+                      style: BorderStyle.solid,
+                      width: 0.3,
+                      color: Color(0xff5E6292),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(
+                        width: width * 0.85,
+                        child: TextFormField(
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return getPortugeseTrans(
+                                  'Please enter CPF account number');
+                            }
+                            return null;
+                          },
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                          ),
+                          controller: _cpfController,
+                          inputFormatters: [
+                            MaskTextInputFormatter(mask: "###.###.###-##")
+                          ],
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.zero,
+                            isDense: true,
+                            border: UnderlineInputBorder(
+                              borderSide: BorderSide.none,
+                            ),
+                            hintStyle: TextStyle(
+                              fontSize: 14,
+                            ),
+                            hintText: getPortugeseTrans(
+                              "Enter 11 digits of your CPF",
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                Column(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.only(top: 15, bottom: 5),
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            getPortugeseTrans('Verify your CPF'),
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+                            getPortugeseTrans(
+                              "Email (This email is for verification only)",
                             ),
                           ),
-                          IconButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            icon: Icon(
-                              Icons.close,
-                              size: 20,
-                            ),
-                          )
                         ],
                       ),
-                      Divider(),
-                      Container(
-                        child: Text(
-                          getPortugeseTrans(
-                              'Kindly type your own CPF to continue with the deposit. Putting other users CPF will cancel the transaction'),
-                          style: TextStyle(
-                            color: secondaryTextColor,
-                            fontSize: 12,
-                          ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(
+                          style: BorderStyle.solid,
+                          width: 0.3,
+                          color: Color(0xff5E6292),
                         ),
                       ),
-                      Container(
-                        padding: EdgeInsets.only(top: 15, bottom: 5),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('CPF'),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(15),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(
-                            style: BorderStyle.solid,
-                            width: 0.3,
-                            color: Color(0xff5E6292),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(
-                              width: width * 0.85,
-                              child: TextFormField(
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return getPortugeseTrans(
-                                        'Please enter CPF account number');
-                                  }
-                                  return null;
-                                },
-                                keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                  decimal: true,
-                                ),
-                                controller: _cpfController,
-                                inputFormatters: [
-                                  MaskTextInputFormatter(mask: "###.###.###-##")
-                                ],
-                                decoration: InputDecoration(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            width: width * 0.85,
+                            child: TextFormField(
+                              enabled: false,
+                              decoration: InputDecoration(
                                   contentPadding: EdgeInsets.zero,
                                   isDense: true,
                                   border: UnderlineInputBorder(
@@ -979,174 +1037,124 @@ class _PixPaymentState extends State<PixPayment>
                                   hintStyle: TextStyle(
                                     fontSize: 14,
                                   ),
-                                  hintText: getPortugeseTrans(
-                                    "Enter 11 digits of your CPF",
-                                  ),
-                                ),
-                              ),
-                            )
-                          ],
+                                  hintText:
+                                      payments.minimumWithdarwalAmt['email'] ??
+                                          ''),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.only(top: 15, bottom: 5),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            getPortugeseTrans('Name'),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(
+                          style: BorderStyle.solid,
+                          width: 0.3,
+                          color: Color(0xff5E6292),
                         ),
                       ),
-                      Column(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            padding: EdgeInsets.only(top: 15, bottom: 5),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  getPortugeseTrans(
-                                    "Email (This email is for verification only)",
+                          SizedBox(
+                            width: width * 0.85,
+                            child: TextFormField(
+                              enabled: false,
+                              decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.zero,
+                                  isDense: true,
+                                  border: UnderlineInputBorder(
+                                    borderSide: BorderSide.none,
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            padding: EdgeInsets.all(15),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                              border: Border.all(
-                                style: BorderStyle.solid,
-                                width: 0.3,
-                                color: Color(0xff5E6292),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                SizedBox(
-                                  width: width * 0.85,
-                                  child: TextFormField(
-                                    enabled: false,
-                                    decoration: InputDecoration(
-                                        contentPadding: EdgeInsets.zero,
-                                        isDense: true,
-                                        border: UnderlineInputBorder(
-                                          borderSide: BorderSide.none,
-                                        ),
-                                        hintStyle: TextStyle(
-                                          fontSize: 14,
-                                        ),
-                                        hintText: payments.minimumWithdarwalAmt[
-                                                'email'] ??
-                                            ''),
+                                  hintStyle: TextStyle(
+                                    fontSize: 14,
                                   ),
-                                )
-                              ],
+                                  hintText:
+                                      payments.minimumWithdarwalAmt['name'] ??
+                                          ''),
                             ),
                           ),
                         ],
                       ),
-                      Column(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.only(top: 15, bottom: 5),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  getPortugeseTrans('Name'),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            padding: EdgeInsets.all(15),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                              border: Border.all(
-                                style: BorderStyle.solid,
-                                width: 0.3,
-                                color: Color(0xff5E6292),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                SizedBox(
-                                  width: width * 0.85,
-                                  child: TextFormField(
-                                    enabled: false,
-                                    decoration: InputDecoration(
-                                        contentPadding: EdgeInsets.zero,
-                                        isDense: true,
-                                        border: UnderlineInputBorder(
-                                          borderSide: BorderSide.none,
-                                        ),
-                                        hintStyle: TextStyle(
-                                          fontSize: 14,
-                                        ),
-                                        hintText: payments
-                                                .minimumWithdarwalAmt['name'] ??
-                                            ''),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          ///  check cpf number is validiate//
-
-                          payments.cpf['code'] == '0'
-                              ? Container()
-                              : Container(
-                                  padding: EdgeInsets.only(top: 15, bottom: 5),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.info_outline,
-                                            color: errorColor,
-                                          ),
-                                          SizedBox(
-                                            width: 10,
-                                          ),
-                                          Text('Invalid Cpf',
-                                              style:
-                                                  TextStyle(color: errorColor)),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                )
-                        ],
-                      ),
-                    ],
-                  ),
-                  Container(
-                    padding: EdgeInsets.only(bottom: 30),
-                    child: LyoButton(
-                      onPressed: (_cpfController.text.isEmpty)
-                          ? null
-                          : () {
-                              if (_cpfController.text.length < 14) {
-                                setState(() {
-                                  _fieldErrors['cpf'] = 'Invalid cpf account';
-                                });
-                              } else {
-                                setState(() {
-                                  _fieldErrors.remove('cpf');
-                                });
-                              }
-                              validateCPF();
-                            },
-                      text: getPortugeseTrans('Continue'),
-                      active: true,
-                      isLoading: payments.isCpfLoading,
-                      activeColor: (_cpfController.text.isEmpty || _loading)
-                          ? Color(0xff5E6292)
-                          : linkColor,
-                      activeTextColor: Colors.black,
                     ),
-                  ),
-                ],
+
+                    ///  check cpf number is validiate//
+
+                    payments.cpf['code'] == '0'
+                        ? Container()
+                        : Container(
+                            padding: EdgeInsets.only(top: 15, bottom: 5),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.info_outline,
+                                      color: errorColor,
+                                    ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text('Invalid Cpf',
+                                        style: TextStyle(color: errorColor)),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          )
+                  ],
+                ),
+              ],
+            ),
+            Container(
+              padding: EdgeInsets.only(bottom: 30),
+              child: LyoButton(
+                onPressed: (_cpfController.text.isEmpty ||
+                        _cpfController.text.length < 14)
+                    ? null
+                    : () {
+                        if (_cpfController.text.length < 14) {
+                          setState(() {
+                            _fieldErrors['cpf'] = 'Invalid cpf account';
+                          });
+                        } else {
+                          setState(() {
+                            _fieldErrors.remove('cpf');
+                          });
+                        }
+                        validateCPF();
+                      },
+                text: getPortugeseTrans('Continue'),
+                active: true,
+                isLoading: payments.isCpfLoading,
+                activeColor: (_cpfController.text.isEmpty ||
+                        _cpfController.text.length < 14)
+                    ? Color(0xff5E6292)
+                    : linkColor,
+                activeTextColor: Colors.black,
               ),
             ),
+          ],
+        ),
+      ),
     );
   }
 }

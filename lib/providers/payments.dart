@@ -1066,18 +1066,26 @@ class Payments with ChangeNotifier {
   Map get minimumWithdarwalAmt {
     return _minimumWithdarwalAmt;
   }
+bool _cpfStatus = false;
+bool get cpfStatus{
+  return _cpfStatus;
+}
+void setCpfStatus(bool value) {
+    _cpfStatus=value;
+    return notifyListeners();
+  }
+
 
   Future<void> getminimumWithDrawalAmount(auth, formdata) async {
     /// url//
     headers['exchange-token'] = auth.loginVerificationToken;
     var url = Uri.https(apiUrl, '/fe-ex-api/pix/basic_info');
     print(url);
-
     try {
       final response =
           await http.post(url, headers: headers, body: jsonEncode(formdata));
       final responseData = json.decode(response.body);
-
+       print(responseData);
       if (responseData['code'] == '0') {
         _minimumWithdarwalAmt = responseData['data'];
 
