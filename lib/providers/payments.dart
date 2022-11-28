@@ -1066,18 +1066,19 @@ class Payments with ChangeNotifier {
   Map get minimumWithdarwalAmt {
     return _minimumWithdarwalAmt;
   }
-bool _cpfStatus = false;
-bool get cpfStatus{
-  return _cpfStatus;
-}
-void setCpfStatus(bool value) {
-    _cpfStatus=value;
+
+  bool _cpfStatus = false;
+  bool get cpfStatus {
+    return _cpfStatus;
+  }
+
+  void setCpfStatus(bool value) {
+    _cpfStatus = value;
     return notifyListeners();
   }
 
-
   Future<void> getminimumWithDrawalAmount(auth, formdata) async {
-    /// url//
+    
     headers['exchange-token'] = auth.loginVerificationToken;
     var url = Uri.https(apiUrl, '/fe-ex-api/pix/basic_info');
     print(url);
@@ -1085,7 +1086,7 @@ void setCpfStatus(bool value) {
       final response =
           await http.post(url, headers: headers, body: jsonEncode(formdata));
       final responseData = json.decode(response.body);
-       print(responseData);
+      print(responseData);
       if (responseData['code'] == '0') {
         _minimumWithdarwalAmt = responseData['data'];
 
@@ -1116,6 +1117,7 @@ void setCpfStatus(bool value) {
   }
 
   Future<void> getCpf(ctx, auth, formdata) async {
+    print(formdata);
     headers['exchange-token'] = auth.loginVerificationToken;
     var url = Uri.https(apiUrl, '/fe-ex-api/pix/valide_cpf');
     print(url);
@@ -1124,17 +1126,99 @@ void setCpfStatus(bool value) {
       final response =
           await http.post(url, headers: headers, body: jsonEncode(formdata));
       final responseData = json.decode(response.body);
+      print(responseData);
       print('eheck cpf is vaLdate....');
 
       if (responseData['code'] == '0') {
         _cpf = responseData;
-         Navigator.pushNamed(ctx, '/pix_payment_details');
+        Navigator.pushNamed(ctx, '/pix_payment_details');
         print(_cpf);
         _isCpfLoading = false;
         notifyListeners();
       } else {
         _cpf = {};
         _isCpfLoading = false;
+        return notifyListeners();
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  /// pix create order
+  Map _pixCreateOrder = {};
+
+  Map get pixCreateOrder {
+    return _pixCreateOrder;
+  }
+
+  bool _isCreateOrderLoading = false;
+  bool get isCreateOrderLoading {
+    return _isCreateOrderLoading;
+  }
+
+  Future<void> getCreatePixOrder(ctx, auth, formdata) async {
+    print(formdata);
+    _isCreateOrderLoading = true;
+
+    /// url//
+    headers['exchange-token'] = auth.loginVerificationToken;
+    var url = Uri.https(apiUrl, '/fe-ex-api/pix/create_order');
+    print(url);
+    try {
+      final response =
+          await http.post(url, headers: headers, body: jsonEncode(formdata));
+      final responseData = json.decode(response.body);
+      print('cerate order ...........');
+      print(responseData);
+      if (responseData['code'] == '106402') {
+        _isCreateOrderLoading = false;
+        Navigator.pushNamed(ctx, '/pix_process_payment');
+        _pixCreateOrder = responseData['data'];
+        print(_pixCreateOrder);
+        notifyListeners();
+      } else {
+        _pixCreateOrder = {};
+
+        return notifyListeners();
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  /// pix detail info
+  Map _pixdetail = {};
+
+  Map get pixdetail {
+    return _pixdetail;
+  }
+
+  bool _ispixdetailLoading = false;
+  bool get ispixdetailLoading {
+    return _ispixdetailLoading;
+  }
+
+  Future<void> getPixDetailInfo(auth, formdata) async {
+    _ispixdetailLoading = true;
+
+    /// url//
+    headers['exchange-token'] = auth.loginVerificationToken;
+    var url = Uri.https(apiUrl, '/fe-ex-api/pix/detail_info');
+    print(url);
+    try {
+      final response =
+          await http.post(url, headers: headers, body: jsonEncode(formdata));
+      final responseData = json.decode(response.body);
+      print('Pix payment detail ...........');
+      print(responseData);
+      if (responseData['code'] == '0') {
+        _ispixdetailLoading = false;
+        _pixdetail = responseData['data'];
+        notifyListeners();
+      } else {
+        _pixdetail = {};
+
         return notifyListeners();
       }
     } catch (e) {

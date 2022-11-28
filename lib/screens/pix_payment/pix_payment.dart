@@ -317,11 +317,19 @@ class _PixPaymentState extends State<PixPayment>
       setState(() {
         payment.setCpfStatus(true);
       });
-    } else {
+    } else if (payment.minimumWithdarwalAmt['cpfStatus'] == 2) {
       setState(() {
         payment.setCpfStatus(false);
       });
     }
+  }
+
+  //// get create order
+  Future<void> getCreateorder() async {
+    var payment = Provider.of<Payments>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
+    await payment
+        .getCreatePixOrder(context,auth, {"amount": _amountBrlController.text});
   }
 
   @override
@@ -750,75 +758,12 @@ class _PixPaymentState extends State<PixPayment>
                               _processTransaction = true;
                             });
                             if (_formKey.currentState!.validate()) {
-                              await payments.getKycVerificationDetails({
-                                'userId': auth.userInfo['id'],
-                              });
-                              setState(() {
-                                _fieldErrors = {};
-                                _cpfController.text =
-                                    payments.minimumWithdarwalAmt['cpf'] ?? '';
-                                _name = '';
-                                _email = '';
-                                _cpf = '';
-                                _loading = false;
-                                _processKyc = false;
-                              });
-
-                              if (payments.pixKycClients.isNotEmpty) {
-                                if (payments.pixKycClients['activate']) {
-                                  await payments.createNewPixTransaction(
-                                      context,
-                                      {
-                                        "client_id":
-                                            payments.pixKycClients['userId'],
-                                        "value": _sendUsdtAmountwithouttax,
-                                        "client": payments.pixKycClients,
-                                        "userAddresses": _userAddresses,
-                                      },
-                                      _amountBrlController.text);
-                                  setState(() {
-                                    _processTransaction = false;
-                                  });
-                                  if (payments.pixNewTransaction.isNotEmpty) {
-                                    Navigator.pushNamed(
-                                        context, '/pix_process_payment');
-                                  }
-                                } else {
-                                  setState(() {
-                                    _processTransaction = false;
-                                  });
-                                  showModalBottomSheet<void>(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.vertical(
-                                        top: Radius.circular(25.0),
-                                      ),
-                                    ),
-                                    isScrollControlled: true,
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return StatefulBuilder(
-                                        builder: (BuildContext context,
-                                            StateSetter setState) {
-                                          return GestureDetector(
-                                            onTap: () {
-                                              FocusManager.instance.primaryFocus
-                                                  ?.unfocus();
-                                            },
-                                            child: kycInformation(
-                                              context,
-                                              setState,
-                                              0.9,
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    },
-                                  );
-                                }
-                              } else {
+                              if (payments.cpfStatus == false) {
+                                await getCreateorder();
                                 setState(() {
                                   _processTransaction = false;
                                 });
+                              } else {
                                 showModalBottomSheet<void>(
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.vertical(
@@ -846,6 +791,9 @@ class _PixPaymentState extends State<PixPayment>
                                     );
                                   },
                                 );
+                                setState(() {
+                                  _processTransaction = false;
+                                });
                               }
                             }
                           },
@@ -1097,7 +1045,7 @@ class _PixPaymentState extends State<PixPayment>
 
                     ///  check cpf number is validiate//
 
-                    payments.cpf['code'] == '0'
+                    payments.cpfStatus == false
                         ? Container()
                         : Container(
                             padding: EdgeInsets.only(top: 15, bottom: 5),

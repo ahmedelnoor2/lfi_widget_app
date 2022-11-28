@@ -37,7 +37,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
 
   @override
   void initState() {
-    getUserDetails();
+    getdetailinfo();
     startOrderCheckTimer();
     _controller = AnimationController(vsync: this);
     super.initState();
@@ -59,48 +59,49 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
     _timerForOrderUpdate = Timer.periodic(
       const Duration(seconds: 5),
       (Timer timer) {
-        getUserDetails();
+        getdetailinfo();
       },
     );
   }
 
-  Future<void> getUserDetails() async {
+  Future<void> getdetailinfo() async {
+    var auth = Provider.of<Auth>(context, listen: false);
     var payments = Provider.of<Payments>(context, listen: false);
-    await payments.getAllPixTransactions(
-      payments.pixKycClients['client_uuid'],
-    );
-    if (payments.allPixTransactions.isNotEmpty) {
-      for (var transaction in payments.allPixTransactions) {
-        if (transaction['uuid_transaction'] ==
-            payments.pixNewTransaction['uuid_transaction']) {
-          setState(() {
-            _currentTransaction = transaction;
-          });
-          if (_timer == null) {
-            payments.decryptPixQR({"qr_code": transaction['qr_code']});
-            setState(() {
-              _timer = Timer.periodic(
-                const Duration(seconds: 1),
-                (Timer timer) {
-                  final nowDate = DateTime.now().toLocal();
-                  var endDate = DateTime.parse(transaction['date_end'])
-                      .toLocal()
-                      .add(Duration(
-                          hours: int.parse(nowDate.timeZoneOffset
-                              .toString()
-                              .split(":")[0])));
-                  final difference = nowDate.difference(endDate).toString();
-                  final hour =
-                      difference.split(':')[0].replaceAll(RegExp('-'), '');
-                  final minute = difference.split(':')[1];
-                  final second = difference.split(':')[2].split('.')[0];
-                  payments.setAwaitingTime('0$hour:$minute:$second');
-                },
-              );
-            });
-          }
-        }
-      }
+
+    await payments.getPixDetailInfo(auth, payments.pixCreateOrder['id']);
+
+    if (payments.pixdetail.isNotEmpty) {
+      //   for (var transaction in payments.allPixTransactions) {
+      //     if (transaction['uuid_transaction'] ==
+      //         payments.pixNewTransaction['uuid_transaction']) {
+      //       setState(() {
+      //         _currentTransaction = transaction;
+      //       });
+      //       if (_timer == null) {
+      //         payments.decryptPixQR({"qr_code": transaction['qr_code']});
+      //         setState(() {
+      //           _timer = Timer.periodic(
+      //             const Duration(seconds: 1),
+      //             (Timer timer) {
+      //               final nowDate = DateTime.now().toLocal();
+      //               var endDate = DateTime.parse(transaction['date_end'])
+      //                   .toLocal()
+      //                   .add(Duration(
+      //                       hours: int.parse(nowDate.timeZoneOffset
+      //                           .toString()
+      //                           .split(":")[0])));
+      //               final difference = nowDate.difference(endDate).toString();
+      //               final hour =
+      //                   difference.split(':')[0].replaceAll(RegExp('-'), '');
+      //               final minute = difference.split(':')[1];
+      //               final second = difference.split(':')[2].split('.')[0];
+      //               payments.setAwaitingTime('0$hour:$minute:$second');
+      //             },
+      //           );
+      //         });
+      //       }
+      //     }
+      //   }
     }
   }
 
@@ -131,8 +132,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                               onTap: () {
                                 if (_timerForOrderUpdate != null) {
                                   _timerForOrderUpdate!.cancel();
-                                  if (_currentTransaction['status'] ==
-                                      'PROCESSING') {
+                                  if (payments.pixdetail['status'] == '0') {
                                     showAlert(
                                       context,
                                       Icon(
@@ -150,8 +150,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                     Navigator.pop(context);
                                   }
                                 } else {
-                                  if (_currentTransaction['status'] ==
-                                      'PROCESSING') {
+                                  if (payments.pixdetail['status'] == '0') {
                                     showAlert(
                                       context,
                                       Icon(
@@ -220,27 +219,27 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                 ),
                               ),
                             ),
-                            // Text(
-                            //   'Brazilian Real',
-                            //   style: TextStyle(
-                            //     fontSize: 12,
-                            //     fontWeight: FontWeight.normal,
-                            //     color: secondaryTextColor,
-                            //   ),
-                            // ),
+                            Text(
+                              'Brazilian Real',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.normal,
+                                color: secondaryTextColor,
+                              ),
+                            ),
                           ],
                         ),
                         Container(
                           padding: EdgeInsets.only(top: 5),
                           child: Text(
-                            'R\$ ${payments.transactionValue}',
+                            'R\$ ${payments.pixdetail['brlAmount'] ?? ''}',
                             style: TextStyle(
                               fontSize: 25,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                        payments.getTxDetails.isNotEmpty
+                        payments.pixdetail.isEmpty
                             ? Container(
                                 padding: EdgeInsets.only(top: 5),
                                 width: width,
@@ -265,8 +264,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              getPortugeseTrans(
-                                                  'Merchant Name'),
+                                              getPortugeseTrans('amount'),
                                               style: TextStyle(
                                                 color: secondaryTextColor,
                                               ),
@@ -277,122 +275,9 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                                   padding:
                                                       EdgeInsets.only(right: 5),
                                                   child: Text(
-                                                    '${payments.getTxDetails['merchantName']}',
+                                                    '${payments.pixdetail['amount'] ?? payments.pixdetail['settledAmount']}',
                                                   ),
                                                 ),
-                                                InkWell(
-                                                  onTap: () {
-                                                    Clipboard.setData(
-                                                      ClipboardData(
-                                                        text:
-                                                            '${payments.getTxDetails['merchantName']}',
-                                                      ),
-                                                    );
-                                                    snackAlert(
-                                                        context,
-                                                        SnackTypes.success,
-                                                        getPortugeseTrans(
-                                                            'Copied'));
-                                                  },
-                                                  child: Icon(
-                                                    Icons.copy,
-                                                    size: 16,
-                                                    color: secondaryTextColor,
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Container(
-                                        padding: EdgeInsets.all(10),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              getPortugeseTrans(
-                                                  'Merchant City'),
-                                              style: TextStyle(
-                                                color: secondaryTextColor,
-                                              ),
-                                            ),
-                                            Row(
-                                              children: [
-                                                Container(
-                                                  padding:
-                                                      EdgeInsets.only(right: 5),
-                                                  child: Text(
-                                                    '${payments.getTxDetails['merchantCity']}',
-                                                  ),
-                                                ),
-                                                InkWell(
-                                                  onTap: () {
-                                                    Clipboard.setData(
-                                                      ClipboardData(
-                                                        text:
-                                                            '${payments.getTxDetails['merchantCity']}',
-                                                      ),
-                                                    );
-                                                    snackAlert(
-                                                        context,
-                                                        SnackTypes.success,
-                                                        getPortugeseTrans(
-                                                            'Copied'));
-                                                  },
-                                                  child: Icon(
-                                                    Icons.copy,
-                                                    size: 16,
-                                                    color: secondaryTextColor,
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Container(
-                                        padding: EdgeInsets.all(10),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              getPortugeseTrans('Country Code'),
-                                              style: TextStyle(
-                                                color: secondaryTextColor,
-                                              ),
-                                            ),
-                                            Row(
-                                              children: [
-                                                Container(
-                                                  padding:
-                                                      EdgeInsets.only(right: 5),
-                                                  child: Text(
-                                                    '${payments.getTxDetails['countryCode']}',
-                                                  ),
-                                                ),
-                                                InkWell(
-                                                  onTap: () {
-                                                    Clipboard.setData(
-                                                      ClipboardData(
-                                                        text:
-                                                            '${payments.getTxDetails['countryCode']}',
-                                                      ),
-                                                    );
-                                                    snackAlert(
-                                                        context,
-                                                        SnackTypes.success,
-                                                        getPortugeseTrans(
-                                                            'Copied'));
-                                                  },
-                                                  child: Icon(
-                                                    Icons.copy,
-                                                    size: 16,
-                                                    color: secondaryTextColor,
-                                                  ),
-                                                )
                                               ],
                                             ),
                                           ],
@@ -405,7 +290,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Expanded(
-                                              flex: 1,
+                                              flex: 2,
                                               child: Text(
                                                 getPortugeseTrans(
                                                     'Transaction ID'),
@@ -422,29 +307,9 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                                     padding: EdgeInsets.only(
                                                         right: 5),
                                                     child: Text(
-                                                      '${payments.getTxDetails['txid']}',
+                                                      '${payments.pixdetail['uuidTransaction'] ?? ''}',
                                                     ),
                                                   ),
-                                                  InkWell(
-                                                    onTap: () {
-                                                      Clipboard.setData(
-                                                        ClipboardData(
-                                                          text:
-                                                              '${payments.getTxDetails['txid']}',
-                                                        ),
-                                                      );
-                                                      snackAlert(
-                                                          context,
-                                                          SnackTypes.success,
-                                                          getPortugeseTrans(
-                                                              'Copied'));
-                                                    },
-                                                    child: Icon(
-                                                      Icons.copy,
-                                                      size: 16,
-                                                      color: secondaryTextColor,
-                                                    ),
-                                                  )
                                                 ],
                                               ),
                                             ),
@@ -458,7 +323,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              getPortugeseTrans('TAX Amount'),
+                                              getPortugeseTrans('Brl Rate'),
                                               style: TextStyle(
                                                 color: secondaryTextColor,
                                               ),
@@ -469,8 +334,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                                   padding:
                                                       EdgeInsets.only(right: 5),
                                                   child: Text(
-                                                    '1.62 BRL',
-                                                  ),
+                                                      '${payments.pixdetail['brlRate'] ?? ''} BRL'),
                                                 ),
                                               ],
                                             ),
@@ -505,8 +369,9 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                       alignment: Alignment.center,
                                       child: QrImage(
                                         data: utf8.decode(
-                                          base64.decode(payments
-                                              .pixNewTransaction['qr_code']),
+                                          base64.decode(
+                                              payments.pixdetail['qrCode'] ??
+                                                  ''),
                                         ),
                                         version: QrVersions.auto,
                                         backgroundColor: Colors.white,
@@ -520,8 +385,8 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                     Clipboard.setData(
                                       ClipboardData(
                                         text: utf8.decode(
-                                          base64.decode(payments
-                                              .pixNewTransaction['qr_code']),
+                                          base64.decode(
+                                              payments.pixdetail['qrCode']),
                                         ),
                                       ),
                                     );
@@ -562,27 +427,25 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                   width: 50,
                                   height: 50,
                                   child: Align(
-                                    alignment: Alignment.center,
-                                    child: _currentTransaction['status'] ==
-                                            'ACCEPTED'
-                                        ? Image.asset(
-                                            'assets/img/approved.png',
-                                            width: 50,
-                                          )
-                                        : _currentTransaction['status'] ==
-                                                'CHARGEBACK'
-                                            ? Image.asset(
-                                                'assets/img/rejected.png',
-                                                width: 50,
-                                              )
-                                            : Icon(
-                                                Icons.timer,
-                                                color: warningColor,
-                                                size: 40,
-                                              ),
-                                  ),
+                                      alignment: Alignment.center,
+                                      child: payments.pixdetail['status'] == '1'
+                                          ? Image.asset(
+                                              'assets/img/approved.png',
+                                              width: 50,
+                                            )
+                                          : payments.pixdetail['status'] == '0'
+                                              ? Icon(
+                                                  Icons.timer,
+                                                  color: warningColor,
+                                                  size: 40,
+                                                )
+                                              : Icon(
+                                                  Icons.timer,
+                                                  color: warningColor,
+                                                  size: 40,
+                                                )),
                                 ),
-                                _currentTransaction['status'] == 'ACCEPTED'
+                                payments.pixdetail['status'] == '1'
                                     ? Container(
                                         padding: EdgeInsets.all(5),
                                         child: Text(
@@ -594,15 +457,14 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                           ),
                                         ),
                                       )
-                                    : _currentTransaction['status'] ==
-                                            'CHARGEBACK'
+                                    : _currentTransaction['status'] == '0'
                                         ? Container(
                                             padding: EdgeInsets.all(5),
                                             child: Text(
-                                              getPortugeseTrans('Rejected'),
+                                              payments.awaitingTime,
                                               style: TextStyle(
-                                                color: errorColor,
-                                                fontWeight: FontWeight.bold,
+                                                color: linkColor,
+                                                fontSize: 16,
                                               ),
                                             ),
                                           )
@@ -617,18 +479,6 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                               ),
                                             ),
                                           ),
-                                _currentTransaction['status'] == 'PROCESSING'
-                                    ? Container(
-                                        padding: EdgeInsets.all(5),
-                                        child: Text(
-                                          payments.awaitingTime,
-                                          style: TextStyle(
-                                            color: linkColor,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      )
-                                    : Container(),
                               ],
                             ),
                           ),
