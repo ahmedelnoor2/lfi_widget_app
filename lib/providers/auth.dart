@@ -17,6 +17,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http_parser/http_parser.dart';
 
 class Auth with ChangeNotifier {
+  ThemeMode _thMode = ThemeMode.dark;
+  ThemeMode get thMode {
+    return _thMode;
+  }
+
+  void setThMode(value) {
+    _thMode = value;
+    print(_thMode);
+    return notifyListeners();
+  }
+
   Map<String, String> headers = {
     'Content-type': 'application/json;charset=utf-8',
     'Accept': 'application/json',

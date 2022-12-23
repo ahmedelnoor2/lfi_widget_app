@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
+
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
@@ -122,12 +122,12 @@ class _SideBarState extends State<SideBar> {
     }
   }
 
-  IconData _getIcon(BuildContext context) {
-    var themeMode = EasyDynamicTheme.of(context).themeMode;
-    return themeMode == ThemeMode.dark
-        ? Icons.brightness_high
-        : Icons.brightness_low;
-  }
+  // IconData _getIcon(BuildContext context) {
+   
+  //   return themeMode == ThemeMode.dark
+  //       ? Icons.brightness_high
+  //       : Icons.brightness_low;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -162,35 +162,30 @@ class _SideBarState extends State<SideBar> {
                             },
                             icon: const Icon(Icons.close),
                           ),
-                          // Row(
-                          //   children: [
-                          //     Padding(
-                          //       padding: const EdgeInsets.all(8.0),
-                          //       child: Container(
-                          //         height: 40,
-                          //         child: LiteRollingSwitch(
-                          //           //initial value
-                          //           value: Theme.of(context).brightness ==
-                          //               Brightness.dark,
-                          //           textOn: 'Light',
-                          //           textOff: 'Dark',
-                          //           colorOn: Colors.blueGrey,
-                          //           colorOff: Colors.blue,
-                          //           iconOn: Icons.dark_mode,
-                          //           iconOff: Icons.sunny,
-                          //           textSize: 16.0,
-                          //           onChanged: (bool value) =>
-                          //               EasyDynamicTheme.of(context)
-                          //                   .changeTheme(dark: value),
-
-                          //           onTap: () {},
-                          //           onDoubleTap: () {},
-                          //           onSwipe: () {},
-                          //         ),
-                          //       ),
-                          //     ),
-                          //   ],
-                          // )
+                           Row(
+                            children: [
+                              InkWell(
+                                  
+                                  onTap: () {
+                                    if (auth.thMode == ThemeMode.light) {
+                                      auth.setThMode(ThemeMode.dark);
+                                    } else {
+                                      auth.setThMode(ThemeMode.light);
+                                    }
+                                  },
+                                  child: auth.thMode == ThemeMode.dark
+                                      ? Icon(Icons.dark_mode)
+                                      : Icon(
+                                          Icons.light_mode,
+                                          color: Colors.amber,
+                                        )),
+                              SizedBox(
+                                width: 40,
+                                height: 50,
+                              )
+                            ],
+                          )
+                         
                         ],
                       ),
                     ),
