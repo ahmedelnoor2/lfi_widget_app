@@ -1,7 +1,10 @@
-
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/giftcard.dart';
+import 'package:lyotrade/providers/notification_provider.dart';
 import 'package:lyotrade/screens/common/header.dart';
+import 'package:provider/provider.dart';
 
 class GiftCard extends StatefulWidget {
   static const routeName = '/gift_card';
@@ -12,6 +15,29 @@ class GiftCard extends StatefulWidget {
 }
 
 class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getAllCountries();
+    getAllCard();
+  }
+
+  Future<void> getAllCountries() async {
+    var giftcardprovider =
+        Provider.of<GiftCardProvider>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
+    var userid = await auth.userInfo['id'];
+    await giftcardprovider.getAllCountries(context, auth, userid);
+  }
+    Future<void> getAllCard() async {
+    var giftcardprovider =
+        Provider.of<GiftCardProvider>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
+    var userid = await auth.userInfo['id'];
+    await giftcardprovider.getAllCard(context, auth, userid);
+  }
+
   int _current = 0;
   final CarouselController _controller = CarouselController();
   final List<String> imgList = [
@@ -25,6 +51,7 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
     final List<Widget> imageSliders = imgList
         .map((item) => Container(
               margin: EdgeInsets.all(5.0),
@@ -62,223 +89,228 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
     return Scaffold(
       appBar: hiddenAppBar(),
       body: Container(
-      
-              
-            
-     
           child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.only(right: 10),
-                        child: IconButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon: Icon(Icons.chevron_left),
-                        ),
-                      ),
-                      Text(
-                        'Gift Card',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                  Container(
+                    padding: EdgeInsets.only(right: 10),
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: Icon(Icons.chevron_left),
+                    ),
+                  ),
+                  Text(
+                    'Gift Card',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
-              Divider(),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  color: Color(0xff292C51),
-                  padding: EdgeInsets.only(top: 5, bottom: 5),
-                  child: Container(
-                    padding: EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      border: Border.all(
-                        style: BorderStyle.solid,
-                        width: 0.3,
-                        color: Color(0xff76B9A),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(
-                          width: width * 0.50,
-                          child: TextFormField(
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter wallet address';
-                              }
-                              return null;
-                            },
-                            decoration: const InputDecoration(
-                              contentPadding: EdgeInsets.zero,
-                              isDense: true,
-                              border: UnderlineInputBorder(
-                                borderSide: BorderSide.none,
-                              ),
-                              hintStyle: TextStyle(
-                                  fontSize: 14, color: Color(0xff5E6292)),
-                              hintText: "Search",
-                              // prefixIcon: Icon(Icons.search)
-                            ),
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                              padding: EdgeInsets.only(right: 10),
-                              child: GestureDetector(
-                                onTap: () async {},
-                                child: Text(
-                                  'San Fransisco,CA',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 180,
-                child: Container(
-                  child: CarouselSlider(
-                    items: imageSliders,
-                    carouselController: _controller,
-                    options: CarouselOptions(
-                        autoPlay: true,
-                        enlargeCenterPage: true,
-                        viewportFraction: 0.7,
-                        aspectRatio: 4.0,
-                        initialPage: 0,
-                        autoPlayCurve: Curves.fastOutSlowIn,
-                        height: height * 30,
-                        onPageChanged: (index, reason) {
-                          setState(() {
-                            _current = index;
-                          });
-                        }),
-                  ),
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: imgList.asMap().entries.map((entry) {
-                  return GestureDetector(
-                    onTap: () => _controller.animateToPage(entry.key),
-                    child: Container(
-                      width: _current == entry.key ? 30.0 : 12.0,
-                      height: _current == entry.key ? 10.0 : 12.0,
-                      margin:
-                          EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-                      decoration: BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.all(Radius.circular(20)),
-                          color: _current == entry.key
-                              ? Color(0xff01FEF5)
-                              : Color(0xff5E6292)),
-                    ),
-                  );
-                }).toList(),
-              ),
-              Spacer(),
-              Container(
+            ],
+          ),
+          Divider(),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              color: Color(0xff292C51),
+              padding: EdgeInsets.only(top: 5, bottom: 5),
+              child: Container(
+                padding: EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Color(0xff25284A),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(15.0),
-                    topRight: Radius.circular(15.0),
+                  borderRadius: BorderRadius.circular(5),
+                  border: Border.all(
+                    style: BorderStyle.solid,
+                    width: 0.3,
+                    color: Color(0xff76B9A),
                   ),
                 ),
-                height: height * 0.5,
-                width: width,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     SizedBox(
-                      height: height * 0.02,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 15, bottom: 15),
-                      child: Text(
-                        'Buy Gift Card',
-                        style: TextStyle(color: Colors.white),
+                      width: width * 0.50,
+                      child: TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter wallet address';
+                          }
+                          return null;
+                        },
+                        decoration: const InputDecoration(
+                          contentPadding: EdgeInsets.zero,
+                          isDense: true,
+                          border: UnderlineInputBorder(
+                            borderSide: BorderSide.none,
+                          ),
+                          hintStyle:
+                              TextStyle(fontSize: 14, color: Color(0xff5E6292)),
+                          hintText: "Search",
+                          // prefixIcon: Icon(Icons.search)
+                        ),
                       ),
                     ),
-                    Expanded(
-                        child: GridView.builder(
-                      shrinkWrap: true,
-                      itemCount: 8,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 4.0,
-                          mainAxisExtent: height * .20,
-                          mainAxisSpacing: 8.0),
-                          
-                      itemBuilder: (BuildContext context, int index) {
-                        
-                        return Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            InkWell(
-                              onTap: (() {
-                                Navigator.pushNamed(context, '/gift_detail');
-                              }),
-                              child: Container(
-                                height: height * .15,
-                                width: MediaQuery.of(context).size.width,
-                                margin: EdgeInsets.all(10),
+                    Row(
+                      children: [
+                        giftcardprovider.toActiveCountry.isNotEmpty
+                            ? Container(
                                 padding: EdgeInsets.only(right: 10),
-                                decoration: BoxDecoration(
-                                  color: Color(0xff292C51),
-                                  border: Border.all(
-                                    color: Color(0xff676B9A),
-                                    width: 1,
-                                  ),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 12),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    'Buy Gift Card',
+                                child: GestureDetector(
+                                  onTap: () async {},
+                                  child: Text(
+                                    giftcardprovider.toActiveCountry['name'] +
+                                        " " +
+                                        giftcardprovider
+                                            .toActiveCountry['currency']['code']
+                                            .toString(),
                                     style: TextStyle(
-                                        color: Color(0xffF6F9FC), fontSize: 11),
+                                      fontSize: 14,
+                                      color: Colors.white,
+                                    ),
                                   ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    )),
+                                ),
+                              )
+                            : Container(),
+                      ],
+                    ),
                   ],
                 ),
               ),
-            ],
-          )),
+            ),
+          ),
+          SizedBox(
+            height: 180,
+            child: Container(
+              child: CarouselSlider(
+                items: imageSliders,
+                carouselController: _controller,
+                options: CarouselOptions(
+                    autoPlay: true,
+                    enlargeCenterPage: true,
+                    viewportFraction: 0.7,
+                    aspectRatio: 4.0,
+                    initialPage: 0,
+                    autoPlayCurve: Curves.fastOutSlowIn,
+                    height: height * 30,
+                    onPageChanged: (index, reason) {
+                      setState(() {
+                        _current = index;
+                      });
+                    }),
+              ),
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: imgList.asMap().entries.map((entry) {
+              return GestureDetector(
+                onTap: () => _controller.animateToPage(entry.key),
+                child: Container(
+                  width: _current == entry.key ? 30.0 : 12.0,
+                  height: _current == entry.key ? 10.0 : 12.0,
+                  margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                  decoration: BoxDecoration(
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      color: _current == entry.key
+                          ? Color(0xff01FEF5)
+                          : Color(0xff5E6292)),
+                ),
+              );
+            }).toList(),
+          ),
+          Spacer(),
+          Container(
+            decoration: BoxDecoration(
+              color: Color(0xff25284A),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(15.0),
+                topRight: Radius.circular(15.0),
+              ),
+            ),
+            height: height * 0.5,
+            width: width,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: height * 0.02,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 15, bottom: 15),
+                  child: Text(
+                    'Buy Gift Card',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                Expanded(
+                    child: giftcardprovider.cardloading?Center(child: CircularProgressIndicator(),):GridView.builder(
+                  shrinkWrap: true,
+                  itemCount: giftcardprovider.allCard.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      crossAxisSpacing: 4.0,
+                      mainAxisExtent: height * .20,
+                      mainAxisSpacing: 8.0),
+                  itemBuilder: (BuildContext context, int index) {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        InkWell(
+                          onTap: (() {
+                            Navigator.pushNamed(context, '/gift_detail');
+                          }),
+                          child: Container(
+                            height: height * .15,
+                            width: MediaQuery.of(context).size.width,
+                            margin: EdgeInsets.all(10),
+                            padding: EdgeInsets.only(right: 10),
+                            decoration: BoxDecoration(
+                              color: Color(0xff292C51),
+                              border: Border.all(
+                                color: Color(0xff676B9A),
+                                width: 1,
+                              ),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 12),
+                          child: Row(
+                            children: [
+                              Flexible(
+                                child: Container(
+                                  
+                                  child: Text(
+                                    giftcardprovider.allCard[index]['name'].toString(),
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        color: Color(0xffF6F9FC), fontSize: 11),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                )),
+              ],
+            ),
+          ),
+        ],
+      )),
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/dex_provider.dart';
 import 'package:lyotrade/providers/future_market.dart';
+import 'package:lyotrade/providers/giftcard.dart';
 import 'package:lyotrade/providers/loan_provider.dart';
 import 'package:lyotrade/providers/notification_provider.dart';
 import 'package:lyotrade/providers/payments.dart';
@@ -114,6 +115,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<Notificationprovider>(
             create: (_) => Notificationprovider()),
         ChangeNotifierProvider<UserKyc>(create: (_) => UserKyc()),
+        ChangeNotifierProvider<GiftCardProvider>(create: (_)=>GiftCardProvider(),)
       ],
       child: Consumer<Auth>(
         builder: (context, auth, _) {

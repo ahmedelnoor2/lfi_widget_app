@@ -270,6 +270,7 @@ class _OrderBookState extends State<OrderBook> {
                       setPriceField(public, bids[index][0] ?? 0);
                     },
                     child: Stack(
+                      
                       children: <Widget>[
                         Container(
                           padding: const EdgeInsets.only(
