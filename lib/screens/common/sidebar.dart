@@ -1,13 +1,13 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
+
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:lite_rolling_switch/lite_rolling_switch.dart';
+
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/user.dart';
@@ -122,12 +122,6 @@ class _SideBarState extends State<SideBar> {
     }
   }
 
-  IconData _getIcon(BuildContext context) {
-    var themeMode = EasyDynamicTheme.of(context).themeMode;
-    return themeMode == ThemeMode.dark
-        ? Icons.brightness_high
-        : Icons.brightness_low;
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -313,6 +313,8 @@ class _PixPaymentState extends State<PixPayment>
     await payment
         .getminimumWithDrawalAmount(auth, {"uaTime": "2022-11-23 11:20:07"});
 
+        print(payment.minimumWithdarwalAmt['cpfStatus']);
+
     if (payment.minimumWithdarwalAmt['cpfStatus'] == 1) {
       setState(() {
         payment.setCpfStatus(true);

@@ -1,4 +1,4 @@
-import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lyotrade/providers/asset.dart';
@@ -84,7 +84,7 @@ void main() async {
   await preferences.setInt('initScreen', 1);
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
           overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top])
-      .then((_) => runApp(EasyDynamicThemeWidget(child: const MyApp())));
+      .then((_) => runApp( const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -121,7 +121,7 @@ class MyApp extends StatelessWidget {
             title: 'LYOTRADE',
             theme: lightThemeData,
             darkTheme: darkThemeData,
-            themeMode: EasyDynamicTheme.of(context).themeMode,
+            
 
             // darkTheme: ThemeData.dark(),
             // themeMode: ThemeMode.dark,

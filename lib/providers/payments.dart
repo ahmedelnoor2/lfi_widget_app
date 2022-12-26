@@ -1120,19 +1120,19 @@ class Payments with ChangeNotifier {
     print(formdata);
     headers['exchange-token'] = auth.loginVerificationToken;
     var url = Uri.https(apiUrl, '/fe-ex-api/pix/valide_cpf');
-    print(url);
+   
     try {
       _isCpfLoading = true;
       final response =
           await http.post(url, headers: headers, body: jsonEncode(formdata));
       final responseData = json.decode(response.body);
-      print(responseData);
-      print('eheck cpf is vaLdate....');
+      
+      
 
       if (responseData['code'] == '0') {
         _cpf = responseData;
         Navigator.pushNamed(ctx, '/pix_payment_details');
-        print(_cpf);
+        setCpfStatus(false);
         _isCpfLoading = false;
         notifyListeners();
       } else {
