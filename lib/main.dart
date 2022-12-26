@@ -73,6 +73,7 @@ import 'package:lyotrade/utils/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'screens/pix_payment/pix_cpf_detail.dart';
 import 'screens/dashboard/gift_card/gift_detail.dart';
 
 int? initScreen;

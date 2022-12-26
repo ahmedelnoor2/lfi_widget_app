@@ -448,7 +448,7 @@ class Asset with ChangeNotifier {
       } else {
         _changeAddress = {};
         _isloadingChangeAddress = false;
-        // snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+        // (ctx, SnackTypes.errors, responseData['msg']);
         auth.checkResponseCode(ctx, responseData['code']);
       }
       return notifyListeners();

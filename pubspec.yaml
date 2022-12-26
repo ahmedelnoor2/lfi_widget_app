@@ -80,19 +80,7 @@ dependencies:
   transparent_image: ^2.0.0
   mask_text_input_formatter: ^2.4.0
   vibration: ^1.7.6
-  
-  lite_rolling_switch: ^1.0.0
   universal_html: ^2.0.5
-  
-  
-
-
-  
-  
-  
-  
-  
-  
   
 
 dev_dependencies:

@@ -8,6 +8,7 @@ import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/Translate.utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:universal_html/js.dart';
 
 class Payments with ChangeNotifier {
   Map<String, String> headers = {
@@ -226,25 +227,21 @@ class Payments with ChangeNotifier {
     );
 
     var postData = json.encode(formData);
-   
+
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
 
-    
       _estimateMessage = responseData;
 
-     // print(_estimateMessage);
-    
       if (responseData['code'] == '0') {
         _estimateRate = responseData['data'];
-       _estimateMessage={};
+        _estimateMessage = {};
         //print(_estimateRate);
         _estimateLoader = false;
         return notifyListeners();
       } else if (responseData['code'] == '4000') {
-        
         snackAlert(ctx, SnackTypes.errors, responseData['msg']['message']);
         _estimateLoader = false;
         return notifyListeners();
@@ -576,7 +573,7 @@ class Payments with ChangeNotifier {
       lyoApiUrl,
       '/payment_gateway/pix/kyc',
     );
-//print(postData);
+
     try {
       final response = await http.put(
         url,
@@ -585,7 +582,7 @@ class Payments with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-//print(responseData);
+
       if (responseData['code'] == '0') {
         _newKyc = responseData['data'];
         snackAlert(ctx, SnackTypes.success, 'Resent KYC verifcation');
@@ -1059,25 +1056,161 @@ class Payments with ChangeNotifier {
     }
   }
 
-  /////pix payment minimum with drawal amount
+  /////pix payment minimum with drawal amount & maximunm
   Map _minimumWithdarwalAmt = {};
 
   Map get minimumWithdarwalAmt {
     return _minimumWithdarwalAmt;
   }
 
-  Future<void> getminimumWithDrawalAmount() async {
-    /// url//
-    var url = Uri.https(lyoApiUrl, '/payment_gateway/pix-setting');
-    try {
-      final response = await http.get(url, headers: headers);
-      final responseData = json.decode(response.body);
+  bool _cpfStatus = false;
+  bool get cpfStatus {
+    return _cpfStatus;
+  }
 
-      if (responseData['code'] == '200') {
+  void setCpfStatus(bool value) {
+    _cpfStatus = value;
+    return notifyListeners();
+  }
+
+  Future<void> getminimumWithDrawalAmount(auth, formdata) async {
+    
+    headers['exchange-token'] = auth.loginVerificationToken;
+    var url = Uri.https(apiUrl, '/fe-ex-api/pix/basic_info');
+    print(url);
+    try {
+      final response =
+          await http.post(url, headers: headers, body: jsonEncode(formdata));
+      final responseData = json.decode(response.body);
+      print(responseData);
+      if (responseData['code'] == '0') {
         _minimumWithdarwalAmt = responseData['data'];
+
         notifyListeners();
       } else {
         _minimumWithdarwalAmt = {};
+
+        return notifyListeners();
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Map _cpf = {};
+
+  Map get cpf {
+    return _cpf;
+  }
+
+  bool _isCpfLoading = false;
+
+  bool get isCpfLoading {
+    return _isCpfLoading;
+  }
+
+  Future<void> getCpf(ctx, auth, formdata) async {
+    print(formdata);
+    headers['exchange-token'] = auth.loginVerificationToken;
+    var url = Uri.https(apiUrl, '/fe-ex-api/pix/valide_cpf');
+   
+    try {
+      _isCpfLoading = true;
+      final response =
+          await http.post(url, headers: headers, body: jsonEncode(formdata));
+      final responseData = json.decode(response.body);
+      
+      
+
+      if (responseData['code'] == '0') {
+        _cpf = responseData;
+        Navigator.pushNamed(ctx, '/pix_payment_details');
+        setCpfStatus(false);
+        _isCpfLoading = false;
+        notifyListeners();
+      } else {
+        _cpf = {};
+        _isCpfLoading = false;
+        return notifyListeners();
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  /// pix create order
+  Map _pixCreateOrder = {};
+
+  Map get pixCreateOrder {
+    return _pixCreateOrder;
+  }
+
+  bool _isCreateOrderLoading = false;
+  bool get isCreateOrderLoading {
+    return _isCreateOrderLoading;
+  }
+
+  Future<void> getCreatePixOrder(ctx, auth, formdata) async {
+    print(formdata);
+    _isCreateOrderLoading = true;
+
+    /// url//
+    headers['exchange-token'] = auth.loginVerificationToken;
+    var url = Uri.https(apiUrl, '/fe-ex-api/pix/create_order');
+    print(url);
+    try {
+      final response =
+          await http.post(url, headers: headers, body: jsonEncode(formdata));
+      final responseData = json.decode(response.body);
+      print('cerate order ...........');
+      print(responseData);
+      if (responseData['code'] == '106402') {
+        _isCreateOrderLoading = false;
+        Navigator.pushNamed(ctx, '/pix_process_payment');
+        _pixCreateOrder = responseData['data'];
+        print(_pixCreateOrder);
+        notifyListeners();
+      } else {
+        _pixCreateOrder = {};
+
+        return notifyListeners();
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  /// pix detail info
+  Map _pixdetail = {};
+
+  Map get pixdetail {
+    return _pixdetail;
+  }
+
+  bool _ispixdetailLoading = false;
+  bool get ispixdetailLoading {
+    return _ispixdetailLoading;
+  }
+
+  Future<void> getPixDetailInfo(auth, formdata) async {
+    _ispixdetailLoading = true;
+
+    /// url//
+    headers['exchange-token'] = auth.loginVerificationToken;
+    var url = Uri.https(apiUrl, '/fe-ex-api/pix/detail_info');
+    print(url);
+    try {
+      final response =
+          await http.post(url, headers: headers, body: jsonEncode(formdata));
+      final responseData = json.decode(response.body);
+      print('Pix payment detail ...........');
+      print(responseData);
+      if (responseData['code'] == '0') {
+        _ispixdetailLoading = false;
+        _pixdetail = responseData['data'];
+        notifyListeners();
+      } else {
+        _pixdetail = {};
 
         return notifyListeners();
       }

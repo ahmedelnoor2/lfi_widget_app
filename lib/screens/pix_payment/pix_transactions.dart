@@ -124,8 +124,8 @@ class _PixTransactionsState extends State<PixTransactions>
                                         );
                                         await payments.setSelectedTransaction(
                                             transaction);
-                                        Navigator.pushNamed(context,
-                                            PixPaymentDetails.routeName);
+                                     //   Navigator.pushNamed(context,
+                                   //         PixPaymentDetails.routeName);
                                       },
                                 title: const Text(
                                   'BRL',

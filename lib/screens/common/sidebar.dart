@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:lite_rolling_switch/lite_rolling_switch.dart';
+
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/user.dart';
@@ -121,13 +121,6 @@ class _SideBarState extends State<SideBar> {
       throw 'Could not launch $url';
     }
   }
-
-  // IconData _getIcon(BuildContext context) {
-   
-  //   return themeMode == ThemeMode.dark
-  //       ? Icons.brightness_high
-  //       : Icons.brightness_low;
-  // }
 
   @override
   Widget build(BuildContext context) {
