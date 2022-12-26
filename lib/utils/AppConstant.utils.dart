@@ -12,7 +12,7 @@ var loanApiUrl = 'staging.api.crypto-loan.lyotrade.com';
 var paymentsApi = 'payments.lyotrade.com';
 var apiurlemailtoken = 'api.dash.lyotrade.com';
 var changeNowApi = 'https://content-api.changenow.io';
-var referralinvitation = '/fe-increment-api/invitation';
+var referralinvitation = kIsWeb ? '/api/fe-increment-api' : 'fe-increment-api';
 //var referralbaseurl = 'https://www.lyotrade.com';
 var referral = '/fe-ex-api/agentV2';
 

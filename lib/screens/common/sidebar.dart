@@ -122,7 +122,6 @@ class _SideBarState extends State<SideBar> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
@@ -156,35 +155,30 @@ class _SideBarState extends State<SideBar> {
                             },
                             icon: const Icon(Icons.close),
                           ),
-                          // Row(
-                          //   children: [
-                          //     Padding(
-                          //       padding: const EdgeInsets.all(8.0),
-                          //       child: Container(
-                          //         height: 40,
-                          //         child: LiteRollingSwitch(
-                          //           //initial value
-                          //           value: Theme.of(context).brightness ==
-                          //               Brightness.dark,
-                          //           textOn: 'Light',
-                          //           textOff: 'Dark',
-                          //           colorOn: Colors.blueGrey,
-                          //           colorOff: Colors.blue,
-                          //           iconOn: Icons.dark_mode,
-                          //           iconOff: Icons.sunny,
-                          //           textSize: 16.0,
-                          //           onChanged: (bool value) =>
-                          //               EasyDynamicTheme.of(context)
-                          //                   .changeTheme(dark: value),
-
-                          //           onTap: () {},
-                          //           onDoubleTap: () {},
-                          //           onSwipe: () {},
-                          //         ),
-                          //       ),
-                          //     ),
-                          //   ],
-                          // )
+                           Row(
+                            children: [
+                              InkWell(
+                                  
+                                  onTap: () {
+                                    if (auth.thMode == ThemeMode.light) {
+                                      auth.setThMode(ThemeMode.dark);
+                                    } else {
+                                      auth.setThMode(ThemeMode.light);
+                                    }
+                                  },
+                                  child: auth.thMode == ThemeMode.dark
+                                      ? Icon(Icons.dark_mode)
+                                      : Icon(
+                                          Icons.light_mode,
+                                          color: Colors.amber,
+                                        )),
+                              SizedBox(
+                                width: 40,
+                                height: 50,
+                              )
+                            ],
+                          )
+                         
                         ],
                       ),
                     ),

@@ -239,7 +239,7 @@ class DexProvider with ChangeNotifier {
 
     try {
       final response = await http.post(url, body: postData, headers: headers);
-      print(response.body);
+     // print(response.body);
       final responseData = json.decode(response.body);
 
       if (responseData.isNotEmpty) {

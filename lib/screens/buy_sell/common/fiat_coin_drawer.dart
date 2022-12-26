@@ -28,7 +28,7 @@ class _FiatCoinDrawerState extends State<FiatCoinDrawer> {
     payments.setSelectedFiatCurrency(currency);
 
     Navigator.pop(context);
-      print(payments.selectedCryptoCurrency['ticker']);
+      //print(payments.selectedCryptoCurrency['ticker']);
     await payments.getEstimateRate(context, auth, {
     
       'from_currency': payments.selectedFiatCurrency['ticker'],
@@ -147,7 +147,7 @@ class _FiatCoinDrawerState extends State<FiatCoinDrawer> {
                   children: [
                     ListTile(
                       onTap: () async {
-                        print(_fiatCurrency);
+                       
                         changeFiatCoin(payments, _fiatCurrency);
                       },
                       leading: CircleAvatar(

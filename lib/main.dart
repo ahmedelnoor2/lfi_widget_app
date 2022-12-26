@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lyotrade/providers/asset.dart';
@@ -32,6 +31,7 @@ import 'package:lyotrade/screens/buy_sell/buy_sell_transactions.dart';
 import 'package:lyotrade/screens/buy_sell/common/process_payment.dart';
 import 'package:lyotrade/screens/dashboard.dart';
 import 'package:lyotrade/screens/dashboard/announcement/announcement_details.dart';
+import 'package:lyotrade/screens/dashboard/gift_card/gift_card.dart';
 import 'package:lyotrade/screens/dashboard/market_search.dart';
 import 'package:lyotrade/screens/dex_swap/dex_swap.dart';
 import 'package:lyotrade/screens/future_trade/future_market_transaction.dart';
@@ -74,6 +74,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'screens/pix_payment/pix_cpf_detail.dart';
+import 'screens/dashboard/gift_card/gift_detail.dart';
 
 int? initScreen;
 
@@ -84,7 +85,7 @@ void main() async {
   await preferences.setInt('initScreen', 1);
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
           overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top])
-      .then((_) => runApp( const MyApp()));
+      .then((_) => runApp(const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -121,10 +122,7 @@ class MyApp extends StatelessWidget {
             title: 'LYOTRADE',
             theme: lightThemeData,
             darkTheme: darkThemeData,
-            
-
-            // darkTheme: ThemeData.dark(),
-            // themeMode: ThemeMode.dark,
+            themeMode: auth.thMode,
             home: initScreen == 0 || initScreen == null
                 ? IntroScreen()
                 : SpashScreen(),
@@ -193,6 +191,8 @@ class MyApp extends StatelessWidget {
               Setting.routeName: ((context) => const Setting()),
               FutureMarketTransaction.routeName: (context) =>
                   const FutureMarketTransaction(),
+              GiftCard.routeName: (context) => const GiftCard(),
+              GiftDetail.routeName: (context) => const GiftDetail(),
             },
           );
         },

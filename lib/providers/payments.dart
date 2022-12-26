@@ -235,8 +235,6 @@ class Payments with ChangeNotifier {
 
       _estimateMessage = responseData;
 
-      print(_estimateMessage);
-
       if (responseData['code'] == '0') {
         _estimateRate = responseData['data'];
         _estimateMessage = {};
@@ -361,8 +359,7 @@ class Payments with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         _changenowTransaction = responseData['data'];
-        print('check......');
-        print(_changenowTransaction);
+     
         return notifyListeners();
       } else if (responseData['code'] == '4000') {
         snackAlert(ctx, SnackTypes.errors, responseData['msg']['message']);
@@ -538,8 +535,7 @@ class Payments with ChangeNotifier {
   }
 
   Future<void> requestKyc(ctx, postData) async {
-    print('check,....');
-    print(postData);
+   
     var url = Uri.https(
       lyoApiUrl,
       '/payment_gateway/pix/kyc',
@@ -577,7 +573,7 @@ class Payments with ChangeNotifier {
       lyoApiUrl,
       '/payment_gateway/pix/kyc',
     );
-    print(postData);
+
     try {
       final response = await http.put(
         url,
@@ -586,7 +582,7 @@ class Payments with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-      print(responseData);
+
       if (responseData['code'] == '0') {
         _newKyc = responseData['data'];
         snackAlert(ctx, SnackTypes.success, 'Resent KYC verifcation');
@@ -699,7 +695,7 @@ class Payments with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         _pixCurrencyExchange = double.parse(responseData['data']['price']);
-        print(_pixCurrencyExchange);
+      //  print(_pixCurrencyExchange);
         return notifyListeners();
       } else {
         _pixCurrencyExchange = 5.6;
@@ -802,10 +798,10 @@ class Payments with ChangeNotifier {
         headers: headers,
       );
 
-      print(postData);
+    //  print(postData);
 
       final responseData = json.decode(response.body);
-      print(responseData);
+     // print(responseData);
 
       if (responseData['code'] == '0') {
         _transactionValue = txValue;
@@ -982,7 +978,7 @@ class Payments with ChangeNotifier {
   }
 
   void runFilter(String enteredKeyword) {
-    print(enteredKeyword.toUpperCase());
+    ///print(enteredKeyword.toUpperCase());
     List results = [];
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
@@ -993,7 +989,7 @@ class Payments with ChangeNotifier {
               item['code'].toLowerCase().contains(enteredKeyword.toLowerCase()))
           .toList();
 
-      print(results);
+     // print(results);
       // we use the toLowerCase() method to make it case-insensitive
     }
 
@@ -1013,12 +1009,12 @@ class Payments with ChangeNotifier {
           .where((item) =>
               item['code'].toLowerCase().contains(enteredKeyword.toLowerCase()))
           .toList();
-      print(results);
+    //  print(results);
       // we use the toLowerCase() method to make it case-insensitive
     }
 
     onRampCryptoFoundList = results;
-    print(onRampCryptoFoundList);
+   // print(onRampCryptoFoundList);
     notifyListeners();
   }
 
@@ -1100,9 +1096,6 @@ class Payments with ChangeNotifier {
       print(e);
     }
   }
-
-  //// pix payment validate cpf check///
-  ///
 
   Map _cpf = {};
 

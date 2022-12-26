@@ -8,10 +8,6 @@ var darkThemeData = ThemeData(
     backgroundColor: Color.fromARGB(255, 26, 29, 63),
   ),
   fontFamily: 'Yantramanav',
-  // bottomAppBarTheme: BottomAppBarTheme(
-  //   color: Color.fromARGB(255, 26, 29, 63),
-  // ),
-  // bottomAppBarColor: Color.fromARGB(255, 26, 29, 63),
   bottomNavigationBarTheme: BottomNavigationBarThemeData(
     backgroundColor: Color.fromARGB(255, 26, 29, 63),
     selectedItemColor: Color.fromARGB(255, 1, 254, 246),
@@ -86,24 +82,7 @@ var darkThemeData = ThemeData(
   ),
   iconTheme: IconThemeData().copyWith(color: Colors.white),
   primaryIconTheme: IconThemeData().copyWith(color: Colors.white),
-  inputDecorationTheme: InputDecorationTheme(
-      // enabledBorder: UnderlineInputBorder(
-      //   borderSide: BorderSide(
-      //     color: secondaryTextColor,
-      //   ),
-      // ),
-      // focusedBorder: UnderlineInputBorder(
-      //   borderSide: BorderSide(
-      //     color: Color.fromARGB(255, 1, 254, 246),
-      //   ),
-      // ),
-      // border: UnderlineInputBorder(
-      //   borderSide: BorderSide(
-      //     color: Color.fromARGB(255, 1, 254, 246),
-      //   ),
-      // ),
-      // labelStyle: TextStyle(color: Colors.white),
-      ),
+  inputDecorationTheme: InputDecorationTheme(),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       minimumSize: Size(0, 35),
@@ -126,7 +105,7 @@ var lightThemeData = ThemeData(
   // bottomAppBarColor: Color.fromARGB(255, 26, 29, 63),
   bottomNavigationBarTheme: BottomNavigationBarThemeData(
     backgroundColor: Color.fromARGB(255, 26, 29, 63),
-    selectedItemColor: Color.fromARGB(255, 1, 254, 246),
+    selectedItemColor: Color(0xff2762FF),
     unselectedItemColor: secondaryTextColor,
     showUnselectedLabels: true,
     type: BottomNavigationBarType.fixed,
