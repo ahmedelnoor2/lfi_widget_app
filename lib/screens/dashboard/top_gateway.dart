@@ -103,7 +103,7 @@ class _TopGatewayState extends State<TopGateway>
                   ),
                   Container(
                     padding: EdgeInsets.only(left: 15),
-                    width: width*0.20,
+                    width: width*0.23,
                     child: Row(
                       children: [
                         Container(

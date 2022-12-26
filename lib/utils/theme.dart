@@ -82,9 +82,7 @@ var darkThemeData = ThemeData(
   ),
   iconTheme: IconThemeData().copyWith(color: Colors.white),
   primaryIconTheme: IconThemeData().copyWith(color: Colors.white),
-  inputDecorationTheme: InputDecorationTheme(
-  
-      ),
+  inputDecorationTheme: InputDecorationTheme(),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       minimumSize: Size(0, 35),
@@ -107,7 +105,7 @@ var lightThemeData = ThemeData(
   // bottomAppBarColor: Color.fromARGB(255, 26, 29, 63),
   bottomNavigationBarTheme: BottomNavigationBarThemeData(
     backgroundColor: Color.fromARGB(255, 26, 29, 63),
-    selectedItemColor: Color.fromARGB(255, 1, 254, 246),
+    selectedItemColor: Color(0xff2762FF),
     unselectedItemColor: secondaryTextColor,
     showUnselectedLabels: true,
     type: BottomNavigationBarType.fixed,

@@ -430,7 +430,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
     if (_defaultOnrampNetwork.isNotEmpty) {
       await asset.getChangeAddress(context, auth, _defaultOnrampNetwork);
 
-      print(asset.changeAddress);
+   
 
       if (asset.changeAddress['addressStr'] != null) {
         setState(() {
@@ -442,7 +442,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
         _currentOnrampAddress = '';
       });
     }
-    print(_currentOnrampAddress);
+    
 
     setState(() {
       _loadingCoins = false;
@@ -498,7 +498,7 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
       data[key] = _textControllers[key]!.text;
     }
 
-    print(jsonEncode(data));
+    
 
     await payments.callOnrampForm(context, {
       'url': payments.estimateOnrampRate['nextStep']['url'],
@@ -1633,10 +1633,10 @@ class _BuySellCryptoState extends State<BuySellCrypto> {
                       child: LyoButton(
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            print('process');
+                          //  print('process');
 
                             processOnrampBuy(formDetails);
-                            print(formDetails);
+                         //   print(formDetails);
                           } else {
                             print('notvalidating');
                           }

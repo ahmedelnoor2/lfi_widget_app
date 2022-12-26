@@ -29,7 +29,7 @@ class ReferralProvider with ChangeNotifier {
 
     var url = Uri.https(
       apiUrl,
-      '$referralinvitation/pageConfig',
+      '$referralinvitation/invitation/pageConfig',
     );
 
     isrefdataloagin = true;
@@ -67,15 +67,16 @@ class ReferralProvider with ChangeNotifier {
 
     var url = Uri.https(
       apiUrl,
-      '$referralinvitation/invitation_reward_ranking_list',
+      '$referralinvitation/invitation/invitation_reward_ranking_list',
     );
+    print(url);
     var data = {};
 
     var body = jsonEncode(data);
     isrewards = true;
     try {
       final response = await http.post(url, headers: headers, body: body);
-
+  
       isrewards = false;
       final responseData = json.decode(response.body);
 
@@ -108,7 +109,7 @@ class ReferralProvider with ChangeNotifier {
 
     var url = Uri.https(
       apiUrl,
-      '$referralinvitation/myInvitations',
+      '$referralinvitation/invitation/myInvitations',
     );
 
     var body = jsonEncode(formdata);
@@ -147,7 +148,7 @@ class ReferralProvider with ChangeNotifier {
 
     var url = Uri.https(
       apiUrl,
-      '$referralinvitation/myInvitationRewards',
+      '$referralinvitation/invitation/myInvitationRewards',
     );
 
     var body = jsonEncode(formdata);

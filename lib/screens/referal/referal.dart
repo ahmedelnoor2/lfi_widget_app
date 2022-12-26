@@ -16,6 +16,7 @@ import 'package:provider/provider.dart';
 
 import '../common/snackalert.dart';
 import '../common/types.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class Referal extends StatefulWidget {
   static const routeName = '/referal_screen';
@@ -257,137 +258,141 @@ class _ReferalState extends State<Referal> {
                       ],
                     ),
                   ),
-                  Container(
-                    margin: EdgeInsets.only(top: 8, left: 16, bottom: 10),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Row(
-                          children: [
-                            Container(
-                              alignment: Alignment.center,
-                              height: height * 0.04,
-                              width: width * 0.1,
-                              decoration: BoxDecoration(
-                                color: selectboxcolour,
-                                shape: BoxShape.circle,
+                 
+                      Container(
+                          margin: EdgeInsets.only(top: 8, left: 16, bottom: 10),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Row(
+                                children: [
+                                  Container(
+                                    alignment: Alignment.center,
+                                    height: height * 0.04,
+                                    width: width * 0.1,
+                                    decoration: BoxDecoration(
+                                      color: selectboxcolour,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Text(
+                                      '1',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        ' Send invitation',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(fontSize: 14),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
-                              child: Text(
-                                '1',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  ' Send invitation',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(fontSize: 14),
+                              Container(
+                                margin: EdgeInsets.only(left: 20),
+                                child: DottedLine(
+                                  direction: Axis.vertical,
+                                  lineLength: height * 0.04,
+                                  lineThickness: 1.0,
+                                  dashLength: 2.0,
+                                  dashColor: Colors.black,
+                                  dashGapLength: 4.0,
+                                  dashGapColor: darkgreyColor,
+                                  dashGapRadius: 0.0,
                                 ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(left: 20),
-                          child: DottedLine(
-                            direction: Axis.vertical,
-                            lineLength: height * 0.04,
-                            lineThickness: 1.0,
-                            dashLength: 2.0,
-                            dashColor: Colors.black,
-                            dashGapLength: 4.0,
-                            dashGapColor: darkgreyColor,
-                            dashGapRadius: 0.0,
+                              ),
+                              Row(
+                                children: [
+                                  Container(
+                                    alignment: Alignment.center,
+                                    height: height * 0.04,
+                                    width: width * 0.1,
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: selectboxcolour),
+                                    child: Text(
+                                      '2',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        ' Friends complete registration and trade',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(fontSize: 14),
+                                      ),
+                                      // Text(
+                                      //   'They hit the road',
+                                      //   textAlign: TextAlign.center,
+                                      //   style: TextStyle(fontSize: 10),
+                                      // ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(left: 20),
+                                child: DottedLine(
+                                  direction: Axis.vertical,
+                                  lineLength: height * 0.04,
+                                  lineThickness: 1.0,
+                                  dashLength: 2.0,
+                                  dashColor: Colors.black,
+                                  dashRadius: 0.0,
+                                  dashGapLength: 4.0,
+                                  dashGapColor: darkgreyColor,
+                                  dashGapRadius: 0.0,
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Container(
+                                    alignment: Alignment.center,
+                                    height: height * 0.04,
+                                    width: width * 0.1,
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: selectboxcolour),
+                                    child: Text(
+                                      '3',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        ' Get rebate income',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(fontSize: 14),
+                                      ),
+                                      // Text(
+                                      //   'You make savings!',
+                                      //   textAlign: TextAlign.center,
+                                      //   style: TextStyle(fontSize: 10),
+                                      // ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
-                        Row(
-                          children: [
-                            Container(
-                              alignment: Alignment.center,
-                              height: height * 0.04,
-                              width: width * 0.1,
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: selectboxcolour),
-                              child: Text(
-                                '2',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  ' Friends complete registration and trade',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(fontSize: 14),
-                                ),
-                                // Text(
-                                //   'They hit the road',
-                                //   textAlign: TextAlign.center,
-                                //   style: TextStyle(fontSize: 10),
-                                // ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(left: 20),
-                          child: DottedLine(
-                            direction: Axis.vertical,
-                            lineLength: height * 0.04,
-                            lineThickness: 1.0,
-                            dashLength: 2.0,
-                            dashColor: Colors.black,
-                            dashRadius: 0.0,
-                            dashGapLength: 4.0,
-                            dashGapColor: darkgreyColor,
-                            dashGapRadius: 0.0,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                              alignment: Alignment.center,
-                              height: height * 0.04,
-                              width: width * 0.1,
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: selectboxcolour),
-                              child: Text(
-                                '3',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  ' Get rebate income',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(fontSize: 14),
-                                ),
-                                // Text(
-                                //   'You make savings!',
-                                //   textAlign: TextAlign.center,
-                                //   style: TextStyle(fontSize: 10),
-                                // ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
                   Container(
                     padding: EdgeInsets.only(bottom: 10),
                     child: Container(
@@ -525,7 +530,8 @@ class _ReferalState extends State<Referal> {
                       ),
                     ),
                   ),
-                  Container(
+                 kIsWeb
+                      ? Container():Container(
                     padding: EdgeInsets.all(15),
                     child: LyoButton(
                       onPressed: _isLoading
