@@ -4,6 +4,7 @@ import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/giftcard.dart';
 import 'package:lyotrade/providers/notification_provider.dart';
 import 'package:lyotrade/screens/common/header.dart';
+import 'package:lyotrade/screens/dashboard/gift_card/country_drawer.dart';
 import 'package:provider/provider.dart';
 
 class GiftCard extends StatefulWidget {
@@ -15,6 +16,7 @@ class GiftCard extends StatefulWidget {
 }
 
 class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   void initState() {
     // TODO: implement initState
@@ -30,7 +32,8 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
     var userid = await auth.userInfo['id'];
     await giftcardprovider.getAllCountries(context, auth, userid);
   }
-    Future<void> getAllCard() async {
+
+  Future<void> getAllCard() async {
     var giftcardprovider =
         Provider.of<GiftCardProvider>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
@@ -87,6 +90,8 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
     final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: const CountryDrawer(),
       appBar: hiddenAppBar(),
       body: Container(
           child: Column(
@@ -114,73 +119,89 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                   ),
                 ],
               ),
+              Container(
+                padding: EdgeInsets.only(right: 10),
+                child: IconButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/gift_transaction_detail');
+                  },
+                  icon: Icon(Icons.history),
+                ),
+              ),
             ],
           ),
           Divider(),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Container(
-              color: Color(0xff292C51),
-              padding: EdgeInsets.only(top: 5, bottom: 5),
+            child: InkWell(
+              onTap: (() {
+                _scaffoldKey.currentState!.openDrawer();
+              }),
               child: Container(
-                padding: EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  border: Border.all(
-                    style: BorderStyle.solid,
-                    width: 0.3,
-                    color: Color(0xff76B9A),
+                color: Color(0xff292C51),
+                padding: EdgeInsets.only(top: 5, bottom: 5),
+                child: Container(
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(
+                      style: BorderStyle.solid,
+                      width: 0.3,
+                      color: Color(0xff76B9A),
+                    ),
                   ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SizedBox(
-                      width: width * 0.50,
-                      child: TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter wallet address';
-                          }
-                          return null;
-                        },
-                        decoration: const InputDecoration(
-                          contentPadding: EdgeInsets.zero,
-                          isDense: true,
-                          border: UnderlineInputBorder(
-                            borderSide: BorderSide.none,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(
+                        width: width * 0.50,
+                        child: TextFormField(
+                          enabled: false,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter wallet address';
+                            }
+                            return null;
+                          },
+                          decoration: const InputDecoration(
+                            contentPadding: EdgeInsets.zero,
+                            isDense: true,
+                            border: UnderlineInputBorder(
+                              borderSide: BorderSide.none,
+                            ),
+                            hintStyle: TextStyle(
+                                fontSize: 14, color: Color(0xff5E6292)),
+                            hintText: "Search",
+                            // prefixIcon: Icon(Icons.search)
                           ),
-                          hintStyle:
-                              TextStyle(fontSize: 14, color: Color(0xff5E6292)),
-                          hintText: "Search",
-                          // prefixIcon: Icon(Icons.search)
                         ),
                       ),
-                    ),
-                    Row(
-                      children: [
-                        giftcardprovider.toActiveCountry.isNotEmpty
-                            ? Container(
-                                padding: EdgeInsets.only(right: 10),
-                                child: GestureDetector(
-                                  onTap: () async {},
-                                  child: Text(
-                                    giftcardprovider.toActiveCountry['name'] +
-                                        " " +
-                                        giftcardprovider
-                                            .toActiveCountry['currency']['code']
-                                            .toString(),
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.white,
+                      Row(
+                        children: [
+                          giftcardprovider.toActiveCountry.isNotEmpty
+                              ? Container(
+                                  padding: EdgeInsets.only(right: 10),
+                                  child: GestureDetector(
+                                    onTap: () async {},
+                                    child: Text(
+                                      giftcardprovider.toActiveCountry['name'] +
+                                          " " +
+                                          giftcardprovider
+                                              .toActiveCountry['currency']
+                                                  ['code']
+                                              .toString(),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              )
-                            : Container(),
-                      ],
-                    ),
-                  ],
+                                )
+                              : Container(),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -252,60 +273,79 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                   ),
                 ),
                 Expanded(
-                    child: giftcardprovider.cardloading?Center(child: CircularProgressIndicator(),):GridView.builder(
-                  shrinkWrap: true,
-                  itemCount: giftcardprovider.allCard.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 4.0,
-                      mainAxisExtent: height * .20,
-                      mainAxisSpacing: 8.0),
-                  itemBuilder: (BuildContext context, int index) {
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        InkWell(
-                          onTap: (() {
-                            Navigator.pushNamed(context, '/gift_detail');
-                          }),
-                          child: Container(
-                            height: height * .15,
-                            width: MediaQuery.of(context).size.width,
-                            margin: EdgeInsets.all(10),
-                            padding: EdgeInsets.only(right: 10),
-                            decoration: BoxDecoration(
-                              color: Color(0xff292C51),
-                              border: Border.all(
-                                color: Color(0xff676B9A),
-                                width: 1,
-                              ),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 12),
-                          child: Row(
-                            children: [
-                              Flexible(
-                                child: Container(
-                                  
-                                  child: Text(
-                                    giftcardprovider.allCard[index]['name'].toString(),
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                        color: Color(0xffF6F9FC), fontSize: 11),
+                    child: giftcardprovider.cardloading
+                        ? Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : GridView.builder(
+                            shrinkWrap: true,
+                            itemCount: giftcardprovider.allCard.length,
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 3,
+                                    crossAxisSpacing: 4.0,
+                                    mainAxisExtent: height * .20,
+                                    mainAxisSpacing: 8.0),
+                            itemBuilder: (BuildContext context, int index) {
+                              var currentindex =
+                                  giftcardprovider.allCard[index];
+                              return Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  InkWell(
+                                    onTap: (() {
+                                      Navigator.pushNamed(
+                                          context, '/gift_detail',
+                                          arguments: {'data': currentindex});
+                                    }),
+                                    child: Container(
+                                      height: height * .15,
+                                      width: MediaQuery.of(context).size.width,
+                                      margin: EdgeInsets.all(10),
+                                      padding: EdgeInsets.only(right: 10),
+                                      decoration: BoxDecoration(
+                                        color: Color(0xff292C51),
+                                        border: Border.all(
+                                          color: Color(0xff676B9A),
+                                          width: 1,
+                                        ),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10)),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                )),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 12),
+                                    child: Row(
+                                      children: [
+                                        Flexible(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              image: DecorationImage(
+                                                image: NetworkImage(
+                                                    currentindex['image']
+                                                        .toString()),
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                            child: Text(
+                                              giftcardprovider.allCard[index]
+                                                      ['name']
+                                                  .toString(),
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                  color: Color(0xffF6F9FC),
+                                                  fontSize: 11),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          )),
               ],
             ),
           ),

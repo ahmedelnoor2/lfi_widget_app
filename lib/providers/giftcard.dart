@@ -30,7 +30,7 @@ class GiftCardProvider with ChangeNotifier {
 
   List _allCountries = [];
 
-  List get allCurrencies {
+  List get allCountries {
     return _allCountries;
   }
 
@@ -93,6 +93,58 @@ class GiftCardProvider with ChangeNotifier {
       } else {
         cardloading=false;
         _allCard = [];
+        return notifyListeners();
+      }
+    } catch (error) {
+      cardloading=false;
+      print(error);
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return notifyListeners();
+    }
+  }
+
+
+  //// Do Transaction////
+  ///
+      // Get all cards
+  bool dotransactionloading=false;
+
+  Map _doTransaction = {};
+
+  Map get doTransaction {
+    return _doTransaction;
+  }
+
+  Future<void> getDoTransaction(ctx, auth,userid,postdata) async {
+    dotransactionloading=true;
+    notifyListeners();
+    headers['token'] = auth.loginVerificationToken;
+    headers['userid'] ='${userid}';
+
+    var mydata=json.encode(postdata);
+    print(mydata);
+
+    var url = Uri.https(lyoApiUrl,'gift-card/transaction');
+    print(url);
+    
+
+    try {
+      final response = await http.post(url,body:mydata ,headers: headers,);
+
+      final responseData = json.decode(response.body);
+       print(responseData);
+
+      if (responseData['code'] == 200) {
+
+        dotransactionloading=false;
+        _doTransaction = responseData;
+        snackAlert(ctx, SnackTypes.success, responseData['msg']);
+    
+        return notifyListeners();
+      } else {
+        snackAlert(ctx, SnackTypes.warning, responseData['msg']);
+        dotransactionloading=false;
+        _doTransaction = {};
         return notifyListeners();
       }
     } catch (error) {

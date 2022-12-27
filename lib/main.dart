@@ -33,6 +33,7 @@ import 'package:lyotrade/screens/buy_sell/common/process_payment.dart';
 import 'package:lyotrade/screens/dashboard.dart';
 import 'package:lyotrade/screens/dashboard/announcement/announcement_details.dart';
 import 'package:lyotrade/screens/dashboard/gift_card/gift_card.dart';
+import 'package:lyotrade/screens/dashboard/gift_card/transaction_history.dart';
 import 'package:lyotrade/screens/dashboard/market_search.dart';
 import 'package:lyotrade/screens/dex_swap/dex_swap.dart';
 import 'package:lyotrade/screens/future_trade/future_market_transaction.dart';
@@ -195,6 +196,7 @@ class MyApp extends StatelessWidget {
                   const FutureMarketTransaction(),
               GiftCard.routeName: (context) => const GiftCard(),
               GiftDetail.routeName: (context) => const GiftDetail(),
+              GiftCardTransaction.routeName:(context)=>const GiftCardTransaction(),
             },
           );
         },
