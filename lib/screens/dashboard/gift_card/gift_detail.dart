@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/giftcard.dart';
+import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/screens/common/drawer.dart';
 
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
@@ -18,20 +20,111 @@ class GiftDetail extends StatefulWidget {
 }
 
 class _GiftDetailState extends State<GiftDetail> {
+  String _defaultCoin = 'USDT';
   double _selectedPercentage = 0;
+  List _allNetworks = [];
+  String _defaultNetwork = 'USDTBSC';
+  String _coinShowName = 'EUSDT';
+  final TextEditingController _searchController = TextEditingController();
+  bool _tagType = false;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final _amountcontroller = TextEditingController();
   @override
   void initState() {
     super.initState();
-    getAccountBalance();
+    getDigitalBalance();
   }
 
-  Future<void> getAccountBalance() async {
-    var asset = Provider.of<Asset>(context, listen: false);
+  Future<void> getDigitalBalance() async {
     var auth = Provider.of<Auth>(context, listen: false);
+    var public = Provider.of<Public>(context, listen: false);
+    var asset = Provider.of<Asset>(context, listen: false);
 
-    await asset.getAccountBalance(context, auth, "USDT");
+    if (asset.selectedAsset.isNotEmpty) {
+      setState(() {
+        _defaultCoin =
+            '${public.publicInfoMarket['market']['coinList'][asset.selectedAsset['coin']]['name']}';
+      });
+    }
+    await asset.getAccountBalance(context, auth, "");
+    getCoinCosts(_defaultCoin);
+  }
+
+  Future<void> getCoinCosts(netwrkType) async {
+    setState(() {
+      _defaultCoin = netwrkType;
+    });
+    var auth = Provider.of<Auth>(context, listen: false);
+    var asset = Provider.of<Asset>(context, listen: false);
+    var public = Provider.of<Public>(context, listen: false);
+
+    if (public.publicInfoMarket['market']['followCoinList'][netwrkType] !=
+        null) {
+      setState(() {
+        _allNetworks.clear();
+      });
+
+      public.publicInfoMarket['market']['followCoinList'][netwrkType]
+          .forEach((k, v) {
+        if (v['followCoinWithdrawOpen'] == 1) {
+          setState(() {
+            _allNetworks.add(v);
+            _defaultCoin = netwrkType;
+            _defaultNetwork = '${v['name']}';
+            _coinShowName = '${v['name']}';
+          });
+
+          if (v['tagType'] == 0) {
+            setState(() {
+              _tagType = false;
+            });
+          } else {
+            setState(() {
+              _tagType = true;
+            });
+          }
+        }
+      });
+    } else {
+      if (public.publicInfoMarket['market']['coinList'][netwrkType]
+              ['tagType'] ==
+          0) {
+        print(public.publicInfoMarket['market']['coinList'][netwrkType]
+            ['tagType']);
+        setState(() {
+          _tagType = false;
+        });
+      } else {
+        setState(() {
+          _tagType = true;
+        });
+      }
+      setState(() {
+        _allNetworks.clear();
+        _allNetworks
+            .add(public.publicInfoMarket['market']['coinList'][netwrkType]);
+        _defaultCoin = netwrkType;
+        _defaultNetwork =
+            '${public.publicInfoMarket['market']['coinList'][netwrkType]['name']}';
+        _coinShowName =
+            '${public.publicInfoMarket['market']['coinList'][netwrkType]['name']}';
+      });
+    }
+
+    await asset.getCoinCosts(auth, _coinShowName);
+    // await asset.getChangeAddress(context, auth, _defaultCoin);
+
+    List _digitialAss = [];
+    asset.accountBalance['allCoinMap'].forEach((k, v) {
+      if (v['depositOpen'] == 1) {
+        _digitialAss.add({
+          'coin': k,
+          'values': v,
+        });
+      }
+    });
+    asset.setDigAssets(_digitialAss);
   }
 
   Future<void> dotransaction() async {
@@ -56,10 +149,21 @@ class _GiftDetailState extends State<GiftDetail> {
     final width = MediaQuery.of(context).size.width;
     var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
     var asset = Provider.of<Asset>(context, listen: true);
+    var public = Provider.of<Public>(context, listen: true);
     final arguments = (ModalRoute.of(context)?.settings.arguments ??
         <String, dynamic>{}) as Map;
 
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: drawer(
+        context,
+        width,
+        height,
+        asset,
+        public,
+        _searchController,
+        getCoinCosts,
+      ),
       appBar: hiddenAppBar(),
       resizeToAvoidBottomInset: false,
       body: Column(
@@ -145,26 +249,58 @@ class _GiftDetailState extends State<GiftDetail> {
                             ]),
                           ),
                         ),
-                        Container(
-                          child: Row(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(left: 8),
-                                child: Text(
-                                  arguments['data']['currency']['name']
-                                      .toString(),
-                                ),
+                        GestureDetector(
+                          onTap: () {
+                            _scaffoldKey.currentState!.openDrawer();
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              border: Border.all(
+                                style: BorderStyle.solid,
+                                width: 0.3,
+                                color: Color(0xff5E6292),
                               ),
-                            ],
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(
-                              color: secondaryTextColor400,
-                              width: .5,
                             ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.only(right: 10),
+                                      child: CircleAvatar(
+                                        radius: 12,
+                                        child: Image.network(
+                                          '${public.publicInfoMarket['market']['coinList'][_defaultCoin]['icon']}',
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.only(right: 5),
+                                      child: Text(
+                                        '$_defaultCoin',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      '${public.publicInfoMarket['market']['coinList'][_defaultCoin]['longName']}',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Icon(Icons.keyboard_arrow_down),
+                              ],
+                            ),
+                            height: 60,
                           ),
-                          height: 50,
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 20, bottom: 20),
@@ -180,7 +316,6 @@ class _GiftDetailState extends State<GiftDetail> {
                           controller: _amountcontroller,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
-                          
                             enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide(
                                   width: 0.5,
@@ -201,6 +336,20 @@ class _GiftDetailState extends State<GiftDetail> {
                               children: [
                                 Text(
                                   'Wallet Balance',
+                                  style:
+                                      TextStyle(color: secondaryTextColor400),
+                                ),
+                                Text(asset.accountBalance['totalBalance']
+                                    .toString())
+                              ]),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 20, bottom: 20),
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Estimated Rate',
                                   style:
                                       TextStyle(color: secondaryTextColor400),
                                 ),

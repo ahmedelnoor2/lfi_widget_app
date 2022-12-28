@@ -401,7 +401,7 @@ class Asset with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-
+      
       if (responseData['code'] == '0') {
         _getCost = responseData['data'];
       } else if (responseData['code'] == '10002') {
