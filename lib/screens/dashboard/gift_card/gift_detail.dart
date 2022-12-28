@@ -178,7 +178,9 @@ class _GiftDetailState extends State<GiftDetail> {
                         ),
                         TextFormField(
                           controller: _amountcontroller,
+                          keyboardType: TextInputType.number,
                           decoration: InputDecoration(
+                          
                             enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide(
                                   width: 0.5,
@@ -221,13 +223,20 @@ class _GiftDetailState extends State<GiftDetail> {
                   ),
                 ),
                 Positioned(
-                  top: -50,
-                  child: CircleAvatar(
-                    radius: 50,
-                    backgroundImage:
-                        NetworkImage('https://picsum.photos/250?image=2'),
-                  ),
-                )
+                    top: -50,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: NetworkImage(
+                            giftcardprovider.toActiveCatalog['card_image']
+                                .toString(),
+                          ),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      height: 120,
+                      width: 200,
+                    ))
               ],
             ),
           )

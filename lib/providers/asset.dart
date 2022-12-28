@@ -959,7 +959,7 @@ class Asset with ChangeNotifier {
       }
       //  _searchallcoin[sMarketSort].clear();
       _searchallcoin.addAll(dummyListData);
-      //print(_searchallcoin);
+      //print(_allcoin);
       notifyListeners();
       return;
     } else {

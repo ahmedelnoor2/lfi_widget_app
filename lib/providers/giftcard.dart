@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:lyotrade/screens/common/snackalert.dart';
@@ -34,9 +35,9 @@ class GiftCardProvider with ChangeNotifier {
     return _allCountries;
   }
 
-  Future<void> getAllCountries(ctx, auth,userid) async {
+  Future<void> getAllCountries(ctx, auth, userid) async {
     headers['token'] = auth.loginVerificationToken;
-    headers['userid'] ='${userid}';
+    headers['userid'] = '${userid}';
 
     var url = Uri.https(lyoApiUrl, 'gift-card/countries');
     print(url);
@@ -61,8 +62,73 @@ class GiftCardProvider with ChangeNotifier {
       return notifyListeners();
     }
   }
-    // Get all cards
-  bool cardloading=false;
+
+  //// Get All Catalog ///
+  Map _toActiveCatalog = {};
+
+  Map get toActiveCatalog {
+    return _toActiveCatalog;
+  }
+
+  void settActiveCatalog(catlog) {
+    _toActiveCatalog = catlog;
+    return notifyListeners();
+  }
+
+  bool IsCatalogloading = false;
+
+  List _allCatalog = [];
+
+  List get allCatalog {
+    return _allCatalog;
+  }
+
+  List _sliderlist = [];
+
+  List get sliderlist {
+    return _sliderlist;
+  }
+
+  Future<void> getAllCatalog(
+    ctx,
+    auth,
+    userid,
+  ) async {
+    IsCatalogloading = true;
+    notifyListeners();
+    headers['token'] = auth.loginVerificationToken;
+    headers['userid'] = '${userid}';
+
+    var url = Uri.https(lyoApiUrl, 'gift-card/catalogues');
+
+    try {
+      final response = await http.get(url, headers: headers);
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['code'] == 200) {
+        IsCatalogloading = false;
+        _allCatalog = responseData['data'];
+        _toActiveCatalog = _allCatalog[0];
+
+        _sliderlist = _allCatalog.take(5).toList();
+
+        return notifyListeners();
+      } else {
+        IsCatalogloading = false;
+        _allCatalog = [];
+        return notifyListeners();
+      }
+    } catch (error) {
+      IsCatalogloading = false;
+      print(error);
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return notifyListeners();
+    }
+  }
+
+  // Get all cards
+  bool cardloading = false;
 
   List _allCard = [];
 
@@ -70,44 +136,48 @@ class GiftCardProvider with ChangeNotifier {
     return _allCard;
   }
 
-  Future<void> getAllCard(ctx, auth,userid) async {
-    cardloading=true;
+  Future<void> getAllCard(
+    ctx,
+    auth,
+    userid,
+  ) async {
+    cardloading = true;
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
-    headers['userid'] ='${userid}';
+    headers['userid'] = '${userid}';
+    var catid = await _toActiveCatalog['id'];
 
-    var url = Uri.https(lyoApiUrl, 'gift-card/cards');
+    var url = Uri.https(lyoApiUrl, 'gift-card/cards/${catid}');
     print(url);
 
     try {
       final response = await http.get(url, headers: headers);
 
       final responseData = json.decode(response.body);
+
       print(responseData);
 
       if (responseData['code'] == 200) {
-        cardloading=false;
+        cardloading = false;
         _allCard = responseData['data'];
-    
+
         return notifyListeners();
       } else {
-        cardloading=false;
+        cardloading = false;
         _allCard = [];
         return notifyListeners();
       }
     } catch (error) {
-      cardloading=false;
+      cardloading = false;
       print(error);
       // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
       return notifyListeners();
     }
   }
 
-
   //// Do Transaction////
-  ///
-      // Get all cards
-  bool dotransactionloading=false;
+
+  bool dotransactionloading = false;
 
   Map _doTransaction = {};
 
@@ -115,40 +185,42 @@ class GiftCardProvider with ChangeNotifier {
     return _doTransaction;
   }
 
-  Future<void> getDoTransaction(ctx, auth,userid,postdata) async {
-    dotransactionloading=true;
+  Future<void> getDoTransaction(ctx, auth, userid, postdata) async {
+    dotransactionloading = true;
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
-    headers['userid'] ='${userid}';
+    headers['userid'] = '${userid}';
 
-    var mydata=json.encode(postdata);
+    var mydata = json.encode(postdata);
     print(mydata);
 
-    var url = Uri.https(lyoApiUrl,'gift-card/transaction');
+    var url = Uri.https(lyoApiUrl, 'gift-card/transaction');
     print(url);
-    
 
     try {
-      final response = await http.post(url,body:mydata ,headers: headers,);
+      final response = await http.post(
+        url,
+        body: mydata,
+        headers: headers,
+      );
 
       final responseData = json.decode(response.body);
-       print(responseData);
+      print(responseData);
 
       if (responseData['code'] == 200) {
-
-        dotransactionloading=false;
+        dotransactionloading = false;
         _doTransaction = responseData;
         snackAlert(ctx, SnackTypes.success, responseData['msg']);
-    
+
         return notifyListeners();
       } else {
         snackAlert(ctx, SnackTypes.warning, responseData['msg']);
-        dotransactionloading=false;
+        dotransactionloading = false;
         _doTransaction = {};
         return notifyListeners();
       }
     } catch (error) {
-      cardloading=false;
+      cardloading = false;
       print(error);
       // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
       return notifyListeners();
