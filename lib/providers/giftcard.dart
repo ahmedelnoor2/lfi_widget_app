@@ -145,9 +145,11 @@ class GiftCardProvider with ChangeNotifier {
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
+   
+    var countrycode = await _toActiveCountry['iso3'];
     var catid = await _toActiveCatalog['id'];
-
-    var url = Uri.https(lyoApiUrl, 'gift-card/cards/${catid}');
+   
+    var url = Uri.https(lyoApiUrl, 'gift-card/cards/$catid/$countrycode');
     print(url);
 
     try {

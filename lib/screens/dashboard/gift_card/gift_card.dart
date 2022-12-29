@@ -117,7 +117,7 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                 Row(
                   children: [
                     Container(
-                      padding: EdgeInsets.only(right: 10),
+                      padding: EdgeInsets.only(right: 10, top: 10),
                       child: IconButton(
                         onPressed: () {
                           Navigator.pop(context);
@@ -149,16 +149,15 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
             ),
             Divider(),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.only(bottom: 10),
               child: InkWell(
                 onTap: (() {
                   _scaffoldKey.currentState!.openDrawer();
                 }),
                 child: Container(
                   color: Color(0xff292C51),
-                  padding: EdgeInsets.only(top: 5, bottom: 5),
+                  // padding: EdgeInsets.only(top: 5, bottom: 5),
                   child: Container(
-                    padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(5),
                       border: Border.all(
@@ -167,58 +166,13 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                         color: Color(0xff76B9A),
                       ),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(
-                          width: width * 0.50,
-                          child: TextFormField(
-                            enabled: false,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter wallet address';
-                              }
-                              return null;
-                            },
-                            decoration: const InputDecoration(
-                              contentPadding: EdgeInsets.zero,
-                              isDense: true,
-                              border: UnderlineInputBorder(
-                                borderSide: BorderSide.none,
-                              ),
-                              hintStyle: TextStyle(
-                                  fontSize: 14, color: Color(0xff5E6292)),
-                              hintText: "Search",
-                              // prefixIcon: Icon(Icons.search)
-                            ),
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            giftcardprovider.toActiveCountry.isNotEmpty
-                                ? Container(
-                                    padding: EdgeInsets.only(right: 10),
-                                    child: GestureDetector(
-                                      onTap: () async {},
-                                      child: Text(
-                                        giftcardprovider
-                                                .toActiveCountry['name'] +
-                                            " " +
-                                            giftcardprovider
-                                                .toActiveCountry['currency']
-                                                    ['code']
-                                                .toString(),
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                : Container(),
-                          ],
-                        ),
-                      ],
+                    child: ListTile(
+                      title: Text(giftcardprovider.toActiveCountry['name'], style: TextStyle(fontWeight: FontWeight.bold),),
+                      subtitle: Text(
+                          'Currency: ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                      trailing: Icon(
+                        Icons.arrow_drop_down,
+                      ),
                     ),
                   ),
                 ),

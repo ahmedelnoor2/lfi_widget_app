@@ -7,6 +7,7 @@ import 'package:lyotrade/providers/giftcard.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class CatalogBottomSheet extends StatefulWidget {
   const CatalogBottomSheet({Key? key}) : super(key: key);
@@ -113,7 +114,7 @@ class _CatalogBottomSheetState extends State<CatalogBottomSheet> {
                           giftcardprovider.settActiveCatalog(data);
                           var userid = await auth.userInfo['id'];
                           Navigator.pop(context);
-                           await giftcardprovider.getAllCard(
+                          await giftcardprovider.getAllCard(
                               context, auth, userid);
                         },
                         child: Padding(
@@ -130,13 +131,11 @@ class _CatalogBottomSheetState extends State<CatalogBottomSheet> {
                                       ? Container()
                                       : Container(
                                           width: 100,
-                                          decoration: BoxDecoration(
-                                            image: DecorationImage(
-                                              image: NetworkImage(
-                                                  data['card_image']
-                                                      .toString()),
-                                              fit: BoxFit.cover,
-                                            ),
+                                          child: FadeInImage.memoryNetwork(
+                                            placeholder: kTransparentImage,
+                                            image:data['card_image']
+                                                      .toString(),
+                                                      fit: BoxFit.cover,
                                           ),
                                         ),
                                   SizedBox(width: 10),
@@ -155,7 +154,6 @@ class _CatalogBottomSheetState extends State<CatalogBottomSheet> {
                                       ],
                                     ),
                                   ),
-                                 
                                 ],
                               ),
                             ),

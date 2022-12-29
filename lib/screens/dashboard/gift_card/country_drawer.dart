@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/giftcard.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
@@ -22,6 +23,7 @@ class _CountryDrawerState extends State<CountryDrawer> {
   @override
   Widget build(BuildContext context) {
     var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
+    var auth = Provider.of<Auth>(context, listen: true);
     return ValueListenableBuilder<List>(
         valueListenable: filtered,
         builder: (context, value, _) {
@@ -39,7 +41,7 @@ class _CountryDrawerState extends State<CountryDrawer> {
                     children: [
                       IconButton(
                         onPressed: () {
-                           searchController.clear();
+                          searchController.clear();
                           searching = false;
                           filtered.value = [];
                           if (searchFocus.hasFocus) searchFocus.unfocus();
@@ -71,11 +73,14 @@ class _CountryDrawerState extends State<CountryDrawer> {
                           searching = true;
                           filtered.value = [];
                           giftcardprovider.allCountries.forEach((country) {
-                            if (country['name']
-                                .toString()
-                                .toLowerCase()
-                                .contains(text.toLowerCase())||
-                                  country['name'].toString().toUpperCase().contains(text)) {
+                            if (country['currency']['name']
+                                    .toString()
+                                    .toUpperCase()
+                                    .contains(text.toUpperCase()) ||
+                                country['currency']['name']
+                                    .toString()
+                                    .toLowerCase()
+                                    .contains(text.toLowerCase())) {
                               filtered.value.add(country);
                             }
                           });
@@ -84,7 +89,6 @@ class _CountryDrawerState extends State<CountryDrawer> {
                           filtered.value = [];
                         }
                       },
-                     
                       controller: searchController,
                       decoration: const InputDecoration(
                         labelText: "Search",
@@ -110,11 +114,13 @@ class _CountryDrawerState extends State<CountryDrawer> {
                       var data = giftcardprovider.allCountries[index];
 
                       return ListTile(
-                        onTap: () {
+                        onTap: () async {
                           giftcardprovider.setActiveCountry(data);
                           searchController.clear();
-                          
+                          var userid = await auth.userInfo['id'];
                           Navigator.pop(context);
+                          await giftcardprovider.getAllCard(
+                              context, auth, userid);
                         },
                         // leading: CircleAvatar(
                         //   radius: width * 0.035,
