@@ -167,9 +167,15 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                       ),
                     ),
                     child: ListTile(
-                      title: Text(giftcardprovider.toActiveCountry['name'], style: TextStyle(fontWeight: FontWeight.bold),),
-                      subtitle: Text(
-                          'Currency: ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                      title: Text(
+                        '${giftcardprovider.toActiveCountry['name']}',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: giftcardprovider.toActiveCountry['currency'] ==
+                              null
+                          ? Container()
+                          : Text(
+                              'Currency: ${giftcardprovider.toActiveCountry['currency']['code']}'),
                       trailing: Icon(
                         Icons.arrow_drop_down,
                       ),

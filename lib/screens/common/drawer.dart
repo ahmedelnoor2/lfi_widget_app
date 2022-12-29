@@ -79,11 +79,14 @@ Widget drawer(
 
               return ListTile(
                 onTap: () {
+                   
+                  //  print(_asset);
                   getCoinCosts(asset.allDigAsset.isNotEmpty
                       ? asset.allDigAsset[index]['coin']
                       : asset.digitialAss[index]['coin']);
                   searchController.clear();
                   asset.filterSearchResults('');
+
                   Navigator.pop(context);
                 },
                 leading: CircleAvatar(

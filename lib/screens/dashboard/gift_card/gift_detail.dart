@@ -25,6 +25,9 @@ class _GiftDetailState extends State<GiftDetail> {
   List _allNetworks = [];
   String _defaultNetwork = 'USDTBSC';
   String _coinShowName = 'EUSDT';
+  double? estimateprice;
+  double estprice = 0.0;
+
   final TextEditingController _searchController = TextEditingController();
   bool _tagType = false;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -132,6 +135,7 @@ class _GiftDetailState extends State<GiftDetail> {
         Provider.of<GiftCardProvider>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
     var userid = await auth.userInfo['id'];
+
     await giftcardprovider.getDoTransaction(context, auth, userid, {
       "productID": "15009",
       "amount": "1.0",
@@ -150,6 +154,10 @@ class _GiftDetailState extends State<GiftDetail> {
     var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
     var asset = Provider.of<Asset>(context, listen: true);
     var public = Provider.of<Public>(context, listen: true);
+
+    print(public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()]
+        [_defaultCoin]);
+
     final arguments = (ModalRoute.of(context)?.settings.arguments ??
         <String, dynamic>{}) as Map;
 
@@ -314,6 +322,20 @@ class _GiftDetailState extends State<GiftDetail> {
                         ),
                         TextFormField(
                           controller: _amountcontroller,
+                          onChanged: ((value) {
+                            if (value.isNotEmpty) {
+                              setState(() {
+                                estprice = double.parse(value);
+                                var finalprice = estprice /
+                                    public.rate[public
+                                        .activeCurrency['fiat_symbol']
+                                        .toUpperCase()][_defaultCoin];
+                                estimateprice = finalprice;
+                              });
+                            } else {
+                              estimateprice = 0.0;
+                            }
+                          }),
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                             enabledBorder: OutlineInputBorder(
@@ -353,13 +375,28 @@ class _GiftDetailState extends State<GiftDetail> {
                                   style:
                                       TextStyle(color: secondaryTextColor400),
                                 ),
-                                Text(asset.accountBalance['totalBalance']
-                                    .toString())
+                                Text(estimateprice.toString())
                               ]),
                         ),
+                        arguments['data']['is_a_range']
+                            ? Container(
+                                padding: EdgeInsets.only(bottom: 30),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                        'Min price: ${arguments['data']['min']}'),
+                                    Text(
+                                        'Min price: ${arguments['data']['max']}'),
+                                  ],
+                                ),
+                              )
+                            : Container(),
                         LyoButton(
                           onPressed: (() async {
-                            dotransaction();
+                            Navigator.pushNamed(context,'/buy_card');
+                           // dotransaction();
                           }),
                           text: 'Buy Now',
                           active: true,
