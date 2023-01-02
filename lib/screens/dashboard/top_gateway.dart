@@ -61,6 +61,7 @@ class _TopGatewayState extends State<TopGateway>
           child: Container(
             padding: EdgeInsets.all(5),
             child: Container(
+              width: width * 0.52,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5),
                 gradient: const LinearGradient(
@@ -102,8 +103,7 @@ class _TopGatewayState extends State<TopGateway>
                     ],
                   ),
                   Container(
-                    padding: EdgeInsets.only(left: 15),
-                    width: width*0.23,
+                    width: width * 0.20,
                     child: Row(
                       children: [
                         Container(
@@ -173,10 +173,9 @@ class _TopGatewayState extends State<TopGateway>
             if (auth.isAuthenticated) {
               if (auth.userInfo['realAuthType'] == 0 ||
                   auth.userInfo['authLevel'] == 0) {
-                snackAlert(context, SnackTypes.warning,
-                    ' (Please check KYC status)');
+                snackAlert(
+                    context, SnackTypes.warning, ' (Please check KYC status)');
               } else {
-      
                 Navigator.pushNamed(context, '/gift_card');
               }
             } else {
@@ -184,7 +183,6 @@ class _TopGatewayState extends State<TopGateway>
             }
           },
           child: Container(
-            
             padding: EdgeInsets.all(5),
             child: Container(
               decoration: BoxDecoration(
@@ -193,8 +191,9 @@ class _TopGatewayState extends State<TopGateway>
                   begin: Alignment.topLeft,
                   end: Alignment(0.8, 1),
                   colors: <Color>[
-                    Color(0xff3F4374),
                     Color(0xff292C51),
+                    Color(0xff3F4374),
+                    
                   ],
                   tileMode: TileMode.mirror,
                 ),
@@ -237,7 +236,6 @@ class _TopGatewayState extends State<TopGateway>
                           height: 60,
                           child: Stack(
                             children: [
-                             
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: Container(
@@ -257,7 +255,6 @@ class _TopGatewayState extends State<TopGateway>
                                   ),
                                 ),
                               ),
-                             
                             ],
                           ),
                         ),

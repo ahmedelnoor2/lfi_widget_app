@@ -69,38 +69,49 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
     var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
+    var auth = Provider.of<Auth>(context, listen: true);
     final List<Widget> imageSliders = giftcardprovider.sliderlist
-        .map((item) => Container(
-              margin: EdgeInsets.all(5.0),
-              child: ClipRRect(
-                  borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                  child: Stack(
-                    children: <Widget>[
-                      CachedNetworkImage(
-                        imageUrl: item['card_image'],
-                        placeholderFadeInDuration: Duration(milliseconds: 1000),
-                        imageBuilder: (context, imageProvider) => Container(
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                                image: imageProvider,
-                                fit: BoxFit.cover,
-                                colorFilter: ColorFilter.mode(
-                                    Colors.transparent, BlendMode.colorBurn)),
+        .map((item) => InkWell(
+              onTap: (() async {
+                giftcardprovider.settActiveCatalog(item);
+                var userid = await auth.userInfo['id'];
+          
+                await giftcardprovider.getAllCard(context, auth, userid);
+              }),
+              child: Container(
+                margin: EdgeInsets.all(5.0),
+                child: ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                    child: Stack(
+                      children: <Widget>[
+                        CachedNetworkImage(
+                          imageUrl: item['card_image'],
+                          placeholderFadeInDuration:
+                              Duration(milliseconds: 1000),
+                          imageBuilder: (context, imageProvider) => Container(
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                  image: imageProvider,
+                                  fit: BoxFit.cover,
+                                  colorFilter: ColorFilter.mode(
+                                      Colors.transparent, BlendMode.colorBurn)),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
+                        ),
+                        Positioned(
+                          bottom: 0.0,
+                          left: 0.0,
+                          right: 0.0,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 20.0),
                           ),
                         ),
-                        errorWidget: (context, url, error) => Icon(Icons.error),
-                      ),
-                      Positioned(
-                        bottom: 0.0,
-                        left: 0.0,
-                        right: 0.0,
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 10.0, horizontal: 20.0),
-                        ),
-                      ),
-                    ],
-                  )),
+                      ],
+                    )),
+              ),
             ))
         .toList();
 
@@ -387,8 +398,7 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                   //     ),
                   //   ),
                   // ),
-                  SizedBox(
-                    height: height * 0.40,
+                  Expanded(
                     child: giftcardprovider.cardloading
                         ? Center(
                             child: CircularProgressIndicator(),

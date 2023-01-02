@@ -101,8 +101,8 @@ class _CatalogBottomSheetState extends State<CatalogBottomSheet> {
                 //     ),
                 //   ),
                 // ),
-                SizedBox(
-                  height: height * 0.5,
+                Expanded(
+                  
                   child: ListView.builder(
                     shrinkWrap: true,
                     itemCount: giftcardprovider.allCatalog.length,

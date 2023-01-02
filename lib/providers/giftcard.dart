@@ -15,7 +15,7 @@ class GiftCardProvider with ChangeNotifier {
     'token': '',
     'userId': '',
   };
-
+ String paymentstatus='Waiting for payment';
   Map _toActiveCountry = {};
 
   Map get toActiveCountry {

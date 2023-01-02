@@ -1,20 +1,33 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/dex_provider.dart';
+import 'package:lyotrade/providers/giftcard.dart';
 import 'package:lyotrade/screens/common/header.dart';
+import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/dex_swap/common/exchange_now.dart';
+import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/ScreenControl.utils.dart';
 import 'package:provider/provider.dart';
 
 class BuyCard extends StatefulWidget {
   static const routeName = '/buy_card';
-  const BuyCard({Key? key}) : super(key: key);
+  const BuyCard({Key? key, this.amount, this.totalprice, this.defaultcoin,this.productID})
+      : super(key: key);
+
+  final String? amount;
+  final double? totalprice;
+  final String? defaultcoin;
+  final String ? productID;
 
   @override
   State<BuyCard> createState() => _BuyCardState();
 }
 
 class _BuyCardState extends State<BuyCard> {
+
+  bool _isverify=false;
   @override
   void initState() {
     super.initState();
@@ -25,14 +38,36 @@ class _BuyCardState extends State<BuyCard> {
     super.dispose();
   }
 
+  Future<void> dotransaction() async {
+    var giftcardprovider =
+        Provider.of<GiftCardProvider>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
+    var userid = await auth.userInfo['id'];
+
+    await giftcardprovider.getDoTransaction(context, auth, userid, {
+      "productID": "15009",
+      "amount": "1.0",
+      "firstName": "Ivan",
+      "lastName": "Begumisa",
+      "email": "i.b@lyopay.com",
+      "orderId": "0213457",
+      "quantity": " 1"
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
+    var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
+    final args = ModalRoute.of(context)!.settings.arguments as BuyCard;
+    // print(args.productID);
     return Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pop(context);
+            },
             icon: Icon(Icons.chevron_left),
           ),
           title: Text(
@@ -53,7 +88,7 @@ class _BuyCardState extends State<BuyCard> {
                   left: 10,
                 ),
                 padding: EdgeInsets.only(bottom: 10),
-                child: Text('status'),
+                child: Text(giftcardprovider.paymentstatus.toString()),
               ),
               Container(
                 margin: EdgeInsets.only(left: 8, right: 16, bottom: 15),
@@ -75,7 +110,7 @@ class _BuyCardState extends State<BuyCard> {
                           Radius.circular(10),
                         ),
                         child: Container(
-                          width: width * 0.5,
+                          width: giftcardprovider.paymentstatus=='Waiting for payment'?width * 0.3:width * 0.3,
                           // width: dexPro
 
                           height: 15,
@@ -89,100 +124,48 @@ class _BuyCardState extends State<BuyCard> {
                   ],
                 ),
               ),
-              Card(
-                child: Container(
-                  padding: EdgeInsets.all(10),
-                ),
-              ),
               Align(
                 alignment: Alignment.center,
-                child: RotatedBox(
-                  quarterTurns: 1,
-                  child: Container(
-                    //padding: EdgeInsets.only(top: 20, bottom: 20),
-                    child: Image.asset(
-                      "assets/img/transfer.gif",
-                      width: 70.0,
-                    ),
-                  ),
+                child: Column(
+                  children: [
+                    Container(
+                        padding: EdgeInsets.only(top: 20, bottom: 5),
+                        child: Text(
+                          '${double.parse(args.totalprice.toString()).toStringAsPrecision(7)}'
+                           +
+                              ' ' +
+                              args.defaultcoin.toString(),
+                          style: TextStyle(
+                              fontSize: 32, fontWeight: FontWeight.bold),
+                        )),
+                    Container(
+                        padding: EdgeInsets.only(bottom: 30),
+                        child: Text('Amount')),
+                  ],
                 ),
               ),
               Card(
                 child: Container(
                   padding: EdgeInsets.all(10),
-                  child: Column(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        child: Text(
-                          'Receive',
-                          style: TextStyle(fontSize: 18),
-                        ),
-                      ),
-                      Divider(),
-                      // Container(
-                      //   child: dexProvider.toActiveCurrency.isNotEmpty
-                      //       ? SvgPicture.network(
-                      //           '${dexProvider.toActiveCurrency['image']}',
-                      //           width: 40,
-                      //         )
-                      //       : Container(),
-                      // ),
                       Container(
                         padding: EdgeInsets.only(top: 5),
                         child: Text(
-                          'amount',
+                          'Payment',
                           style: TextStyle(
                             fontSize: 20,
                           ),
                         ),
                       ),
                       Container(
-                        padding: EdgeInsets.only(top: 5, bottom: 10),
+                        padding: EdgeInsets.only(top: 5),
                         child: Text(
-                          'ticker'.toUpperCase(),
+                          args.amount.toString()+' '+giftcardprovider
+                                  .toActiveCountry['currency']['code'],
                           style: TextStyle(
                             fontSize: 14,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.only(
-                            top: 15, bottom: 15, right: 15, left: 15),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(
-                            width: 0.3,
-                            color: Color(0xff5E6292),
-                          ),
-                        ),
-                        child: InkWell(
-                          onTap: () {
-                            // Clipboard.setData(
-                            //   ClipboardData(
-                            //     text: dexProvider.processPayment['payoutAddress'],
-                            //   ),
-                            // );
-                            // snackAlert(context, SnackTypes.success, 'Copied');
-                          },
-                          child: Row(
-                            children: [
-                              Container(
-                                width: width * 0.70,
-                                child: Text(
-                                  '3422',
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              GestureDetector(
-                                child: Container(
-                                  padding: EdgeInsets.only(left: 8),
-                                  child: Image.asset(
-                                    'assets/img/copy.png',
-                                    width: 18,
-                                  ),
-                                ),
-                              ),
-                            ],
                           ),
                         ),
                       ),
@@ -190,6 +173,19 @@ class _BuyCardState extends State<BuyCard> {
                   ),
                 ),
               ),
+              Container(
+                padding: EdgeInsets.only(top: 50, right: 4, left: 4),
+                child: LyoButton(
+                  onPressed: (() async {
+                    dotransaction();
+                  }),
+                  text: 'Buy Now',
+                  active: true,
+                  isLoading: giftcardprovider.dotransactionloading,
+                  activeColor: linkColor,
+                  activeTextColor: Colors.black,
+                ),
+              )
             ],
           ),
         ));

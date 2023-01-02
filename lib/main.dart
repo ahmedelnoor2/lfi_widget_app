@@ -198,7 +198,7 @@ class MyApp extends StatelessWidget {
               GiftCard.routeName: (context) => const GiftCard(),
               GiftDetail.routeName: (context) => const GiftDetail(),
               GiftCardTransaction.routeName:(context)=>const GiftCardTransaction(),
-              BuyCard.routeName:(context)=>const BuyCard()
+              BuyCard.routeName:(context)=> BuyCard()
             },
           );
         },

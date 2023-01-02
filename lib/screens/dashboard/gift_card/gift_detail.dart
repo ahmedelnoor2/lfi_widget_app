@@ -7,6 +7,7 @@ import 'package:lyotrade/screens/common/drawer.dart';
 
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
+import 'package:lyotrade/screens/dashboard/gift_card/buycard.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
@@ -31,6 +32,7 @@ class _GiftDetailState extends State<GiftDetail> {
   final TextEditingController _searchController = TextEditingController();
   bool _tagType = false;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _formKey = GlobalKey<FormState>();
 
   final _amountcontroller = TextEditingController();
   @override
@@ -130,22 +132,7 @@ class _GiftDetailState extends State<GiftDetail> {
     asset.setDigAssets(_digitialAss);
   }
 
-  Future<void> dotransaction() async {
-    var giftcardprovider =
-        Provider.of<GiftCardProvider>(context, listen: false);
-    var auth = Provider.of<Auth>(context, listen: false);
-    var userid = await auth.userInfo['id'];
-
-    await giftcardprovider.getDoTransaction(context, auth, userid, {
-      "productID": "15009",
-      "amount": "1.0",
-      "firstName": "Ivan",
-      "lastName": "Begumisa",
-      "email": "i.b@lyopay.com",
-      "orderId": "0213457",
-      "quantity": " 1"
-    });
-  }
+  String? _errorText = '';
 
   @override
   Widget build(BuildContext context) {
@@ -155,8 +142,8 @@ class _GiftDetailState extends State<GiftDetail> {
     var asset = Provider.of<Asset>(context, listen: true);
     var public = Provider.of<Public>(context, listen: true);
 
-    print(public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()]
-        [_defaultCoin]);
+    // print(public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()]
+    //     [_defaultCoin]);
 
     final arguments = (ModalRoute.of(context)?.settings.arguments ??
         <String, dynamic>{}) as Map;
@@ -226,22 +213,22 @@ class _GiftDetailState extends State<GiftDetail> {
               ],
             ),
           ),
-          SingleChildScrollView(
-            child: Stack(
-              clipBehavior: Clip.none,
-              alignment: AlignmentDirectional.topCenter,
-              fit: StackFit.loose,
-              children: <Widget>[
-                Container(
-                  height: height * 0.75,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                      color: Color(0xff25284A),
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(20),
-                          topRight: Radius.circular(20))),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+          Stack(
+            clipBehavior: Clip.none,
+            alignment: AlignmentDirectional.topCenter,
+            fit: StackFit.loose,
+            children: <Widget>[
+              Container(
+                height: height * 0.75,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                    color: Color(0xff25284A),
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20))),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SingleChildScrollView(
                     child: Column(
                       children: [
                         SizedBox(
@@ -315,40 +302,56 @@ class _GiftDetailState extends State<GiftDetail> {
                           child: Container(
                             child: Row(children: [
                               Text(
-                                'Amount',
+                                'Amount' +
+                                    ' ' +
+                                    '(${giftcardprovider.toActiveCountry['currency']['code']})',
                               ),
                             ]),
                           ),
                         ),
-                        TextFormField(
-                          controller: _amountcontroller,
-                          onChanged: ((value) {
-                            if (value.isNotEmpty) {
-                              setState(() {
-                                estprice = double.parse(value);
-                                var finalprice = estprice /
-                                    public.rate[public
-                                        .activeCurrency['fiat_symbol']
-                                        .toUpperCase()][_defaultCoin];
-                                estimateprice = finalprice;
-                              });
-                            } else {
-                              estimateprice = 0.0;
-                            }
-                          }),
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  width: 0.5,
-                                  color: secondaryTextColor400), //<-- SEE HERE
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: secondaryTextColor400, width: 0.5),
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            hintText: 'Amount',
+                        Form(
+                          key: _formKey,
+                          child: TextFormField(
+                            controller: _amountcontroller,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter Amount';
+                              }
+
+                              return null;
+                            },
+                            onChanged: ((value) {
+                              if (value.isNotEmpty) {
+                                setState(() {
+                                  estprice = double.parse(value);
+                                  var finalprice = estprice /
+                                      public.rate[public
+                                          .activeCurrency['fiat_symbol']
+                                          .toUpperCase()][_defaultCoin];
+                                  estimateprice = finalprice;
+                                });
+                              } else {
+                                estimateprice = 0.0;
+                              }
+                            }),
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      width: 0.5,
+                                      color:
+                                          secondaryTextColor400), //<-- SEE HERE
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: secondaryTextColor400, width: 0.5),
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                hintText: 'Amount',
+                                // errorText: _errorText,
+                                suffixText: giftcardprovider
+                                    .toActiveCountry['currency']['code']
+                                    .toString()),
                           ),
                         ),
                         Padding(
@@ -375,7 +378,9 @@ class _GiftDetailState extends State<GiftDetail> {
                                   style:
                                       TextStyle(color: secondaryTextColor400),
                                 ),
-                                Text(estimateprice.toString())
+                                Text('${estimateprice.toString()}'
+                                        ' ' +
+                                    _defaultCoin.toString())
                               ]),
                         ),
                         arguments['data']['is_a_range']
@@ -388,17 +393,24 @@ class _GiftDetailState extends State<GiftDetail> {
                                     Text(
                                         'Min price: ${arguments['data']['min']}'),
                                     Text(
-                                        'Min price: ${arguments['data']['max']}'),
+                                        'Max price: ${arguments['data']['max']}'),
                                   ],
                                 ),
                               )
                             : Container(),
                         LyoButton(
                           onPressed: (() async {
-                            Navigator.pushNamed(context,'/buy_card');
-                           // dotransaction();
+                            if (_formKey.currentState!.validate()) {
+                              Navigator.pushNamed(context, '/buy_card',
+                                  arguments: BuyCard(
+                                      amount: _amountcontroller.text,
+                                      totalprice: estimateprice,
+                                      defaultcoin: _defaultCoin,
+                                      productID: arguments['data']['BillerID']
+                                          .toString()));
+                            }
                           }),
-                          text: 'Buy Now',
+                          text: 'Continue',
                           active: true,
                           isLoading: giftcardprovider.dotransactionloading,
                           activeColor: linkColor,
@@ -408,23 +420,23 @@ class _GiftDetailState extends State<GiftDetail> {
                     ),
                   ),
                 ),
-                Positioned(
-                    top: -50,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: NetworkImage(
-                            giftcardprovider.toActiveCatalog['card_image']
-                                .toString(),
-                          ),
-                          fit: BoxFit.cover,
+              ),
+              Positioned(
+                  top: -50,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: NetworkImage(
+                          giftcardprovider.toActiveCatalog['card_image']
+                              .toString(),
                         ),
+                        fit: BoxFit.cover,
                       ),
-                      height: 120,
-                      width: 200,
-                    ))
-              ],
-            ),
+                    ),
+                    height: 120,
+                    width: 200,
+                  ))
+            ],
           )
         ],
       ),
