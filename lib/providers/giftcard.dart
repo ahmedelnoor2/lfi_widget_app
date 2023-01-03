@@ -15,7 +15,7 @@ class GiftCardProvider with ChangeNotifier {
     'token': '',
     'userId': '',
   };
- String paymentstatus='Waiting for payment';
+  String paymentstatus = 'Waiting for payment';
   Map _toActiveCountry = {};
 
   Map get toActiveCountry {
@@ -145,10 +145,10 @@ class GiftCardProvider with ChangeNotifier {
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
-   
+
     var countrycode = await _toActiveCountry['iso3'];
     var catid = await _toActiveCatalog['id'];
-   
+
     var url = Uri.https(lyoApiUrl, 'gift-card/cards/$catid/$countrycode');
     print(url);
 
@@ -177,6 +177,143 @@ class GiftCardProvider with ChangeNotifier {
     }
   }
 
+  /// Otp verification///
+  bool _isverify = false;
+
+  bool get isverify {
+    return _isverify;
+  }
+
+  void setverify(value) {
+    _isverify = value;
+    
+  }
+
+  //Google code enable//
+  bool _isgoogleCode = false;
+
+  bool get isgoogleCode {
+    return _isgoogleCode;
+  }
+
+  void setgoolgeCode(value) {
+    _isgoogleCode = value;
+    
+  }
+
+  bool otpverifcation = false;
+
+  Map _doverify = {};
+
+  Map get doverify {
+    return _doverify;
+  }
+
+  Future<void> getDoVerify(ctx, auth, userid, postdata) async {
+    print(postdata);
+    otpverifcation = true;
+    notifyListeners();
+    headers['token'] = auth.loginVerificationToken;
+    headers['userid'] = '${userid}';
+
+    var mydata = json.encode(postdata);
+
+    var url = Uri.https(lyoApiUrl, 'gift-card/send_verification_request');
+
+    try {
+      final response = await http.post(
+        url,
+        body: mydata,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+      print(responseData);
+
+      if (responseData['code'] == '200') {
+       
+        otpverifcation = false;
+        _doverify = responseData['data'];
+        print(_doverify);
+        setverify(true);
+        setgoolgeCode(_doverify['googleCode']);
+
+        snackAlert(ctx, SnackTypes.success, responseData['msg']);
+
+        return notifyListeners();
+      } else {
+        snackAlert(ctx, SnackTypes.warning, responseData['msg']);
+        otpverifcation = false;
+        _doverify = {};
+        return notifyListeners();
+      }
+    } catch (error) {
+      otpverifcation = false;
+      print(error);
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return notifyListeners();
+    }
+  }
+
+  /// withDrawal///
+
+  bool _iswithdrwal = false;
+  bool get iswithdrwal{
+
+    return _iswithdrwal;
+  }
+
+  Map _dowithdrawal = {};
+
+  Map get dowithdrawal {
+    return _dowithdrawal;
+  }
+
+  Future<void> getDoWithDrawal(ctx, auth, userid, postdata) async {
+    _iswithdrwal = true;
+    notifyListeners();
+    headers['token'] = auth.loginVerificationToken;
+    headers['userid'] = '${userid}';
+
+    var mydata = json.encode(postdata);
+    print(mydata);
+
+    var url = Uri.https(lyoApiUrl, 'gift-card/withdraw');
+    print(url);
+
+    try {
+      final response = await http.post(
+        url,
+        body: mydata,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+      print(responseData);
+
+      if (responseData['code'] == '200') {
+        
+       
+        _iswithdrwal = false;
+        _dowithdrawal = responseData;
+        paymentstatus='Card is Processing';
+
+        snackAlert(ctx, SnackTypes.success, responseData['msg']);
+
+        return notifyListeners();
+      } else {
+        snackAlert(ctx, SnackTypes.warning, responseData['msg']);
+        _iswithdrwal = false;
+        _doverify = {};
+        return notifyListeners();
+      }
+    } catch (error) {
+      _iswithdrwal = false;
+      print(error);
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return notifyListeners();
+    }
+  }
   //// Do Transaction////
 
   bool dotransactionloading = false;

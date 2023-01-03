@@ -314,8 +314,16 @@ class _GiftDetailState extends State<GiftDetail> {
                           child: TextFormField(
                             controller: _amountcontroller,
                             validator: (value) {
+                              var min = double.parse(arguments['data']['min']);
+                              var max = double.parse(arguments['data']['max']);
+                              var myvalue = double.parse(value!);
+
                               if (value == null || value.isEmpty) {
                                 return 'Please enter Amount';
+                              } else if (myvalue < min) {
+                                return 'Minimum Amount';
+                              } else if (myvalue > max) {
+                                return 'Max Amount';
                               }
 
                               return null;
@@ -397,7 +405,19 @@ class _GiftDetailState extends State<GiftDetail> {
                                   ],
                                 ),
                               )
-                            : Container(),
+                            : Container(
+                                padding: EdgeInsets.only(bottom: 30),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                        'Min price: ${arguments['data']['min']}'),
+                                    Text(
+                                        'Max price: ${arguments['data']['max']}'),
+                                  ],
+                                ),
+                              ),
                         LyoButton(
                           onPressed: (() async {
                             if (_formKey.currentState!.validate()) {
