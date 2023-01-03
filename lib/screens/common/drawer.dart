@@ -10,7 +10,12 @@ Widget drawer(
   public,
   searchController,
   getCoinCosts,
+  filterWallet,
 ) {
+  List assets = asset.allDigAsset.isNotEmpty
+                ? asset.allDigAsset
+                : asset.digitialAss;
+
   return Container(
     decoration: BoxDecoration(
       color: Colors.grey[850],
@@ -67,6 +72,50 @@ Widget drawer(
         ),
         SizedBox(
           height: height * 0.8,
+          child: Column(children: assets.map((_asset) {
+            return filterWallet != null ? filterWallet.contains(_asset['coin']) ? ListTile(
+                onTap: () {
+                   
+                  //  print(_asset);
+                  getCoinCosts(_asset['coin']);
+                  searchController.clear();
+                  asset.filterSearchResults('');
+
+                  Navigator.pop(context);
+                },
+                leading: CircleAvatar(
+                  radius: width * 0.035,
+                  child: Image.network(
+                    '${public.publicInfoMarket['market']['coinList'][_asset['coin']]['icon']}',
+                  ),
+                ),
+                title: Text(getCoinName(
+                    '${public.publicInfoMarket['market']['coinList'][_asset['coin']]['showName']}')),
+                trailing: Text('${_asset['values']['total_balance']}'),
+              ) : Container() : ListTile(
+                onTap: () {
+                   
+                  //  print(_asset);
+                  getCoinCosts(_asset['coin']);
+                  searchController.clear();
+                  asset.filterSearchResults('');
+
+                  Navigator.pop(context);
+                },
+                leading: CircleAvatar(
+                  radius: width * 0.035,
+                  child: Image.network(
+                    '${public.publicInfoMarket['market']['coinList'][_asset['coin']]['icon']}',
+                  ),
+                ),
+                title: Text(getCoinName(
+                    '${public.publicInfoMarket['market']['coinList'][_asset['coin']]['showName']}')),
+                trailing: Text('${_asset['values']['total_balance']}'),
+              );
+          }).toList(),),
+        ),
+        SizedBox(
+          height: height * 0.8,
           child: ListView.builder(
             shrinkWrap: true,
             itemCount: asset.allDigAsset.isNotEmpty
@@ -81,9 +130,7 @@ Widget drawer(
                 onTap: () {
                    
                   //  print(_asset);
-                  getCoinCosts(asset.allDigAsset.isNotEmpty
-                      ? asset.allDigAsset[index]['coin']
-                      : asset.digitialAss[index]['coin']);
+                  getCoinCosts(_asset['coin']);
                   searchController.clear();
                   asset.filterSearchResults('');
 

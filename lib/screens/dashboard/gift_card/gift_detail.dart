@@ -21,11 +21,11 @@ class GiftDetail extends StatefulWidget {
 }
 
 class _GiftDetailState extends State<GiftDetail> {
-  String _defaultCoin = 'USDT';
+  String _defaultCoin = 'LYO1';
   double _selectedPercentage = 0;
   List _allNetworks = [];
-  String _defaultNetwork = 'USDTBSC';
-  String _coinShowName = 'EUSDT';
+  String _defaultNetwork = 'BSC';
+  String _coinShowName = 'LYO1';
   double? estimateprice;
   double estprice = 0.0;
 
@@ -158,6 +158,7 @@ class _GiftDetailState extends State<GiftDetail> {
         public,
         _searchController,
         getCoinCosts,
+        giftcardprovider.allwallet,
       ),
       appBar: hiddenAppBar(),
       resizeToAvoidBottomInset: false,

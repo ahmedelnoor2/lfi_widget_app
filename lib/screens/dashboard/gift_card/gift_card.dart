@@ -28,10 +28,21 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
   void initState() {
     // TODO: implement initState
     super.initState();
+    getAllWallet();
     getAllCountries();
     getCatalog();
   }
 
+  // Get wallets//
+  Future<void> getAllWallet() async {
+    var giftcardprovider =
+        Provider.of<GiftCardProvider>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
+    var userid = await auth.userInfo['id'];
+    await giftcardprovider.getAllWallet(context, auth,userid);
+  }
+  
+  
   Future<void> getAllCountries() async {
     var giftcardprovider =
         Provider.of<GiftCardProvider>(context, listen: false);
@@ -70,6 +81,7 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     var auth = Provider.of<Auth>(context, listen: true);
+
     final List<Widget> imageSliders = giftcardprovider.sliderlist
         .map((item) => InkWell(
               onTap: (() async {

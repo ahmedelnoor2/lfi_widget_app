@@ -16,6 +16,47 @@ class GiftCardProvider with ChangeNotifier {
     'userId': '',
   };
   String paymentstatus = 'Waiting for payment';
+  //// Get Wallet//
+  List _allwallet = [];
+
+  List get allwallet {
+    return _allwallet;
+  }
+
+  Future<void> getAllWallet(ctx, auth, userid) async {
+    headers['token'] = auth.loginVerificationToken;
+    headers['userid'] = '${userid}';
+
+    var url = Uri.https(lyoApiUrl, 'gift-card/wallets');
+    // print(url);
+
+    try {
+      final response = await http.get(url, headers: headers);
+
+      final responseData = json.decode(response.body);
+      print('All wallet .....');
+      // print(responseData);
+
+      if (responseData['code'] == 200) {
+        _allwallet = [];
+        for(var wallet in responseData['data']) {
+          print(wallet);
+          _allwallet.add(wallet['coin']);
+        }
+        // _allwallet = responseData['data'];
+
+        return notifyListeners();
+      } else {
+        _allwallet = [];
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return notifyListeners();
+    }
+  }
+
   Map _toActiveCountry = {};
 
   Map get toActiveCountry {
@@ -186,7 +227,6 @@ class GiftCardProvider with ChangeNotifier {
 
   void setverify(value) {
     _isverify = value;
-    
   }
 
   //Google code enable//
@@ -198,7 +238,6 @@ class GiftCardProvider with ChangeNotifier {
 
   void setgoolgeCode(value) {
     _isgoogleCode = value;
-    
   }
 
   bool otpverifcation = false;
@@ -231,7 +270,6 @@ class GiftCardProvider with ChangeNotifier {
       print(responseData);
 
       if (responseData['code'] == '200') {
-       
         otpverifcation = false;
         _doverify = responseData['data'];
         print(_doverify);
@@ -258,8 +296,7 @@ class GiftCardProvider with ChangeNotifier {
   /// withDrawal///
 
   bool _iswithdrwal = false;
-  bool get iswithdrwal{
-
+  bool get iswithdrwal {
     return _iswithdrwal;
   }
 
@@ -292,11 +329,9 @@ class GiftCardProvider with ChangeNotifier {
       print(responseData);
 
       if (responseData['code'] == '200') {
-        
-       
         _iswithdrwal = false;
         _dowithdrawal = responseData;
-        paymentstatus='Card is Processing';
+        paymentstatus = 'Card is Processing';
 
         snackAlert(ctx, SnackTypes.success, responseData['msg']);
 

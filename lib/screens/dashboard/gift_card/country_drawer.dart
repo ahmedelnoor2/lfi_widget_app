@@ -75,8 +75,8 @@ class _CountryDrawerState extends State<CountryDrawer> {
                           giftcardprovider.allCountries.forEach((country) {
                             if (country['currency']['name']
                                     .toString()
-                                    .toUpperCase()
-                                    .contains(text.toUpperCase()) ||
+                                    .toLowerCase()
+                                    .contains(text.toLowerCase()) ||
                                 country['currency']['name']
                                     .toString()
                                     .toLowerCase()
@@ -123,12 +123,7 @@ class _CountryDrawerState extends State<CountryDrawer> {
                           await giftcardprovider.getAllCard(
                               context, auth, userid);
                         },
-                        // leading: CircleAvatar(
-                        //   radius: width * 0.035,
-                        //   child: Image.network(
-                        //     '${public.publicInfoMarket['market']['coinList'][_asset['coin']]['icon']}',
-                        //   ),
-                        // ),
+                       
                         title: Text(data['name']),
                         trailing: Text(data['currency']['code']),
                       );
