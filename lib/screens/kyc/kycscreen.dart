@@ -87,7 +87,7 @@ class _KycscreenState extends State<Kycscreen>
                       'assets/img/personal_verfication.png',
                       height: width * 0.1,
                     ),
-                    title: Text('Personal Verification'),
+                    title: Text('Individual Verification'),
                     subtitle: Text(
                       auth.userInfo['sumsubLevelName'].isEmpty
                           ? 'Complete your KYC'
@@ -123,7 +123,7 @@ class _KycscreenState extends State<Kycscreen>
                       'assets/img/entitiy_verfication.png',
                       height: width * 0.1,
                     ),
-                    title: Text('Entity Verification'),
+                    title: Text('Corporate Verification'),
                     subtitle: Text(
                       'Complete your KYC',
                       style: TextStyle(
@@ -131,7 +131,7 @@ class _KycscreenState extends State<Kycscreen>
                       ),
                     ),
                     onTap: () {
-                      snackAlert(context, SnackTypes.warning, 'Coming soon...');
+                      snackAlert(context, SnackTypes.warning, 'Available on LYOTRADE website only');
                       // Navigator.pushNamed(context, '/entityverification');
                     },
                     trailing: Column(
