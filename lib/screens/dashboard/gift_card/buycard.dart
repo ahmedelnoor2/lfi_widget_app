@@ -2,12 +2,14 @@ import 'dart:async';
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/dex_provider.dart';
 import 'package:lyotrade/providers/giftcard.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/dex_swap/common/exchange_now.dart';
+import 'package:lyotrade/utils/Coins.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/ScreenControl.utils.dart';
 import 'package:provider/provider.dart';
@@ -35,12 +37,14 @@ class _BuyCardState extends State<BuyCard> {
   final _formKey = GlobalKey<FormState>();
   final _optcontroller = TextEditingController();
   final _googlecodecontroller = TextEditingController();
-   bool _startTimer = false;
-   late Timer _timer;
+  bool _startTimer = false;
+  late Timer _timer;
   int _start = 90;
+  bool withdrwalResponse = false;
   @override
   void initState() {
     super.initState();
+
     changeverifystatus();
   }
 
@@ -48,6 +52,7 @@ class _BuyCardState extends State<BuyCard> {
   void dispose() async {
     super.dispose();
   }
+
   void startTimer(coin) {
     setState(() {
       _startTimer = true;
@@ -76,33 +81,34 @@ class _BuyCardState extends State<BuyCard> {
         Provider.of<GiftCardProvider>(context, listen: false);
     giftcardprovider.setverify(false);
     giftcardprovider.setgoolgeCode(false);
+    giftcardprovider.paymentstatus = 'Waiting for payment';
   }
 
   Future<void> optVerify(coin) async {
     var giftcardprovider =
         Provider.of<GiftCardProvider>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
+    var asset = Provider.of<Asset>(context, listen: false);
+
     var userid = await auth.userInfo['id'];
 
-    await giftcardprovider.getDoVerify(context, auth, userid, {
-      "address": "0x11f4D6a5a90d830023E01489D7c74552FC00D1c4",
-      "symbol": 'LYO'
-    });
+    await giftcardprovider.getDoVerify(context, auth, userid,
+        {"address": asset.changeAddress['addressStr'], "symbol": '$coin'});
   }
 
-  Future<void> withDrawal(coin, amount, verifitypre) async {
+  Future<void> withDrawal(coin, totalprice, verifitypre) async {
     var giftcardprovider =
         Provider.of<GiftCardProvider>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
     var userid = await auth.userInfo['id'];
 
-    print(verifitypre);
+    //print(verifitypre);
 
-    await giftcardprovider.getDoWithDrawal(context, auth, userid, {
-      "address": "16jSX1dKCc2NAPp3tVxLDff3sh4kTWhfE2",
+    withdrwalResponse =
+        await giftcardprovider.getDoWithDrawal(context, auth, userid, {
       "symbol": '$coin',
       "fee": "1",
-      "amount": "$amount",
+      "amount": "$totalprice",
       "verificationType": "$verifitypre",
       "emailValidCode":
           verifitypre == 'emailValidCode' ? _optcontroller.text : "",
@@ -135,7 +141,7 @@ class _BuyCardState extends State<BuyCard> {
     var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
     final args = ModalRoute.of(context)!.settings.arguments as BuyCard;
 
-    print(giftcardprovider.isverify);
+    print(giftcardprovider.paymentstatus);
     // print(args.productID);
     return Scaffold(
         appBar: AppBar(
@@ -163,13 +169,18 @@ class _BuyCardState extends State<BuyCard> {
                   left: 10,
                 ),
                 padding: EdgeInsets.only(bottom: 10),
-                child: Text(giftcardprovider.paymentstatus ==
-                                  'Waiting for payment'
-                              ? 'Waiting for payment'
+                child: Text(
+                  giftcardprovider.paymentstatus == 'Waiting for payment'
+                      ? 'Waiting for payment'
+                      : giftcardprovider.paymentstatus == 'Card is Processing'
+                          ? 'Card is Processing'
+                          : giftcardprovider.paymentstatus == 'Completed'
+                              ? 'Completed'
                               : giftcardprovider.paymentstatus ==
-                                      'Card is Processing'
-                                  ? 'Card is Processing'
-                                  :'Waiting for payment',),
+                                      'Failed to process a Gift Card, Please Contact Admin.'
+                                  ? 'Failed to process a Gift Card, Please Contact Admin.'
+                                  : 'Waiting for payment',
+                ),
               ),
               Container(
                 margin: EdgeInsets.only(left: 8, right: 16, bottom: 15),
@@ -197,7 +208,13 @@ class _BuyCardState extends State<BuyCard> {
                               : giftcardprovider.paymentstatus ==
                                       'Card is Processing'
                                   ? width * 0.5
-                                  : width * 0.3,
+                                  : giftcardprovider.paymentstatus ==
+                                          'Completed'
+                                      ? width * 1.0
+                                      : giftcardprovider.paymentstatus ==
+                                              'Failed to process a Gift Card, Please Contact Admin.'
+                                          ? width * 0.0
+                                          : width * 0.3,
                           // width: dexPro
 
                           height: 15,
@@ -220,7 +237,7 @@ class _BuyCardState extends State<BuyCard> {
                         child: Text(
                           '${double.parse(args.totalprice.toString()).toStringAsPrecision(7)}' +
                               ' ' +
-                              args.defaultcoin.toString(),
+                              getCoinName(args.defaultcoin.toString()),
                           style: TextStyle(
                               fontSize: 32, fontWeight: FontWeight.bold),
                         )),
@@ -261,123 +278,199 @@ class _BuyCardState extends State<BuyCard> {
                   ),
                 ),
               ),
-              Column(
-                children: [
-                  SizedBox(
-                    height: 40,
-                  ),
-                  Form(
-                    key: _formKey,
-                    child: Column(
+              giftcardprovider.paymentstatus == 'Completed'
+                  ? Column(
                       children: [
-                        TextFormField(
-                          controller: _optcontroller,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter Code';
-                            }
-
-                            return null;
-                          },
-                          onChanged: ((value) {}),
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  width: 0.5,
-                                  color: secondaryTextColor400), //<-- SEE HERE
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: secondaryTextColor400, width: 0.5),
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            hintText: 'Please Enter Code',
-                            suffixIcon: InkWell(
-                              onTap:_startTimer
-                                ? null
-                                : () {
-                                    setState(() {
-                                      _start = 90;
-                                    });
-                                    startTimer(args.defaultcoin);
-                                  }, 
-                              child: Container(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 15,
-                                    right: 10,
-                                  ),
-                                  child:Text(_startTimer
-                                ? '${_start}s Get it again'
-                                : 'Click to send'),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            // errorText: _errorText,
+                        Center(
+                          child: Image.asset(
+                            'assets/img/approved.png',
+                            width: 180,
                           ),
-                      
-                        SizedBox(
-                          height: 20,
                         ),
-                        giftcardprovider.isgoogleCode == true
-                            ? TextFormField(
-                                controller: _googlecodecontroller,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please Google Code';
-                                  }
-
-                                  return null;
-                                },
-                                onChanged: ((value) {}),
-                                keyboardType: TextInputType.number,
-                                decoration: InputDecoration(
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        width: 0.5,
-                                        color:
-                                            secondaryTextColor400), //<-- SEE HERE
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: secondaryTextColor400,
-                                        width: 0.5),
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  hintText: 'Please Google Code',
-
-                                  // errorText: _errorText,
-                                ),
-                              )
-                            : Container(),
-                      ],
-                    ),
-                  ),
-                  giftcardprovider.isverify == true
-                      ? Container(
-                          padding: EdgeInsets.only(top: 50, right: 4, left: 4),
+                        Text(
+                          'Completed',
+                          style: TextStyle(color: successColor),
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(top: 20, right: 4, left: 4),
                           child: LyoButton(
                             onPressed: (() async {
-                              if (_formKey.currentState!.validate()) {
-                                await withDrawal(
-                                    args.defaultcoin,
-                                    args.totalprice,
-                                    giftcardprovider
-                                        .doverify['verificationType']);
-                              }
+                              Navigator.pop(context);
                             }),
-                            text: 'Buy Now',
+                            text: 'Back',
                             active: true,
                             isLoading: giftcardprovider.iswithdrwal,
                             activeColor: linkColor,
                             activeTextColor: Colors.black,
                           ),
                         )
-                      : Container()
-                ],
-              ),
+                      ],
+                    )
+                  : giftcardprovider.paymentstatus ==
+                          'Failed to process a Gift Card, Please Contact Admin.'
+                      ? Column(
+                          children: [
+                            Center(
+                              child: Image.asset(
+                                'assets/img/rejected.png',
+                                width: 180,
+                              ),
+                            ),
+                            Text(
+                              'Failed to process a Gift Card, Please Contact Admin.',
+                              style: TextStyle(color: Colors.red),
+                            ),
+                            Container(
+                              padding:
+                                  EdgeInsets.only(top: 20, right: 4, left: 4),
+                              child: LyoButton(
+                                onPressed: (() async {
+                                  Navigator.pop(context);
+                                }),
+                                text: 'Back',
+                                active: true,
+                                isLoading: giftcardprovider.iswithdrwal,
+                                activeColor: linkColor,
+                                activeTextColor: Colors.black,
+                              ),
+                            )
+                          ],
+                        )
+                      : Container(
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                height: 40,
+                              ),
+                              Form(
+                                key: _formKey,
+                                child: Column(
+                                  children: [
+                                    TextFormField(
+                                      controller: _optcontroller,
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Please enter Code';
+                                        }
+
+                                        return null;
+                                      },
+                                      onChanged: ((value) {}),
+                                      keyboardType: TextInputType.number,
+                                      decoration: InputDecoration(
+                                        enabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                              width: 0.5,
+                                              color:
+                                                  secondaryTextColor400), //<-- SEE HERE
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: secondaryTextColor400,
+                                              width: 0.5),
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                        ),
+                                        hintText: 'Please Enter Code',
+                                        suffixIcon: InkWell(
+                                          onTap: _startTimer
+                                              ? null
+                                              : () {
+                                                  setState(() {
+                                                    _start = 90;
+                                                  });
+                                                  startTimer(args.defaultcoin);
+                                                },
+                                          child: Container(
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                top: 15,
+                                                right: 10,
+                                              ),
+                                              child: Text(_startTimer
+                                                  ? '${_start}s Get it again'
+                                                  : 'Click to send'),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      // errorText: _errorText,
+                                    ),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                    giftcardprovider.isgoogleCode == true
+                                        ? TextFormField(
+                                            controller: _googlecodecontroller,
+                                            validator: (value) {
+                                              if (value == null ||
+                                                  value.isEmpty) {
+                                                return 'Please Google Code';
+                                              }
+
+                                              return null;
+                                            },
+                                            onChanged: ((value) {}),
+                                            keyboardType: TextInputType.number,
+                                            decoration: InputDecoration(
+                                              enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    width: 0.5,
+                                                    color:
+                                                        secondaryTextColor400), //<-- SEE HERE
+                                              ),
+                                              focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color:
+                                                        secondaryTextColor400,
+                                                    width: 0.5),
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                              ),
+                                              hintText: 'Please Google Code',
+
+                                              // errorText: _errorText,
+                                            ),
+                                          )
+                                        : Container(),
+                                  ],
+                                ),
+                              ),
+                              giftcardprovider.isverify == true
+                                  ? Container(
+                                      padding: EdgeInsets.only(
+                                          top: 50, right: 4, left: 4),
+                                      child: LyoButton(
+                                        onPressed: (() async {
+                                          if (_formKey.currentState!
+                                              .validate()) {
+                                            await withDrawal(
+                                                    args.defaultcoin,
+                                                    args.totalprice,
+                                                    giftcardprovider.doverify[
+                                                        'verificationType'])
+                                                .whenComplete(() => {
+                                                      if (withdrwalResponse ==
+                                                          true)
+                                                        {
+                                                          dotransaction(
+                                                              args.productID,
+                                                              args.amount),
+                                                        }
+                                                    });
+                                          }
+                                        }),
+                                        text: 'Buy Now',
+                                        active: true,
+                                        isLoading: giftcardprovider.iswithdrwal,
+                                        activeColor: linkColor,
+                                        activeTextColor: Colors.black,
+                                      ),
+                                    )
+                                  : Container()
+                            ],
+                          ),
+                        ),
             ],
           ),
         ));

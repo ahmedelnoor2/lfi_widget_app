@@ -9,6 +9,7 @@ import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/dashboard/gift_card/buycard.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
+import 'package:lyotrade/utils/Coins.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 
@@ -26,7 +27,7 @@ class _GiftDetailState extends State<GiftDetail> {
   List _allNetworks = [];
   String _defaultNetwork = 'BSC';
   String _coinShowName = 'LYO1';
-  double? estimateprice;
+  double? estimateprice=0.0;
   double estprice = 0.0;
 
   final TextEditingController _searchController = TextEditingController();
@@ -54,6 +55,7 @@ class _GiftDetailState extends State<GiftDetail> {
     }
     await asset.getAccountBalance(context, auth, "");
     getCoinCosts(_defaultCoin);
+    await asset.getChangeAddress(context, auth, _defaultCoin);
   }
 
   Future<void> getCoinCosts(netwrkType) async {
@@ -63,6 +65,8 @@ class _GiftDetailState extends State<GiftDetail> {
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
     var public = Provider.of<Public>(context, listen: false);
+
+    await asset.getChangeAddress(context, auth,_defaultCoin);
 
     if (public.publicInfoMarket['market']['followCoinList'][netwrkType] !=
         null) {
@@ -141,7 +145,7 @@ class _GiftDetailState extends State<GiftDetail> {
     var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
     var asset = Provider.of<Asset>(context, listen: true);
     var public = Provider.of<Public>(context, listen: true);
-
+   
     // print(public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()]
     //     [_defaultCoin]);
 
@@ -276,7 +280,8 @@ class _GiftDetailState extends State<GiftDetail> {
                                     Container(
                                       padding: EdgeInsets.only(right: 5),
                                       child: Text(
-                                        '$_defaultCoin',
+                                        getCoinName(_defaultCoin),
+                                        
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
@@ -337,7 +342,7 @@ class _GiftDetailState extends State<GiftDetail> {
                                       public.rate[public
                                           .activeCurrency['fiat_symbol']
                                           .toUpperCase()][_defaultCoin];
-                                  estimateprice = finalprice;
+                                  estimateprice = double.parse(finalprice.toStringAsPrecision(8));
                                 });
                               } else {
                                 estimateprice = 0.0;
@@ -388,8 +393,8 @@ class _GiftDetailState extends State<GiftDetail> {
                                       TextStyle(color: secondaryTextColor400),
                                 ),
                                 Text('${estimateprice.toString()}'
-                                        ' ' +
-                                    _defaultCoin.toString())
+                                        ' ' +getCoinName(_defaultCoin.toString())
+                                    )
                               ]),
                         ),
                         arguments['data']['is_a_range']

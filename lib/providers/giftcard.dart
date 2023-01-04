@@ -41,7 +41,7 @@ class GiftCardProvider with ChangeNotifier {
         _allwallet = [];
         for(var wallet in responseData['data']) {
           print(wallet);
-          _allwallet.add(wallet['coin']);
+          _allwallet.add(wallet['coinType']);
         }
         // _allwallet = responseData['data'];
 
@@ -306,7 +306,7 @@ class GiftCardProvider with ChangeNotifier {
     return _dowithdrawal;
   }
 
-  Future<void> getDoWithDrawal(ctx, auth, userid, postdata) async {
+  Future<bool> getDoWithDrawal(ctx, auth, userid, postdata) async {
     _iswithdrwal = true;
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
@@ -335,18 +335,22 @@ class GiftCardProvider with ChangeNotifier {
 
         snackAlert(ctx, SnackTypes.success, responseData['msg']);
 
-        return notifyListeners();
+        notifyListeners();
+        return true;
       } else {
         snackAlert(ctx, SnackTypes.warning, responseData['msg']);
         _iswithdrwal = false;
         _doverify = {};
-        return notifyListeners();
+         
+        notifyListeners();
+        return false;
       }
     } catch (error) {
       _iswithdrwal = false;
       print(error);
       // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
-      return notifyListeners();
+       notifyListeners();
+       return false;
     }
   }
   //// Do Transaction////
@@ -381,20 +385,24 @@ class GiftCardProvider with ChangeNotifier {
       final responseData = json.decode(response.body);
       print(responseData);
 
-      if (responseData['code'] == 200) {
+      if (responseData['code'] == '200') {
         dotransactionloading = false;
         _doTransaction = responseData;
+        paymentstatus = 'Completed';
         snackAlert(ctx, SnackTypes.success, responseData['msg']);
+        print(paymentstatus);
 
         return notifyListeners();
       } else {
         snackAlert(ctx, SnackTypes.warning, responseData['msg']);
         dotransactionloading = false;
         _doTransaction = {};
+        paymentstatus='Failed to process a Gift Card, Please Contact Admin.';
         return notifyListeners();
       }
     } catch (error) {
       cardloading = false;
+      paymentstatus='Failed to process a Gift Card, Please Contact Admin.';
       print(error);
       // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
       return notifyListeners();
