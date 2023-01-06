@@ -210,7 +210,7 @@ class GiftCardProvider with ChangeNotifier {
     }
   }
   //// Estimate////
-  var amountsystm=0.0;
+  var amountsystm;
   bool isEstimate = false;
 
   Map _estimateRate = {};
@@ -242,7 +242,9 @@ class GiftCardProvider with ChangeNotifier {
       if (responseData['code'] == 200) {
         isEstimate = false;
         _estimateRate = responseData['data']['records'][0];
+        print(_estimateRate);
         amountsystm=double.parse(_estimateRate['amount_system']);
+        print(amountsystm);
         return notifyListeners();
       } else {
         //snackAlert(ctx, SnackTypes.warning, responseData['msg']);

@@ -13,6 +13,7 @@ import 'package:lyotrade/screens/dashboard/gift_card/country_drawer.dart';
 
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class GiftCard extends StatefulWidget {
   static const routeName = '/gift_card';
@@ -436,12 +437,16 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                                         arguments: {'data': currentindex},
                                       );
                                     },
-                                    leading: Image.network(
-                                      giftcardprovider
+                                    leading: Container(
+                                          width: 100,
+                                          child: FadeInImage.memoryNetwork(
+                                            placeholder: kTransparentImage,
+                                            image:giftcardprovider
                                           .toActiveCatalog['card_image']
-                                          .toString(),
-                                      fit: BoxFit.contain,
-                                    ),
+                                                      .toString(),
+                                                      fit: BoxFit.cover,
+                                          ),
+                                        ),
                                     title: Text('${currentindex['name']}'),
                                     subtitle: currentindex['is_a_range']
                                         ? Column(

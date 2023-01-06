@@ -48,8 +48,9 @@ class _GiftDetailState extends State<GiftDetail> {
         Provider.of<GiftCardProvider>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
     var userid = await auth.userInfo['id'];
-    giftcardprovider.getEstimateRate(context, auth, userid,
+    await giftcardprovider.getEstimateRate(context, auth, userid,
         {"currency": "$currency", "payment": payment, "productID": productID});
+        return;
   }
 
   Future<void> getDigitalBalance() async {
@@ -258,6 +259,10 @@ class _GiftDetailState extends State<GiftDetail> {
                         GestureDetector(
                           onTap: () {
                             _scaffoldKey.currentState!.openDrawer();
+                            setState(() {
+                              estimateprice = 0.0;
+                              _amountcontroller.clear();
+                            });
                           },
                           child: Container(
                             padding: EdgeInsets.all(8),
@@ -341,19 +346,30 @@ class _GiftDetailState extends State<GiftDetail> {
                               return null;
                             },
                             onChanged: ((value) async {
-                              await getEstimateRate(
-                                  arguments['data']['BillerID'],
-                                  _amountcontroller.text,
-                                  arguments['data']['currency']['code']);
                               if (value.isNotEmpty) {
+                                await getEstimateRate(
+                                    arguments['data']['BillerID'],
+                                    _amountcontroller.text,
+                                    arguments['data']['currency']['code']);
                                 setState(() {
                                   estprice = double.parse(value);
+                                  print('Est price:${estprice}');
+                                  print(giftcardprovider.amountsystm);
                                   var price =
                                       giftcardprovider.amountsystm / estprice;
-                                  var finalprice = estprice / price;
 
-                                  estimateprice = finalprice;
-                                  print(estimateprice);
+                                  print('price:${price}');
+
+                                  var finalprice = estprice / price;
+                                    print('FInal price:${finalprice}');
+
+
+                                  estimateprice = finalprice /
+                                      public.rate[public
+                                          .activeCurrency['fiat_symbol']
+                                          .toUpperCase()][_defaultCoin];
+                                  print(
+                                      'puble rate price:${public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()][_defaultCoin]}');
                                 });
                               } else {
                                 estimateprice = 0.0;
@@ -403,9 +419,11 @@ class _GiftDetailState extends State<GiftDetail> {
                                   style:
                                       TextStyle(color: secondaryTextColor400),
                                 ),
-                                Text('${estimateprice}'
-                                        ' ' +
-                                    getCoinName(_defaultCoin.toString()))
+                                giftcardprovider.isEstimate
+                                    ? CircularProgressIndicator()
+                                    : Text('${estimateprice}'
+                                            ' ' +
+                                        getCoinName(_defaultCoin.toString()))
                               ]),
                         ),
                         arguments['data']['is_a_range']
