@@ -27,7 +27,7 @@ class _GiftDetailState extends State<GiftDetail> {
   List _allNetworks = [];
   String _defaultNetwork = 'BSC';
   String _coinShowName = 'LYO1';
-  double? estimateprice=0.0;
+  double? estimateprice = 0.0;
   double estprice = 0.0;
 
   final TextEditingController _searchController = TextEditingController();
@@ -40,6 +40,16 @@ class _GiftDetailState extends State<GiftDetail> {
   void initState() {
     super.initState();
     getDigitalBalance();
+  }
+
+  // Get Estimate Rate//
+  Future<void> getEstimateRate(productID, payment, currency) async {
+    var giftcardprovider =
+        Provider.of<GiftCardProvider>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
+    var userid = await auth.userInfo['id'];
+    giftcardprovider.getEstimateRate(context, auth, userid,
+        {"currency": "$currency", "payment": payment, "productID": productID});
   }
 
   Future<void> getDigitalBalance() async {
@@ -66,7 +76,7 @@ class _GiftDetailState extends State<GiftDetail> {
     var asset = Provider.of<Asset>(context, listen: false);
     var public = Provider.of<Public>(context, listen: false);
 
-    await asset.getChangeAddress(context, auth,_defaultCoin);
+    await asset.getChangeAddress(context, auth, _defaultCoin);
 
     if (public.publicInfoMarket['market']['followCoinList'][netwrkType] !=
         null) {
@@ -99,8 +109,6 @@ class _GiftDetailState extends State<GiftDetail> {
       if (public.publicInfoMarket['market']['coinList'][netwrkType]
               ['tagType'] ==
           0) {
-        print(public.publicInfoMarket['market']['coinList'][netwrkType]
-            ['tagType']);
         setState(() {
           _tagType = false;
         });
@@ -145,12 +153,10 @@ class _GiftDetailState extends State<GiftDetail> {
     var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
     var asset = Provider.of<Asset>(context, listen: true);
     var public = Provider.of<Public>(context, listen: true);
-   
-    // print(public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()]
-    //     [_defaultCoin]);
 
     final arguments = (ModalRoute.of(context)?.settings.arguments ??
         <String, dynamic>{}) as Map;
+    // print(arguments);
 
     return Scaffold(
       key: _scaffoldKey,
@@ -281,7 +287,6 @@ class _GiftDetailState extends State<GiftDetail> {
                                       padding: EdgeInsets.only(right: 5),
                                       child: Text(
                                         getCoinName(_defaultCoin),
-                                        
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
@@ -320,29 +325,35 @@ class _GiftDetailState extends State<GiftDetail> {
                           child: TextFormField(
                             controller: _amountcontroller,
                             validator: (value) {
-                              var min = double.parse(arguments['data']['min']);
-                              var max = double.parse(arguments['data']['max']);
-                              var myvalue = double.parse(value!);
+                              var min = double.parse(
+                                  arguments['data']['min'].replaceAll(',', ""));
+                              var max = double.parse(
+                                  arguments['data']['max'].replaceAll(',', ""));
 
                               if (value == null || value.isEmpty) {
                                 return 'Please enter Amount';
-                              } else if (myvalue < min) {
+                              } else if (double.parse(value.toString()) < min) {
                                 return 'Minimum Amount';
-                              } else if (myvalue > max) {
+                              } else if (double.parse(value.toString()) > max) {
                                 return 'Max Amount';
                               }
 
                               return null;
                             },
-                            onChanged: ((value) {
+                            onChanged: ((value) async {
+                              await getEstimateRate(
+                                  arguments['data']['BillerID'],
+                                  _amountcontroller.text,
+                                  arguments['data']['currency']['code']);
                               if (value.isNotEmpty) {
                                 setState(() {
                                   estprice = double.parse(value);
-                                  var finalprice = estprice /
-                                      public.rate[public
-                                          .activeCurrency['fiat_symbol']
-                                          .toUpperCase()][_defaultCoin];
-                                  estimateprice = double.parse(finalprice.toStringAsPrecision(8));
+                                  var price =
+                                      giftcardprovider.amountsystm / estprice;
+                                  var finalprice = estprice / price;
+
+                                  estimateprice = finalprice;
+                                  print(estimateprice);
                                 });
                               } else {
                                 estimateprice = 0.0;
@@ -392,9 +403,9 @@ class _GiftDetailState extends State<GiftDetail> {
                                   style:
                                       TextStyle(color: secondaryTextColor400),
                                 ),
-                                Text('${estimateprice.toString()}'
-                                        ' ' +getCoinName(_defaultCoin.toString())
-                                    )
+                                Text('${estimateprice}'
+                                        ' ' +
+                                    getCoinName(_defaultCoin.toString()))
                               ]),
                         ),
                         arguments['data']['is_a_range']

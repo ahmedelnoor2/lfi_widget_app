@@ -34,13 +34,10 @@ class GiftCardProvider with ChangeNotifier {
       final response = await http.get(url, headers: headers);
 
       final responseData = json.decode(response.body);
-      print('All wallet .....');
-      // print(responseData);
 
       if (responseData['code'] == 200) {
         _allwallet = [];
-        for(var wallet in responseData['data']) {
-          print(wallet);
+        for (var wallet in responseData['data']) {
           _allwallet.add(wallet['coinType']);
         }
         // _allwallet = responseData['data'];
@@ -81,13 +78,11 @@ class GiftCardProvider with ChangeNotifier {
     headers['userid'] = '${userid}';
 
     var url = Uri.https(lyoApiUrl, 'gift-card/countries');
-    print(url);
 
     try {
       final response = await http.get(url, headers: headers);
 
       final responseData = json.decode(response.body);
-      print(responseData);
 
       if (responseData['code'] == 200) {
         _allCountries = responseData['data'];
@@ -191,14 +186,11 @@ class GiftCardProvider with ChangeNotifier {
     var catid = await _toActiveCatalog['id'];
 
     var url = Uri.https(lyoApiUrl, 'gift-card/cards/$catid/$countrycode');
-    print(url);
 
     try {
       final response = await http.get(url, headers: headers);
 
       final responseData = json.decode(response.body);
-
-      print(responseData);
 
       if (responseData['code'] == 200) {
         cardloading = false;
@@ -212,6 +204,56 @@ class GiftCardProvider with ChangeNotifier {
       }
     } catch (error) {
       cardloading = false;
+      print(error);
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return notifyListeners();
+    }
+  }
+  //// Estimate////
+  var amountsystm=0.0;
+  bool isEstimate = false;
+
+  Map _estimateRate = {};
+
+  Map get estimateRate {
+    return _estimateRate;
+  }
+
+  Future<void> getEstimateRate(ctx, auth, userid, postdata) async {
+    isEstimate = true;
+    notifyListeners();
+    headers['token'] = auth.loginVerificationToken;
+    headers['userid'] = '${userid}';
+    
+    var mydata = json.encode(postdata);
+
+    var url = Uri.https(lyoApiUrl, 'gift-card/estimate');
+
+    try {
+      final response = await http.post(
+        url,
+        body: mydata,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+  
+
+      if (responseData['code'] == 200) {
+        isEstimate = false;
+        _estimateRate = responseData['data']['records'][0];
+        amountsystm=double.parse(_estimateRate['amount_system']);
+        return notifyListeners();
+      } else {
+        //snackAlert(ctx, SnackTypes.warning, responseData['msg']);
+        isEstimate = false;
+        _estimateRate = {};
+
+        return notifyListeners();
+      }
+    } catch (error) {
+      isEstimate = false;
+
       print(error);
       // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
       return notifyListeners();
@@ -249,7 +291,6 @@ class GiftCardProvider with ChangeNotifier {
   }
 
   Future<void> getDoVerify(ctx, auth, userid, postdata) async {
-    print(postdata);
     otpverifcation = true;
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
@@ -267,12 +308,11 @@ class GiftCardProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-      print(responseData);
 
       if (responseData['code'] == '200') {
         otpverifcation = false;
         _doverify = responseData['data'];
-        print(_doverify);
+
         setverify(true);
         setgoolgeCode(_doverify['googleCode']);
 
@@ -313,10 +353,8 @@ class GiftCardProvider with ChangeNotifier {
     headers['userid'] = '${userid}';
 
     var mydata = json.encode(postdata);
-    print(mydata);
-
+    print(postdata);
     var url = Uri.https(lyoApiUrl, 'gift-card/withdraw');
-    print(url);
 
     try {
       final response = await http.post(
@@ -341,7 +379,7 @@ class GiftCardProvider with ChangeNotifier {
         snackAlert(ctx, SnackTypes.warning, responseData['msg']);
         _iswithdrwal = false;
         _doverify = {};
-         
+
         notifyListeners();
         return false;
       }
@@ -349,8 +387,8 @@ class GiftCardProvider with ChangeNotifier {
       _iswithdrwal = false;
       print(error);
       // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
-       notifyListeners();
-       return false;
+      notifyListeners();
+      return false;
     }
   }
   //// Do Transaction////
@@ -370,10 +408,8 @@ class GiftCardProvider with ChangeNotifier {
     headers['userid'] = '${userid}';
 
     var mydata = json.encode(postdata);
-    print(mydata);
 
     var url = Uri.https(lyoApiUrl, 'gift-card/transaction');
-    print(url);
 
     try {
       final response = await http.post(
@@ -383,26 +419,24 @@ class GiftCardProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-      print(responseData);
 
       if (responseData['code'] == '200') {
         dotransactionloading = false;
         _doTransaction = responseData;
         paymentstatus = 'Completed';
         snackAlert(ctx, SnackTypes.success, responseData['msg']);
-        print(paymentstatus);
 
         return notifyListeners();
       } else {
         snackAlert(ctx, SnackTypes.warning, responseData['msg']);
         dotransactionloading = false;
         _doTransaction = {};
-        paymentstatus='Failed to process a Gift Card, Please Contact Admin.';
+        paymentstatus = 'Failed to process a Gift Card, Please Contact Admin.';
         return notifyListeners();
       }
     } catch (error) {
       cardloading = false;
-      paymentstatus='Failed to process a Gift Card, Please Contact Admin.';
+      paymentstatus = 'Failed to process a Gift Card, Please Contact Admin.';
       print(error);
       // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
       return notifyListeners();

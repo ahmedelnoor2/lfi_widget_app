@@ -451,7 +451,7 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                                               Text(
                                                   'Min price: ${currentindex['min']}'),
                                               Text(
-                                                  'Min price: ${currentindex['max']}'),
+                                                  'Max price: ${currentindex['max']}'),
                                             ],
                                           )
                                         : Text('Price: ${currentindex['max']}'),

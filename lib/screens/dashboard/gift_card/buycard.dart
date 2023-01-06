@@ -101,9 +101,6 @@ class _BuyCardState extends State<BuyCard> {
         Provider.of<GiftCardProvider>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
     var userid = await auth.userInfo['id'];
-
-    //print(verifitypre);
-
     withdrwalResponse =
         await giftcardprovider.getDoWithDrawal(context, auth, userid, {
       "symbol": '$coin',
@@ -140,9 +137,6 @@ class _BuyCardState extends State<BuyCard> {
     final width = MediaQuery.of(context).size.width;
     var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
     final args = ModalRoute.of(context)!.settings.arguments as BuyCard;
-
-    print(giftcardprovider.paymentstatus);
-    // print(args.productID);
     return Scaffold(
         appBar: AppBar(
           leading: IconButton(
