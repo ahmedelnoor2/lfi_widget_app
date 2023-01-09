@@ -38,7 +38,9 @@ class GiftCardProvider with ChangeNotifier {
       if (responseData['code'] == 200) {
         _allwallet = [];
         for (var wallet in responseData['data']) {
+          
           _allwallet.add(wallet['coinType']);
+          _allwallet.add(wallet['coin']);
         }
         // _allwallet = responseData['data'];
 
