@@ -330,141 +330,159 @@ class _BuyCardState extends State<BuyCard> {
                             )
                           ],
                         )
-                      : Container(
-                          child: Column(
-                            children: [
-                              SizedBox(
-                                height: 40,
-                              ),
-                              Form(
-                                key: _formKey,
-                                child: Column(
-                                  children: [
-                                    TextFormField(
-                                      controller: _optcontroller,
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please enter Verification Code';
-                                        }
+                      : Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  height: 40,
+                                ),
+                                Form(
+                                  key: _formKey,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                          padding: EdgeInsets.only(bottom: 10),
+                                          child: Text(
+                                              'Email or Phone Verification code')),
+                                      TextFormField(
+                                        controller: _optcontroller,
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Please enter Verification Code';
+                                          }
 
-                                        return null;
-                                      },
-                                      onChanged: ((value) {}),
-                                      keyboardType: TextInputType.number,
-                                      decoration: InputDecoration(
-                                        enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(
-                                              width: 0.5,
-                                              color:
-                                                  secondaryTextColor400), //<-- SEE HERE
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(
-                                              color: secondaryTextColor400,
-                                              width: 0.5),
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                        ),
-                                        hintText:
-                                            'Please enter verification code',
-                                        suffixIcon: InkWell(
-                                          onTap: _startTimer
-                                              ? null
-                                              : () {
-                                                  setState(() {
-                                                    _start = 90;
-                                                  });
-                                                  startTimer(args.defaultcoin);
-                                                },
-                                          child: Container(
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                top: 15,
-                                                right: 10,
+                                          return null;
+                                        },
+                                        onChanged: ((value) {}),
+                                        keyboardType: TextInputType.number,
+                                        decoration: InputDecoration(
+                                          enabledBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                width: 0.5,
+                                                color:
+                                                    secondaryTextColor400), //<-- SEE HERE
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: secondaryTextColor400,
+                                                width: 0.5),
+                                            borderRadius:
+                                                BorderRadius.circular(5),
+                                          ),
+                                          hintText:
+                                              'Please enter verification code',
+                                          suffixIcon: InkWell(
+                                            onTap: _startTimer
+                                                ? null
+                                                : () {
+                                                    setState(() {
+                                                      _start = 90;
+                                                    });
+                                                    startTimer(
+                                                        args.defaultcoin);
+                                                  },
+                                            child: Container(
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                  top: 15,
+                                                  right: 10,
+                                                ),
+                                                child: Text(_startTimer
+                                                    ? '${_start}s Get it again'
+                                                    : 'Click to send'),
                                               ),
-                                              child: Text(_startTimer
-                                                  ? '${_start}s Get it again'
-                                                  : 'Click to send'),
                                             ),
                                           ),
                                         ),
+                                        // errorText: _errorText,
                                       ),
-                                      // errorText: _errorText,
-                                    ),
-                                    SizedBox(
-                                      height: 20,
-                                    ),
-                                    giftcardprovider.isgoogleCode == true
-                                        ? TextFormField(
-                                            controller: _googlecodecontroller,
-                                            validator: (value) {
-                                              if (value == null ||
-                                                  value.isEmpty) {
-                                                return 'Please Google authenticator code';
-                                              }
+                                      Container(
+                                          padding: EdgeInsets.only(
+                                              bottom: 10, top: 10),
+                                          child: Text(
+                                              'Google authenticator code')),
+                                      giftcardprovider.isgoogleCode == true
+                                          ? TextFormField(
+                                              controller: _googlecodecontroller,
+                                              validator: (value) {
+                                                if (value == null ||
+                                                    value.isEmpty) {
+                                                  return 'Please Google authenticator code';
+                                                }
 
-                                              return null;
-                                            },
-                                            onChanged: ((value) {}),
-                                            keyboardType: TextInputType.number,
-                                            decoration: InputDecoration(
-                                              enabledBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    width: 0.5,
-                                                    color:
-                                                        secondaryTextColor400), //<-- SEE HERE
-                                              ),
-                                              focusedBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color:
-                                                        secondaryTextColor400,
-                                                    width: 0.5),
-                                                borderRadius:
-                                                    BorderRadius.circular(5),
-                                              ),
-                                              hintText:
-                                                  'Please Google  authenticator code',
+                                                return null;
+                                              },
+                                              onChanged: ((value) {}),
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              decoration: InputDecoration(
+                                                enabledBorder:
+                                                    OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      width: 0.5,
+                                                      color:
+                                                          secondaryTextColor400), //<-- SEE HERE
+                                                ),
+                                                focusedBorder:
+                                                    OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color:
+                                                          secondaryTextColor400,
+                                                      width: 0.5),
+                                                  borderRadius:
+                                                      BorderRadius.circular(5),
+                                                ),
+                                                hintText:
+                                                    'Please Google  authenticator code',
 
-                                              // errorText: _errorText,
-                                            ),
-                                          )
-                                        : Container(),
-                                  ],
+                                                // errorText: _errorText,
+                                              ),
+                                            )
+                                          : Container(),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              giftcardprovider.isverify == true
-                                  ? Container(
-                                      padding: EdgeInsets.only(
-                                          top: 50, right: 4, left: 4),
-                                      child: LyoButton(
-                                        onPressed: (() async {
-                                          if (_formKey.currentState!
-                                              .validate()) {
-                                            await withDrawal(
-                                                    args.defaultcoin,
-                                                    args.totalprice,
-                                                    giftcardprovider.doverify[
-                                                        'verificationType'])
-                                                .whenComplete(() => {
-                                                      if (withdrwalResponse ==
-                                                          true)
-                                                        {
-                                                          dotransaction(
-                                                              args.productID,
-                                                              args.amount),
-                                                        }
-                                                    });
-                                          }
-                                        }),
-                                        text: 'Buy Now',
-                                        active: true,
-                                        isLoading: giftcardprovider.iswithdrwal,
-                                        activeColor: linkColor,
-                                        activeTextColor: Colors.black,
-                                      ),
-                                    )
-                                  : Container()
-                            ],
+                                giftcardprovider.isverify == true
+                                    ? Container(
+                                        padding: EdgeInsets.only(
+                                          top: 35,
+                                        ),
+                                        child: LyoButton(
+                                          onPressed: (() async {
+                                            if (_formKey.currentState!
+                                                .validate()) {
+                                              await withDrawal(
+                                                      args.defaultcoin,
+                                                      args.totalprice,
+                                                      giftcardprovider.doverify[
+                                                          'verificationType'])
+                                                  .whenComplete(() => {
+                                                        if (withdrwalResponse ==
+                                                            true)
+                                                          {
+                                                            dotransaction(
+                                                                args.productID,
+                                                                args.amount),
+                                                          }
+                                                      });
+                                            }
+                                          }),
+                                          text: 'Buy Now',
+                                          active: true,
+                                          isLoading:
+                                              giftcardprovider.iswithdrwal,
+                                          activeColor: linkColor,
+                                          activeTextColor: Colors.black,
+                                        ),
+                                      )
+                                    : Container()
+                              ],
+                            ),
                           ),
                         ),
             ],
