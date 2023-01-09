@@ -388,7 +388,7 @@ class _GiftDetailState extends State<GiftDetail> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(top: 20, bottom: 20),
+                          padding: const EdgeInsets.only(top: 20, bottom: 10),
                           child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -402,7 +402,7 @@ class _GiftDetailState extends State<GiftDetail> {
                               ]),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(top: 20, bottom: 20),
+                          padding: const EdgeInsets.only(top: 10, bottom: 20),
                           child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -447,12 +447,15 @@ class _GiftDetailState extends State<GiftDetail> {
                               ),
                         LyoButton(
                           onPressed: (() async {
-                            print(double.parse(double.parse('${estimateprice}').toStringAsFixed(4)));
+                            print(double.parse(double.parse('${estimateprice}')
+                                .toStringAsFixed(4)));
                             if (_formKey.currentState!.validate()) {
                               Navigator.pushNamed(context, '/buy_card',
                                   arguments: BuyCard(
                                       amount: _amountcontroller.text,
-                                      totalprice: double.parse(double.parse('${estimateprice}').toStringAsFixed(4)),
+                                      totalprice: double.parse(
+                                          double.parse('${estimateprice}')
+                                              .toStringAsFixed(4)),
                                       defaultcoin: _defaultCoin,
                                       productID: arguments['data']['BillerID']
                                           .toString()));

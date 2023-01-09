@@ -401,48 +401,54 @@ class _BuyCardState extends State<BuyCard> {
                                         ),
                                         // errorText: _errorText,
                                       ),
-                                      Container(
+                                      
+                                      giftcardprovider.isgoogleCode == true
+                                          ? Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Container(
                                           padding: EdgeInsets.only(
                                               bottom: 10, top: 10),
                                           child: Text(
                                               'Google authenticator code')),
-                                      giftcardprovider.isgoogleCode == true
-                                          ? TextFormField(
-                                              controller: _googlecodecontroller,
-                                              validator: (value) {
-                                                if (value == null ||
-                                                    value.isEmpty) {
-                                                  return 'Please Google authenticator code';
-                                                }
+                                              TextFormField(
+                                                  controller: _googlecodecontroller,
+                                                  validator: (value) {
+                                                    if (value == null ||
+                                                        value.isEmpty) {
+                                                      return 'Please Google authenticator code';
+                                                    }
 
-                                                return null;
-                                              },
-                                              onChanged: ((value) {}),
-                                              keyboardType:
-                                                  TextInputType.number,
-                                              decoration: InputDecoration(
-                                                enabledBorder:
-                                                    OutlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                      width: 0.5,
-                                                      color:
-                                                          secondaryTextColor400), //<-- SEE HERE
-                                                ),
-                                                focusedBorder:
-                                                    OutlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                      color:
-                                                          secondaryTextColor400,
-                                                      width: 0.5),
-                                                  borderRadius:
-                                                      BorderRadius.circular(5),
-                                                ),
-                                                hintText:
-                                                    'Please Google  authenticator code',
+                                                    return null;
+                                                  },
+                                                  onChanged: ((value) {}),
+                                                  keyboardType:
+                                                      TextInputType.number,
+                                                  decoration: InputDecoration(
+                                                    enabledBorder:
+                                                        OutlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                          width: 0.5,
+                                                          color:
+                                                              secondaryTextColor400), //<-- SEE HERE
+                                                    ),
+                                                    focusedBorder:
+                                                        OutlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                          color:
+                                                              secondaryTextColor400,
+                                                          width: 0.5),
+                                                      borderRadius:
+                                                          BorderRadius.circular(5),
+                                                    ),
+                                                    hintText:
+                                                        'Please Google  authenticator code',
 
-                                                // errorText: _errorText,
-                                              ),
-                                            )
+                                                    // errorText: _errorText,
+                                                  ),
+                                                ),
+                                            ],
+                                          )
                                           : Container(),
                                     ],
                                   ),
