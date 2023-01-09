@@ -338,9 +338,9 @@ class _GiftDetailState extends State<GiftDetail> {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter Amount';
                               } else if (double.parse(value.toString()) < min) {
-                                return 'Minimum Amount:{$min}';
+                                return 'Minimum Amount:$min';
                               } else if (double.parse(value.toString()) > max) {
-                                return 'Max Amount:{$max}';
+                                return 'Max Amount:$max';
                               }
 
                               return null;
