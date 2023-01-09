@@ -344,7 +344,7 @@ class _BuyCardState extends State<BuyCard> {
                                       controller: _optcontroller,
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
-                                          return 'Please enter Code';
+                                          return 'Please enter Verification Code';
                                         }
 
                                         return null;
@@ -365,7 +365,8 @@ class _BuyCardState extends State<BuyCard> {
                                           borderRadius:
                                               BorderRadius.circular(5),
                                         ),
-                                        hintText: 'Please Enter Code',
+                                        hintText:
+                                            'Please enter verification code',
                                         suffixIcon: InkWell(
                                           onTap: _startTimer
                                               ? null
@@ -399,7 +400,7 @@ class _BuyCardState extends State<BuyCard> {
                                             validator: (value) {
                                               if (value == null ||
                                                   value.isEmpty) {
-                                                return 'Please Google Code';
+                                                return 'Please Google authenticator code';
                                               }
 
                                               return null;
@@ -421,7 +422,8 @@ class _BuyCardState extends State<BuyCard> {
                                                 borderRadius:
                                                     BorderRadius.circular(5),
                                               ),
-                                              hintText: 'Please Google Code',
+                                              hintText:
+                                                  'Please Google  authenticator code',
 
                                               // errorText: _errorText,
                                             ),

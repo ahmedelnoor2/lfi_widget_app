@@ -50,7 +50,7 @@ class _GiftDetailState extends State<GiftDetail> {
     var userid = await auth.userInfo['id'];
     await giftcardprovider.getEstimateRate(context, auth, userid,
         {"currency": "$currency", "payment": payment, "productID": productID});
-        return;
+    return;
   }
 
   Future<void> getDigitalBalance() async {
@@ -338,9 +338,9 @@ class _GiftDetailState extends State<GiftDetail> {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter Amount';
                               } else if (double.parse(value.toString()) < min) {
-                                return 'Minimum Amount';
+                                return 'Minimum Amount:{$min}';
                               } else if (double.parse(value.toString()) > max) {
-                                return 'Max Amount';
+                                return 'Max Amount:{$max}';
                               }
 
                               return null;
@@ -353,23 +353,15 @@ class _GiftDetailState extends State<GiftDetail> {
                                     arguments['data']['currency']['code']);
                                 setState(() {
                                   estprice = double.parse(value);
-                                  print('Est price:${estprice}');
-                                  print(giftcardprovider.amountsystm);
+
                                   var price =
                                       giftcardprovider.amountsystm / estprice;
 
-                                  print('price:${price}');
-
                                   var finalprice = estprice / price;
-                                    print('FInal price:${finalprice}');
-
-
                                   estimateprice = finalprice /
                                       public.rate[public
                                           .activeCurrency['fiat_symbol']
                                           .toUpperCase()][_defaultCoin];
-                                  print(
-                                      'puble rate price:${public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()][_defaultCoin]}');
                                 });
                               } else {
                                 estimateprice = 0.0;
@@ -455,11 +447,12 @@ class _GiftDetailState extends State<GiftDetail> {
                               ),
                         LyoButton(
                           onPressed: (() async {
+                            print(double.parse(double.parse('${estimateprice}').toStringAsFixed(4)));
                             if (_formKey.currentState!.validate()) {
                               Navigator.pushNamed(context, '/buy_card',
                                   arguments: BuyCard(
                                       amount: _amountcontroller.text,
-                                      totalprice: estimateprice,
+                                      totalprice: double.parse(double.parse('${estimateprice}').toStringAsFixed(4)),
                                       defaultcoin: _defaultCoin,
                                       productID: arguments['data']['BillerID']
                                           .toString()));
