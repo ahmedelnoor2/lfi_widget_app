@@ -5,6 +5,7 @@ import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/dex_provider.dart';
 import 'package:lyotrade/providers/future_market.dart';
 import 'package:lyotrade/providers/loan_provider.dart';
+import 'package:lyotrade/providers/trade_challenge';
 import 'package:lyotrade/providers/notification_provider.dart';
 import 'package:lyotrade/providers/payments.dart';
 import 'package:lyotrade/providers/public.dart';
@@ -68,6 +69,7 @@ import 'package:lyotrade/screens/trade/kline_chart.dart';
 import 'package:lyotrade/screens/trade/margin/margin_trade_history.dart';
 import 'package:lyotrade/screens/trade/trade.dart';
 import 'package:lyotrade/screens/trade/trade_history.dart';
+import 'package:lyotrade/screens/trade_challenge/trade_challenge.dart';
 
 import 'package:lyotrade/utils/theme.dart';
 import 'package:provider/provider.dart';
@@ -114,6 +116,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<Notificationprovider>(
             create: (_) => Notificationprovider()),
         ChangeNotifierProvider<UserKyc>(create: (_) => UserKyc()),
+        ChangeNotifierProvider<TradeChallenge>(
+          create: (_) => TradeChallenge(),
+        )
       ],
       child: Consumer<Auth>(
         builder: (context, auth, _) {
@@ -193,6 +198,8 @@ class MyApp extends StatelessWidget {
                   const FutureMarketTransaction(),
               GiftCard.routeName: (context) => const GiftCard(),
               GiftDetail.routeName: (context) => const GiftDetail(),
+              TradeChallengeScreen.routeName: (context) => const TradeChallengeScreen(),
+              
             },
           );
         },

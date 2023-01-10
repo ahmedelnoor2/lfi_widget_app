@@ -107,6 +107,12 @@ var neturalcolor = Color(0xFFF6F9FC);
 var cardcolor = Color(0xFF292C51);
 var marketcharcolor1=Color(0xff3F4374);
 var marketcharcolor2=Color(0xff3F4374);
+var tradechallengbtn=Color(0xff018EF0);
+
+/// trade challenge colour//
+var tradegreen=Color(0xff199B56);
+ var trade_txtColour=Color(0xff4C515E);
+ var clipcolor=Color(0xffE1E5F2);
 // Referral
 var clipCircle = {
   'in_1': Color(0xffF6B708),

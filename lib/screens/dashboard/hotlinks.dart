@@ -26,9 +26,11 @@ class _HotlinksState extends State<Hotlinks> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          
           GestureDetector(
             onTap: () {
-              snackAlert(context, SnackTypes.warning, 'Coming Soon...');
+            Navigator.pushNamed(context, '/trade_challenge');
+              //snackAlert(context, SnackTypes.warning, 'Coming Soon...');
             },
             child: Column(
               children: [
