@@ -69,6 +69,7 @@ import 'package:lyotrade/screens/trade/kline_chart.dart';
 import 'package:lyotrade/screens/trade/margin/margin_trade_history.dart';
 import 'package:lyotrade/screens/trade/trade.dart';
 import 'package:lyotrade/screens/trade/trade_history.dart';
+import 'package:lyotrade/screens/trade_challenge/reward_center.dart';
 import 'package:lyotrade/screens/trade_challenge/trade_challenge.dart';
 
 import 'package:lyotrade/utils/theme.dart';
@@ -199,6 +200,7 @@ class MyApp extends StatelessWidget {
               GiftCard.routeName: (context) => const GiftCard(),
               GiftDetail.routeName: (context) => const GiftDetail(),
               TradeChallengeScreen.routeName: (context) => const TradeChallengeScreen(),
+              RewardCenterScreen.routeName:(context) =>const RewardCenterScreen(),
               
             },
           );

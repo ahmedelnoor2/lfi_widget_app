@@ -198,6 +198,7 @@ class Asset with ChangeNotifier {
 
       final responseData = json.decode(response.body);
 
+
       if (responseData['code'] == '0') {
         _totalAccountBalance = responseData['data'];
       } else {
@@ -263,7 +264,7 @@ class Asset with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-
+          
       if (responseData['code'] == '0') {
         _p2pBalance = responseData['data'];
 

@@ -113,6 +113,7 @@ var tradechallengbtn=Color(0xff018EF0);
 var tradegreen=Color(0xff199B56);
  var trade_txtColour=Color(0xff4C515E);
  var clipcolor=Color(0xffE1E5F2);
+ var tradelistcolor=Color(0xffF7CB1C);
 // Referral
 var clipCircle = {
   'in_1': Color(0xffF6B708),
