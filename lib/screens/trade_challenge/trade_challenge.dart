@@ -14,6 +14,8 @@ class TradeChallengeScreen extends StatefulWidget {
 
 class _TradeChallengeScreenState extends State<TradeChallengeScreen>
     with TickerProviderStateMixin {
+
+      
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
