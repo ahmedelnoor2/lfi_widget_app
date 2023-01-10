@@ -92,8 +92,7 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
                           ),
                           child: ElevatedButton(
                             onPressed: () {
-                            Navigator.pushNamed(context, '/reward_center');
-
+                              Navigator.pushNamed(context, '/reward_center');
                             },
                             style: ElevatedButton.styleFrom(
                               primary: tradegreen, // background
@@ -116,7 +115,7 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
           Card(
             margin: EdgeInsets.only(bottom: 15),
             child: Container(
-              height: height * 0.27,
+              height: height * 0.25,
               padding: EdgeInsets.all(8),
               child: Column(
                 children: [
@@ -165,55 +164,66 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
                         shrinkWrap: true,
                         scrollDirection: Axis.horizontal,
                         itemCount: 15,
-                        itemBuilder: (BuildContext context, int index) => Card(
-                          color: Colors.white,
-                          child: Container(
-                            width: width * 0.30,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    Image.asset(
+                        itemBuilder: (BuildContext context, int index) =>
+                            Container(
+                          width: width * 0.35,
+                          margin: EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(8))),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Container(
+                                   height: height * 0.11,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(8),
+                                          bottomLeft: Radius.circular(4)),
+                                    ),
+                                    child: Image.asset(
                                       'assets/img/clip.png',
+                                      fit: BoxFit.cover,
                                       color: index == 0 ? null : clipcolor,
                                     ),
+                                  ),
+                                  Text(
+                                    index.toString(),
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                              Container(
+                                padding: EdgeInsets.only(right: 25),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
                                     Text(
-                                      index.toString(),
+                                      '0.01',
                                       style: TextStyle(
                                           fontSize: 18,
+                                          color: tradegreen,
                                           fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      'USDT',
+                                      style: TextStyle(
+                                        height: 0.8,
+                                        fontSize: 10,
+                                        color: trade_txtColour,
+                                      ),
                                     ),
                                   ],
                                 ),
-                                Container(
-                                  padding: EdgeInsets.only(right: 25),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        '0.01',
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            color: tradegreen,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      Text(
-                                        'USDT',
-                                        style: TextStyle(
-                                          height: 0.8,
-                                          fontSize: 10,
-                                          color: trade_txtColour,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -295,7 +305,7 @@ Widget allprogressList(context) {
     shrinkWrap: true,
     scrollDirection: Axis.vertical,
     itemCount: 15,
-    padding: EdgeInsets.only(top: 20,left: 8,right: 8),
+    padding: EdgeInsets.only(top: 20, left: 8, right: 8),
     itemBuilder: (BuildContext context, int index) => Card(
       child: Container(
         width: width * 0.30,
@@ -367,7 +377,7 @@ Widget allprogressList(context) {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Container(
-                          width: width*0.55,
+                          width: width * 0.55,
                           child: Text(
                             "Daily spot trading volumes ≥ 100 USDT ",
                             style: TextStyle(
@@ -415,7 +425,9 @@ Widget allprogressList(context) {
                 ),
               ],
             ),
-            Divider(color: Colors.white,)
+            Divider(
+              color: Colors.white,
+            )
           ],
         ),
       ),
