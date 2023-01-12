@@ -5,13 +5,14 @@ import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/dex_provider.dart';
 import 'package:lyotrade/providers/future_market.dart';
 import 'package:lyotrade/providers/loan_provider.dart';
-import 'package:lyotrade/providers/trade_challenge';
+
 import 'package:lyotrade/providers/notification_provider.dart';
 import 'package:lyotrade/providers/payments.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/referral.dart';
 import 'package:lyotrade/providers/staking.dart';
 import 'package:lyotrade/providers/trade.dart';
+import 'package:lyotrade/providers/trade_challenge.dart';
 import 'package:lyotrade/providers/user.dart';
 import 'package:lyotrade/providers/user_kyc.dart';
 import 'package:lyotrade/screens/assets/assets.dart';
@@ -199,9 +200,10 @@ class MyApp extends StatelessWidget {
                   const FutureMarketTransaction(),
               GiftCard.routeName: (context) => const GiftCard(),
               GiftDetail.routeName: (context) => const GiftDetail(),
-              TradeChallengeScreen.routeName: (context) => const TradeChallengeScreen(),
-              RewardCenterScreen.routeName:(context) =>const RewardCenterScreen(),
-              
+              TradeChallengeScreen.routeName: (context) =>
+                  const TradeChallengeScreen(),
+              RewardCenterScreen.routeName: (context) =>
+                  const RewardCenterScreen(),
             },
           );
         },

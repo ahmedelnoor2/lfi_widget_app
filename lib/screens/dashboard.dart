@@ -128,6 +128,7 @@ class _DashboardState extends State<Dashboard> {
 
   Future<void> checkLoginStatus() async {
     var auth = Provider.of<Auth>(context, listen: false);
+    
     await auth.checkLogin(context);
   }
 
@@ -208,6 +209,7 @@ class _DashboardState extends State<Dashboard> {
 
     var public = Provider.of<Public>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
+    //print(auth.authToken);
 
     return WillPopScope(
       onWillPop: () {

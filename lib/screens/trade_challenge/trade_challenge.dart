@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:intl/intl.dart';
+import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/trade_challenge.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/common/no_data.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:provider/provider.dart';
+import 'package:skeletons/skeletons.dart';
 
 class TradeChallengeScreen extends StatefulWidget {
   static const routeName = '/trade_challenge';
@@ -18,11 +22,48 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
     with TickerProviderStateMixin {
   late final TabController _tabtradechallengController =
       TabController(length: 3, vsync: this);
+  var type;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getRewardCenter();
+    getUserTask();
+  }
+
+  // get reward center //
+  Future<void> getRewardCenter() async {
+    var tradeChallengeProvider =
+        Provider.of<TradeChallenge>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
+    tradeChallengeProvider.getTaskCenter(context, auth);
+  }
+  Future<void> getDoDailyCheckIN() async {
+    var tradeChallengeProvider =
+        Provider.of<TradeChallenge>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
+    tradeChallengeProvider.getTaskCenter(context, auth);
+  }
+
+  // User Task ///
+
+  Future<void> getUserTask() async {
+    var tradeChallengeProvider =
+        Provider.of<TradeChallenge>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
+    tradeChallengeProvider.getUserTask(context, auth, {"type": type});
+  }
 
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
+    var tradeChallengeProvider =
+        Provider.of<TradeChallenge>(context, listen: true);
+    var auth = Provider.of<Auth>(context, listen: true);
+
+    var checkedInDay = tradeChallengeProvider.taskCenter['signInInfo']['seriateSignInNum']-1;
 
     return Scaffold(
       appBar: hiddenAppBar(),
@@ -71,12 +112,35 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
                         SizedBox(
                           height: 5,
                         ),
-                        Text(
-                          '100 USDT ',
-                          style: TextStyle(
-                              fontSize: 18,
-                              color: tradegreen,
-                              fontWeight: FontWeight.bold),
+                        Row(
+                          children: [
+                            Text(
+                              tradeChallengeProvider
+                                      .taskCenter['titleRewardAmount'] ??
+                                  '',
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  color: tradegreen,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Container(
+                              padding: EdgeInsets.only(left: 5),
+                              child: tradeChallengeProvider
+                                          .taskCenter['signInInfo'] ==
+                                      null
+                                  ? Text('')
+                                  : Text(
+                                      tradeChallengeProvider
+                                                  .taskCenter['signInInfo']
+                                              ['rewardCoin'] ??
+                                          '',
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          color: tradegreen,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                            ),
+                          ],
                         ),
                         Text('Cash reward, easy to get',
                             style: TextStyle(fontWeight: FontWeight.w400)),
@@ -143,7 +207,39 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
                         ),
                         height: 35,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            var checkInAmount = checkedInDay >= 0 ? tradeChallengeProvider.taskCenter['signInInfo']['rewards'][checkedInDay] : 0;
+
+                             showModalBottomSheet<void>(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return StatefulBuilder(
+                              builder:
+                                  (BuildContext context, StateSetter setState) {
+                                return Container(
+                                  height: height*0.50,
+                                  child:Column(children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: InkWell(
+                                        onTap: (() {
+                                          Navigator.pop(context);
+                                        }),
+                                        child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                          children: [
+                                            Icon(Icons.close),
+                                            Text(checkInAmount),
+                                        ],),
+                                      ),
+                                    )
+
+                                  ],),);
+                              },
+                            );
+                          },
+                        );
+                          },
                           style: ElevatedButton.styleFrom(
                             primary: tradechallengbtn, // background
                             onPrimary: Colors.white, // foreground
@@ -158,76 +254,111 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
                   ),
                   Padding(
                     padding: EdgeInsets.only(top: 30),
-                    child: SizedBox(
-                      height: height * 0.11,
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemCount: 15,
-                        itemBuilder: (BuildContext context, int index) =>
-                            Container(
-                          width: width * 0.35,
-                          margin: EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(8))),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  Container(
-                                   height: height * 0.11,
+                    child: tradeChallengeProvider.isloadingtaskCenter
+                        ? SizedBox(
+                            height: height * 0.11,
+                            child: ListView.builder(
+                                shrinkWrap: true,
+                                scrollDirection: Axis.horizontal,
+                                itemCount: 4,
+                                itemBuilder: (BuildContext context, int index) {
+                                  [index];
+                                  return Padding(
+                                    padding: const EdgeInsets.all(4.0),
+                                    child: SkeletonAvatar(
+                                      style: SkeletonAvatarStyle(
+                                          shape: BoxShape.rectangle,
+                                          width: 140,
+                                          height: height * 0.11),
+                                    ),
+                                  );
+                                }),
+                          )
+                        : SizedBox(
+                            height: height * 0.11,
+                            child: ListView.builder(
+                                shrinkWrap: true,
+                                scrollDirection: Axis.horizontal,
+                                itemCount: tradeChallengeProvider
+                                    .taskCenter['signInInfo']['rewards'].length,
+                                itemBuilder: (BuildContext context, int index) {
+
+                                  var currentindex = index + 1;
+                                  var data = tradeChallengeProvider
+                                          .taskCenter['signInInfo']['rewards']
+                                      [index];
+                                  return Container(
+                                    width: width * 0.35,
+                                    margin: EdgeInsets.all(5),
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(8),
-                                          bottomLeft: Radius.circular(4)),
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(8))),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            Container(
+                                              height: height * 0.11,
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.only(
+                                                    topLeft: Radius.circular(8),
+                                                    bottomLeft:
+                                                        Radius.circular(4)),
+                                              ),
+                                              child: Image.asset(
+                                                'assets/img/clip.png',
+                                                fit: BoxFit.cover,
+                                                color: checkedInDay >= index ? null : clipcolor,
+                                              ),
+                                            ),
+                                            Text(
+                                              currentindex.toString(),
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        ),
+                                        Container(
+                                          padding: EdgeInsets.only(right: 25),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                data ?? '',
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    color: tradegreen,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              Text(
+                                                tradeChallengeProvider
+                                                                .taskCenter[
+                                                            'signInInfo']
+                                                        ['rewardCoin'] ??
+                                                    '',
+                                                style: TextStyle(
+                                                  height: 0.8,
+                                                  fontSize: 10,
+                                                  color: trade_txtColour,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    child: Image.asset(
-                                      'assets/img/clip.png',
-                                      fit: BoxFit.cover,
-                                      color: index == 0 ? null : clipcolor,
-                                    ),
-                                  ),
-                                  Text(
-                                    index.toString(),
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                              Container(
-                                padding: EdgeInsets.only(right: 25),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      '0.01',
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          color: tradegreen,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Text(
-                                      'USDT',
-                                      style: TextStyle(
-                                        height: 0.8,
-                                        fontSize: 10,
-                                        color: trade_txtColour,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
+                                  );
+                                }),
                           ),
-                        ),
-                      ),
-                    ),
                   ),
                 ],
               ),
@@ -254,16 +385,25 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
                                 unselectedLabelColor: Colors.white,
                                 isScrollable: true,
                                 onTap: (value) {
-                                  setState(() {
-                                    // _tabIndicatorColor = value == 0 ? Colors.green : Colors.red;
-                                  });
+                                  if (value == 1) {
+                                    setState(() {
+                                      type = 1;
+                                      getUserTask();
+                                    });
+                                  } else if (value == 2) {
+                                    type = 0;
+                                    getUserTask();
+                                  } else {
+                                    type = null;
+                                    getUserTask();
+                                  }
                                 },
                                 tabs: <Tab>[
                                   Tab(
                                     text: 'All in Progress',
                                   ),
                                   Tab(
-                                    text: 'Beginner’s',
+                                    text: 'Beginner’s Task',
                                   ),
                                   Tab(
                                     text: 'Daily Task',
@@ -282,9 +422,12 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
                           child: TabBarView(
                             controller: _tabtradechallengController,
                             children: [
-                              allprogressList(context),
-                              Text('data'),
-                              Text('data')
+                              usertasklist(
+                                  context, tradeChallengeProvider.usertask),
+                              usertasklist(
+                                  context, tradeChallengeProvider.usertask),
+                              usertasklist(
+                                  context, tradeChallengeProvider.usertask),
                             ],
                           ),
                         )
@@ -297,140 +440,183 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
   }
 }
 
-Widget allprogressList(context) {
+Widget usertasklist(context, usertask) {
   final height = MediaQuery.of(context).size.height;
   final width = MediaQuery.of(context).size.width;
+  var tradeChallengeProvider =
+      Provider.of<TradeChallenge>(context, listen: true);
+  return tradeChallengeProvider.isloadinUserTask
+      ? Center(child: CircularProgressIndicator())
+      : usertask.isEmpty
+          ? noData('No Data')
+          : ListView.builder(
+              shrinkWrap: true,
+              scrollDirection: Axis.vertical,
+              itemCount: usertask.length,
+              padding: EdgeInsets.only(top: 20, left: 8, right: 8),
+              itemBuilder: (BuildContext context, int index) {
+                var currentindex = usertask[index];
 
-  return ListView.builder(
-    shrinkWrap: true,
-    scrollDirection: Axis.vertical,
-    itemCount: 15,
-    padding: EdgeInsets.only(top: 20, left: 8, right: 8),
-    itemBuilder: (BuildContext context, int index) => Card(
-      child: Container(
-        width: width * 0.30,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 55),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: 140,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: tradelistcolor,
-                      ),
-                      borderRadius: BorderRadius.circular(4),
-                      color: tradelistcolor,
-                    ),
-                    height: 20,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                return Card(
+                  child: Container(
+                    width: width * 0.30,
+                    child: Column(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(left: 4),
-                          child: Text(
-                            '0.1 USDT',
-                            style: TextStyle(color: trade_txtColour),
+                          padding: const EdgeInsets.only(left: 55),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                width: 140,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: tradelistcolor,
+                                  ),
+                                  borderRadius: BorderRadius.circular(4),
+                                  color: tradelistcolor,
+                                ),
+                                height: 20,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 4),
+                                      child: Text(
+                                        currentindex['rewardAmount'] +
+                                            " " +
+                                            currentindex['rewardCoin'],
+                                        style:
+                                            TextStyle(color: trade_txtColour),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: 70,
+                                      height: 19,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(4),
+                                        color: Colors.white,
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 4),
+                                        child: Center(
+                                          child: Text(
+                                            'Cash Reward',
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 10),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                          currentindex['remindTime']==null?Container():Text(
+                            DateFormat('dd-MM-y H:mm').format(
+                                DateTime.fromMillisecondsSinceEpoch(int.parse(
+                                    '${currentindex['remindTime']}'))),
+                            style: const TextStyle(fontWeight: FontWeight.bold,fontSize: 11),)
+                            ],
                           ),
                         ),
-                        Container(
-                          width: 70,
-                          height: 19,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4),
-                            color: Colors.white,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 4),
-                            child: Center(
-                              child: Text(
-                                'Cash Reward',
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 10),
-                              ),
+                        Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                    width: 55,
+                                    child:
+                                        Image.asset('assets/img/tradech1.png')),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: width * 0.55,
+                                      child: Text(
+                                        "Daily spot trading volumes ≥ " +
+                                            currentindex['targetValue']
+                                                .toString() +
+                                            ' ' +
+                                            currentindex['targetCoin']
+                                                .toString(),
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                            height: 1.5),
+                                      ),
+                                    ),
+                                    Row(
+                                      children: [
+                                        Container(
+                                          width: 140,
+                                          margin: EdgeInsets.only(right: 4),
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(4),
+                                            color: Colors.white,
+                                          ),
+                                          height: 6,
+                                        ),
+                                        Text(
+                                          "${currentindex['finishedAmount']}/" +
+                                              currentindex['targetValue']
+                                                  .toString() +
+                                              ' ' +
+                                              currentindex['targetCoin']
+                                                  .toString(),
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Container(
+                                  padding: EdgeInsets.only(top: 10, left: 15),
+                                  height: 35,
+                                  child: ElevatedButton(
+                                    onPressed: () {},
+                                    style: ElevatedButton.styleFrom(
+                                      primary: tradechallengbtn, // background
+                                      onPrimary: Colors.white, // foreground
+                                    ),
+                                    child: Text(
+                                      'Complete',
+                                      style: TextStyle(fontSize: 10),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
+                          ],
+                        ),
+                        Divider(
+                          color: Colors.white,
                         )
                       ],
                     ),
                   ),
-                  Text(
-                    '2020-04-01 12:12:38',
-                    style: TextStyle(color: neturalcolor, fontSize: 11),
-                  ),
-                ],
-              ),
-            ),
-            Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Container(
-                        width: 55,
-                        child: Image.asset('assets/img/tradech1.png')),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: width * 0.55,
-                          child: Text(
-                            "Daily spot trading volumes ≥ 100 USDT ",
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                height: 1.5),
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                              width: 140,
-                              margin: EdgeInsets.only(right: 4),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(4),
-                                color: Colors.white,
-                              ),
-                              height: 6,
-                            ),
-                            Text(
-                              "0.00/100 USDT",
-                              style: TextStyle(
-                                  fontSize: 12, fontWeight: FontWeight.w500),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Container(
-                      padding: EdgeInsets.only(top: 10, left: 15),
-                      height: 35,
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          primary: tradechallengbtn, // background
-                          onPrimary: Colors.white, // foreground
-                        ),
-                        child: Text(
-                          'Complete',
-                          style: TextStyle(fontSize: 10),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Divider(
-              color: Colors.white,
-            )
-          ],
-        ),
-      ),
-    ),
-  );
+                );
+              });
 }
+
+const _shimmerGradient = LinearGradient(
+  colors: [
+    Color(0xFFEBEBF4),
+    Color(0xFFF4F4F4),
+    Color(0xFFEBEBF4),
+  ],
+  stops: [
+    0.1,
+    0.3,
+    0.4,
+  ],
+  begin: Alignment(-1.0, -0.3),
+  end: Alignment(1.0, 0.3),
+  tileMode: TileMode.clamp,
+);

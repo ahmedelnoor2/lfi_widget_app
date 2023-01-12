@@ -293,7 +293,7 @@ class Asset with ChangeNotifier {
 
     var url = Uri.https(
       apiUrl,
-      '$exApi/lever/finance/balance',
+      '$exApi/',
     );
 
     var postData = json.encode({});

@@ -290,7 +290,7 @@ class _personalverificationState extends State<personalverification>
         userInfoList[personalKyc['levelName']] = personalKyc;
       }
     }
-    print(userInfoList);
+    //print(userInfoList);
 
     return Scaffold(
       appBar: hiddenAppBar(),
