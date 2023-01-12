@@ -6,7 +6,9 @@ import 'package:lyotrade/providers/trade_challenge.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/common/no_data.dart';
+import 'package:lyotrade/screens/trade_challenge/checkin_Bottomsheet.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletons/skeletons.dart';
 
@@ -23,23 +25,39 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
   late final TabController _tabtradechallengController =
       TabController(length: 3, vsync: this);
   var type;
+  List allprogress = [
+    'Daily spot trading volumes',
+    'Daily margin trading volumes',
+    'Daily futures trading volumes'
+  ];
+  List beginnertask = [
+    {
+      "name": "First spot trading volumes",
+      "subtitle":
+          "days after new user is registered, the first spot trading buy or sell transaction in any currency pair ≥"
+    },
+    {
+      "name": "First margin trading volumes",
+      "subtitle":
+          "days after new user is registered, the first margin trading buy or sell transaction in any currency pair ≥"
+    },
+    {
+      "name": "First deposit of cryptocurrency",
+      "subtitle":
+          "days after the new user registers, the first digital currency recharge or the first third-party purchase amount ≥"
+    }
+  ];
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getRewardCenter();
+    getTaskCenter();
     getUserTask();
   }
 
-  // get reward center //
-  Future<void> getRewardCenter() async {
-    var tradeChallengeProvider =
-        Provider.of<TradeChallenge>(context, listen: false);
-    var auth = Provider.of<Auth>(context, listen: false);
-    tradeChallengeProvider.getTaskCenter(context, auth);
-  }
-  Future<void> getDoDailyCheckIN() async {
+  // get task center //
+  Future<void> getTaskCenter() async {
     var tradeChallengeProvider =
         Provider.of<TradeChallenge>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
@@ -63,7 +81,10 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
         Provider.of<TradeChallenge>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
 
-    var checkedInDay = tradeChallengeProvider.taskCenter['signInInfo']['seriateSignInNum']-1;
+    var checkedInDay =
+        tradeChallengeProvider.taskCenter['signInInfo']['seriateSignInNum'] - 1;
+
+    ///print(tradeChallengeProvider.taskCenter);
 
     return Scaffold(
       appBar: hiddenAppBar(),
@@ -188,7 +209,8 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
                     children: [
                       Column(
                         children: [
-                          Text('Check in for 0 Consecutive Days  ',
+                          Text(
+                              'Check in for ${tradeChallengeProvider.taskCenter['signInInfo']['seriateSignInNum']} Consecutive Days  ',
                               style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 18,
@@ -207,39 +229,28 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
                         ),
                         height: 35,
                         child: ElevatedButton(
-                          onPressed: () {
-                            var checkInAmount = checkedInDay >= 0 ? tradeChallengeProvider.taskCenter['signInInfo']['rewards'][checkedInDay] : 0;
-
-                             showModalBottomSheet<void>(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return StatefulBuilder(
-                              builder:
-                                  (BuildContext context, StateSetter setState) {
-                                return Container(
-                                  height: height*0.50,
-                                  child:Column(children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: InkWell(
-                                        onTap: (() {
-                                          Navigator.pop(context);
-                                        }),
-                                        child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.end,
-                                          children: [
-                                            Icon(Icons.close),
-                                            Text(checkInAmount),
-                                        ],),
-                                      ),
-                                    )
-
-                                  ],),);
-                              },
-                            );
-                          },
-                        );
-                          },
+                          onPressed: tradeChallengeProvider
+                                      .taskCenter['signInInfo']['isSignIn'] ==
+                                  1
+                              ? null
+                              : () async {
+                                  var checkInAmount = checkedInDay >= 0
+                                      ? tradeChallengeProvider
+                                              .taskCenter['signInInfo']
+                                          ['rewards'][checkedInDay]
+                                      : 0;
+                                  showModalBottomSheet<void>(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return StatefulBuilder(builder:
+                                          (BuildContext context,
+                                              StateSetter setState) {
+                                        return CheckIn_BottomSheet(
+                                            checkInAmount);
+                                      });
+                                    },
+                                  );
+                                },
                           style: ElevatedButton.styleFrom(
                             primary: tradechallengbtn, // background
                             onPrimary: Colors.white, // foreground
@@ -282,7 +293,6 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
                                 itemCount: tradeChallengeProvider
                                     .taskCenter['signInInfo']['rewards'].length,
                                 itemBuilder: (BuildContext context, int index) {
-
                                   var currentindex = index + 1;
                                   var data = tradeChallengeProvider
                                           .taskCenter['signInInfo']['rewards']
@@ -312,7 +322,9 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
                                               child: Image.asset(
                                                 'assets/img/clip.png',
                                                 fit: BoxFit.cover,
-                                                color: checkedInDay >= index ? null : clipcolor,
+                                                color: checkedInDay >= index
+                                                    ? null
+                                                    : clipcolor,
                                               ),
                                             ),
                                             Text(
@@ -385,6 +397,7 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
                                 unselectedLabelColor: Colors.white,
                                 isScrollable: true,
                                 onTap: (value) {
+                                  print(value);
                                   if (value == 1) {
                                     setState(() {
                                       type = 1;
@@ -422,12 +435,14 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
                           child: TabBarView(
                             controller: _tabtradechallengController,
                             children: [
-                              usertasklist(
-                                  context, tradeChallengeProvider.usertask),
-                              usertasklist(
-                                  context, tradeChallengeProvider.usertask),
-                              usertasklist(
-                                  context, tradeChallengeProvider.usertask),
+                              userAllProgress(context,
+                                  tradeChallengeProvider.usertask, allprogress),
+                              userbeginnerTask(
+                                  context,
+                                  tradeChallengeProvider.usertask,
+                                  beginnertask),
+                              userDailyTask(context,
+                                  tradeChallengeProvider.usertask, allprogress),
                             ],
                           ),
                         )
@@ -440,7 +455,7 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
   }
 }
 
-Widget usertasklist(context, usertask) {
+Widget userAllProgress(context, usertask, allprogress) {
   final height = MediaQuery.of(context).size.height;
   final width = MediaQuery.of(context).size.width;
   var tradeChallengeProvider =
@@ -456,6 +471,9 @@ Widget usertasklist(context, usertask) {
               padding: EdgeInsets.only(top: 20, left: 8, right: 8),
               itemBuilder: (BuildContext context, int index) {
                 var currentindex = usertask[index];
+                var progress =
+                    double.parse(currentindex['finishedAmount'] ?? '0') /
+                        double.parse(currentindex['targetValue']);
 
                 return Card(
                   child: Container(
@@ -513,11 +531,408 @@ Widget usertasklist(context, usertask) {
                                   ],
                                 ),
                               ),
-                          currentindex['remindTime']==null?Container():Text(
-                            DateFormat('dd-MM-y H:mm').format(
-                                DateTime.fromMillisecondsSinceEpoch(int.parse(
-                                    '${currentindex['remindTime']}'))),
-                            style: const TextStyle(fontWeight: FontWeight.bold,fontSize: 11),)
+                              currentindex['remindTime'] == null
+                                  ? Container()
+                                  : Text(
+                                      DateFormat('dd-MM-y H:mm').format(DateTime
+                                          .fromMillisecondsSinceEpoch(int.parse(
+                                              '${currentindex['remindTime']}'))),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 11),
+                                    )
+                            ],
+                          ),
+                        ),
+                        Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                    width: 55,
+                                    child:
+                                        Image.asset('assets/img/tradech1.png')),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: width * 0.55,
+                                      child: Text(
+                                        "${allprogress[index]} ≥ " +
+                                            currentindex['targetValue']
+                                                .toString() +
+                                            ' ' +
+                                            currentindex['targetCoin']
+                                                .toString(),
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                            height: 1.5),
+                                      ),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        LinearPercentIndicator(
+                                          padding: EdgeInsets.only(right: 10),
+                                          width: width * 0.35,
+                                          lineHeight: 12,
+                                          backgroundColor: Colors.grey,
+                                          progressColor: Colors.blue,
+                                          percent: progress, // progress
+                                          center: Text(
+                                            "${double.parse('${progress * 100}').toStringAsFixed(1)}%",
+                                            style: TextStyle(fontSize: 10),
+                                          ),
+                                          alignment: MainAxisAlignment.start,
+                                          animation: true,
+                                          animationDuration: 1000,
+                                          onAnimationEnd: () {
+                                            print("Linear Animation finished");
+                                          },
+                                          barRadius: Radius.circular(10),
+                                        ),
+                                        Text(
+                                          "${currentindex['finishedAmount']}/" +
+                                              currentindex['targetValue']
+                                                  .toString() +
+                                              ' ' +
+                                              currentindex['targetCoin']
+                                                  .toString(),
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Container(
+                                  padding: EdgeInsets.only(top: 10, left: 15),
+                                  height: 35,
+                                  child: ElevatedButton(
+                                    onPressed: () {},
+                                    style: ElevatedButton.styleFrom(
+                                      primary: tradechallengbtn, // background
+                                      onPrimary: Colors.white, // foreground
+                                    ),
+                                    child: Text(
+                                      'Complete',
+                                      style: TextStyle(fontSize: 10),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Divider(
+                          color: Colors.white,
+                        )
+                      ],
+                    ),
+                  ),
+                );
+              });
+}
+
+Widget userbeginnerTask(context, usertask, beginnertask) {
+  final height = MediaQuery.of(context).size.height;
+  final width = MediaQuery.of(context).size.width;
+  var tradeChallengeProvider =
+      Provider.of<TradeChallenge>(context, listen: true);
+  return tradeChallengeProvider.isloadinUserTask
+      ? Center(child: CircularProgressIndicator())
+      : usertask.isEmpty
+          ? noData('No Data')
+          : ListView.builder(
+              shrinkWrap: true,
+              scrollDirection: Axis.vertical,
+              itemCount: usertask.length,
+              padding: EdgeInsets.only(top: 20, left: 8, right: 8),
+              itemBuilder: (BuildContext context, int index) {
+                var currentindex = usertask[index];
+                var progress =
+                    double.parse(currentindex['finishedAmount'] ?? '0') /
+                        double.parse(currentindex['targetValue']);
+
+                return Card(
+                  child: Container(
+                    width: width * 0.30,
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 55),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                width: 140,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: tradelistcolor,
+                                  ),
+                                  borderRadius: BorderRadius.circular(4),
+                                  color: tradelistcolor,
+                                ),
+                                height: 20,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 4),
+                                      child: Text(
+                                        currentindex['rewardAmount'] +
+                                            " " +
+                                            currentindex['rewardCoin'],
+                                        style:
+                                            TextStyle(color: trade_txtColour),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: 70,
+                                      height: 19,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(4),
+                                        color: Colors.white,
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 4),
+                                        child: Center(
+                                          child: Text(
+                                            'Cash Reward',
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 10),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              currentindex['remindTime'] == null
+                                  ? Container()
+                                  : Text(
+                                      DateFormat('dd-MM-y H:mm').format(DateTime
+                                          .fromMillisecondsSinceEpoch(int.parse(
+                                              '${currentindex['remindTime']}'))),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 11),
+                                    )
+                            ],
+                          ),
+                        ),
+                        Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                    width: 55,
+                                    child:
+                                        Image.asset('assets/img/tradech1.png')),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: width * 0.58,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "${beginnertask[index]['name'] ?? ''} ≥ " +
+                                                currentindex['targetValue']
+                                                    .toString() +
+                                                ' ' +
+                                                currentindex['targetCoin']
+                                                    .toString(),
+                                            style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500,
+                                                height: 1.5),
+                                          ),
+                                          Text(
+                                            tradeChallengeProvider.taskCenter[
+                                                        'rewardReceiveTerm']
+                                                    .toString() +
+                                                " " +
+                                                "${beginnertask[index]['subtitle'] ?? ''} " +
+                                                currentindex['targetValue']
+                                                    .toString() +
+                                                ' ' +
+                                                currentindex['targetCoin']
+                                                    .toString(),
+                                            style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500,
+                                                height: 1.5),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        LinearPercentIndicator(
+                                          padding: EdgeInsets.only(right: 10),
+                                          width: width * 0.35,
+                                          lineHeight: 12,
+                                          backgroundColor: Colors.grey,
+                                          progressColor: Colors.blue,
+                                          percent: progress, // progress
+                                          center: Text(
+                                            "${double.parse('${progress * 100}').toStringAsFixed(1)}%",
+                                            style: TextStyle(fontSize: 10),
+                                          ),
+                                          alignment: MainAxisAlignment.start,
+                                          animation: true,
+                                          animationDuration: 1000,
+                                          onAnimationEnd: () {
+                                            print("Linear Animation finished");
+                                          },
+                                          barRadius: Radius.circular(10),
+                                        ),
+                                        Text(
+                                          "${currentindex['finishedAmount']}/" +
+                                              currentindex['targetValue']
+                                                  .toString() +
+                                              ' ' +
+                                              currentindex['targetCoin']
+                                                  .toString(),
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Container(
+                                  padding: EdgeInsets.only(top: 10, left: 15),
+                                  height: 35,
+                                  child: ElevatedButton(
+                                    onPressed: () {},
+                                    style: ElevatedButton.styleFrom(
+                                      primary: tradechallengbtn, // background
+                                      onPrimary: Colors.white, // foreground
+                                    ),
+                                    child: Text(
+                                      'Complete',
+                                      style: TextStyle(fontSize: 10),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Divider(
+                          color: Colors.white,
+                        )
+                      ],
+                    ),
+                  ),
+                );
+              });
+}
+
+Widget userDailyTask(context, usertask, allprogress) {
+  final height = MediaQuery.of(context).size.height;
+  final width = MediaQuery.of(context).size.width;
+  var tradeChallengeProvider =
+      Provider.of<TradeChallenge>(context, listen: true);
+  return tradeChallengeProvider.isloadinUserTask
+      ? Center(child: CircularProgressIndicator())
+      : usertask.isEmpty
+          ? noData('No Data')
+          : ListView.builder(
+              shrinkWrap: true,
+              scrollDirection: Axis.vertical,
+              itemCount: usertask.length,
+              padding: EdgeInsets.only(top: 20, left: 8, right: 8),
+              itemBuilder: (BuildContext context, int index) {
+                var currentindex = usertask[index];
+                var progress =
+                    double.parse(currentindex['finishedAmount'] ?? '0') /
+                        double.parse(currentindex['targetValue']);
+
+                return Card(
+                  child: Container(
+                    width: width * 0.30,
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 55),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                width: 140,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: tradelistcolor,
+                                  ),
+                                  borderRadius: BorderRadius.circular(4),
+                                  color: tradelistcolor,
+                                ),
+                                height: 20,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 4),
+                                      child: Text(
+                                        currentindex['rewardAmount'] +
+                                            " " +
+                                            currentindex['rewardCoin'],
+                                        style:
+                                            TextStyle(color: trade_txtColour),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: 70,
+                                      height: 19,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(4),
+                                        color: Colors.white,
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 4),
+                                        child: Center(
+                                          child: Text(
+                                            'Cash Reward',
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 10),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              currentindex['remindTime'] == null
+                                  ? Container()
+                                  : Text(
+                                      DateFormat('dd-MM-y H:mm').format(DateTime
+                                          .fromMillisecondsSinceEpoch(int.parse(
+                                              '${currentindex['remindTime']}'))),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 11),
+                                    )
                             ],
                           ),
                         ),
@@ -550,16 +965,27 @@ Widget usertasklist(context, usertask) {
                                       ),
                                     ),
                                     Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
                                       children: [
-                                        Container(
-                                          width: 140,
-                                          margin: EdgeInsets.only(right: 4),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(4),
-                                            color: Colors.white,
+                                        LinearPercentIndicator(
+                                          padding: EdgeInsets.only(right: 10),
+                                          width: width * 0.35,
+                                          lineHeight: 12,
+                                          backgroundColor: Colors.grey,
+                                          progressColor: Colors.blue,
+                                          percent: progress, // progress
+                                          center: Text(
+                                            "${double.parse('${progress * 100}').toStringAsFixed(1)}%",
+                                            style: TextStyle(fontSize: 10),
                                           ),
-                                          height: 6,
+                                          alignment: MainAxisAlignment.start,
+                                          animation: true,
+                                          animationDuration: 1000,
+                                          onAnimationEnd: () {
+                                            print("Linear Animation finished");
+                                          },
+                                          barRadius: Radius.circular(10),
                                         ),
                                         Text(
                                           "${currentindex['finishedAmount']}/" +

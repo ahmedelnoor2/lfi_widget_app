@@ -40,6 +40,7 @@ class TradeChallenge with ChangeNotifier {
       _isloadingtaskCenter = true;
       final response = await http.post(url, headers: headers);
       final responseData = json.decode(response.body);
+      print(responseData);
       if (responseData['code'] == "0") {
         _isloadingtaskCenter = false;
         _taskCenter = responseData['data'];
@@ -230,16 +231,16 @@ class TradeChallenge with ChangeNotifier {
     return _isLoadingWithDrawal;
   }
 
-  Future<void> getUserWithDrawalRecord(ctx, auth,post) async {
+  Future<void> getUserWithDrawalRecord(ctx, auth, post) async {
     headers['exchange-token'] = auth.loginVerificationToken;
     var url = Uri.https(
       apiUrl,
       '$rewardcenterApi/user_withdraw_record_list',
     );
-     var postData = json.encode(post);
+    var postData = json.encode(post);
     try {
       _isLoadingWithDrawal = true;
-      final response = await http.post(url,body: postData, headers: headers);
+      final response = await http.post(url, body: postData, headers: headers);
       final responseData = json.decode(response.body);
       print(responseData);
       if (responseData['code'] == "0") {
@@ -280,19 +281,21 @@ class TradeChallenge with ChangeNotifier {
       '$rewardcenterApi/do_daily_sign_in',
     );
     try {
-      _isloadingtaskCenter = true;
+      _isloadingdailyCheckIn = true;
       final response = await http.post(url, headers: headers);
       final responseData = json.decode(response.body);
+      notifyListeners();
+      print(responseData);
       if (responseData['code'] == "0") {
-        _isloadingtaskCenter = false;
-        _dailyCheckIn = responseData['data'];
+        _isloadingdailyCheckIn = false;
+        _dailyCheckIn = responseData;
         return notifyListeners();
-      }else if (responseData['code'] == "101205") {
-        _isloadingtaskCenter = false;
-        _dailyCheckIn = responseData['data'];
+      } else if (responseData['code'] == "101205") {
+        _isloadingdailyCheckIn = false;
+        _dailyCheckIn = responseData;
         return notifyListeners();
       } else {
-        _isloadingtaskCenter = false;
+        _isloadingdailyCheckIn = false;
         _dailyCheckIn = {};
         return notifyListeners();
       }
