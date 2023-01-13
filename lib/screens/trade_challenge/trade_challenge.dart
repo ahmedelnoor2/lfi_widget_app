@@ -30,6 +30,11 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
     'Daily margin trading volumes',
     'Daily futures trading volumes'
   ];
+  List dailytask = [
+    'Daily spot trading volumes',
+    'Daily margin trading volumes',
+    'Daily futures trading volumes'
+  ];
   List beginnertask = [
     {
       "name": "First spot trading volumes",
@@ -61,7 +66,7 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
     var tradeChallengeProvider =
         Provider.of<TradeChallenge>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
-    tradeChallengeProvider.getTaskCenter(context, auth);
+    await tradeChallengeProvider.getTaskCenter(context, auth);
   }
 
   // User Task ///
@@ -70,7 +75,7 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
     var tradeChallengeProvider =
         Provider.of<TradeChallenge>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
-    tradeChallengeProvider.getUserTask(context, auth, {"type": type});
+    await tradeChallengeProvider.getUserTask(context, auth, {"type": type});
   }
 
   @override
@@ -81,8 +86,11 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
         Provider.of<TradeChallenge>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
 
-    var checkedInDay =
-        tradeChallengeProvider.taskCenter['signInInfo']['seriateSignInNum'] - 1;
+    var checkedInDay = (tradeChallengeProvider.taskCenter.isNotEmpty
+            ? tradeChallengeProvider.taskCenter['signInInfo']
+                ['seriateSignInNum']
+            : 0) -
+        1;
 
     ///print(tradeChallengeProvider.taskCenter);
 
@@ -210,7 +218,7 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
                       Column(
                         children: [
                           Text(
-                              'Check in for ${tradeChallengeProvider.taskCenter['signInInfo']['seriateSignInNum']} Consecutive Days  ',
+                              'Check in for ${tradeChallengeProvider.taskCenter.isNotEmpty ? tradeChallengeProvider.taskCenter['signInInfo']['seriateSignInNum'] : ''} Consecutive Days  ',
                               style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 18,
@@ -230,27 +238,30 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
                         height: 35,
                         child: ElevatedButton(
                           onPressed: tradeChallengeProvider
-                                      .taskCenter['signInInfo']['isSignIn'] ==
-                                  1
-                              ? null
-                              : () async {
-                                  var checkInAmount = checkedInDay >= 0
-                                      ? tradeChallengeProvider
-                                              .taskCenter['signInInfo']
-                                          ['rewards'][checkedInDay]
-                                      : 0;
-                                  showModalBottomSheet<void>(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return StatefulBuilder(builder:
-                                          (BuildContext context,
-                                              StateSetter setState) {
-                                        return CheckIn_BottomSheet(
-                                            checkInAmount);
-                                      });
-                                    },
-                                  );
-                                },
+                                  .taskCenter.isNotEmpty
+                              ? tradeChallengeProvider.taskCenter['signInInfo']
+                                          ['isSignIn'] ==
+                                      1
+                                  ? null
+                                  : () async {
+                                      var checkInAmount = checkedInDay >= 0
+                                          ? tradeChallengeProvider
+                                                  .taskCenter['signInInfo']
+                                              ['rewards'][checkedInDay]
+                                          : 0;
+                                      showModalBottomSheet<void>(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return StatefulBuilder(builder:
+                                              (BuildContext context,
+                                                  StateSetter setState) {
+                                            return CheckIn_BottomSheet(
+                                                checkInAmount);
+                                          });
+                                        },
+                                      );
+                                    }
+                              : null,
                           style: ElevatedButton.styleFrom(
                             primary: tradechallengbtn, // background
                             onPrimary: Colors.white, // foreground
@@ -442,7 +453,7 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
                                   tradeChallengeProvider.usertask,
                                   beginnertask),
                               userDailyTask(context,
-                                  tradeChallengeProvider.usertask, allprogress),
+                                  tradeChallengeProvider.usertask, dailytask),
                             ],
                           ),
                         )
@@ -596,7 +607,7 @@ Widget userAllProgress(context, usertask, allprogress) {
                                           barRadius: Radius.circular(10),
                                         ),
                                         Text(
-                                          "${currentindex['finishedAmount']}/" +
+                                          "${double.parse(currentindex['finishedAmount'] == null ? '0' : currentindex['finishedAmount']).toStringAsFixed(1)}/" +
                                               currentindex['targetValue']
                                                   .toString() +
                                               ' ' +
@@ -614,7 +625,16 @@ Widget userAllProgress(context, usertask, allprogress) {
                                   padding: EdgeInsets.only(top: 10, left: 15),
                                   height: 35,
                                   child: ElevatedButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      if (index == 0) {
+                                        Navigator.pushNamed(context, '/trade');
+                                      } else if (index == 1) {
+                                        Navigator.pushNamed(context, '/trade');
+                                      } else {
+                                        Navigator.pushNamed(
+                                            context, '/future_trade');
+                                      }
+                                    },
                                     style: ElevatedButton.styleFrom(
                                       primary: tradechallengbtn, // background
                                       onPrimary: Colors.white, // foreground
@@ -762,8 +782,9 @@ Widget userbeginnerTask(context, usertask, beginnertask) {
                                                 height: 1.5),
                                           ),
                                           Text(
-                                            tradeChallengeProvider.taskCenter[
-                                                        'rewardReceiveTerm']
+                                            (tradeChallengeProvider.taskCenter[
+                                                            'rewardReceiveTerm'] ??
+                                                        0)
                                                     .toString() +
                                                 " " +
                                                 "${beginnertask[index]['subtitle'] ?? ''} " +
@@ -804,7 +825,7 @@ Widget userbeginnerTask(context, usertask, beginnertask) {
                                           barRadius: Radius.circular(10),
                                         ),
                                         Text(
-                                          "${currentindex['finishedAmount']}/" +
+                                          "${double.parse(currentindex['finishedAmount'] == null ? '0' : currentindex['finishedAmount']).toStringAsFixed(1)}/" +
                                               currentindex['targetValue']
                                                   .toString() +
                                               ' ' +
@@ -822,7 +843,16 @@ Widget userbeginnerTask(context, usertask, beginnertask) {
                                   padding: EdgeInsets.only(top: 10, left: 15),
                                   height: 35,
                                   child: ElevatedButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      if (index == 0) {
+                                        Navigator.pushNamed(context, '/trade');
+                                      } else if (index == 1) {
+                                        Navigator.pushNamed(context, '/trade');
+                                      } else {
+                                        Navigator.pushNamed(
+                                            context, '/future_trade');
+                                      }
+                                    },
                                     style: ElevatedButton.styleFrom(
                                       primary: tradechallengbtn, // background
                                       onPrimary: Colors.white, // foreground
@@ -847,7 +877,7 @@ Widget userbeginnerTask(context, usertask, beginnertask) {
               });
 }
 
-Widget userDailyTask(context, usertask, allprogress) {
+Widget userDailyTask(context, usertask, dailytask) {
   final height = MediaQuery.of(context).size.height;
   final width = MediaQuery.of(context).size.width;
   var tradeChallengeProvider =
@@ -952,7 +982,7 @@ Widget userDailyTask(context, usertask, allprogress) {
                                     Container(
                                       width: width * 0.55,
                                       child: Text(
-                                        "Daily spot trading volumes ≥ " +
+                                        dailytask[index] +
                                             currentindex['targetValue']
                                                 .toString() +
                                             ' ' +
@@ -988,7 +1018,7 @@ Widget userDailyTask(context, usertask, allprogress) {
                                           barRadius: Radius.circular(10),
                                         ),
                                         Text(
-                                          "${currentindex['finishedAmount']}/" +
+                                          "${double.parse(currentindex['finishedAmount'] == null ? '0' : currentindex['finishedAmount']).toStringAsFixed(1)}/" +
                                               currentindex['targetValue']
                                                   .toString() +
                                               ' ' +
@@ -1006,7 +1036,16 @@ Widget userDailyTask(context, usertask, allprogress) {
                                   padding: EdgeInsets.only(top: 10, left: 15),
                                   height: 35,
                                   child: ElevatedButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      if (index == 0) {
+                                        Navigator.pushNamed(context, '/trade');
+                                      } else if (index == 1) {
+                                        Navigator.pushNamed(context, '/trade');
+                                      } else {
+                                        Navigator.pushNamed(
+                                            context, '/future_trade');
+                                      }
+                                    },
                                     style: ElevatedButton.styleFrom(
                                       primary: tradechallengbtn, // background
                                       onPrimary: Colors.white, // foreground
