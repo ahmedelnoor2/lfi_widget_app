@@ -68,6 +68,7 @@ import 'package:lyotrade/screens/take_loan/process_loan.dart';
 import 'package:lyotrade/screens/take_loan/take_loan.dart';
 import 'package:lyotrade/screens/trade/kline_chart.dart';
 import 'package:lyotrade/screens/trade/margin/margin_trade_history.dart';
+import 'package:lyotrade/screens/trade/market_margin_header.dart';
 import 'package:lyotrade/screens/trade/trade.dart';
 import 'package:lyotrade/screens/trade/trade_history.dart';
 import 'package:lyotrade/screens/trade_challenge/reward_center.dart';
@@ -204,6 +205,7 @@ class MyApp extends StatelessWidget {
                   const TradeChallengeScreen(),
               RewardCenterScreen.routeName: (context) =>
                   const RewardCenterScreen(),
+        
             },
           );
         },

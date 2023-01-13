@@ -96,7 +96,9 @@ bottomNav(context, auth) {
             context,
             PageRouteBuilder(
               settings: RouteSettings(name: Trade.routeName),
-              pageBuilder: (context, animation1, animation2) => Trade(),
+              pageBuilder: (context, animation1, animation2) => Trade(
+                tradeType: null,
+              ),
               transitionDuration: Duration(seconds: 0),
             ),
           );

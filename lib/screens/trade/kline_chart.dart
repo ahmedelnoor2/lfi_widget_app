@@ -279,7 +279,7 @@ class _KlineChartState extends State<KlineChart>
                 ? current
                 : next)[1])
         : 0;
-print(public.activeMarketTick);
+    print(public.activeMarketTick);
     return Scaffold(
       key: _scaffoldKey,
       drawer: MarketDrawer(
@@ -960,7 +960,9 @@ print(public.activeMarketTick);
                           PageRouteBuilder(
                             settings: RouteSettings(name: Trade.routeName),
                             pageBuilder: (context, animation1, animation2) =>
-                                Trade(),
+                                Trade(
+                              tradeType: null,
+                            ),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );
@@ -983,7 +985,9 @@ print(public.activeMarketTick);
                           PageRouteBuilder(
                             settings: RouteSettings(name: Trade.routeName),
                             pageBuilder: (context, animation1, animation2) =>
-                                Trade(),
+                                Trade(
+                              tradeType: null,
+                            ),
                             transitionDuration: Duration(seconds: 0),
                           ),
                         );

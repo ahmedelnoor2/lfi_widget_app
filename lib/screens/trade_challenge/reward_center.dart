@@ -122,7 +122,7 @@ class _RewardCenterScreenState extends State<RewardCenterScreen>
           Card(
             margin: EdgeInsets.all(12),
             child: Container(
-              height: height * 0.27,
+              height: height * 0.30,
               padding: EdgeInsets.all(8),
               child: Column(children: [
                 Row(

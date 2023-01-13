@@ -6,6 +6,7 @@ import 'package:lyotrade/providers/trade_challenge.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/common/no_data.dart';
+import 'package:lyotrade/screens/trade/trade.dart';
 import 'package:lyotrade/screens/trade_challenge/checkin_Bottomsheet.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:percent_indicator/percent_indicator.dart';
@@ -621,30 +622,61 @@ Widget userAllProgress(context, usertask, allprogress) {
                                     ),
                                   ],
                                 ),
-                                Container(
-                                  padding: EdgeInsets.only(top: 10, left: 15),
-                                  height: 35,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      if (index == 0) {
-                                        Navigator.pushNamed(context, '/trade');
-                                      } else if (index == 1) {
-                                        Navigator.pushNamed(context, '/trade');
-                                      } else {
-                                        Navigator.pushNamed(
-                                            context, '/future_trade');
-                                      }
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      primary: tradechallengbtn, // background
-                                      onPrimary: Colors.white, // foreground
-                                    ),
-                                    child: Text(
-                                      'Complete',
-                                      style: TextStyle(fontSize: 10),
-                                    ),
-                                  ),
-                                ),
+                                currentindex['status'] == 0
+                                    ? Container(
+                                        padding:
+                                            EdgeInsets.only(top: 10, left: 15),
+                                        height: 35,
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            if (index == 0) {
+                                              Navigator.pushNamed(
+                                                  context, '/trade');
+                                            } else if (index == 1) {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const Trade(
+                                                          tradeType:
+                                                              'crossMargin',
+                                                        )),
+                                              );
+                                            } else {
+                                              Navigator.pushNamed(
+                                                  context, '/future_trade');
+                                            }
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            primary:
+                                                tradechallengbtn, // background
+                                            onPrimary:
+                                                Colors.white, // foreground
+                                          ),
+                                          child: Text(
+                                            'Complete',
+                                            style: TextStyle(fontSize: 10),
+                                          ),
+                                        ),
+                                      )
+                                    : Container(
+                                        padding:
+                                            EdgeInsets.only(top: 10, left: 15),
+                                        height: 35,
+                                        child: ElevatedButton(
+                                          onPressed: null,
+                                          style: ElevatedButton.styleFrom(
+                                            primary:
+                                                tradechallengbtn, // background
+                                            onPrimary:
+                                                Colors.white, // foreground
+                                          ),
+                                          child: Text(
+                                            'Expired',
+                                            style: TextStyle(fontSize: 10),
+                                          ),
+                                        ),
+                                      ),
                               ],
                             ),
                           ],
@@ -738,12 +770,14 @@ Widget userbeginnerTask(context, usertask, beginnertask) {
                               currentindex['remindTime'] == null
                                   ? Container()
                                   : Text(
-                                      DateFormat('dd-MM-y H:mm').format(DateTime
-                                          .fromMillisecondsSinceEpoch(int.parse(
-                                              '${currentindex['remindTime']}'))),
+                                      "Expiration time:" +
+                                          DateFormat('dd-MM-y H:mm').format(
+                                              DateTime.fromMillisecondsSinceEpoch(
+                                                  int.parse(
+                                                      '${currentindex['remindTime']}'))),
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 11),
+                                          fontSize: 9),
                                     )
                             ],
                           ),
@@ -839,30 +873,54 @@ Widget userbeginnerTask(context, usertask, beginnertask) {
                                     ),
                                   ],
                                 ),
-                                Container(
-                                  padding: EdgeInsets.only(top: 10, left: 15),
-                                  height: 35,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      if (index == 0) {
-                                        Navigator.pushNamed(context, '/trade');
-                                      } else if (index == 1) {
-                                        Navigator.pushNamed(context, '/trade');
-                                      } else {
-                                        Navigator.pushNamed(
-                                            context, '/future_trade');
-                                      }
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      primary: tradechallengbtn, // background
-                                      onPrimary: Colors.white, // foreground
-                                    ),
-                                    child: Text(
-                                      'Complete',
-                                      style: TextStyle(fontSize: 10),
-                                    ),
-                                  ),
-                                ),
+                                currentindex['status'] == 0
+                                    ? Container(
+                                        padding:
+                                            EdgeInsets.only(top: 10, left: 15),
+                                        height: 35,
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            if (index == 0) {
+                                              Navigator.pushNamed(
+                                                  context, '/trade');
+                                            } else if (index == 1) {
+                                              Navigator.pushNamed(
+                                                  context, '/trade');
+                                            } else {
+                                              Navigator.pushNamed(
+                                                  context, '/future_trade');
+                                            }
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            primary:
+                                                tradechallengbtn, // background
+                                            onPrimary:
+                                                Colors.white, // foreground
+                                          ),
+                                          child: Text(
+                                            'Complete',
+                                            style: TextStyle(fontSize: 10),
+                                          ),
+                                        ),
+                                      )
+                                    : Container(
+                                        padding:
+                                            EdgeInsets.only(top: 10, left: 15),
+                                        height: 35,
+                                        child: ElevatedButton(
+                                          onPressed: null,
+                                          style: ElevatedButton.styleFrom(
+                                            primary:
+                                                tradechallengbtn, // background
+                                            onPrimary:
+                                                Colors.white, // foreground
+                                          ),
+                                          child: Text(
+                                            'Expired',
+                                            style: TextStyle(fontSize: 10),
+                                          ),
+                                        ),
+                                      ),
                               ],
                             ),
                           ],
@@ -1032,30 +1090,54 @@ Widget userDailyTask(context, usertask, dailytask) {
                                     ),
                                   ],
                                 ),
-                                Container(
-                                  padding: EdgeInsets.only(top: 10, left: 15),
-                                  height: 35,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      if (index == 0) {
-                                        Navigator.pushNamed(context, '/trade');
-                                      } else if (index == 1) {
-                                        Navigator.pushNamed(context, '/trade');
-                                      } else {
-                                        Navigator.pushNamed(
-                                            context, '/future_trade');
-                                      }
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      primary: tradechallengbtn, // background
-                                      onPrimary: Colors.white, // foreground
-                                    ),
-                                    child: Text(
-                                      'Complete',
-                                      style: TextStyle(fontSize: 10),
-                                    ),
-                                  ),
-                                ),
+                                currentindex['status'] == 0
+                                    ? Container(
+                                        padding:
+                                            EdgeInsets.only(top: 10, left: 15),
+                                        height: 35,
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            if (index == 0) {
+                                              Navigator.pushNamed(
+                                                  context, '/trade');
+                                            } else if (index == 1) {
+                                              Navigator.pushNamed(
+                                                  context, '/trade');
+                                            } else {
+                                              Navigator.pushNamed(
+                                                  context, '/future_trade');
+                                            }
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            primary:
+                                                tradechallengbtn, // background
+                                            onPrimary:
+                                                Colors.white, // foreground
+                                          ),
+                                          child: Text(
+                                            'Complete',
+                                            style: TextStyle(fontSize: 10),
+                                          ),
+                                        ),
+                                      )
+                                    : Container(
+                                        padding:
+                                            EdgeInsets.only(top: 10, left: 15),
+                                        height: 35,
+                                        child: ElevatedButton(
+                                          onPressed: null,
+                                          style: ElevatedButton.styleFrom(
+                                            primary:
+                                                tradechallengbtn, // background
+                                            onPrimary:
+                                                Colors.white, // foreground
+                                          ),
+                                          child: Text(
+                                            'Expired',
+                                            style: TextStyle(fontSize: 10),
+                                          ),
+                                        ),
+                                      ),
                               ],
                             ),
                           ],
