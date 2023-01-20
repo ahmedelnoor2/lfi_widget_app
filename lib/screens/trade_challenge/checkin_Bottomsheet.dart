@@ -14,7 +14,7 @@ class CheckIn_BottomSheet extends StatefulWidget {
     Key? key,
   }) : super(key: key);
 
-  final checkInAmount;
+  final dynamic checkInAmount;
 
   @override
   State<CheckIn_BottomSheet> createState() => _CheckIn_BottomSheetState();
@@ -141,3 +141,4 @@ class _CheckIn_BottomSheetState extends State<CheckIn_BottomSheet> {
           );
   }
 }
+ 

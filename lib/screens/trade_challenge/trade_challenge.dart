@@ -68,10 +68,9 @@ class _TradeChallengeScreenState extends State<TradeChallengeScreen>
         Provider.of<TradeChallenge>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
     await tradeChallengeProvider.getTaskCenter(context, auth);
-  }
-
+  } 
+   
   // User Task ///
-
   Future<void> getUserTask() async {
     var tradeChallengeProvider =
         Provider.of<TradeChallenge>(context, listen: false);
