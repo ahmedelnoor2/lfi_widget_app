@@ -119,7 +119,7 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
 
         if (marketData['channel'] == 'market_${marketCoin}_ticker') {
           public.setActiveMarketTick(marketData['tick'] ?? []);
-    
+
           public.setLastPrice('${marketData['tick']['close']}');
         }
       }
