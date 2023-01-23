@@ -295,8 +295,6 @@ class _PixPaymentState extends State<PixPayment>
     });
   }
 
-  
-
 /////
   Future<void> validateCPF() async {
     var auth = Provider.of<Auth>(context, listen: false);
@@ -1050,26 +1048,24 @@ class _PixPaymentState extends State<PixPayment>
 
                     ///  check cpf number is validiate//
 
-                    
-                        
-                        // Container(
-                        //     padding: EdgeInsets.only(top: 15, bottom: 5),
-                        //     child: Row(
-                        //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        //       children: [
-                        //         Row(
-                        //           children: [
-                                    
-                        //             SizedBox(
-                        //               width: 10,
-                        //             ),
-                        //             Text(payments.cpfStatus == false?'Invalid Cpf':'',
-                        //                 style: TextStyle(color: errorColor)),
-                        //           ],
-                        //         ),
-                        //       ],
-                        //     ),
-                        //   )
+                    // Container(
+                    //     padding: EdgeInsets.only(top: 15, bottom: 5),
+                    //     child: Row(
+                    //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //       children: [
+                    //         Row(
+                    //           children: [
+
+                    //             SizedBox(
+                    //               width: 10,
+                    //             ),
+                    //             Text(payments.cpfStatus == false?'Invalid Cpf':'',
+                    //                 style: TextStyle(color: errorColor)),
+                    //           ],
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   )
                   ],
                 ),
               ],
