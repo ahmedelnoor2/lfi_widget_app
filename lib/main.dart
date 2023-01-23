@@ -117,7 +117,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<Notificationprovider>(
             create: (_) => Notificationprovider()),
         ChangeNotifierProvider<UserKyc>(create: (_) => UserKyc()),
-        ChangeNotifierProvider<GiftCardProvider>(create: (_)=>GiftCardProvider(),)
+        ChangeNotifierProvider<GiftCardProvider>(
+          create: (_) => GiftCardProvider(),
+        )
       ],
       child: Consumer<Auth>(
         builder: (context, auth, _) {
@@ -197,8 +199,9 @@ class MyApp extends StatelessWidget {
                   const FutureMarketTransaction(),
               GiftCard.routeName: (context) => const GiftCard(),
               GiftDetail.routeName: (context) => const GiftDetail(),
-              GiftCardTransaction.routeName:(context)=>const GiftCardTransaction(),
-              BuyCard.routeName:(context)=> BuyCard()
+              GiftCardTransaction.routeName: (context) =>
+                  const GiftCardTransaction(),
+              BuyCard.routeName: (context) => BuyCard()
             },
           );
         },
