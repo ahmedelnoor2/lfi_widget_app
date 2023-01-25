@@ -196,8 +196,9 @@ class _TopGatewayState extends State<TopGateway>
                     begin: Alignment.topLeft,
                     end: Alignment(0.8, 1),
                     colors: <Color>[
-                      Color(0xff292C51),
                       Color(0xff3F4374),
+                      Color(0xff292C51),
+                      
                     ],
                     tileMode: TileMode.mirror,
                   ),

@@ -1134,6 +1134,12 @@ class Payments with ChangeNotifier {
         print(_cpfStatus);
         _isCpfLoading = false;
         return notifyListeners();
+      } else {
+        _cpf = {};
+        Navigator.pop(ctx);
+        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+        _isCpfLoading = false;
+        return notifyListeners();
       }
     } catch (e) {
       print(e);
