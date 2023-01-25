@@ -59,7 +59,7 @@ class _BuyCrptoySliderState extends State<BuyCrptoySlider> {
       children: [
         Card(
           child: Container(
-            width: width * 0.325,
+            width: width * 0.40,
             height: height * 0.17,
             decoration: BoxDecoration(),
             child: Column(
@@ -170,7 +170,7 @@ class _BuyCrptoySliderState extends State<BuyCrptoySlider> {
                   ).toList(),
                 ),
                 Container(
-                  padding: EdgeInsets.only(left: 12),
+                  padding: EdgeInsets.only(left: 22),
                   height: 10,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,

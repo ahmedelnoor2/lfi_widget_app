@@ -31,7 +31,7 @@ class _BuyCryptoState extends State<BuyCrypto> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         SizedBox(
-            width: width * 0.325,
+            width: width * 0.40,
             child: BuyCrptoySlider(
               channel: widget.channel,
             )),
@@ -50,7 +50,7 @@ class _BuyCryptoState extends State<BuyCrypto> {
             }
           },
           child: SizedBox(
-            width: width * 0.64,
+            width: width * 0.57,
             height: height * 0.18,
             child: Card(
               child: Container(
