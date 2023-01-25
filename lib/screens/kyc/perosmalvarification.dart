@@ -316,7 +316,7 @@ class _personalverificationState extends State<personalverification>
                             ),
                           ),
                           Text(
-                            'Personal Verification',
+                            'Individual Verification',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,

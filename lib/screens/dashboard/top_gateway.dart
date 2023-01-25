@@ -39,7 +39,7 @@ class _TopGatewayState extends State<TopGateway>
     var auth = Provider.of<Auth>(context, listen: true);
     var payments = Provider.of<Payments>(context, listen: true);
     // print(auth.userInfo);
-
+    
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -268,10 +268,10 @@ class _TopGatewayState extends State<TopGateway>
                   ],
                 ),
               ),
-            ),
+            ],
           ),
-        )
-      ],
+        ),
+      ),
     );
   }
 }

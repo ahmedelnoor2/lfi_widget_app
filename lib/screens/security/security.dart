@@ -92,17 +92,24 @@ class _SecurityState extends State<Security> {
               ),
               trailing: TextButton(
                 onPressed: () {
-                  showModalBottomSheet<void>(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (BuildContext context) {
-                      return StatefulBuilder(
-                        builder: (BuildContext context, StateSetter setState) {
-                          return processSupportUrl('email');
-                        },
-                      );
-                    },
-                  );
+                  if (auth.userInfo['email'].isEmpty &&
+                      auth.userInfo['googleStatus'] == 1) {
+                    Navigator.pushNamed(context, '/email_change');
+                  } else {
+                    showModalBottomSheet<void>(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (BuildContext context) {
+                        return StatefulBuilder(
+                          builder:
+                              (BuildContext context, StateSetter setState) {
+                            return processSupportUrl('email');
+                          },
+                        );
+                      },
+                    );
+                  }
+
                   // if (auth.userInfo['mobileNumber'].isEmpty &&
                   //     auth.userInfo['googleStatus'] == 0) {
                   //   showAlert(
@@ -167,23 +174,23 @@ class _SecurityState extends State<Security> {
               ),
               trailing: TextButton(
                 onPressed: () {
-                  print(auth.userInfo);
-                  showModalBottomSheet<void>(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (BuildContext context) {
-                      return StatefulBuilder(
-                        builder: (BuildContext context, StateSetter setState) {
-                          return processSupportUrl('phone number');
-                        },
-                      );
-                    },
-                  );
-                  // if (auth.userInfo['mobileNumber'].isNotEmpty) {
-                  //   Navigator.pushNamed(context, '/phone_number');
-                  // } else {
-                  //   snackAlert(context, SnackTypes.warning, 'Coming Soon...');
-                  // }
+                  // print(auth.userInfo);
+                  if (auth.userInfo['mobileNumber'].isNotEmpty) {
+                    showModalBottomSheet<void>(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (BuildContext context) {
+                        return StatefulBuilder(
+                          builder:
+                              (BuildContext context, StateSetter setState) {
+                            return processSupportUrl('phone number');
+                          },
+                        );
+                      },
+                    );
+                  } else {
+                    Navigator.pushNamed(context, '/phone_number');
+                  }
                 },
                 child: Text(
                   auth.userInfo['mobileNumber'].isEmpty ? 'Connect' : 'Change',
