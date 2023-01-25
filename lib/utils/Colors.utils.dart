@@ -111,6 +111,7 @@ var tradechallengbtn=Color(0xff018EF0);
 
 /// trade challenge colour//
 var tradegreen=Color(0xff199B56);
+ var icongreen=Color(0xff00C7A1);
  var trade_txtColour=Color(0xff4C515E);
  var clipcolor=Color(0xffE1E5F2);
  var tradelistcolor=Color(0xffF7CB1C);

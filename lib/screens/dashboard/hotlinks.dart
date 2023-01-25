@@ -28,19 +28,9 @@ class _HotlinksState extends State<Hotlinks> {
         children: [
           GestureDetector(
             onTap: () {
-              if (auth.isAuthenticated) {
-                if (auth.userInfo['realAuthType'] == 0 ||
-                    auth.userInfo['authLevel'] == 0) {
-                  snackAlert(
-                      context, SnackTypes.warning, 'Please check KYC status');
-                } else {
-                  Navigator.pushNamed(context, '/trade_challenge');
-                }
-              } else {
-                Navigator.pushNamed(context, '/authentication');
-              }
+            
 
-              //snackAlert(context, SnackTypes.warning, 'Coming Soon...');
+            snackAlert(context, SnackTypes.warning, 'Coming Soon...');
             },
             child: Column(
               children: [
@@ -54,7 +44,7 @@ class _HotlinksState extends State<Hotlinks> {
                   ),
                 ),
                 Text(
-                  'Challenge',
+                  'New Listing',
                   style: TextStyle(
                     fontSize: 12,
                   ),
