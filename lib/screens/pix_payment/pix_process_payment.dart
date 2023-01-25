@@ -427,23 +427,24 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                   width: 50,
                                   height: 50,
                                   child: Align(
-                                      alignment: Alignment.center,
-                                      child: payments.pixdetail['status'] == '1'
-                                          ? Image.asset(
-                                              'assets/img/approved.png',
-                                              width: 50,
-                                            )
-                                          : payments.pixdetail['status'] == '0'
-                                              ? Icon(
-                                                  Icons.timer,
-                                                  color: warningColor,
-                                                  size: 40,
-                                                )
-                                              : Icon(
-                                                  Icons.timer,
-                                                  color: warningColor,
-                                                  size: 40,
-                                                )),
+                                    alignment: Alignment.center,
+                                    child: payments.pixdetail['status'] == '1'
+                                        ? Image.asset(
+                                            'assets/img/approved.png',
+                                            width: 50,
+                                          )
+                                        : payments.pixdetail['status'] == '0'
+                                            ? Icon(
+                                                Icons.timer,
+                                                color: warningColor,
+                                                size: 40,
+                                              )
+                                            : Icon(
+                                                Icons.timer,
+                                                color: warningColor,
+                                                size: 40,
+                                              ),
+                                  ),
                                 ),
                                 payments.pixdetail['status'] == '1'
                                     ? Container(
