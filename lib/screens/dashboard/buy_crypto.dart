@@ -62,7 +62,7 @@ class _BuyCryptoState extends State<BuyCrypto> {
                   ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(12.0),
+                  padding: const EdgeInsets.all(6.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -71,7 +71,7 @@ class _BuyCryptoState extends State<BuyCrypto> {
                         '10 TRADE',
                         style: TextStyle(
                             color: linkColor,
-                            fontSize: 24,
+                            fontSize: width * 0.055,
                             fontWeight: FontWeight.w700),
                       ),
                       Text('CHALLENGE',
@@ -79,14 +79,12 @@ class _BuyCryptoState extends State<BuyCrypto> {
                               color: secondaryTextColor,
                               fontSize: 15,
                               fontWeight: FontWeight.w400)),
-                      SizedBox(
-                        height: 10,
-                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text('WIN FREE',
                                   style: TextStyle(
@@ -95,13 +93,13 @@ class _BuyCryptoState extends State<BuyCrypto> {
                               Text('USDT',
                                   style: TextStyle(
                                       color: icongreen,
-                                      fontSize: 26,
+                                      fontSize: width * 0.06,
                                       fontWeight: FontWeight.w700))
                             ],
                           ),
                           Container(
                             margin: EdgeInsets.only(left: 15),
-                            width: 45,
+                            width: 30,
                             child: Image.asset('assets/img/usdt.png'),
                           )
                         ],
