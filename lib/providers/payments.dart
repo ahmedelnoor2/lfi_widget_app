@@ -359,7 +359,7 @@ class Payments with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         _changenowTransaction = responseData['data'];
-     
+
         return notifyListeners();
       } else if (responseData['code'] == '4000') {
         snackAlert(ctx, SnackTypes.errors, responseData['msg']['message']);
@@ -535,7 +535,6 @@ class Payments with ChangeNotifier {
   }
 
   Future<void> requestKyc(ctx, postData) async {
-   
     var url = Uri.https(
       lyoApiUrl,
       '/payment_gateway/pix/kyc',
@@ -695,7 +694,7 @@ class Payments with ChangeNotifier {
 
       if (responseData['code'] == '0') {
         _pixCurrencyExchange = double.parse(responseData['data']['price']);
-      //  print(_pixCurrencyExchange);
+        //  print(_pixCurrencyExchange);
         return notifyListeners();
       } else {
         _pixCurrencyExchange = 5.6;
@@ -798,10 +797,10 @@ class Payments with ChangeNotifier {
         headers: headers,
       );
 
-    //  print(postData);
+      //  print(postData);
 
       final responseData = json.decode(response.body);
-     // print(responseData);
+      // print(responseData);
 
       if (responseData['code'] == '0') {
         _transactionValue = txValue;
@@ -989,7 +988,7 @@ class Payments with ChangeNotifier {
               item['code'].toLowerCase().contains(enteredKeyword.toLowerCase()))
           .toList();
 
-     // print(results);
+      // print(results);
       // we use the toLowerCase() method to make it case-insensitive
     }
 
@@ -1009,12 +1008,12 @@ class Payments with ChangeNotifier {
           .where((item) =>
               item['code'].toLowerCase().contains(enteredKeyword.toLowerCase()))
           .toList();
-    //  print(results);
+      //  print(results);
       // we use the toLowerCase() method to make it case-insensitive
     }
 
     onRampCryptoFoundList = results;
-   // print(onRampCryptoFoundList);
+    // print(onRampCryptoFoundList);
     notifyListeners();
   }
 
@@ -1074,7 +1073,6 @@ class Payments with ChangeNotifier {
   }
 
   Future<void> getminimumWithDrawalAmount(auth, formdata) async {
-    
     headers['exchange-token'] = auth.loginVerificationToken;
     var url = Uri.https(apiUrl, '/fe-ex-api/pix/basic_info');
     print(url);
@@ -1113,15 +1111,13 @@ class Payments with ChangeNotifier {
     print(formdata);
     headers['exchange-token'] = auth.loginVerificationToken;
     var url = Uri.https(apiUrl, '/fe-ex-api/pix/valide_cpf');
-   
+
     try {
       _isCpfLoading = true;
       final response =
           await http.post(url, headers: headers, body: jsonEncode(formdata));
       final responseData = json.decode(response.body);
-      
-      
-
+      print(responseData);
       if (responseData['code'] == '0') {
         _cpf = responseData;
         Navigator.pushNamed(ctx, '/pix_payment_details');
@@ -1130,6 +1126,7 @@ class Payments with ChangeNotifier {
         notifyListeners();
       } else {
         _cpf = {};
+        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
         _isCpfLoading = false;
         return notifyListeners();
       }
@@ -1164,15 +1161,16 @@ class Payments with ChangeNotifier {
       final responseData = json.decode(response.body);
       print('cerate order ...........');
       print(responseData);
-      if (responseData['code'] == '106402') {
+      if (responseData['code'] == '0') {
         _isCreateOrderLoading = false;
         Navigator.pushNamed(ctx, '/pix_process_payment');
         _pixCreateOrder = responseData['data'];
+        snackAlert(ctx, SnackTypes.success, responseData['msg']);
         print(_pixCreateOrder);
         notifyListeners();
       } else {
         _pixCreateOrder = {};
-
+        snackAlert(ctx, SnackTypes.warning, responseData['msg']);
         return notifyListeners();
       }
     } catch (e) {
@@ -1192,22 +1190,35 @@ class Payments with ChangeNotifier {
     return _ispixdetailLoading;
   }
 
+  String _payQr = "";
+
+  String get payQr {
+    return _payQr;
+  }
+
+  void resetPayQr() {
+    _payQr = "";
+    return notifyListeners();
+  }
+
   Future<void> getPixDetailInfo(auth, formdata) async {
     _ispixdetailLoading = true;
 
     /// url//
     headers['exchange-token'] = auth.loginVerificationToken;
     var url = Uri.https(apiUrl, '/fe-ex-api/pix/detail_info');
-    print(url);
     try {
       final response =
           await http.post(url, headers: headers, body: jsonEncode(formdata));
+      print(response.body);
       final responseData = json.decode(response.body);
       print('Pix payment detail ...........');
-      print(responseData);
       if (responseData['code'] == '0') {
         _ispixdetailLoading = false;
         _pixdetail = responseData['data'];
+        if (_payQr.isEmpty) {
+          _payQr = _pixdetail['qrCode'];
+        }
         notifyListeners();
       } else {
         _pixdetail = {};
