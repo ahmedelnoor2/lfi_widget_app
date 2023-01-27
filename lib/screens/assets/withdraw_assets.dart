@@ -452,6 +452,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
         public,
         _searchController,
         getCoinCosts,
+        null,
       ),
       body: _validateEmailProcess
           ? withdrawAmount(context)

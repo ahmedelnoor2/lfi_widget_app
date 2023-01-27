@@ -48,6 +48,19 @@ class _BuyCryptoState extends State<BuyCrypto> {
             height:height* 0.15,
             child: Card(
               child: Container(
+                 decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment(0.8, 1),
+                    colors: <Color>[
+                      Color(0xff3F4374),
+                      Color(0xff292C51),
+                      
+                    ],
+                    tileMode: TileMode.mirror,
+                  ),
+                ),
                 padding: EdgeInsets.all(10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,6 +121,19 @@ class _BuyCryptoState extends State<BuyCrypto> {
             height: height * 0.15,
             child: Card(
               child: Container(
+                 decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment(0.8, 1),
+                    colors: <Color>[
+                      Color(0xff3F4374),
+                      Color(0xff292C51),
+                      
+                    ],
+                    tileMode: TileMode.mirror,
+                  ),
+                ),
                 padding: EdgeInsets.all(10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -149,6 +175,19 @@ class _BuyCryptoState extends State<BuyCrypto> {
             height: height * 0.15,
             child: Card(
               child: Container(
+                 decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment(0.8, 1),
+                    colors: <Color>[
+                      Color(0xff3F4374),
+                      Color(0xff292C51),
+                      
+                    ],
+                    tileMode: TileMode.mirror,
+                  ),
+                ),
                 padding: EdgeInsets.all(10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

@@ -436,15 +436,14 @@ class Public with ChangeNotifier {
       apiUrl,
       '$exApi/common/rateV2',
     );
-
     var postData = json.encode({
       "fiat": _activeCurrency['fiat_symbol'].toUpperCase(),
     });
-
     try {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
+     
       if (responseData['code'] == "0") {
         _rate = responseData['data']['rate'];
         return notifyListeners();

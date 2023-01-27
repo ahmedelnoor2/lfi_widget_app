@@ -69,6 +69,7 @@ class _PixPaymentState extends State<PixPayment>
     _amountBrlController.clear();
     _amountUsdtController.clear();
     _cpfController.clear();
+
     getminimumWithDrawalAmount();
     getExchangeRate();
     getUserAddress();
@@ -822,7 +823,7 @@ class _PixPaymentState extends State<PixPayment>
   Future<void> getClientUpdate(payments) async {
     if (payments.clientUpdateCall == 1) {
       var auth = Provider.of<Auth>(context, listen: false);
-      var payments = Provider.of<Payments>(context, listen: false);
+      var payments = Provider.of<Payments>(context, listen: true);
       await payments.getKycVerificationTransaction(
         payments.pixKycClients['client_uuid'],
       );
@@ -1047,29 +1048,24 @@ class _PixPaymentState extends State<PixPayment>
 
                     ///  check cpf number is validiate//
 
-                    payments.cpfStatus == false
-                        ? Container()
-                        : Container(
-                            padding: EdgeInsets.only(top: 15, bottom: 5),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.info_outline,
-                                      color: errorColor,
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text('Invalid Cpf',
-                                        style: TextStyle(color: errorColor)),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          )
+                    // Container(
+                    //     padding: EdgeInsets.only(top: 15, bottom: 5),
+                    //     child: Row(
+                    //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //       children: [
+                    //         Row(
+                    //           children: [
+
+                    //             SizedBox(
+                    //               width: 10,
+                    //             ),
+                    //             Text(payments.cpfStatus == false?'Invalid Cpf':'',
+                    //                 style: TextStyle(color: errorColor)),
+                    //           ],
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   )
                   ],
                 ),
               ],

@@ -1120,12 +1120,22 @@ class Payments with ChangeNotifier {
       print(responseData);
       if (responseData['code'] == '0') {
         _cpf = responseData;
+
         Navigator.pushNamed(ctx, '/pix_payment_details');
         setCpfStatus(false);
         _isCpfLoading = false;
         notifyListeners();
+      } else if (responseData['code'] == '106411') {
+        _cpf = {};
+        Navigator.pop(ctx);
+        snackAlert(ctx, SnackTypes.errors, responseData['msg']);
+        print('check...');
+        print(_cpfStatus);
+        _isCpfLoading = false;
+        return notifyListeners();
       } else {
         _cpf = {};
+        Navigator.pop(ctx);
         snackAlert(ctx, SnackTypes.errors, responseData['msg']);
         _isCpfLoading = false;
         return notifyListeners();
