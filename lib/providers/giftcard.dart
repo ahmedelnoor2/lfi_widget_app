@@ -38,12 +38,12 @@ class GiftCardProvider with ChangeNotifier {
       if (responseData['code'] == 200) {
         _allwallet = [];
         for (var wallet in responseData['data']) {
-          
           _allwallet.add(wallet['coinType']);
           _allwallet.add(wallet['coin']);
         }
         // _allwallet = responseData['data'];
-
+        print('check..');
+        print(_allwallet);
         return notifyListeners();
       } else {
         _allwallet = [];
@@ -211,6 +211,7 @@ class GiftCardProvider with ChangeNotifier {
       return notifyListeners();
     }
   }
+
   //// Estimate////
   var amountsystm;
   bool isEstimate = false;
@@ -226,7 +227,7 @@ class GiftCardProvider with ChangeNotifier {
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
-    
+
     var mydata = json.encode(postdata);
 
     var url = Uri.https(lyoApiUrl, 'gift-card/estimate');
@@ -239,13 +240,12 @@ class GiftCardProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-  
 
       if (responseData['code'] == 200) {
         isEstimate = false;
         _estimateRate = responseData['data']['records'][0];
         print(_estimateRate);
-        amountsystm=double.parse(_estimateRate['amount_system']);
+        amountsystm = double.parse(_estimateRate['amount_system']);
         print(amountsystm);
         return notifyListeners();
       } else {

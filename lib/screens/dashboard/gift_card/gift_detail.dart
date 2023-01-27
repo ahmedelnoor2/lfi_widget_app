@@ -22,11 +22,11 @@ class GiftDetail extends StatefulWidget {
 }
 
 class _GiftDetailState extends State<GiftDetail> {
-  String _defaultCoin = 'LYO1';
+  String _defaultCoin = 'USDT';
   double _selectedPercentage = 0;
   List _allNetworks = [];
   String _defaultNetwork = 'BSC';
-  String _coinShowName = 'LYO1';
+  String _coinShowName = 'USDTBSC';
   double? estimateprice = 0.0;
   double estprice = 0.0;
 

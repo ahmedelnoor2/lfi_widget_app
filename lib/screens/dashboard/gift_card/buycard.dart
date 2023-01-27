@@ -101,6 +101,7 @@ class _BuyCardState extends State<BuyCard> {
         Provider.of<GiftCardProvider>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
     var userid = await auth.userInfo['id'];
+    print(coin);
     withdrwalResponse =
         await giftcardprovider.getDoWithDrawal(context, auth, userid, {
       "symbol": '$coin',
@@ -112,6 +113,8 @@ class _BuyCardState extends State<BuyCard> {
       "smsValidCode": verifitypre == 'smsValidCode' ? _optcontroller.text : "",
       "googleCode": _googlecodecontroller.text
     });
+
+    print(withdrwalResponse);
   }
 
   Future<void> dotransaction(productid, amount) async {
@@ -401,18 +404,19 @@ class _BuyCardState extends State<BuyCard> {
                                         ),
                                         // errorText: _errorText,
                                       ),
-                                      
                                       giftcardprovider.isgoogleCode == true
                                           ? Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Container(
-                                          padding: EdgeInsets.only(
-                                              bottom: 10, top: 10),
-                                          child: Text(
-                                              'Google authenticator code')),
-                                              TextFormField(
-                                                  controller: _googlecodecontroller,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                    padding: EdgeInsets.only(
+                                                        bottom: 10, top: 10),
+                                                    child: Text(
+                                                        'Google authenticator code')),
+                                                TextFormField(
+                                                  controller:
+                                                      _googlecodecontroller,
                                                   validator: (value) {
                                                     if (value == null ||
                                                         value.isEmpty) {
@@ -439,7 +443,8 @@ class _BuyCardState extends State<BuyCard> {
                                                               secondaryTextColor400,
                                                           width: 0.5),
                                                       borderRadius:
-                                                          BorderRadius.circular(5),
+                                                          BorderRadius.circular(
+                                                              5),
                                                     ),
                                                     hintText:
                                                         'Please Google  authenticator code',
@@ -447,8 +452,8 @@ class _BuyCardState extends State<BuyCard> {
                                                     // errorText: _errorText,
                                                   ),
                                                 ),
-                                            ],
-                                          )
+                                              ],
+                                            )
                                           : Container(),
                                     ],
                                   ),
