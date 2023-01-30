@@ -85,7 +85,6 @@ import 'screens/pix_payment/pix_cpf_detail.dart';
 import 'screens/dashboard/gift_card/gift_detail.dart';
 
 int? initScreen;
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -124,8 +123,6 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<UserKyc>(create: (_) => UserKyc()),
         ChangeNotifierProvider<TradeChallenge>(
           create: (_) => TradeChallenge(),
-        ChangeNotifierProvider<GiftCardProvider>(
-          create: (_) => GiftCardProvider(),
         )
       ],
       child: Consumer<Auth>(
