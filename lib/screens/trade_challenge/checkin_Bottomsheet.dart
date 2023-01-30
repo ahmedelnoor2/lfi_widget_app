@@ -32,7 +32,7 @@ class _CheckIn_BottomSheetState extends State<CheckIn_BottomSheet> {
     var tradeChallengeProvider =
         Provider.of<TradeChallenge>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
-   await tradeChallengeProvider.getDoDailyCheckIn(context, auth);
+    await tradeChallengeProvider.getDoDailyCheckIn(context, auth);
     await getTaskCenter();
   }
 
@@ -93,7 +93,7 @@ class _CheckIn_BottomSheetState extends State<CheckIn_BottomSheet> {
                   padding: const EdgeInsets.all(8.0),
                   child: Center(
                     child: Text(
-                      widget.checkInAmount +
+                      widget.checkInAmount.toString() +
                           tradeChallengeProvider.taskCenter['signInInfo']
                               ['rewardCoin'],
                       style: TextStyle(fontSize: 22),
@@ -141,4 +141,3 @@ class _CheckIn_BottomSheetState extends State<CheckIn_BottomSheet> {
           );
   }
 }
- 
