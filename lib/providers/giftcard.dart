@@ -299,6 +299,7 @@ class GiftCardProvider with ChangeNotifier {
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
+    print(postdata);
 
     var mydata = json.encode(postdata);
 
@@ -312,11 +313,12 @@ class GiftCardProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
+      print('send verification Api.${responseData}');
 
       if (responseData['code'] == '200') {
         otpverifcation = false;
         _doverify = responseData['data'];
-
+        print(_doverify);
         setverify(true);
         setgoolgeCode(_doverify['googleCode']);
 
@@ -366,11 +368,11 @@ class GiftCardProvider with ChangeNotifier {
         body: mydata,
         headers: headers,
       );
-
       final responseData = json.decode(response.body);
+      print('with drawal process ....');
       print(responseData);
 
-      if (responseData['code'] == '200') {
+      if (responseData['code'] == '0' || responseData['code'] == 0) {
         _iswithdrwal = false;
         _dowithdrawal = responseData;
         paymentstatus = 'Card is Processing';
@@ -423,8 +425,9 @@ class GiftCardProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
+      print(responseData);
 
-      if (responseData['code'] == '200') {
+      if (responseData['code'] == '200' || responseData['code'] == 200) {
         dotransactionloading = false;
         _doTransaction = responseData;
         paymentstatus = 'Completed';
@@ -439,7 +442,7 @@ class GiftCardProvider with ChangeNotifier {
         return notifyListeners();
       }
     } catch (error) {
-      cardloading = false;
+      dotransactionloading = false;
       paymentstatus = 'Failed to process a Gift Card, Please Contact Admin.';
       print(error);
       // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');

@@ -91,21 +91,26 @@ class _BuyCardState extends State<BuyCard> {
     var asset = Provider.of<Asset>(context, listen: false);
 
     var userid = await auth.userInfo['id'];
+    print(auth.userInfo['email']);
 
-    await giftcardprovider.getDoVerify(context, auth, userid,
-        {"address": asset.changeAddress['addressStr'], "symbol": '$coin'});
+    await giftcardprovider.getDoVerify(context, auth, userid, {
+      "address": asset.changeAddress['addressStr'],
+      "symbol": '$coin',
+      "verificationType": auth.userInfo['email'].isNotEmpty ? '17' : '4'
+    });
   }
 
   Future<void> withDrawal(coin, totalprice, verifitypre) async {
     var giftcardprovider =
         Provider.of<GiftCardProvider>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
+    var asset = Provider.of<Asset>(context, listen: false);
     var userid = await auth.userInfo['id'];
-    print(coin);
+
     withdrwalResponse =
         await giftcardprovider.getDoWithDrawal(context, auth, userid, {
       "symbol": '$coin',
-      "fee": "1",
+      "fee": '${asset.getCost['defaultFee']}',
       "amount": "$totalprice",
       "verificationType": "$verifitypre",
       "emailValidCode":
@@ -113,7 +118,6 @@ class _BuyCardState extends State<BuyCard> {
       "smsValidCode": verifitypre == 'smsValidCode' ? _optcontroller.text : "",
       "googleCode": _googlecodecontroller.text
     });
-
     print(withdrwalResponse);
   }
 
@@ -122,6 +126,8 @@ class _BuyCardState extends State<BuyCard> {
         Provider.of<GiftCardProvider>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
     var userid = await auth.userInfo['id'];
+    print(productid);
+    print(amount);
 
     await giftcardprovider.getDoTransaction(context, auth, userid, {
       "productID": "$productid",
@@ -472,11 +478,12 @@ class _BuyCardState extends State<BuyCard> {
                                                       args.totalprice,
                                                       giftcardprovider.doverify[
                                                           'verificationType'])
-                                                  .whenComplete(() => {
+                                                  .whenComplete(() async => {
+                                                  
                                                         if (withdrwalResponse ==
                                                             true)
                                                           {
-                                                            dotransaction(
+                                                         await   dotransaction(
                                                                 args.productID,
                                                                 args.amount),
                                                           }
@@ -485,8 +492,7 @@ class _BuyCardState extends State<BuyCard> {
                                           }),
                                           text: 'Buy Now',
                                           active: true,
-                                          isLoading:
-                                              giftcardprovider.iswithdrwal,
+                                          isLoading:false,
                                           activeColor: linkColor,
                                           activeTextColor: Colors.black,
                                         ),

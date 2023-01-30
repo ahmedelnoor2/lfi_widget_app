@@ -22,11 +22,11 @@ class GiftDetail extends StatefulWidget {
 }
 
 class _GiftDetailState extends State<GiftDetail> {
-  String _defaultCoin = 'USDT';
+  String _defaultCoin = 'USDTBSC';
   double _selectedPercentage = 0;
   List _allNetworks = [];
   String _defaultNetwork = 'BSC';
-  String _coinShowName = 'USDTBSC';
+  String _coinShowName = 'USDT';
   double? estimateprice = 0.0;
   double estprice = 0.0;
 
@@ -65,14 +65,11 @@ class _GiftDetailState extends State<GiftDetail> {
       });
     }
     await asset.getAccountBalance(context, auth, "");
-    getCoinCosts(_defaultCoin);
+    await getCoinCosts(_coinShowName);
     await asset.getChangeAddress(context, auth, _defaultCoin);
   }
 
   Future<void> getCoinCosts(netwrkType) async {
-    setState(() {
-      _defaultCoin = netwrkType;
-    });
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
     var public = Provider.of<Public>(context, listen: false);
@@ -90,9 +87,9 @@ class _GiftDetailState extends State<GiftDetail> {
         if (v['followCoinWithdrawOpen'] == 1) {
           setState(() {
             _allNetworks.add(v);
-            _defaultCoin = netwrkType;
+            _defaultCoin = '${v['name']}';
             _defaultNetwork = '${v['name']}';
-            _coinShowName = '${v['name']}';
+            _coinShowName = '${v['showName']}';
           });
 
           if (v['tagType'] == 0) {
@@ -122,15 +119,17 @@ class _GiftDetailState extends State<GiftDetail> {
         _allNetworks.clear();
         _allNetworks
             .add(public.publicInfoMarket['market']['coinList'][netwrkType]);
-        _defaultCoin = netwrkType;
+        _defaultCoin =
+            '${public.publicInfoMarket['market']['coinList'][netwrkType]['name']}';
         _defaultNetwork =
             '${public.publicInfoMarket['market']['coinList'][netwrkType]['name']}';
         _coinShowName =
-            '${public.publicInfoMarket['market']['coinList'][netwrkType]['name']}';
+            '${public.publicInfoMarket['market']['coinList'][netwrkType]['showName']}';
       });
     }
 
-    await asset.getCoinCosts(auth, _coinShowName);
+    await asset.getCoinCosts(auth, _defaultCoin);
+
     // await asset.getChangeAddress(context, auth, _defaultCoin);
 
     List _digitialAss = [];
@@ -158,7 +157,9 @@ class _GiftDetailState extends State<GiftDetail> {
     final arguments = (ModalRoute.of(context)?.settings.arguments ??
         <String, dynamic>{}) as Map;
     // print(arguments);
+    // print(asset.getCost['withdraw_min']);
 
+   // print('${asset.getCost['defaultFee']}');
     return Scaffold(
       key: _scaffoldKey,
       drawer: drawer(
@@ -284,7 +285,7 @@ class _GiftDetailState extends State<GiftDetail> {
                                       child: CircleAvatar(
                                         radius: 12,
                                         child: Image.network(
-                                          '${public.publicInfoMarket['market']['coinList'][_defaultCoin]['icon']}',
+                                          '${public.publicInfoMarket['market']['coinList'][_coinShowName]['icon']}',
                                         ),
                                       ),
                                     ),
@@ -299,7 +300,7 @@ class _GiftDetailState extends State<GiftDetail> {
                                       ),
                                     ),
                                     Text(
-                                      '${public.publicInfoMarket['market']['coinList'][_defaultCoin]['longName']}',
+                                      '${public.publicInfoMarket['market']['coinList'][_coinShowName]['longName']}',
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.normal,
@@ -341,6 +342,9 @@ class _GiftDetailState extends State<GiftDetail> {
                                 return 'Minimum Amount:$min';
                               } else if (double.parse(value.toString()) > max) {
                                 return 'Max Amount:$max';
+                              } else if (double.parse(value) <
+                                  asset.getCost['withdraw_min']) {
+                                return 'Minimum withdrawal amount is ${asset.getCost['withdraw_min']}';
                               }
 
                               return null;
