@@ -187,6 +187,7 @@ class _TransactionsState extends State<Transactions>
         public,
         _searchController,
         getCoinCosts,
+        null,
       ),
       body: Container(
         padding: EdgeInsets.only(

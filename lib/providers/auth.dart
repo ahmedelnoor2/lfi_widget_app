@@ -542,6 +542,7 @@ class Auth with ChangeNotifier {
       'googleCode': formData['googleCode'],
       'smsAuthCode': formData['smsAuthCode'],
     });
+print(formData);
 
     try {
       final response = await http.post(url, body: postData, headers: headers);

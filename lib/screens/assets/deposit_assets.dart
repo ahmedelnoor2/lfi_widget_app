@@ -234,6 +234,7 @@ class _DepositAssetsState extends State<DepositAssets> {
         public,
         _searchController,
         getCoinCosts,
+        null,
       ),
       body: SingleChildScrollView(
         child: Container(

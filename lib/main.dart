@@ -4,6 +4,7 @@ import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/dex_provider.dart';
 import 'package:lyotrade/providers/future_market.dart';
+import 'package:lyotrade/providers/giftcard.dart';
 import 'package:lyotrade/providers/loan_provider.dart';
 
 import 'package:lyotrade/providers/notification_provider.dart';
@@ -33,7 +34,9 @@ import 'package:lyotrade/screens/buy_sell/buy_sell_transactions.dart';
 import 'package:lyotrade/screens/buy_sell/common/process_payment.dart';
 import 'package:lyotrade/screens/dashboard.dart';
 import 'package:lyotrade/screens/dashboard/announcement/announcement_details.dart';
+import 'package:lyotrade/screens/dashboard/gift_card/buycard.dart';
 import 'package:lyotrade/screens/dashboard/gift_card/gift_card.dart';
+import 'package:lyotrade/screens/dashboard/gift_card/transaction_history.dart';
 import 'package:lyotrade/screens/dashboard/market_search.dart';
 import 'package:lyotrade/screens/dex_swap/dex_swap.dart';
 import 'package:lyotrade/screens/future_trade/future_market_transaction.dart';
@@ -121,6 +124,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<UserKyc>(create: (_) => UserKyc()),
         ChangeNotifierProvider<TradeChallenge>(
           create: (_) => TradeChallenge(),
+        ChangeNotifierProvider<GiftCardProvider>(
+          create: (_) => GiftCardProvider(),
         )
       ],
       child: Consumer<Auth>(
@@ -205,7 +210,9 @@ class MyApp extends StatelessWidget {
                   const TradeChallengeScreen(),
               RewardCenterScreen.routeName: (context) =>
                   const RewardCenterScreen(),
-        
+              GiftCardTransaction.routeName: (context) =>
+                  const GiftCardTransaction(),
+              BuyCard.routeName: (context) => BuyCard()
             },
           );
         },

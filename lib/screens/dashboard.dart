@@ -209,7 +209,6 @@ class _DashboardState extends State<Dashboard> {
 
     var public = Provider.of<Public>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
-    //print(auth.userInfo);
 
     return WillPopScope(
       onWillPop: () {
