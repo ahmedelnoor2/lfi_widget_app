@@ -27,8 +27,9 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 
 class Trade extends StatefulWidget {
   static const routeName = '/trade';
-  const Trade({Key? key}) : super(key: key);
+  const Trade({Key? key, this.tradeType}) : super(key: key);
 
+  final tradeType;
   @override
   State<Trade> createState() => _TradeState();
 }
@@ -48,7 +49,7 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     connectWebSocket();
-
+    setTabIndex();
     super.initState();
   }
 
@@ -58,6 +59,14 @@ class _TradeState extends State<Trade> with SingleTickerProviderStateMixin {
       _channel.sink.close();
     }
     super.dispose();
+  }
+
+  void setTabIndex() {
+    if (widget.tradeType != null) {
+      setState(() {
+        _tabController.index = 1;
+      });
+    }
   }
 
   Future<Null> refreshList() async {

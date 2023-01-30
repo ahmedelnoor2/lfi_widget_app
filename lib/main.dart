@@ -6,12 +6,14 @@ import 'package:lyotrade/providers/dex_provider.dart';
 import 'package:lyotrade/providers/future_market.dart';
 import 'package:lyotrade/providers/giftcard.dart';
 import 'package:lyotrade/providers/loan_provider.dart';
+
 import 'package:lyotrade/providers/notification_provider.dart';
 import 'package:lyotrade/providers/payments.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/referral.dart';
 import 'package:lyotrade/providers/staking.dart';
 import 'package:lyotrade/providers/trade.dart';
+import 'package:lyotrade/providers/trade_challenge.dart';
 import 'package:lyotrade/providers/user.dart';
 import 'package:lyotrade/providers/user_kyc.dart';
 import 'package:lyotrade/screens/assets/assets.dart';
@@ -69,8 +71,11 @@ import 'package:lyotrade/screens/take_loan/process_loan.dart';
 import 'package:lyotrade/screens/take_loan/take_loan.dart';
 import 'package:lyotrade/screens/trade/kline_chart.dart';
 import 'package:lyotrade/screens/trade/margin/margin_trade_history.dart';
+import 'package:lyotrade/screens/trade/market_margin_header.dart';
 import 'package:lyotrade/screens/trade/trade.dart';
 import 'package:lyotrade/screens/trade/trade_history.dart';
+import 'package:lyotrade/screens/trade_challenge/reward_center.dart';
+import 'package:lyotrade/screens/trade_challenge/trade_challenge.dart';
 
 import 'package:lyotrade/utils/theme.dart';
 import 'package:provider/provider.dart';
@@ -80,7 +85,6 @@ import 'screens/pix_payment/pix_cpf_detail.dart';
 import 'screens/dashboard/gift_card/gift_detail.dart';
 
 int? initScreen;
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -117,8 +121,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<Notificationprovider>(
             create: (_) => Notificationprovider()),
         ChangeNotifierProvider<UserKyc>(create: (_) => UserKyc()),
-        ChangeNotifierProvider<GiftCardProvider>(
-          create: (_) => GiftCardProvider(),
+        ChangeNotifierProvider<TradeChallenge>(
+          create: (_) => TradeChallenge(),
         )
       ],
       child: Consumer<Auth>(
@@ -199,6 +203,10 @@ class MyApp extends StatelessWidget {
                   const FutureMarketTransaction(),
               GiftCard.routeName: (context) => const GiftCard(),
               GiftDetail.routeName: (context) => const GiftDetail(),
+              TradeChallengeScreen.routeName: (context) =>
+                  const TradeChallengeScreen(),
+              RewardCenterScreen.routeName: (context) =>
+                  const RewardCenterScreen(),
               GiftCardTransaction.routeName: (context) =>
                   const GiftCardTransaction(),
               BuyCard.routeName: (context) => BuyCard()

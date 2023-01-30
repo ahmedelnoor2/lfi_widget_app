@@ -28,7 +28,9 @@ class _HotlinksState extends State<Hotlinks> {
         children: [
           GestureDetector(
             onTap: () {
-              snackAlert(context, SnackTypes.warning, 'Coming Soon...');
+            
+
+            snackAlert(context, SnackTypes.warning, 'Coming Soon...');
             },
             child: Column(
               children: [
