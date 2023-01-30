@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'dart:convert';
+import 'dart:convert' show base64;
+import 'dart:convert' show utf8;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -68,7 +69,8 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
     var auth = Provider.of<Auth>(context, listen: false);
     var payments = Provider.of<Payments>(context, listen: false);
 
-    await payments.getPixDetailInfo(auth, payments.pixCreateOrder['id']);
+    await payments
+        .getPixDetailInfo(auth, {'id': '${payments.pixCreateOrder['id']}'});
 
     if (payments.pixdetail.isNotEmpty) {
       //   for (var transaction in payments.allPixTransactions) {
@@ -111,6 +113,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
     width = MediaQuery.of(context).size.width;
     var payments = Provider.of<Payments>(context, listen: true);
     var getPortugeseTrans = payments.getPortugeseTrans;
+
     return Scaffold(
       appBar: hiddenAppBar(),
       body: SingleChildScrollView(
@@ -132,7 +135,8 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                               onTap: () {
                                 if (_timerForOrderUpdate != null) {
                                   _timerForOrderUpdate!.cancel();
-                                  if (payments.pixdetail['status'] == '0') {
+                                  if (payments.pixdetail['status'] == '0' ||
+                                      payments.pixdetail['status'] == 0) {
                                     showAlert(
                                       context,
                                       Icon(
@@ -147,10 +151,12 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                       'Cancel Transaction',
                                     );
                                   } else {
+                                    payments.resetPayQr();
                                     Navigator.pop(context);
                                   }
                                 } else {
-                                  if (payments.pixdetail['status'] == '0') {
+                                  if (payments.pixdetail['status'] == '0' ||
+                                      payments.pixdetail['status'] == 0) {
                                     showAlert(
                                       context,
                                       Icon(
@@ -165,6 +171,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                       'Cancel Transaction',
                                     );
                                   } else {
+                                    payments.resetPayQr();
                                     Navigator.pop(context);
                                   }
                                 }
@@ -352,66 +359,80 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                           child: Card(
                             child: Column(
                               children: [
-                                Container(
-                                  margin: EdgeInsets.only(top: 20),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(0),
-                                    border: Border.all(
-                                      style: BorderStyle.solid,
-                                      width: 1,
-                                      color: secondaryTextColor,
-                                    ),
-                                  ),
-                                  child: SizedBox(
-                                    width: width * 0.4,
-                                    height: width * 0.4,
-                                    child: Align(
-                                      alignment: Alignment.center,
-                                      child: QrImage(
-                                        data: utf8.decode(
-                                          base64.decode(
-                                              payments.pixdetail['qrCode'] ??
-                                                  ''),
+                                ((payments.pixdetail['status'] == '1' ||
+                                            payments.pixdetail['status'] ==
+                                                '5') ||
+                                        (payments.pixdetail['status'] == 1 ||
+                                            payments.pixdetail['status'] == 5))
+                                    ? Image.asset(
+                                        'assets/img/approved.png',
+                                        width: 200,
+                                      )
+                                    : Container(
+                                        margin: EdgeInsets.only(top: 20),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(0),
+                                          border: Border.all(
+                                            style: BorderStyle.solid,
+                                            width: 1,
+                                            color: secondaryTextColor,
+                                          ),
                                         ),
-                                        version: QrVersions.auto,
-                                        backgroundColor: Colors.white,
-                                        size: 150.0,
+                                        child: SizedBox(
+                                          width: width * 0.4,
+                                          height: width * 0.4,
+                                          child: Align(
+                                            alignment: Alignment.center,
+                                            child: payments.payQr.isEmpty
+                                                ? Container()
+                                                : Image.memory(
+                                                    base64.decode(
+                                                      payments.payQr
+                                                          .split(',')[1]
+                                                          .replaceAll("\n", ""),
+                                                    ),
+                                                  ),
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    Clipboard.setData(
-                                      ClipboardData(
-                                        text: utf8.decode(
-                                          base64.decode(
-                                              payments.pixdetail['qrCode']),
+                                ((payments.pixdetail['status'] == '1' ||
+                                            payments.pixdetail['status'] ==
+                                                '5') ||
+                                        (payments.pixdetail['status'] == 1 ||
+                                            payments.pixdetail['status'] == 5))
+                                    ? Container()
+                                    : InkWell(
+                                        onTap: () {
+                                          Clipboard.setData(
+                                            ClipboardData(
+                                              text:
+                                                  payments.pixdetail['qrCode'],
+                                            ),
+                                          );
+                                          snackAlert(context,
+                                              SnackTypes.success, 'Copied');
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.all(20),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Container(
+                                                padding:
+                                                    EdgeInsets.only(right: 10),
+                                                child: Text(getPortugeseTrans(
+                                                    'PIX QR Code')),
+                                              ),
+                                              Icon(
+                                                Icons.copy,
+                                                size: 18,
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    );
-                                    snackAlert(
-                                        context, SnackTypes.success, 'Copied');
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.all(20),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Container(
-                                          padding: EdgeInsets.only(right: 10),
-                                          child: Text(
-                                              getPortugeseTrans('PIX QR Code')),
-                                        ),
-                                        Icon(
-                                          Icons.copy,
-                                          size: 18,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
                               ],
                             ),
                           ),
@@ -427,26 +448,42 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                   width: 50,
                                   height: 50,
                                   child: Align(
-                                    alignment: Alignment.center,
-                                    child: payments.pixdetail['status'] == '1'
-                                        ? Image.asset(
-                                            'assets/img/approved.png',
-                                            width: 50,
-                                          )
-                                        : payments.pixdetail['status'] == '0'
-                                            ? Icon(
-                                                Icons.timer,
-                                                color: warningColor,
-                                                size: 40,
-                                              )
-                                            : Icon(
-                                                Icons.timer,
-                                                color: warningColor,
-                                                size: 40,
-                                              ),
-                                  ),
+                                      alignment: Alignment.center,
+                                      child: ((payments.pixdetail['status'] ==
+                                                      '1' ||
+                                                  payments.pixdetail[
+                                                          'status'] ==
+                                                      '5') ||
+                                              (payments.pixdetail['status'] ==
+                                                      1 ||
+                                                  payments.pixdetail[
+                                                          'status'] ==
+                                                      5))
+                                          ? Image.asset(
+                                              'assets/img/approved.png',
+                                              width: 50,
+                                            )
+                                          : (payments.pixdetail['status'] ==
+                                                      '0' ||
+                                                  payments.pixdetail[
+                                                          'status'] ==
+                                                      0)
+                                              ? Icon(
+                                                  Icons.timer,
+                                                  color: warningColor,
+                                                  size: 40,
+                                                )
+                                              : Icon(
+                                                  Icons.timer,
+                                                  color: warningColor,
+                                                  size: 40,
+                                                )),
                                 ),
-                                payments.pixdetail['status'] == '1'
+                                ((payments.pixdetail['status'] == '1' ||
+                                            payments.pixdetail['status'] ==
+                                                '5') ||
+                                        (payments.pixdetail['status'] == 1 ||
+                                            payments.pixdetail['status'] == 5))
                                     ? Container(
                                         padding: EdgeInsets.all(5),
                                         child: Text(
@@ -458,7 +495,8 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                           ),
                                         ),
                                       )
-                                    : _currentTransaction['status'] == '0'
+                                    : (_currentTransaction['status'] == '0' ||
+                                            _currentTransaction['status'] == 0)
                                         ? Container(
                                             padding: EdgeInsets.all(5),
                                             child: Text(

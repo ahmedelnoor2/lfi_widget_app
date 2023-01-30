@@ -1118,7 +1118,6 @@ class Payments with ChangeNotifier {
           await http.post(url, headers: headers, body: jsonEncode(formdata));
       final responseData = json.decode(response.body);
       print(responseData);
-
       if (responseData['code'] == '0') {
         _cpf = responseData;
 
@@ -1172,15 +1171,16 @@ class Payments with ChangeNotifier {
       final responseData = json.decode(response.body);
       print('cerate order ...........');
       print(responseData);
-      if (responseData['code'] == '106402') {
+      if (responseData['code'] == '0') {
         _isCreateOrderLoading = false;
         Navigator.pushNamed(ctx, '/pix_process_payment');
         _pixCreateOrder = responseData['data'];
+        snackAlert(ctx, SnackTypes.success, responseData['msg']);
         print(_pixCreateOrder);
         notifyListeners();
       } else {
         _pixCreateOrder = {};
-
+        snackAlert(ctx, SnackTypes.warning, responseData['msg']);
         return notifyListeners();
       }
     } catch (e) {
@@ -1200,22 +1200,35 @@ class Payments with ChangeNotifier {
     return _ispixdetailLoading;
   }
 
+  String _payQr = "";
+
+  String get payQr {
+    return _payQr;
+  }
+
+  void resetPayQr() {
+    _payQr = "";
+    return notifyListeners();
+  }
+
   Future<void> getPixDetailInfo(auth, formdata) async {
     _ispixdetailLoading = true;
 
     /// url//
     headers['exchange-token'] = auth.loginVerificationToken;
     var url = Uri.https(apiUrl, '/fe-ex-api/pix/detail_info');
-    print(url);
     try {
       final response =
           await http.post(url, headers: headers, body: jsonEncode(formdata));
+      print(response.body);
       final responseData = json.decode(response.body);
       print('Pix payment detail ...........');
-      print(responseData);
       if (responseData['code'] == '0') {
         _ispixdetailLoading = false;
         _pixdetail = responseData['data'];
+        if (_payQr.isEmpty) {
+          _payQr = _pixdetail['qrCode'];
+        }
         notifyListeners();
       } else {
         _pixdetail = {};
