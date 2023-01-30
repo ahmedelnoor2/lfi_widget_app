@@ -6,6 +6,8 @@ import 'package:lyotrade/providers/trade_challenge.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/common/no_data.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -207,7 +209,10 @@ class _RewardCenterScreenState extends State<RewardCenterScreen>
                     height: 50,
                     padding: EdgeInsets.only(top: 5),
                     child: LyoButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        snackAlert(
+                            context, SnackTypes.warning, "Coming Soon ......");
+                      },
                       text: 'Withdraw',
                       active: true,
                       activeColor: tradechallengbtn,
