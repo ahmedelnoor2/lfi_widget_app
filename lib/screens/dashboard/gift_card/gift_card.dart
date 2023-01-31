@@ -82,6 +82,7 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     var auth = Provider.of<Auth>(context, listen: true);
+   
 
     final List<Widget> imageSliders = giftcardprovider.sliderlist
         .map((item) => InkWell(
@@ -162,9 +163,8 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                   padding: EdgeInsets.only(right: 10),
                   child: IconButton(
                     onPressed: () {
-                      snackAlert(
-                          context, SnackTypes.warning, 'Comming soon...');
-                      // Navigator.pushNamed(context, '/gift_transaction_detail');
+             
+                     Navigator.pushNamed(context, '/gift_transaction_detail');
                     },
                     icon: Icon(Icons.history),
                   ),
@@ -429,6 +429,7 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                                 itemBuilder: (BuildContext context, int index) {
                                   var currentindex =
                                       giftcardprovider.allCard[index];
+                                      
                                   return ListTile(
                                     onTap: () {
                                       Navigator.pushNamed(

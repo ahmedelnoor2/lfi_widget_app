@@ -126,18 +126,9 @@ class _BuyCardState extends State<BuyCard> {
         Provider.of<GiftCardProvider>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
     var userid = await auth.userInfo['id'];
-    print(productid);
-    print(amount);
 
-    await giftcardprovider.getDoTransaction(context, auth, userid, {
-      "productID": "$productid",
-      "amount": "$amount",
-      "firstName": "Ivan",
-      "lastName": "Begumisa",
-      "email": "i.b@lyopay.com",
-      "orderId": "0213457",
-      "quantity": " 1"
-    });
+    await giftcardprovider.getDoTransaction(context, auth, userid,
+        {"productID": "$productid", "amount": "$amount", "quantity": 1});
   }
 
   @override
@@ -479,11 +470,10 @@ class _BuyCardState extends State<BuyCard> {
                                                       giftcardprovider.doverify[
                                                           'verificationType'])
                                                   .whenComplete(() async => {
-                                                  
                                                         if (withdrwalResponse ==
                                                             true)
                                                           {
-                                                         await   dotransaction(
+                                                            await dotransaction(
                                                                 args.productID,
                                                                 args.amount),
                                                           }
@@ -492,7 +482,7 @@ class _BuyCardState extends State<BuyCard> {
                                           }),
                                           text: 'Buy Now',
                                           active: true,
-                                          isLoading:false,
+                                          isLoading: false,
                                           activeColor: linkColor,
                                           activeTextColor: Colors.black,
                                         ),

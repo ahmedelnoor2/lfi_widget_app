@@ -156,7 +156,7 @@ class _GiftDetailState extends State<GiftDetail> {
 
     final arguments = (ModalRoute.of(context)?.settings.arguments ??
         <String, dynamic>{}) as Map;
-    // print(arguments);
+  
     // print(asset.getCost['withdraw_min']);
 
    // print('${asset.getCost['defaultFee']}');
