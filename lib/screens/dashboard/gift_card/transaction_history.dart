@@ -5,6 +5,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:intl/intl.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/giftcard.dart';
+import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/common/no_data.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
@@ -40,7 +41,7 @@ class _GiftCardTransactionState extends State<GiftCardTransaction> {
   @override
   Widget build(BuildContext context) {
     var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
-   
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -85,52 +86,15 @@ class _GiftCardTransactionState extends State<GiftCardTransaction> {
                           itemBuilder: (BuildContext context, int index) {
                             var currentIndex =
                                 giftcardprovider.transaction[index];
-                            print(currentIndex);
-                            return InkWell(
-                              onTap: () {
-                                showModalBottomSheet(
-                                  context: context,
-                                  isScrollControlled: true,
-                                  builder: (builder) {
-                                    return new Container(
-                                      height:
-                                          MediaQuery.of(context).size.height /
-                                              1,
-                                      child: new Container(
-                                        decoration: new BoxDecoration(
-                                            borderRadius: new BorderRadius.only(
-                                                topLeft:
-                                                    const Radius.circular(20.0),
-                                                topRight: const Radius.circular(
-                                                    20.0))),
-                                        child: Container(
-                                            child: WebView(
-                                          initialUrl:
-                                              currentIndex['giftCardDetails'][0]
-                                                  ['Redemption URL'],
-                                          javascriptMode:
-                                              JavascriptMode.unrestricted,
-                                              onPageStarted: (url) {
-                                                setState(() {
-                                              isLoading = true;
-                                            });
-                                              },
-                                          onPageFinished: (finish) {
-                                            setState(() {
-                                              isLoading = false;
-                                            });
-                                            
-                                          },
-                                        )),
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
+
+                            return Card(
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
                                   children: [
+                                    SizedBox(
+                                      height: 10,
+                                    ),
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -282,7 +246,66 @@ class _GiftCardTransactionState extends State<GiftCardTransaction> {
                                         )
                                       ],
                                     ),
-                                    Divider(),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 8,
+                                          right: 8,
+                                          top: 16,
+                                          bottom: 8),
+                                      child: Container(
+                                        padding: EdgeInsets.only(left: 5),
+                                        child: LyoButton(
+                                          onPressed: () {
+                                            showModalBottomSheet(
+                                              context: context,
+                                              isScrollControlled: true,
+                                              builder: (builder) {
+                                                return new Container(
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height /
+                                                      1.1,
+                                                  child: new Container(
+                                                    decoration: new BoxDecoration(
+                                                        borderRadius: new BorderRadius
+                                                                .only(
+                                                            topLeft: const Radius
+                                                                .circular(20.0),
+                                                            topRight: const Radius
+                                                                    .circular(
+                                                                20.0))),
+                                                    child: Container(
+                                                        child: WebView(
+                                                      initialUrl: currentIndex[
+                                                              'giftCardDetails']
+                                                          [0]['Redemption URL'],
+                                                      javascriptMode:
+                                                          JavascriptMode
+                                                              .unrestricted,
+                                                      onPageStarted: (url) {
+                                                        setState(() {
+                                                          isLoading = true;
+                                                        });
+                                                      },
+                                                      onPageFinished: (finish) {
+                                                        setState(() {
+                                                          isLoading = false;
+                                                        });
+                                                      },
+                                                    )),
+                                                  ),
+                                                );
+                                              },
+                                            );
+                                          },
+                                          text: 'Redme',
+                                          active: true,
+                                          activeColor: linkColor,
+                                          activeTextColor: Colors.black,
+                                          isLoading: false,
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
