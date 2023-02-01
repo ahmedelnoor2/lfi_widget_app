@@ -123,6 +123,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<UserKyc>(create: (_) => UserKyc()),
         ChangeNotifierProvider<TradeChallenge>(
           create: (_) => TradeChallenge(),
+        ),
+        ChangeNotifierProvider<GiftCardProvider>(
+          create: (_) => GiftCardProvider(),
         )
       ],
       child: Consumer<Auth>(
