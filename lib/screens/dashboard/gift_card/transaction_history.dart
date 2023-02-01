@@ -298,7 +298,7 @@ class _GiftCardTransactionState extends State<GiftCardTransaction> {
                                               },
                                             );
                                           },
-                                          text: 'Redme',
+                                          text: 'Redeem',
                                           active: true,
                                           activeColor: linkColor,
                                           activeTextColor: Colors.black,
