@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/assets/assets.dart';
 import 'package:lyotrade/screens/auth/authentication.dart';
@@ -13,6 +14,7 @@ import 'package:vibration/vibration.dart';
 bottomNav(context, auth) {
   var _currentRoute = ModalRoute.of(context)!.settings.name;
   var public = Provider.of<Public>(context, listen: false);
+  var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
   return BottomNavigationBar(
     items: <BottomNavigationBarItem>[
@@ -21,35 +23,35 @@ bottomNav(context, auth) {
           'assets/img/bottom_bar/${(_currentRoute == '/' || _currentRoute == '/dashboard') ? 'home_active' : 'home'}.png',
           width: 24,
         ),
-        label: 'Home',
+        label: languageprovider.getlanguage['navbar'][0] ?? 'Home',
       ),
       BottomNavigationBarItem(
         icon: Image.asset(
           'assets/img/bottom_bar/${(_currentRoute == '/market') ? 'market_active' : 'market'}.png',
           width: 24,
         ),
-        label: 'Markets',
+        label: languageprovider.getlanguage['navbar'][1] ?? 'Markets',
       ),
       BottomNavigationBarItem(
         icon: Image.asset(
           'assets/img/bottom_bar/${(_currentRoute == '/trade') ? 'trade_active' : 'trade'}.png',
           width: 24,
         ),
-        label: 'Trade',
+        label: languageprovider.getlanguage['navbar'][2] ?? 'Trade',
       ),
       BottomNavigationBarItem(
         icon: Image.asset(
           'assets/img/bottom_bar/${(_currentRoute == '/future_trade') ? 'future_active' : 'future'}.png',
           width: 24,
         ),
-        label: 'Futures',
+        label: languageprovider.getlanguage['navbar'][3] ?? 'Futures',
       ),
       BottomNavigationBarItem(
         icon: Image.asset(
           'assets/img/bottom_bar/${(_currentRoute == '/assets') ? 'asset_active' : 'asset'}.png',
           width: 24,
         ),
-        label: 'Assets',
+        label: languageprovider.getlanguage['navbar'][4] ?? 'Assets',
       ),
     ],
     currentIndex: (_currentRoute == '/' || _currentRoute == '/dashboard')
