@@ -91,20 +91,26 @@ class _BuyCardState extends State<BuyCard> {
     var asset = Provider.of<Asset>(context, listen: false);
 
     var userid = await auth.userInfo['id'];
+    print(auth.userInfo['email']);
 
-    await giftcardprovider.getDoVerify(context, auth, userid,
-        {"address": asset.changeAddress['addressStr'], "symbol": '$coin'});
+    await giftcardprovider.getDoVerify(context, auth, userid, {
+      "address": asset.changeAddress['addressStr'],
+      "symbol": '$coin',
+      "verificationType": auth.userInfo['email'].isNotEmpty ? '17' : '4'
+    });
   }
 
   Future<void> withDrawal(coin, totalprice, verifitypre) async {
     var giftcardprovider =
         Provider.of<GiftCardProvider>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
+    var asset = Provider.of<Asset>(context, listen: false);
     var userid = await auth.userInfo['id'];
+
     withdrwalResponse =
         await giftcardprovider.getDoWithDrawal(context, auth, userid, {
       "symbol": '$coin',
-      "fee": "1",
+      "fee": '${asset.getCost['defaultFee']}',
       "amount": "$totalprice",
       "verificationType": "$verifitypre",
       "emailValidCode":
@@ -112,6 +118,7 @@ class _BuyCardState extends State<BuyCard> {
       "smsValidCode": verifitypre == 'smsValidCode' ? _optcontroller.text : "",
       "googleCode": _googlecodecontroller.text
     });
+    print(withdrwalResponse);
   }
 
   Future<void> dotransaction(productid, amount) async {
@@ -120,15 +127,8 @@ class _BuyCardState extends State<BuyCard> {
     var auth = Provider.of<Auth>(context, listen: false);
     var userid = await auth.userInfo['id'];
 
-    await giftcardprovider.getDoTransaction(context, auth, userid, {
-      "productID": "$productid",
-      "amount": "$amount",
-      "firstName": "Ivan",
-      "lastName": "Begumisa",
-      "email": "i.b@lyopay.com",
-      "orderId": "0213457",
-      "quantity": " 1"
-    });
+    await giftcardprovider.getDoTransaction(context, auth, userid,
+        {"productID": "$productid", "amount": "$amount", "quantity": 1});
   }
 
   @override
@@ -401,18 +401,19 @@ class _BuyCardState extends State<BuyCard> {
                                         ),
                                         // errorText: _errorText,
                                       ),
-                                      
                                       giftcardprovider.isgoogleCode == true
                                           ? Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Container(
-                                          padding: EdgeInsets.only(
-                                              bottom: 10, top: 10),
-                                          child: Text(
-                                              'Google authenticator code')),
-                                              TextFormField(
-                                                  controller: _googlecodecontroller,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                    padding: EdgeInsets.only(
+                                                        bottom: 10, top: 10),
+                                                    child: Text(
+                                                        'Google authenticator code')),
+                                                TextFormField(
+                                                  controller:
+                                                      _googlecodecontroller,
                                                   validator: (value) {
                                                     if (value == null ||
                                                         value.isEmpty) {
@@ -439,7 +440,8 @@ class _BuyCardState extends State<BuyCard> {
                                                               secondaryTextColor400,
                                                           width: 0.5),
                                                       borderRadius:
-                                                          BorderRadius.circular(5),
+                                                          BorderRadius.circular(
+                                                              5),
                                                     ),
                                                     hintText:
                                                         'Please Google  authenticator code',
@@ -447,8 +449,8 @@ class _BuyCardState extends State<BuyCard> {
                                                     // errorText: _errorText,
                                                   ),
                                                 ),
-                                            ],
-                                          )
+                                              ],
+                                            )
                                           : Container(),
                                     ],
                                   ),
@@ -467,11 +469,11 @@ class _BuyCardState extends State<BuyCard> {
                                                       args.totalprice,
                                                       giftcardprovider.doverify[
                                                           'verificationType'])
-                                                  .whenComplete(() => {
+                                                  .whenComplete(() async => {
                                                         if (withdrwalResponse ==
                                                             true)
                                                           {
-                                                            dotransaction(
+                                                            await dotransaction(
                                                                 args.productID,
                                                                 args.amount),
                                                           }

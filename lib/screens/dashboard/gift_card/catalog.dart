@@ -112,6 +112,7 @@ class _CatalogBottomSheetState extends State<CatalogBottomSheet> {
                       return InkWell(
                         onTap: () async {
                           giftcardprovider.settActiveCatalog(data);
+                          
                           var userid = await auth.userInfo['id'];
                           Navigator.pop(context);
                           await giftcardprovider.getAllCard(

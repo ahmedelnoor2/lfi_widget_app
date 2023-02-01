@@ -76,8 +76,7 @@ Widget drawer(
               return filterWallet != null
                   ? filterWallet.contains(_asset['values']['coinName'])
                       ? ListTile(
-                          onTap: ()async {
-                            
+                          onTap: () async {
                             // print(_asset);
                             getCoinCosts(_asset['coin']);
                             searchController.clear();

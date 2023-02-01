@@ -42,7 +42,8 @@ class GiftCardProvider with ChangeNotifier {
           _allwallet.add(wallet['coin']);
         }
         // _allwallet = responseData['data'];
-
+        print('check..');
+        print(_allwallet);
         return notifyListeners();
       } else {
         _allwallet = [];
@@ -287,6 +288,8 @@ class GiftCardProvider with ChangeNotifier {
 
   bool otpverifcation = false;
 
+  var verificationType = '';
+
   Map _doverify = {};
 
   Map get doverify {
@@ -298,6 +301,8 @@ class GiftCardProvider with ChangeNotifier {
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
+    print('verificatiom');
+    print(postdata);
 
     var mydata = json.encode(postdata);
 
@@ -311,11 +316,15 @@ class GiftCardProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
+      print('send verification Api.${responseData}');
 
       if (responseData['code'] == '200') {
         otpverifcation = false;
         _doverify = responseData['data'];
 
+        //verificationType = _doverify['verificationType'];
+
+        print(_doverify);
         setverify(true);
         setgoolgeCode(_doverify['googleCode']);
 
@@ -356,20 +365,23 @@ class GiftCardProvider with ChangeNotifier {
     headers['userid'] = '${userid}';
 
     var mydata = json.encode(postdata);
-    print(postdata);
-    var url = Uri.https(lyoApiUrl, 'gift-card/withdraw');
+    print(mydata);
 
+    var url = Uri.https(lyoApiUrl, 'gift-card/withdraw');
+    print(url);
     try {
       final response = await http.post(
         url,
         body: mydata,
         headers: headers,
       );
-
+      print(response);
       final responseData = json.decode(response.body);
+      print('with drawal process ....');
       print(responseData);
 
-      if (responseData['code'] == '200') {
+      if (responseData['code'] == '0' || responseData['code'] == 0) {
+        print('i am calling');
         _iswithdrwal = false;
         _dowithdrawal = responseData;
         paymentstatus = 'Card is Processing';
@@ -422,8 +434,9 @@ class GiftCardProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
+      print(responseData);
 
-      if (responseData['code'] == '200') {
+      if (responseData['code'] == '200' || responseData['code'] == 200) {
         dotransactionloading = false;
         _doTransaction = responseData;
         paymentstatus = 'Completed';
@@ -438,10 +451,61 @@ class GiftCardProvider with ChangeNotifier {
         return notifyListeners();
       }
     } catch (error) {
-      cardloading = false;
+      dotransactionloading = false;
       paymentstatus = 'Failed to process a Gift Card, Please Contact Admin.';
       print(error);
       // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return notifyListeners();
+    }
+  }
+
+  /// Get All Gift Card Transaction ///
+  //// Do Transaction////
+
+  bool istransactionloading = false;
+
+  List _transaction = [];
+
+  List get transaction {
+    return _transaction;
+  }
+
+  Future<void> getAllTransaction(
+    ctx,
+    auth,
+    userid,
+  ) async {
+    istransactionloading = true;
+    notifyListeners();
+    headers['token'] = auth.loginVerificationToken;
+    headers['userid'] = '${userid}';
+
+    var url = Uri.https(lyoApiUrl, 'gift-card/transaction');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: headers,
+      );
+
+      final responseData = json.decode(response.body);
+      print(responseData);
+
+      if (responseData['code'] == '200' || responseData['code'] == 200) {
+        istransactionloading = false;
+        _transaction = responseData['data'];
+
+        return notifyListeners();
+      } else {
+        snackAlert(ctx, SnackTypes.warning, responseData['msg']);
+        istransactionloading = false;
+        _transaction = [];
+        return notifyListeners();
+      }
+    } catch (error) {
+      istransactionloading = false;
+      print(error);
+      snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
       return notifyListeners();
     }
   }
