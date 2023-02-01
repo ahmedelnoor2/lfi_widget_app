@@ -795,7 +795,7 @@ Widget userbeginnerTask(context, usertask, beginnertask) {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Container(
-                                      width: width * 0.58,
+                                      width: width * 0.54,
                                       child: Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
@@ -1092,7 +1092,7 @@ Widget userDailyTask(context, usertask, dailytask) {
                                 currentindex['status'] == 0
                                     ? Container(
                                         padding:
-                                            EdgeInsets.only(top: 10, left: 15),
+                                            EdgeInsets.only(top: 10, left: 10),
                                         height: 35,
                                         child: ElevatedButton(
                                           onPressed: () {
