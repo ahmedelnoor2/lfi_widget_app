@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/dashboard.dart';
 import 'package:lyotrade/utils/web_url.dart';
@@ -29,7 +30,13 @@ class _SpashScreenState extends State<SpashScreen>
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this);
+    getLanguage();
     waitCalls();
+  }
+
+  Future<void> getLanguage() async {
+    var languageprovider = Provider.of<LanguageChange>(context, listen: false);
+    await languageprovider.getlanguageChange(context);
   }
 
   Future<void> waitCalls() async {

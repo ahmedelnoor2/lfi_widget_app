@@ -5,6 +5,7 @@ import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/dex_provider.dart';
 import 'package:lyotrade/providers/future_market.dart';
 import 'package:lyotrade/providers/giftcard.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/loan_provider.dart';
 
 import 'package:lyotrade/providers/notification_provider.dart';
@@ -103,6 +104,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<Auth>(create: (_) => Auth()),
+        ChangeNotifierProvider<LanguageChange>(create: (_) => LanguageChange()),
         ChangeNotifierProvider<Public>(create: (_) => Public()),
         ChangeNotifierProvider<Asset>(create: (_) => Asset()),
         ChangeNotifierProvider<User>(create: (_) => User()),

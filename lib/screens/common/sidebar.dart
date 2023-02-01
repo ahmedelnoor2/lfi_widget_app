@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/user.dart';
 import 'package:lyotrade/screens/common/alert.dart';
@@ -37,6 +38,7 @@ class _SideBarState extends State<SideBar> {
   bool _processLogout = false;
 
   String _versionNumber = '0.0';
+  languageItem? selectedMenu;
 
   @override
   void initState() {
@@ -122,12 +124,18 @@ class _SideBarState extends State<SideBar> {
     }
   }
 
+  Future<void> changelanguage() async {
+    var languageprovider = Provider.of<LanguageChange>(context, listen: false);
+    await languageprovider.getlanguageChange(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
 
     var public = Provider.of<Public>(context, listen: true);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
     var user = Provider.of<User>(context, listen: true);
 
@@ -155,10 +163,9 @@ class _SideBarState extends State<SideBar> {
                             },
                             icon: const Icon(Icons.close),
                           ),
-                           Row(
+                          Row(
                             children: [
                               InkWell(
-                                  
                                   onTap: () {
                                     if (auth.thMode == ThemeMode.light) {
                                       auth.setThMode(ThemeMode.dark);
@@ -178,7 +185,6 @@ class _SideBarState extends State<SideBar> {
                               )
                             ],
                           )
-                         
                         ],
                       ),
                     ),
@@ -426,6 +432,48 @@ class _SideBarState extends State<SideBar> {
                     title: Text('Settings'),
                   ),
                   ListTile(
+                    onTap: () {},
+                    leading: const Icon(Icons.language),
+                    title: const Text('Language'),
+                    trailing: languageprovider.islanguageloading
+                        ? CircularProgressIndicator()
+                        : PopupMenuButton<languageItem>(
+                            initialValue: selectedMenu,
+                            // Callback that sets the selected popup menu item.
+                            onSelected: (languageItem item) async {
+                              setState(() {
+                                selectedMenu = item;
+                                print(selectedMenu);
+                              });
+                              if (item == languageItem.Spanish) {
+                                setState(() {
+                                  languageprovider.defaultlanguage =
+                                      'lan=es_ES';
+                                });
+                                await changelanguage();
+                              } else if (item == languageItem.English) {
+                                setState(() {
+                                  languageprovider.defaultlanguage =
+                                      'lan=en_US';
+                                });
+                              }
+
+                              await changelanguage();
+                            },
+                            itemBuilder: (BuildContext context) =>
+                                <PopupMenuEntry<languageItem>>[
+                              const PopupMenuItem<languageItem>(
+                                value: languageItem.English,
+                                child: Text('English'),
+                              ),
+                              const PopupMenuItem<languageItem>(
+                                value: languageItem.Spanish,
+                                child: Text('Spanish'),
+                              ),
+                            ],
+                          ),
+                  ),
+                  ListTile(
                     onTap: () {
                       _supportAndFaqs();
                     },
@@ -481,3 +529,5 @@ class _SideBarState extends State<SideBar> {
     }
   }
 }
+
+enum languageItem { English, Spanish }
