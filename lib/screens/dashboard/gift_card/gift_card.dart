@@ -40,10 +40,9 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
         Provider.of<GiftCardProvider>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
     var userid = await auth.userInfo['id'];
-    await giftcardprovider.getAllWallet(context, auth,userid);
+    await giftcardprovider.getAllWallet(context, auth, userid);
   }
-  
-  
+
   Future<void> getAllCountries() async {
     var giftcardprovider =
         Provider.of<GiftCardProvider>(context, listen: false);
@@ -82,14 +81,13 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     var auth = Provider.of<Auth>(context, listen: true);
-   
 
     final List<Widget> imageSliders = giftcardprovider.sliderlist
         .map((item) => InkWell(
               onTap: (() async {
                 giftcardprovider.settActiveCatalog(item);
                 var userid = await auth.userInfo['id'];
-          
+
                 await giftcardprovider.getAllCard(context, auth, userid);
               }),
               child: Container(
@@ -163,8 +161,7 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                   padding: EdgeInsets.only(right: 10),
                   child: IconButton(
                     onPressed: () {
-             
-                     Navigator.pushNamed(context, '/gift_transaction_detail');
+                      Navigator.pushNamed(context, '/gift_transaction_detail');
                     },
                     icon: Icon(Icons.history),
                   ),
@@ -191,10 +188,12 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                       ),
                     ),
                     child: ListTile(
-                      title: Text(
-                        '${giftcardprovider.toActiveCountry['name']}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
+                      title: giftcardprovider.toActiveCountry['name'] == null
+                          ? Container()
+                          : Text(
+                              '${giftcardprovider.toActiveCountry['name']}',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
                       subtitle: giftcardprovider.toActiveCountry['currency'] ==
                               null
                           ? Container()
@@ -313,7 +312,7 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
+                       giftcardprovider.toActiveCatalog['brand']==null?Container():Text(
                             giftcardprovider.toActiveCatalog['brand']
                                 .toString(),
                             style: TextStyle(
@@ -429,7 +428,7 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                                 itemBuilder: (BuildContext context, int index) {
                                   var currentindex =
                                       giftcardprovider.allCard[index];
-                                      
+
                                   return ListTile(
                                     onTap: () {
                                       Navigator.pushNamed(
@@ -439,15 +438,15 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                                       );
                                     },
                                     leading: Container(
-                                          width: 100,
-                                          child: FadeInImage.memoryNetwork(
-                                            placeholder: kTransparentImage,
-                                            image:giftcardprovider
-                                          .toActiveCatalog['card_image']
-                                                      .toString(),
-                                                      fit: BoxFit.cover,
-                                          ),
-                                        ),
+                                      width: 100,
+                                      child: FadeInImage.memoryNetwork(
+                                        placeholder: kTransparentImage,
+                                        image: giftcardprovider
+                                            .toActiveCatalog['card_image']
+                                            .toString(),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
                                     title: Text('${currentindex['name']}'),
                                     subtitle: currentindex['is_a_range']
                                         ? Column(

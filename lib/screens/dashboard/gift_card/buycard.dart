@@ -482,7 +482,8 @@ class _BuyCardState extends State<BuyCard> {
                                           }),
                                           text: 'Buy Now',
                                           active: true,
-                                          isLoading: false,
+                                          isLoading:
+                                              giftcardprovider.iswithdrwal,
                                           activeColor: linkColor,
                                           activeTextColor: Colors.black,
                                         ),
