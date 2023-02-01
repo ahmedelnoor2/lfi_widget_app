@@ -73,6 +73,7 @@ Widget drawer(
           height: height * 0.8,
           child: Column(
             children: assets.map((_asset) {
+              print(_asset);
               return filterWallet != null
                   ? filterWallet.contains(_asset['values']['coinName'])
                       ? ListTile(
@@ -81,7 +82,7 @@ Widget drawer(
                             getCoinCosts(_asset['coin']);
                             searchController.clear();
                             asset.filterSearchResults('');
-
+                            asset.setSelectedGiftAsset(_asset);
                             Navigator.pop(context);
                           },
                           leading: CircleAvatar(
@@ -102,7 +103,7 @@ Widget drawer(
                         getCoinCosts(_asset['coin']);
                         searchController.clear();
                         asset.filterSearchResults('');
-
+                        asset.setSelectedGiftAsset(_asset);
                         Navigator.pop(context);
                       },
                       leading: CircleAvatar(

@@ -156,10 +156,10 @@ class _GiftDetailState extends State<GiftDetail> {
 
     final arguments = (ModalRoute.of(context)?.settings.arguments ??
         <String, dynamic>{}) as Map;
-  
+
     // print(asset.getCost['withdraw_min']);
 
-   // print('${asset.getCost['defaultFee']}');
+    // print('${asset.getCost['defaultFee']}');
     return Scaffold(
       key: _scaffoldKey,
       drawer: drawer(
@@ -401,8 +401,12 @@ class _GiftDetailState extends State<GiftDetail> {
                                   style:
                                       TextStyle(color: secondaryTextColor400),
                                 ),
-                                Text(asset.accountBalance['totalBalance']
-                                    .toString())
+                                Text(asset.selectedGiftAsset.isNotEmpty
+                                    ? asset.selectedGiftAsset['values']
+                                            ['total_balance']
+                                        .toString()
+                                    : asset.accountBalance['totalBalance']
+                                        .toString())
                               ]),
                         ),
                         Padding(

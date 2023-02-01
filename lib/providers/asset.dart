@@ -981,4 +981,15 @@ class Asset with ChangeNotifier {
     _selectedAsset = asset;
     return notifyListeners();
   }
+
+  Map _selectedGiftAsset = {};
+
+  Map get selectedGiftAsset {
+    return _selectedGiftAsset;
+  }
+
+  void setSelectedGiftAsset(asset){
+    _selectedGiftAsset = asset;
+    return notifyListeners();
+  }
 }

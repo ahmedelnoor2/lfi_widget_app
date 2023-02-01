@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
@@ -477,12 +478,15 @@ class _TradeFormState extends State<TradeForm> {
                           },
                           style: TextStyle(fontSize: 16),
                           inputFormatters: [
+                            FilteringTextInputFormatter.allow(
+                                RegExp(r'^\d*\.?\d{0,2}')),
                             DecimalTextInputFormatter(
-                              decimalRange: public.activeMarket.isNotEmpty
-                                  ? public.activeMarket['volume']
-                                  : 4,
-                              coUnit: 2,
-                            ),
+                                decimalRange:
+                                    public.activeMarket['volume'] == null ||
+                                            public.activeMarket['volume'] == 0
+                                        ? 4
+                                        : public.activeMarket['volume'],
+                                coUnit: 2),
                           ],
                           keyboardType:
                               TextInputType.numberWithOptions(decimal: true),
