@@ -32,7 +32,7 @@ class _SpashScreenState extends State<SpashScreen>
     _controller = AnimationController(vsync: this);
 
     waitCalls();
-    getLanguage();
+    // getLanguage();
   }
 
   Future<void> getLanguage() async {
