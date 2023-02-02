@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:archive/archive_io.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:provider/provider.dart';
@@ -79,8 +80,9 @@ class _Login extends State<Login> {
     }
     super.dispose();
   }
+
   void checkVerificationMethod() {
-    var auth  =Provider.of<Auth>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
     auth.setGoogleAuth(false);
     var public = Provider.of<Public>(context, listen: false);
 
@@ -135,6 +137,7 @@ class _Login extends State<Login> {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
     var auth = Provider.of<Auth>(context, listen: false);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -293,7 +296,7 @@ class _Login extends State<Login> {
   Widget _buildCaptchaView() {
     return WebViewX(
       key: const ValueKey('webviewx'),
-      height: height * 0.09,
+      height: height,
       width: width,
       initialContent: '<div></div>',
       initialSourceType: SourceType.html,

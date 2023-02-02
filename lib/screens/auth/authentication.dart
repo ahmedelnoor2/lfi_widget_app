@@ -242,13 +242,14 @@ class _AuthenticationState extends State<Authentication> {
         return onAndroidBackPress(context);
       },
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         // appBar: appBar(context, null),
         body: _checkingSession
             ? Center(
                 child: CircularProgressIndicator(),
               )
-            : SingleChildScrollView(
-                padding: EdgeInsets.only(top: width * 0.08),
+            : Container(
+                padding: EdgeInsets.only(top: width * 0.06),
                 child: Container(
                   padding: EdgeInsets.only(top: width * 0.1),
                   child: Column(
@@ -257,7 +258,7 @@ class _AuthenticationState extends State<Authentication> {
                     children: [
                       Container(
                         padding: const EdgeInsets.only(left: 10),
-                        height: height * 0.20,
+                        height: height * 0.17,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -349,7 +350,6 @@ class _AuthenticationState extends State<Authentication> {
                                   ),
                       ),
                       Container(
-                        padding: const EdgeInsets.only(bottom: 100),
                         child: Align(
                           alignment: Alignment.bottomCenter,
                           child: _verifyEmail
@@ -385,6 +385,7 @@ class _AuthenticationState extends State<Authentication> {
                                 ),
                         ),
                       ),
+                      Spacer()
                     ],
                   ),
                 ),
