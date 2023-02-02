@@ -4,6 +4,7 @@ import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/ticker_provider.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/payments.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
@@ -38,6 +39,8 @@ class _TopGatewayState extends State<TopGateway>
   Widget build(BuildContext context) {
     var auth = Provider.of<Auth>(context, listen: true);
     var payments = Provider.of<Payments>(context, listen: true);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
+
     // print(auth.userInfo);
 
     return Row(
@@ -80,29 +83,41 @@ class _TopGatewayState extends State<TopGateway>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Deposit BRL',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                languageprovider.getlanguage['home']
+                                        ['deposit_title'] ??
+                                    'Deposit BRL',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              'Bank Transfer',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: secondaryTextColor,
-                              ),
-                            )
-                          ],
-                        ),
-                      ],
+                              Container(
+                                width: 100,
+                                child: Text(
+                                  languageprovider.getlanguage['home']
+                                          ['deposit_text'] ??
+                                      'Bank Transfer',
+                                  softWrap: false,
+                                                          maxLines: 2,
+                                                          overflow: TextOverflow.ellipsis, 
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: secondaryTextColor,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                     Container(
                       // width: width * 0.20,

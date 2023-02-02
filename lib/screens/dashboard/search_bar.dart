@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/notification_provider.dart';
 import 'package:lyotrade/providers/user.dart';
 import 'package:lyotrade/screens/common/alert.dart';
@@ -70,7 +71,7 @@ class _SearchBarState extends State<SearchBar>
     var auth = Provider.of<Auth>(context, listen: true);
     var notificationProvider =
         Provider.of<Notificationprovider>(context, listen: true);
-
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
     return Container(
       padding: EdgeInsets.only(
         bottom: 10,
@@ -115,7 +116,10 @@ class _SearchBarState extends State<SearchBar>
                           child: Image.asset('assets/img/search.png'),
                         ),
                         Text(
-                          'Search LYO',
+                          languageprovider.getlanguage.isNotEmpty
+                              ? languageprovider.getlanguage['home']
+                                  ['search_placeholder']
+                              : "Search LYO",
                           style: TextStyle(
                             color: secondaryTextColor,
                             fontSize: 12,
@@ -215,6 +219,7 @@ class _SearchBarState extends State<SearchBar>
     height = MediaQuery.of(context).size.height;
     var auth = Provider.of<Auth>(context, listen: true);
     var user = Provider.of<User>(context, listen: true);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
     return Container(
       padding: EdgeInsets.all(10),
@@ -228,7 +233,7 @@ class _SearchBarState extends State<SearchBar>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                auth.isAuthenticated ? 'Invite Friends' : 'Share Application',
+                auth.isAuthenticated ?languageprovider.getlanguage['home']['invite-button']['title']?? 'Invite Friends' :'Share Application',
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -298,7 +303,7 @@ class _SearchBarState extends State<SearchBar>
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text('Invitaion Code'),
+                             Text( languageprovider.getlanguage['home']['invite-button']['invitation-code']??'Invitaion Code'),
                             Row(
                               children: [
                                 Text(user.userInvitation.isNotEmpty

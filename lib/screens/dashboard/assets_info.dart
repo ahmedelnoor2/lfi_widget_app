@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/dashboard/skeleton/dashboard_skull.dart';
 import 'package:lyotrade/screens/market/market.dart';
@@ -39,6 +40,8 @@ class _AssetsInfoState extends State<AssetsInfo>
     width = MediaQuery.of(context).size.width;
 
     var public = Provider.of<Public>(context, listen: true);
+     var languageprovider = Provider.of<LanguageChange>(context, listen: true);
+
 
     if (public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()] !=
         null) {
@@ -73,7 +76,7 @@ class _AssetsInfoState extends State<AssetsInfo>
                             SizedBox(
                               width: width * 0.15,
                               child: Text(
-                                'Coin',
+                        languageprovider.getlanguage['home']['table_header1'] ??'Coin',
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: secondaryTextColor,
@@ -86,7 +89,7 @@ class _AssetsInfoState extends State<AssetsInfo>
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   Text(
-                                    'Price(USDT)',
+                             languageprovider.getlanguage['home']['table_header2']??'Price(USDT)',
                                     style: TextStyle(
                                       fontSize: 13,
                                       color: secondaryTextColor,
@@ -98,7 +101,7 @@ class _AssetsInfoState extends State<AssetsInfo>
                             SizedBox(
                               width: width * 0.2,
                               child: Text(
-                                '24H Change',
+                           languageprovider.getlanguage['home']['table_header3']??'24H Change',
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: secondaryTextColor,

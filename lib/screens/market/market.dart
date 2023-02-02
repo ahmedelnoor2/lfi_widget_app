@@ -3,6 +3,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/bottomnav.dart';
 import 'package:lyotrade/screens/common/header.dart';
@@ -62,6 +63,7 @@ class _MarketState extends State<Market> {
     var _currentRoute = ModalRoute.of(context)!.settings.name;
 
     var public = Provider.of<Public>(context, listen: true);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
 
     ///print(public.getrecomendedsybol());
@@ -85,7 +87,7 @@ class _MarketState extends State<Market> {
                           padding: EdgeInsets.only(right: 20),
                         ),
                         Text(
-                          'Market',
+                      languageprovider.getlanguage['markets']['title']??'Market',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -317,14 +319,14 @@ class _MarketState extends State<Market> {
                                 ),
                                 tabs: [
                                   Tab(
-                                    text: 'Exchange',
+                                    text:languageprovider.getlanguage['markets']['exchange_btn']?? 'Exchange',
                                   ),
                                   Tab(
                                     icon: Icon(
                                       Icons.star,
                                       size: 12,
                                     ),
-                                    text: "Favourites",
+                                    text:languageprovider.getlanguage['markets']['fav_btn']['title']??"Favourites",
                                   ),
                                 ],
                               ),
@@ -378,7 +380,7 @@ class _MarketState extends State<Market> {
                                                   hintStyle: TextStyle(
                                                     fontSize: 14,
                                                   ),
-                                                  hintText: "Search",
+                                                  hintText:languageprovider.getlanguage['markets']['search_placeholder']?? "Search",
                                                 ),
                                               ),
                                             ),

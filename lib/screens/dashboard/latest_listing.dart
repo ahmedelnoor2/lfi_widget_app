@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/Number.utils.dart';
@@ -16,6 +17,7 @@ class _LatestListingState extends State<LatestListing> {
   @override
   Widget build(BuildContext context) {
     var public = Provider.of<Public>(context, listen: true);
+     var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
     // print(widget.listingSymbol);
 
@@ -73,7 +75,7 @@ class _LatestListingState extends State<LatestListing> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'LYO Credit',
+                     languageprovider.getlanguage['home']['credit_title']??   'LYO Credit',
                         style: TextStyle(
                           fontSize: 8,
                           fontWeight: FontWeight.bold,
@@ -101,7 +103,7 @@ class _LatestListingState extends State<LatestListing> {
                         Container(
                           padding: EdgeInsets.only(bottom: 2),
                           child: Text(
-                            'Price (USDT)',
+                     languageprovider.getlanguage['home']['credit_price']??       'Price (USDT)',
                             style: TextStyle(
                               fontSize: 8,
                               color: secondaryTextColor,
@@ -129,7 +131,7 @@ class _LatestListingState extends State<LatestListing> {
                       Container(
                         padding: EdgeInsets.only(bottom: 2),
                         child: Text(
-                          'Since Listing (USDT)',
+                     languageprovider.getlanguage['home']['credit_listing']?? 'Since Listing (USDT)',
                           style: TextStyle(
                             fontSize: 8,
                             color: secondaryTextColor,

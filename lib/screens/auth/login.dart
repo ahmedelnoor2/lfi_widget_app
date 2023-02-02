@@ -79,8 +79,9 @@ class _Login extends State<Login> {
     }
     super.dispose();
   }
+
   void checkVerificationMethod() {
-    var auth  =Provider.of<Auth>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
     auth.setGoogleAuth(false);
     var public = Provider.of<Public>(context, listen: false);
 
@@ -293,7 +294,7 @@ class _Login extends State<Login> {
   Widget _buildCaptchaView() {
     return WebViewX(
       key: const ValueKey('webviewx'),
-      height: height * 0.09,
+      height: height,
       width: width,
       initialContent: '<div></div>',
       initialSourceType: SourceType.html,
