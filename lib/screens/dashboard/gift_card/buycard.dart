@@ -136,6 +136,7 @@ class _BuyCardState extends State<BuyCard> {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
+        var asset = Provider.of<Asset>(context, listen: true);
     final args = ModalRoute.of(context)!.settings.arguments as BuyCard;
     return Scaffold(
         appBar: AppBar(
@@ -236,8 +237,15 @@ class _BuyCardState extends State<BuyCard> {
                               fontSize: 32, fontWeight: FontWeight.bold),
                         )),
                     Container(
-                        padding: EdgeInsets.only(bottom: 30),
+                        padding: EdgeInsets.only(bottom: 10),
                         child: Text('Amount')),
+                    Container(
+                      padding: EdgeInsets.only(bottom: 10),
+                      child: Text(
+                        
+                        'WithDrawal Fee:'+'${asset.getCost['defaultFee']??''}',
+                        style: TextStyle(color: warningColor),
+                        ),)
                   ],
                 ),
               ),

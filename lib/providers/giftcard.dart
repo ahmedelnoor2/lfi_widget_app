@@ -22,6 +22,7 @@ class GiftCardProvider with ChangeNotifier {
   List get allwallet {
     return _allwallet;
   }
+
   var walletBalance;
 
   Future<void> getAllWallet(ctx, auth, userid) async {
@@ -44,8 +45,8 @@ class GiftCardProvider with ChangeNotifier {
         }
         // _allwallet = responseData['data'];
         print('check..');
-       // print(_allwallet['tota']);
-       //walletBalance= _allwallet['total_balance']
+        // print(_allwallet['tota']);
+        //walletBalance= _allwallet['total_balance']
         return notifyListeners();
       } else {
         _allwallet = [];
@@ -190,12 +191,12 @@ class GiftCardProvider with ChangeNotifier {
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
-   // print(_toActiveCatalog);
+    // print(_toActiveCatalog);
     var countrycode = await _toActiveCountry['iso3'];
     var catid = await _toActiveCatalog['id'];
 
     var url = Uri.https(lyoApiUrl, 'gift-card/cards/$catid/$countrycode');
-  //  print(url);
+    //  print(url);
 
     try {
       final response = await http.get(url, headers: headers);
@@ -252,9 +253,9 @@ class GiftCardProvider with ChangeNotifier {
       if (responseData['code'] == 200) {
         isEstimate = false;
         _estimateRate = responseData['data']['records'][0];
-       // print(_estimateRate);
+        // print(_estimateRate);
         amountsystm = double.parse(_estimateRate['amount_system']);
-    //    print(amountsystm);
+        //    print(amountsystm);
         return notifyListeners();
       } else {
         //snackAlert(ctx, SnackTypes.warning, responseData['msg']);
@@ -309,8 +310,8 @@ class GiftCardProvider with ChangeNotifier {
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
-   // print('verificatiom');
-   // print(postdata);
+    // print('verificatiom');
+    // print(postdata);
 
     var mydata = json.encode(postdata);
 
@@ -324,7 +325,7 @@ class GiftCardProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-    //  print('send verification Api.${responseData}');
+      //  print('send verification Api.${responseData}');
 
       if (responseData['code'] == '200') {
         otpverifcation = false;
@@ -332,7 +333,7 @@ class GiftCardProvider with ChangeNotifier {
 
         //verificationType = _doverify['verificationType'];
 
-     //   print(_doverify);
+        //   print(_doverify);
         setverify(true);
         setgoolgeCode(_doverify['googleCode']);
 
@@ -383,13 +384,13 @@ class GiftCardProvider with ChangeNotifier {
         body: mydata,
         headers: headers,
       );
-    //  print(response);
+      //  print(response);
       final responseData = json.decode(response.body);
-   //   print('with drawal process ....');
-   //   print(responseData);
+      //   print('with drawal process ....');
+      //   print(responseData);
 
       if (responseData['code'] == '0' || responseData['code'] == 0) {
-    //    print('i am calling');
+        //    print('i am calling');
         _iswithdrwal = false;
         _dowithdrawal = responseData;
         paymentstatus = 'Card is Processing';
@@ -442,7 +443,7 @@ class GiftCardProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-    //  print(responseData);
+      //  print(responseData);
 
       if (responseData['code'] == '200' || responseData['code'] == 200) {
         dotransactionloading = false;
@@ -497,7 +498,7 @@ class GiftCardProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-     // print(responseData);
+      // print(responseData);
 
       if (responseData['code'] == '200' || responseData['code'] == 200) {
         istransactionloading = false;
