@@ -65,7 +65,7 @@ class _GiftDetailState extends State<GiftDetail> {
       });
     }
     await asset.getAccountBalance(context, auth, _defaultCoin);
-   
+
     await getCoinCosts(_coinShowName);
     await asset.getChangeAddress(context, auth, _defaultCoin);
   }
@@ -402,7 +402,9 @@ class _GiftDetailState extends State<GiftDetail> {
                                   style:
                                       TextStyle(color: secondaryTextColor400),
                                 ),
-                                Text(asset.accountBalance['allCoinMap'][_coinShowName]['allBalance'].toString())
+                                Text(asset.accountBalance['allCoinMap']
+                                        [_coinShowName]['allBalance']
+                                    .toString())
                               ]),
                         ),
                         Padding(
