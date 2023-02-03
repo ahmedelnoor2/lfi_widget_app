@@ -102,65 +102,73 @@ class _CatalogBottomSheetState extends State<CatalogBottomSheet> {
                 //   ),
                 // ),
                 Expanded(
-                  
                   child: ListView.builder(
                     shrinkWrap: true,
                     itemCount: giftcardprovider.allCatalog.length,
                     itemBuilder: (context, index) {
                       var data = giftcardprovider.allCatalog[index];
-
-                      return InkWell(
-                        onTap: () async {
-                          giftcardprovider.settActiveCatalog(data);
-                          
-                          var userid = await auth.userInfo['id'];
-                          Navigator.pop(context);
-                          await giftcardprovider.getAllCard(
-                              context, auth, userid);
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 5.0, horizontal: 10.0),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Container(
-                              height: 70,
-                              color: Color(0xff292C51),
-                              child: Row(
-                                children: <Widget>[
-                                  data['card_image'] == null
-                                      ? Container()
-                                      : Container(
-                                          width: 100,
-                                          child: FadeInImage.memoryNetwork(
-                                            placeholder: kTransparentImage,
-                                            image:data['card_image']
+                      return (data['iso2'] ==
+                              giftcardprovider.toActiveCountry['iso2'])
+                          ? InkWell(
+                              onTap: () async {
+                                Navigator.pop(context);
+                                giftcardprovider.settActiveCatalog(data);
+//print(giftcardprovider.toActiveCatalog);
+                                var userid = await auth.userInfo['id'];
+                                await giftcardprovider.getAllCatalog(
+                                    context, auth, userid, {
+                                  "country":
+                                      giftcardprovider.toActiveCountry['iso2'],
+                                }, false);
+                                await giftcardprovider.getAllCard(
+                                    context, auth, userid);
+                              },
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 5.0, horizontal: 10.0),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Container(
+                                    height: 70,
+                                    color: Color(0xff292C51),
+                                    child: Row(
+                                      children: <Widget>[
+                                        data['card_image'] == null
+                                            ? Container()
+                                            : Container(
+                                                width: 100,
+                                                child:
+                                                    FadeInImage.memoryNetwork(
+                                                  placeholder:
+                                                      kTransparentImage,
+                                                  image: data['card_image']
                                                       .toString(),
-                                                      fit: BoxFit.cover,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                        SizedBox(width: 10),
+                                        Expanded(
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: <Widget>[
+                                              Text(data['brand'] ?? ''),
+                                              // Text(
+                                              //     'expiration: ' + data['expiration'],
+                                              //     style:
+                                              //         TextStyle(color: greyTextColor))
+                                            ],
                                           ),
                                         ),
-                                  SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Text(data['brand'] ?? ''),
-                                        // Text(
-                                        //     'expiration: ' + data['expiration'],
-                                        //     style:
-                                        //         TextStyle(color: greyTextColor))
                                       ],
                                     ),
                                   ),
-                                ],
+                                ),
                               ),
-                            ),
-                          ),
-                        ),
-                      );
+                            )
+                          : Container();
                     },
                   ),
                 ),

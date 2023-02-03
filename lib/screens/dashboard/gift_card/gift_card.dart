@@ -31,7 +31,6 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
     super.initState();
     getAllWallet();
     getAllCountries();
-    getCatalog();
   }
 
   // Get wallets//
@@ -49,6 +48,7 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
     var auth = Provider.of<Auth>(context, listen: false);
     var userid = await auth.userInfo['id'];
     await giftcardprovider.getAllCountries(context, auth, userid);
+    await getCatalog();
   }
 
   Future<void> getCatalog() async {
@@ -56,8 +56,9 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
         Provider.of<GiftCardProvider>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
     var userid = await auth.userInfo['id'];
-    await giftcardprovider.getAllCatalog(context, auth, userid);
-    getAllCard();
+    await giftcardprovider.getAllCatalog(context, auth, userid,
+        {"country": giftcardprovider.toActiveCountry['iso2']}, true);
+    await getAllCard();
   }
 
   Future<void> getAllCard() async {
@@ -87,7 +88,6 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
               onTap: (() async {
                 giftcardprovider.settActiveCatalog(item);
                 var userid = await auth.userInfo['id'];
-
                 await giftcardprovider.getAllCard(context, auth, userid);
               }),
               child: Container(
@@ -213,25 +213,27 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                   ? Center(
                       child: CircularProgressIndicator(),
                     )
-                  : Container(
-                      child: CarouselSlider(
-                        items: imageSliders,
-                        carouselController: _controller,
-                        options: CarouselOptions(
-                            autoPlay: true,
-                            enlargeCenterPage: true,
-                            viewportFraction: 0.7,
-                            aspectRatio: 4.0,
-                            initialPage: 0,
-                            autoPlayCurve: Curves.fastOutSlowIn,
-                            height: height * 30,
-                            onPageChanged: (index, reason) {
-                              setState(() {
-                                _current = index;
-                              });
-                            }),
-                      ),
-                    ),
+                  : giftcardprovider.sliderlist.isEmpty
+                      ? Center(child: noData('No Card Available'))
+                      : Container(
+                          child: CarouselSlider(
+                            items: imageSliders,
+                            carouselController: _controller,
+                            options: CarouselOptions(
+                                autoPlay: true,
+                                enlargeCenterPage: true,
+                                viewportFraction: 0.7,
+                                aspectRatio: 4.0,
+                                initialPage: 0,
+                                autoPlayCurve: Curves.fastOutSlowIn,
+                                height: height * 30,
+                                onPageChanged: (index, reason) {
+                                  setState(() {
+                                    _current = index;
+                                  });
+                                }),
+                          ),
+                        ),
             ),
             Container(
               height: 60,
@@ -285,17 +287,19 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                   ),
                   InkWell(
                     onTap: (() {
-                      showModalBottomSheet<void>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return StatefulBuilder(
-                            builder:
-                                (BuildContext context, StateSetter setState) {
-                              return CatalogBottomSheet();
-                            },
-                          );
-                        },
-                      );
+                      giftcardprovider.toActiveCatalog.isNotEmpty
+                          ? showModalBottomSheet<void>(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return StatefulBuilder(
+                                  builder: (BuildContext context,
+                                      StateSetter setState) {
+                                    return CatalogBottomSheet();
+                                  },
+                                );
+                              },
+                            )
+                          : null;
                     }),
                     child: Container(
                       margin: EdgeInsets.only(top: 10, bottom: 10),
@@ -312,15 +316,17 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                       giftcardprovider.toActiveCatalog['brand']==null?Container():Text(
-                            giftcardprovider.toActiveCatalog['brand']
-                                .toString(),
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
+                          giftcardprovider.toActiveCatalog['brand'] == null
+                              ? Container()
+                              : Text(
+                                  giftcardprovider.toActiveCatalog['brand']
+                                      .toString(),
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
                           Icon(
                             Icons.arrow_drop_down,
                           ),

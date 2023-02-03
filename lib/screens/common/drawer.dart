@@ -73,7 +73,8 @@ Widget drawer(
           height: height * 0.8,
           child: Column(
             children: assets.map((_asset) {
-              print(_asset);
+
+             //print(_asset);
               return filterWallet != null
                   ? filterWallet.contains(_asset['values']['coinName'])
                       ? ListTile(

@@ -64,7 +64,8 @@ class _GiftDetailState extends State<GiftDetail> {
             '${public.publicInfoMarket['market']['coinList'][asset.selectedAsset['coin']]['name']}';
       });
     }
-    await asset.getAccountBalance(context, auth, "");
+    await asset.getAccountBalance(context, auth, _defaultCoin);
+   
     await getCoinCosts(_coinShowName);
     await asset.getChangeAddress(context, auth, _defaultCoin);
   }
@@ -401,12 +402,7 @@ class _GiftDetailState extends State<GiftDetail> {
                                   style:
                                       TextStyle(color: secondaryTextColor400),
                                 ),
-                                Text(asset.selectedGiftAsset.isNotEmpty
-                                    ? asset.selectedGiftAsset['values']
-                                            ['total_balance']
-                                        .toString()
-                                    : asset.accountBalance['totalBalance']
-                                        .toString())
+                                Text(asset.accountBalance['allCoinMap'][_coinShowName]['allBalance'].toString())
                               ]),
                         ),
                         Padding(
@@ -455,8 +451,8 @@ class _GiftDetailState extends State<GiftDetail> {
                               ),
                         LyoButton(
                           onPressed: (() async {
-                            print(double.parse(double.parse('${estimateprice}')
-                                .toStringAsFixed(4)));
+                            // print(double.parse(double.parse('${estimateprice}')
+                            //     .toStringAsFixed(4)));
                             if (_formKey.currentState!.validate()) {
                               Navigator.pushNamed(context, '/buy_card',
                                   arguments: BuyCard(

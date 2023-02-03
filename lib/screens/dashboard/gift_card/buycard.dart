@@ -91,7 +91,7 @@ class _BuyCardState extends State<BuyCard> {
     var asset = Provider.of<Asset>(context, listen: false);
 
     var userid = await auth.userInfo['id'];
-    print(auth.userInfo['email']);
+    //print(auth.userInfo['email']);
 
     await giftcardprovider.getDoVerify(context, auth, userid, {
       "address": asset.changeAddress['addressStr'],
@@ -118,7 +118,7 @@ class _BuyCardState extends State<BuyCard> {
       "smsValidCode": verifitypre == 'smsValidCode' ? _optcontroller.text : "",
       "googleCode": _googlecodecontroller.text
     });
-    print(withdrwalResponse);
+   // print(withdrwalResponse);
   }
 
   Future<void> dotransaction(productid, amount) async {
@@ -417,7 +417,7 @@ class _BuyCardState extends State<BuyCard> {
                                                   validator: (value) {
                                                     if (value == null ||
                                                         value.isEmpty) {
-                                                      return 'Please Google authenticator code';
+                                                      return 'Please Enter Google Authenticator Code';
                                                     }
 
                                                     return null;
@@ -444,7 +444,7 @@ class _BuyCardState extends State<BuyCard> {
                                                               5),
                                                     ),
                                                     hintText:
-                                                        'Please Google  authenticator code',
+                                                        'Please enter google authenticator code',
 
                                                     // errorText: _errorText,
                                                   ),
