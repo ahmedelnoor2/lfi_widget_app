@@ -290,11 +290,16 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                       giftcardprovider.toActiveCatalog.isNotEmpty
                           ? showModalBottomSheet<void>(
                               context: context,
+                              isScrollControlled: true,
                               builder: (BuildContext context) {
                                 return StatefulBuilder(
                                   builder: (BuildContext context,
                                       StateSetter setState) {
-                                    return CatalogBottomSheet();
+                                    return Container(
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.85,
+                                        child: CatalogBottomSheet());
                                   },
                                 );
                               },
