@@ -127,383 +127,380 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
             ))
         .toList();
 
-    return  Scaffold(
-          key: _scaffoldKey,
-          drawer: const CountryDrawer(),
-          appBar: hiddenAppBar(),
-          body: SingleChildScrollView(
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(right: 10, top: 10),
-                          child: IconButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            icon: Icon(Icons.chevron_left),
-                          ),
-                        ),
-                        Text(
-                          'Gift Card',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      padding: EdgeInsets.only(right: 10),
-                      child: IconButton(
-                        onPressed: () {
-                          Navigator.pushNamed(
-                              context, '/gift_transaction_detail');
-                        },
-                        icon: Icon(Icons.history),
-                      ),
-                    ),
-                  ],
-                ),
-                Divider(),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: InkWell(
-                    onTap: (() {
-                      _scaffoldKey.currentState!.openDrawer();
-                    }),
-                    child: Container(
-                      color: Color(0xff292C51),
-                      // padding: EdgeInsets.only(top: 5, bottom: 5),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(
-                            style: BorderStyle.solid,
-                            width: 0.3,
-                            color: Color(0xff76B9A),
-                          ),
-                        ),
-                        child: ListTile(
-                          title: giftcardprovider.toActiveCountry['name'] ==
-                                  null
-                              ? Container()
-                              : Text(
-                                  '${giftcardprovider.toActiveCountry['name']}',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                          subtitle: giftcardprovider
-                                      .toActiveCountry['currency'] ==
-                                  null
-                              ? Container()
-                              : Text(
-                                  'Currency: ${giftcardprovider.toActiveCountry['currency']['code']}'),
-                          trailing: Icon(
-                            Icons.arrow_drop_down,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 180,
-                  child: giftcardprovider.IsCatalogloading
-                      ? Center(
-                          child: CircularProgressIndicator(),
-                        )
-                      : giftcardprovider.sliderlist.isEmpty
-                          ? Center(child: noData('No Card Available'))
-                          : Container(
-                              child: CarouselSlider(
-                                items: imageSliders,
-                                carouselController: _controller,
-                                options: CarouselOptions(
-                                    autoPlay: true,
-                                    enlargeCenterPage: true,
-                                    viewportFraction: 0.7,
-                                    aspectRatio: 4.0,
-                                    initialPage: 0,
-                                    autoPlayCurve: Curves.fastOutSlowIn,
-                                    height: height * 30,
-                                    onPageChanged: (index, reason) {
-                                      setState(() {
-                                        _current = index;
-                                      });
-                                    }),
-                              ),
-                            ),
-                ),
-                Container(
-                  height: 60,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: giftcardprovider.sliderlist
-                        .asMap()
-                        .entries
-                        .map((entry) {
-                      return GestureDetector(
-                        onTap: () => _controller.animateToPage(entry.key),
-                        child: Container(
-                          width: _current == entry.key ? 30.0 : 12.0,
-                          height: _current == entry.key ? 10.0 : 12.0,
-                          margin: EdgeInsets.symmetric(
-                              vertical: 8.0, horizontal: 4.0),
-                          decoration: BoxDecoration(
-                              shape: BoxShape.rectangle,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(20)),
-                              color: _current == entry.key
-                                  ? Color(0xff01FEF5)
-                                  : Color(0xff5E6292)),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-                Container(
-                  height: height * 0.54,
-                  width: width,
-                  decoration: BoxDecoration(
-                    color: Color(0xff25284A),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(15.0),
-                      topRight: Radius.circular(15.0),
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+    return Scaffold(
+        key: _scaffoldKey,
+        drawer: const CountryDrawer(),
+        appBar: hiddenAppBar(),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
                     children: [
-                      SizedBox(
-                        height: height * 0.01,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          left: 15,
-                        ),
-                        child: Text(
-                          'Buy Gift Card',
-                          style: TextStyle(color: Colors.white),
+                      Container(
+                        padding: EdgeInsets.only(right: 10, top: 10),
+                        child: IconButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          icon: Icon(Icons.chevron_left),
                         ),
                       ),
-                      InkWell(
-                        onTap: (() {
-                          giftcardprovider.toActiveCatalog.isNotEmpty
-                              ? showModalBottomSheet<void>(
-                                  context: context,
-                                  isScrollControlled: true,
-                                  builder: (BuildContext context) {
-                                    return StatefulBuilder(
-                                      builder: (BuildContext context,
-                                          StateSetter setState) {
-                                        return Container(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.85,
-                                            child: CatalogBottomSheet());
-                                      },
-                                    );
-                                  },
-                                )
-                              : null;
-                        }),
-                        child: Container(
-                          margin: EdgeInsets.only(top: 10, bottom: 10),
-                          width: width,
-                          padding: EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                              // borderRadius: BorderRadius.circular(5),
-                              border: Border.all(
-                                style: BorderStyle.solid,
-                                width: 0.3,
-                                color: bottombuttoncolour,
-                              ),
-                              color: bottombuttoncolour),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              giftcardprovider.toActiveCatalog['brand'] == null
-                                  ? Container()
-                                  : Text(
-                                      giftcardprovider.toActiveCatalog['brand']
-                                          .toString(),
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                              Icon(
-                                Icons.arrow_drop_down,
-                              ),
-                            ],
-                          ),
+                      Text(
+                        'Gift Card',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
-                      ),
-                      // Padding(
-                      //   padding: const EdgeInsets.all(8.0),
-                      //   child: InkWell(
-                      //     onTap: (() {
-                      //       showModalBottomSheet<void>(
-                      //         context: context,
-                      //         builder: (BuildContext context) {
-                      //           return StatefulBuilder(
-                      //             builder:
-                      //                 (BuildContext context, StateSetter setState) {
-                      //               return CatalogBottomSheet();
-                      //             },
-                      //           );
-                      //         },
-                      //       );
-                      //     }),
-                      //     child: Container(
-                      //       color: Color(0xff292C51),
-                      //       padding: EdgeInsets.only(top: 5, bottom: 5),
-                      //       child: Container(
-                      //         padding: EdgeInsets.all(12),
-                      //         decoration: BoxDecoration(
-                      //           borderRadius: BorderRadius.circular(5),
-                      //           border: Border.all(
-                      //             style: BorderStyle.solid,
-                      //             width: 0.3,
-                      //             color: Color(0xff76B9A),
-                      //           ),
-                      //         ),
-                      //         child: Row(
-                      //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //           children: [
-                      //             SizedBox(
-                      //               width: width * 0.50,
-                      //               child: TextFormField(
-                      //                 enabled: false,
-                      //                 validator: (value) {
-                      //                   if (value == null || value.isEmpty) {
-                      //                     return 'Please enter wallet address';
-                      //                   }
-                      //                   return null;
-                      //                 },
-                      //                 decoration: const InputDecoration(
-                      //                   contentPadding: EdgeInsets.zero,
-                      //                   isDense: true,
-                      //                   border: UnderlineInputBorder(
-                      //                     borderSide: BorderSide.none,
-                      //                   ),
-                      //                   hintStyle: TextStyle(
-                      //                       fontSize: 14, color: Color(0xff5E6292)),
-                      //                   hintText: "Search",
-                      //                   // prefixIcon: Icon(Icons.search)
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //             Row(
-                      //               children: [
-                      //                 giftcardprovider.toActiveCatalog.isNotEmpty
-                      //                     ? Container(
-                      //                         padding: EdgeInsets.only(right: 10),
-                      //                         child: GestureDetector(
-                      //                           onTap: () async {},
-                      //                           child: Text(
-                      //                             giftcardprovider
-                      //                                 .toActiveCatalog['brand']
-                      //                                 .toString(),
-                      //                             style: TextStyle(
-                      //                               fontSize: 14,
-                      //                               color: Colors.white,
-                      //                             ),
-                      //                           ),
-                      //                         ),
-                      //                       )
-                      //                     : Container(),
-                      //               ],
-                      //             ),
-                      //           ],
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
-                      Expanded(
-                        child: giftcardprovider.cardloading
-                            ? Center(
-                                child: CircularProgressIndicator(),
-                              )
-                            : giftcardprovider.allCard.length <= 0
-                                ? Center(
-                                    child: noData('No Cards Available'),
-                                  )
-                                : ListView.separated(
-                                    separatorBuilder:
-                                        (BuildContext context, int index) =>
-                                            const Divider(),
-                                    shrinkWrap: true,
-                                    itemCount: giftcardprovider.allCard.length,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      var currentindex =
-                                          giftcardprovider.allCard[index];
-
-                                      return ListTile(
-                                        onTap: () {
-                                          Navigator.pushNamed(
-                                            context,
-                                            '/gift_detail',
-                                            arguments: {'data': currentindex},
-                                          );
-                                        },
-                                        leading: Container(
-                                          width: 100,
-                                          child: FadeInImage.memoryNetwork(
-                                            placeholder: kTransparentImage,
-                                            image: giftcardprovider
-                                                .toActiveCatalog['card_image']
-                                                .toString(),
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                        title: Text('${currentindex['name']}'),
-                                        subtitle: currentindex['is_a_range']
-                                            ? Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                      'Min price: ${currentindex['min']}'),
-                                                  Text(
-                                                      'Max price: ${currentindex['max']}'),
-                                                ],
-                                              )
-                                            : Text(
-                                                'Price: ${currentindex['max']}'),
-                                        trailing: Icon(Icons.chevron_right),
-                                      );
-                                    },
-                                  ),
                       ),
                     ],
                   ),
+                  Container(
+                    padding: EdgeInsets.only(right: 10),
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.pushNamed(
+                            context, '/gift_transaction_detail');
+                      },
+                      icon: Icon(Icons.history),
+                    ),
+                  ),
+                ],
+              ),
+              Divider(),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: InkWell(
+                  onTap: (() {
+                    _scaffoldKey.currentState!.openDrawer();
+                  }),
+                  child: Container(
+                    color: Color(0xff292C51),
+                    // padding: EdgeInsets.only(top: 5, bottom: 5),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(
+                          style: BorderStyle.solid,
+                          width: 0.3,
+                          color: Color(0xff76B9A),
+                        ),
+                      ),
+                      child: ListTile(
+                        title: giftcardprovider.toActiveCountry['name'] == null
+                            ? Container()
+                            : Text(
+                                '${giftcardprovider.toActiveCountry['name']}',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                        subtitle: giftcardprovider
+                                    .toActiveCountry['currency'] ==
+                                null
+                            ? Container()
+                            : Text(
+                                'Currency: ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                        trailing: Icon(
+                          Icons.arrow_drop_down,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-              ],
-            ),
-          ),
-          floatingActionButton:FloatingActionButton(
-            backgroundColor: cardcolor,
-    
-    onPressed:(){},
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text('BETA',style: TextStyle(fontSize: 10,color: Colors.red),),
-        Text('Version',style: TextStyle(fontSize:8,color: Colors.white)),
-      ],
-    ),
-          ));
+              ),
+              SizedBox(
+                height: 180,
+                child: giftcardprovider.IsCatalogloading
+                    ? Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : giftcardprovider.sliderlist.isEmpty
+                        ? Center(child: noData('No Card Available'))
+                        : Container(
+                            child: CarouselSlider(
+                              items: imageSliders,
+                              carouselController: _controller,
+                              options: CarouselOptions(
+                                  autoPlay: true,
+                                  enlargeCenterPage: true,
+                                  viewportFraction: 0.7,
+                                  aspectRatio: 4.0,
+                                  initialPage: 0,
+                                  autoPlayCurve: Curves.fastOutSlowIn,
+                                  height: height * 30,
+                                  onPageChanged: (index, reason) {
+                                    setState(() {
+                                      _current = index;
+                                    });
+                                  }),
+                            ),
+                          ),
+              ),
+              Container(
+                height: 60,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children:
+                      giftcardprovider.sliderlist.asMap().entries.map((entry) {
+                    return GestureDetector(
+                      onTap: () => _controller.animateToPage(entry.key),
+                      child: Container(
+                        width: _current == entry.key ? 30.0 : 12.0,
+                        height: _current == entry.key ? 10.0 : 12.0,
+                        margin: EdgeInsets.symmetric(
+                            vertical: 8.0, horizontal: 4.0),
+                        decoration: BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.all(Radius.circular(20)),
+                            color: _current == entry.key
+                                ? Color(0xff01FEF5)
+                                : Color(0xff5E6292)),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              Container(
+                height: height * 0.54,
+                width: width,
+                decoration: BoxDecoration(
+                  color: Color(0xff25284A),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(15.0),
+                    topRight: Radius.circular(15.0),
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: height * 0.01,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 15,
+                      ),
+                      child: Text(
+                        'Buy Gift Card',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: (() {
+                        giftcardprovider.toActiveCatalog.isNotEmpty
+                            ? showModalBottomSheet<void>(
+                                context: context,
+                                isScrollControlled: true,
+                                builder: (BuildContext context) {
+                                  return StatefulBuilder(
+                                    builder: (BuildContext context,
+                                        StateSetter setState) {
+                                      return Container(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.85,
+                                          child: CatalogBottomSheet());
+                                    },
+                                  );
+                                },
+                              )
+                            : null;
+                      }),
+                      child: Container(
+                        margin: EdgeInsets.only(top: 10, bottom: 10),
+                        width: width,
+                        padding: EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                            // borderRadius: BorderRadius.circular(5),
+                            border: Border.all(
+                              style: BorderStyle.solid,
+                              width: 0.3,
+                              color: bottombuttoncolour,
+                            ),
+                            color: bottombuttoncolour),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            giftcardprovider.toActiveCatalog['brand'] == null
+                                ? Container()
+                                : Text(
+                                    giftcardprovider.toActiveCatalog['brand']
+                                        .toString(),
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                            Icon(
+                              Icons.arrow_drop_down,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.all(8.0),
+                    //   child: InkWell(
+                    //     onTap: (() {
+                    //       showModalBottomSheet<void>(
+                    //         context: context,
+                    //         builder: (BuildContext context) {
+                    //           return StatefulBuilder(
+                    //             builder:
+                    //                 (BuildContext context, StateSetter setState) {
+                    //               return CatalogBottomSheet();
+                    //             },
+                    //           );
+                    //         },
+                    //       );
+                    //     }),
+                    //     child: Container(
+                    //       color: Color(0xff292C51),
+                    //       padding: EdgeInsets.only(top: 5, bottom: 5),
+                    //       child: Container(
+                    //         padding: EdgeInsets.all(12),
+                    //         decoration: BoxDecoration(
+                    //           borderRadius: BorderRadius.circular(5),
+                    //           border: Border.all(
+                    //             style: BorderStyle.solid,
+                    //             width: 0.3,
+                    //             color: Color(0xff76B9A),
+                    //           ),
+                    //         ),
+                    //         child: Row(
+                    //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //           children: [
+                    //             SizedBox(
+                    //               width: width * 0.50,
+                    //               child: TextFormField(
+                    //                 enabled: false,
+                    //                 validator: (value) {
+                    //                   if (value == null || value.isEmpty) {
+                    //                     return 'Please enter wallet address';
+                    //                   }
+                    //                   return null;
+                    //                 },
+                    //                 decoration: const InputDecoration(
+                    //                   contentPadding: EdgeInsets.zero,
+                    //                   isDense: true,
+                    //                   border: UnderlineInputBorder(
+                    //                     borderSide: BorderSide.none,
+                    //                   ),
+                    //                   hintStyle: TextStyle(
+                    //                       fontSize: 14, color: Color(0xff5E6292)),
+                    //                   hintText: "Search",
+                    //                   // prefixIcon: Icon(Icons.search)
+                    //                 ),
+                    //               ),
+                    //             ),
+                    //             Row(
+                    //               children: [
+                    //                 giftcardprovider.toActiveCatalog.isNotEmpty
+                    //                     ? Container(
+                    //                         padding: EdgeInsets.only(right: 10),
+                    //                         child: GestureDetector(
+                    //                           onTap: () async {},
+                    //                           child: Text(
+                    //                             giftcardprovider
+                    //                                 .toActiveCatalog['brand']
+                    //                                 .toString(),
+                    //                             style: TextStyle(
+                    //                               fontSize: 14,
+                    //                               color: Colors.white,
+                    //                             ),
+                    //                           ),
+                    //                         ),
+                    //                       )
+                    //                     : Container(),
+                    //               ],
+                    //             ),
+                    //           ],
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
+                    Expanded(
+                      child: giftcardprovider.cardloading
+                          ? Center(
+                              child: CircularProgressIndicator(),
+                            )
+                          : giftcardprovider.allCard.length <= 0
+                              ? Center(
+                                  child: noData('No Cards Available'),
+                                )
+                              : ListView.separated(
+                                  separatorBuilder:
+                                      (BuildContext context, int index) =>
+                                          const Divider(),
+                                  shrinkWrap: true,
+                                  itemCount: giftcardprovider.allCard.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    var currentindex =
+                                        giftcardprovider.allCard[index];
 
-    
+                                    return ListTile(
+                                      onTap: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/gift_detail',
+                                          arguments: {'data': currentindex},
+                                        );
+                                      },
+                                      leading: Container(
+                                        width: 100,
+                                        child: FadeInImage.memoryNetwork(
+                                          placeholder: kTransparentImage,
+                                          image: giftcardprovider
+                                              .toActiveCatalog['card_image']
+                                              .toString(),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      title: Text('${currentindex['name']}'),
+                                      subtitle: currentindex['is_a_range']
+                                          ? Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                    'Min price: ${currentindex['min']}'),
+                                                Text(
+                                                    'Max price: ${currentindex['max']}'),
+                                              ],
+                                            )
+                                          : Text(
+                                              'Price: ${currentindex['max']}'),
+                                      trailing: Icon(Icons.chevron_right),
+                                    );
+                                  },
+                                ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: cardcolor,
+          onPressed: () {},
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'BETA',
+                style: TextStyle(fontSize: 10, color: Colors.red),
+              ),
+              Text('Version',
+                  style: TextStyle(fontSize: 8, color: Colors.white)),
+            ],
+          ),
+        ));
   }
 }
