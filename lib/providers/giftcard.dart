@@ -194,8 +194,11 @@ class GiftCardProvider with ChangeNotifier {
     // print(_toActiveCatalog);
     var countrycode = await _toActiveCountry['iso3'];
     var catid = await _toActiveCatalog['id'];
+    var name = _toActiveCatalog['brand'].split(" ")[0];
+    print(name);
 
-    var url = Uri.https(lyoApiUrl, 'gift-card/cards/$catid/$countrycode');
+    var url =
+        Uri.https(lyoApiUrl, 'gift-card/cards/$catid/$countrycode', {'name': '$name'});
     //  print(url);
 
     try {

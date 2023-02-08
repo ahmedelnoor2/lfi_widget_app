@@ -174,23 +174,22 @@ class _CatalogBottomSheetState extends State<CatalogBottomSheet> {
                               giftcardprovider.toActiveCountry['iso2'])
                           ? InkWell(
                               onTap: () async {
-                                snackAlert(context, SnackTypes.warning,
-                                    "Beta feature:Preview release");
+                               
                                 Navigator.pop(context);
-                                // giftcardprovider.settActiveCatalog(data);
-                                // //print(giftcardprovider.toActiveCatalog);
-                                // var userid = await auth.userInfo['id'];
-                                // await giftcardprovider.getAllCatalog(
-                                //     context,
-                                //     auth,
-                                //     userid,
-                                //     {
-                                //       "country": giftcardprovider
-                                //           .toActiveCountry['iso2'],
-                                //     },
-                                //     false);
-                                // await giftcardprovider.getAllCard(
-                                //     context, auth, userid);
+                                giftcardprovider.settActiveCatalog(data);
+                                //print(giftcardprovider.toActiveCatalog);
+                                var userid = await auth.userInfo['id'];
+                                await giftcardprovider.getAllCatalog(
+                                    context,
+                                    auth,
+                                    userid,
+                                    {
+                                      "country": giftcardprovider
+                                          .toActiveCountry['iso2'],
+                                    },
+                                    false);
+                                await giftcardprovider.getAllCard(
+                                    context, auth, userid);
                               },
                               child: Padding(
                                 padding: EdgeInsets.symmetric(
