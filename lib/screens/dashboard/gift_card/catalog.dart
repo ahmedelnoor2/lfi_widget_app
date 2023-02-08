@@ -5,6 +5,8 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/giftcard.dart';
 import 'package:lyotrade/screens/common/no_data.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +35,7 @@ class _CatalogBottomSheetState extends State<CatalogBottomSheet> {
 
   // This function is called whenever the text field changes
   void _runFilter(String enteredKeyword) {
-   // print(enteredKeyword);
+    // print(enteredKeyword);
     var giftcardprovider =
         Provider.of<GiftCardProvider>(context, listen: false);
     //print(giftcardprovider.allCatalog);
@@ -47,7 +49,7 @@ class _CatalogBottomSheetState extends State<CatalogBottomSheet> {
     } else {
       giftcardprovider.allCatalog.where(
         (element) {
-        //  print(element["brand"].toString());
+          //  print(element["brand"].toString());
           if (element["brand"]
               .toLowerCase()
               .contains(enteredKeyword.toLowerCase())) {
@@ -172,21 +174,23 @@ class _CatalogBottomSheetState extends State<CatalogBottomSheet> {
                               giftcardprovider.toActiveCountry['iso2'])
                           ? InkWell(
                               onTap: () async {
+                                snackAlert(context, SnackTypes.warning,
+                                    "Beta feature:Preview release");
                                 Navigator.pop(context);
-                                giftcardprovider.settActiveCatalog(data);
-//print(giftcardprovider.toActiveCatalog);
-                                var userid = await auth.userInfo['id'];
-                                await giftcardprovider.getAllCatalog(
-                                    context,
-                                    auth,
-                                    userid,
-                                    {
-                                      "country": giftcardprovider
-                                          .toActiveCountry['iso2'],
-                                    },
-                                    false);
-                                await giftcardprovider.getAllCard(
-                                    context, auth, userid);
+                                // giftcardprovider.settActiveCatalog(data);
+                                // //print(giftcardprovider.toActiveCatalog);
+                                // var userid = await auth.userInfo['id'];
+                                // await giftcardprovider.getAllCatalog(
+                                //     context,
+                                //     auth,
+                                //     userid,
+                                //     {
+                                //       "country": giftcardprovider
+                                //           .toActiveCountry['iso2'],
+                                //     },
+                                //     false);
+                                // await giftcardprovider.getAllCard(
+                                //     context, auth, userid);
                               },
                               child: Padding(
                                 padding: EdgeInsets.symmetric(

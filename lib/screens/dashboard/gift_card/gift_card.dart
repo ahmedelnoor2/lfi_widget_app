@@ -86,9 +86,11 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
     final List<Widget> imageSliders = giftcardprovider.sliderlist
         .map((item) => InkWell(
               onTap: (() async {
-                giftcardprovider.settActiveCatalog(item);
-                var userid = await auth.userInfo['id'];
-                await giftcardprovider.getAllCard(context, auth, userid);
+                snackAlert(context, SnackTypes.warning,
+                                    "Beta feature:Preview release");
+                // giftcardprovider.settActiveCatalog(item);
+                // var userid = await auth.userInfo['id'];
+                // await giftcardprovider.getAllCard(context, auth, userid);
               }),
               child: Container(
                 margin: EdgeInsets.all(5.0),
@@ -446,11 +448,13 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
 
                                     return ListTile(
                                       onTap: () {
-                                        Navigator.pushNamed(
-                                          context,
-                                          '/gift_detail',
-                                          arguments: {'data': currentindex},
-                                        );
+                                        snackAlert(context, SnackTypes.warning,
+                                    "Beta feature:Preview release");
+                                        // Navigator.pushNamed(
+                                        //   context,
+                                        //   '/gift_detail',
+                                        //   arguments: {'data': currentindex},
+                                        // );
                                       },
                                       leading: Container(
                                         width: 100,
