@@ -6,6 +6,7 @@ import 'package:k_chart/entity/index.dart';
 import 'package:lyotrade/screens/common/alert.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
+import 'package:lyotrade/screens/language/choose_language.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:k_chart/entity/k_line_entity.dart';
 import 'package:lyotrade/utils/Translate.utils.dart';
@@ -274,7 +275,17 @@ class Public with ChangeNotifier {
   Map get publicInfo {
     return _publicInfo;
   }
+  List _language = [];
 
+  List get language {
+    return _language;
+  }
+  String _defaultLanguage = '';
+
+  String get defaultLanguage {
+    return _defaultLanguage;
+  }
+  
   Future<void> getPublicInfo() async {
     var url = Uri.https(
       lyoApiUrl,
@@ -290,6 +301,8 @@ class Public with ChangeNotifier {
       final responseData = json.decode(response.body);
       // print(json.decode(response.body.split('window.publicInfo=')[1]));
       _publicInfo = responseData;
+      _language=_publicInfo['lan']['lanList'];
+      _defaultLanguage=publicInfo['lan']['defLan'];
       return notifyListeners();
     } catch (error) {
       print(error);

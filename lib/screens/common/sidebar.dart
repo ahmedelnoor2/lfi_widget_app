@@ -124,10 +124,7 @@ class _SideBarState extends State<SideBar> {
     }
   }
 
-  Future<void> changelanguage() async {
-    var languageprovider = Provider.of<LanguageChange>(context, listen: false);
-    await languageprovider.getlanguageChange(context);
-  }
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -462,43 +459,7 @@ class _SideBarState extends State<SideBar> {
                     },
                     leading: const Icon(Icons.language),
                     title: const Text('Language'),
-                    trailing: languageprovider.islanguageloading
-                        ? CircularProgressIndicator()
-                        : PopupMenuButton<languageItem>(
-                            initialValue: selectedMenu,
-                            // Callback that sets the selected popup menu item.
-                            onSelected: (languageItem item) async {
-                              setState(() {
-                                selectedMenu = item;
-                                print(selectedMenu);
-                              });
-                              if (item == languageItem.Spanish) {
-                                setState(() {
-                                  languageprovider.defaultlanguage =
-                                      'lan=es_ES';
-                                });
-                                await changelanguage();
-                              } else if (item == languageItem.English) {
-                                setState(() {
-                                  languageprovider.defaultlanguage =
-                                      'lan=en_US';
-                                });
-                              }
-
-                              await changelanguage();
-                            },
-                            itemBuilder: (BuildContext context) =>
-                                <PopupMenuEntry<languageItem>>[
-                              const PopupMenuItem<languageItem>(
-                                value: languageItem.English,
-                                child: Text('English'),
-                              ),
-                              const PopupMenuItem<languageItem>(
-                                value: languageItem.Spanish,
-                                child: Text('Spanish'),
-                              ),
-                            ],
-                          ),
+                   
                   ),
                   ListTile(
                     onTap: () {

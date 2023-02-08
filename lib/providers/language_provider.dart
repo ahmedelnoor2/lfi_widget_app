@@ -3,6 +3,8 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:gallery_saver/files.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 
 import '../utils/AppConstant.utils.dart';
 import 'package:http/http.dart' as http;
@@ -23,6 +25,16 @@ class LanguageChange with ChangeNotifier {
     this._currentLocale = new Locale(_locale);
     notifyListeners();
   }
+  int _activeIndex = 0;
+ 
+  int get activeIndex{
+    return  _activeIndex;
+  }
+   void setlangIndex(index){
+_activeIndex=index;
+notifyListeners();
+
+  }
 
   bool _islanguageloading = false;
 
@@ -37,8 +49,10 @@ class LanguageChange with ChangeNotifier {
   }
 
   var defaultlanguage = 'lan=en_US';
+
   Future<void> getlanguageChange(ctx) async {
     _islanguageloading = true;
+    
     var url = Uri.https(
       apiUrl,
       '/getLocale',
@@ -54,8 +68,7 @@ class LanguageChange with ChangeNotifier {
       if (responseData['code'] == 0) {
         _islanguageloading = false;
         _getlanguage = responseData['data']['mobile'];
-        print('object....');
-        print(_getlanguage);
+   
 
         return notifyListeners();
       } else {

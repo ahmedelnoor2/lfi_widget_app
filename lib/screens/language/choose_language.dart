@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/screens/common/widget/language_selector.dart';
 
 import 'package:lyotrade/utils/Colors.utils.dart';
@@ -13,42 +16,21 @@ class ChooseLanguage extends StatefulWidget {
   _ChooseLanguageState createState() => _ChooseLanguageState();
 }
 
-List<LanguageModel> languages = [
-  LanguageModel(
-    language: "English",
-    imagePath: "assets/img/england.png",
-  ),
-  LanguageModel(
-    language: "Spanish",
-    imagePath: "assets/img/spain.png",
-  ),
-  LanguageModel(
-    language: "German",
-    imagePath: "assets/img/germany.png",
-  ),
-  LanguageModel(
-    language: "Korean",
-    imagePath: "assets/img/korea.png",
-  ),
-  LanguageModel(
-    language: "Polish",
-    imagePath: "assets/img/poland.png",
-  ),
-  LanguageModel(
-    language: "Italian",
-    imagePath: "assets/img/italy.png",
-  ),
-];
+Future<void> changelanguage(context) async {
+  var languageprovider = Provider.of<LanguageChange>(context, listen: false);
+  var public = Provider.of<Public>(context, listen: false);
+  await languageprovider.getlanguageChange(
+    context,
+  );
+}
 
 class _ChooseLanguageState extends State<ChooseLanguage> {
-  int _activeIndex = 0;
   @override
   Widget build(BuildContext context) {
     var public = Provider.of<Public>(context, listen: true);
-    print(public.publicInfo['lan']['lanList']);
-    print(languages);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
+    // print(public.language);
     return Scaffold(
-      
       body: SingleChildScrollView(
         child: SafeArea(
           child: Container(
@@ -72,45 +54,38 @@ class _ChooseLanguageState extends State<ChooseLanguage> {
                 SizedBox(
                   height: 35.0,
                 ),
-                ...languages.map((language) {
-                //  print(language);
-                  int _currentIndex = languages.indexOf(language);
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _activeIndex = _currentIndex;
-                      
-                      });
-                    },
-                    child: LanguageSelector(
-                      isActive: _activeIndex == _currentIndex,
-                      language: language.language,
-                      imagePath: language.imagePath,
-                    ),
-                  );
-                }).toList(),
-                AnimatedCrossFade(
-                  crossFadeState: _activeIndex == 0
-                      ? CrossFadeState.showFirst
-                      : CrossFadeState.showSecond,
-                  duration: Duration(milliseconds: 450),
-                  firstChild: Container(
-                    height: 50,
-                  ),
-                  secondChild: LyoButton(
-                    text: "Continue",
-                    active: true,
-                    onPressed: () {
-                      // Navigator.of(context).push(
-                      //   // MaterialPageRoute(
-                      //   //   builder: (BuildContext context) {
-                      //   //    // return Dashboard();
-                      //   //   },
-                      //   // ),
-                      // );
-                    },
-                  ),
-                )
+                SizedBox(
+                  height: 400,
+                  child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: public.language.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        var currentIndex = public.language[index];
+                        // print(index);
+                        // print(currentIndex);
+                        // print(currentIndex);
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() async {
+                              snackAlert(context, SnackTypes.warning,
+                                  "Processing .....");
+                              languageprovider.setlangIndex(index);
+                              languageprovider.defaultlanguage =
+                                  "lan=${currentIndex['id']}";
+                              await changelanguage(context);
+                               snackAlert(context, SnackTypes.warning,
+                                  "Sucessfully Changed .....");
+                            });
+                          },
+                          child: LanguageSelector(
+                            isActive: languageprovider.activeIndex == index,
+                            language: currentIndex['name'],
+                            imagePath: currentIndex['lang_logo'],
+                            id: currentIndex['id'],
+                          ),
+                        );
+                      }),
+                ),
               ],
             ),
           ),

@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 
 import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:provider/provider.dart';
 
 class LanguageSelector extends StatelessWidget {
   final bool? isActive;
   final String? language;
   final String? imagePath;
-  LanguageSelector({this.isActive, this.language, this.imagePath});
+  final String? id;
+  LanguageSelector(
+      {required this.isActive, this.language, this.imagePath, this.id});
   @override
   Widget build(BuildContext context) {
-    print(isActive);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
     return InkWell(
-      child: Container(
-        
+      child:Container(
         margin: EdgeInsets.only(bottom: 10.0),
         padding: EdgeInsets.symmetric(horizontal: 16.0),
         width: double.infinity,
@@ -32,8 +35,15 @@ class LanguageSelector extends StatelessWidget {
         child: Center(
           child: Row(
             children: [
-              Image.asset(
-                this.imagePath!,
+              CircleAvatar(
+                backgroundColor: cardcolor,
+                radius: 25.0,
+                child: Text(
+                  imagePath.toString(),
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
               ),
               SizedBox(
                 width: 10.0,
@@ -47,10 +57,11 @@ class LanguageSelector extends StatelessWidget {
                 ),
               ),
               Spacer(),
-              Container(
+            Container(
                 child: isActive!
                     ? Icon(
                         Icons.check_circle,
+                        size: 30,
                         color: bluechartColor,
                       )
                     : SizedBox.shrink(),
