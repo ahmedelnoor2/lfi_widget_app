@@ -46,6 +46,7 @@ import 'package:lyotrade/screens/intro_screen/intro_screen.dart';
 import 'package:lyotrade/screens/kyc/enitityverificatrion.dart';
 import 'package:lyotrade/screens/kyc/kycscreen.dart';
 import 'package:lyotrade/screens/kyc/perosmalvarification.dart';
+import 'package:lyotrade/screens/language/choose_language.dart';
 import 'package:lyotrade/screens/market/market.dart';
 import 'package:lyotrade/screens/pix_payment/pix_payment.dart';
 import 'package:lyotrade/screens/pix_payment/pix_payment_details.dart';
@@ -214,7 +215,8 @@ class MyApp extends StatelessWidget {
                   const RewardCenterScreen(),
               GiftCardTransaction.routeName: (context) =>
                   const GiftCardTransaction(),
-              BuyCard.routeName: (context) => BuyCard()
+              BuyCard.routeName: (context) => BuyCard(),
+              ChooseLanguage.routeName: (context) => ChooseLanguage()
             },
           );
         },

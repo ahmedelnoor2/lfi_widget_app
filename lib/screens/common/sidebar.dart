@@ -457,7 +457,9 @@ class _SideBarState extends State<SideBar> {
                         'Settings'),
                   ),
                   ListTile(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pushNamed(context, '/chooseLanguage');
+                    },
                     leading: const Icon(Icons.language),
                     title: const Text('Language'),
                     trailing: languageprovider.islanguageloading
