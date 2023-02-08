@@ -16,7 +16,7 @@ class LanguageSelector extends StatelessWidget {
         margin: EdgeInsets.only(bottom: 10.0),
         padding: EdgeInsets.symmetric(horizontal: 16.0),
         width: double.infinity,
-        height: 90,
+        height: 85,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8.0),
@@ -51,7 +51,7 @@ class LanguageSelector extends StatelessWidget {
                 child: isActive!
                     ? Icon(
                         Icons.check_circle,
-                        color: textFieldTextColor,
+                        color: bluechartColor,
                       )
                     : SizedBox.shrink(),
               ),

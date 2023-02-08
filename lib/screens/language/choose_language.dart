@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/common/widget/language_selector.dart';
 
 import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:provider/provider.dart';
 
 class ChooseLanguage extends StatefulWidget {
   static const routeName = '/chooseLanguage';
@@ -42,8 +44,11 @@ class _ChooseLanguageState extends State<ChooseLanguage> {
   int _activeIndex = 0;
   @override
   Widget build(BuildContext context) {
+    var public = Provider.of<Public>(context, listen: true);
+    print(public.publicInfo['lan']['lanList']);
     print(languages);
     return Scaffold(
+      
       body: SingleChildScrollView(
         child: SafeArea(
           child: Container(
@@ -85,7 +90,7 @@ class _ChooseLanguageState extends State<ChooseLanguage> {
                   );
                 }).toList(),
                 AnimatedCrossFade(
-                  crossFadeState: _activeIndex == -1
+                  crossFadeState: _activeIndex == 0
                       ? CrossFadeState.showFirst
                       : CrossFadeState.showSecond,
                   duration: Duration(milliseconds: 450),
