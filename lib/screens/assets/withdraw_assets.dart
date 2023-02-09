@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/screens/assets/common/networks.dart';
 import 'package:lyotrade/screens/assets/common/qr_scanner.dart';
 import 'package:lyotrade/screens/common/alert.dart';
@@ -440,6 +441,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
 
     var asset = Provider.of<Asset>(context, listen: true);
     var public = Provider.of<Public>(context, listen: true);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
     return Scaffold(
       key: _scaffoldKey,
@@ -496,7 +498,9 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                           ),
                                         ),
                                         Text(
-                                          'Withdraw',
+                                          languageprovider.getlanguage[
+                                                  'withdraw_detail']['title'] ??
+                                              'Withdraw',
                                           style: TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
@@ -573,7 +577,9 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                   children: [
                                     Container(
                                       padding: EdgeInsets.only(right: 5),
-                                      child: Text('Chain name'),
+                                      child: Text(languageprovider.getlanguage[
+                                              'withdraw_detail']['cname'] ??
+                                          'Chain name'),
                                     ),
                                     Container(
                                       padding: EdgeInsets.only(right: 5),
@@ -662,7 +668,10 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                     GestureDetector(
                                       onTap: () {},
                                       child: Text(
-                                        'Address List',
+                                        languageprovider.getlanguage[
+                                                    'withdraw_detail']
+                                                ['addr_list_btn'] ??
+                                            'Address List',
                                         style: TextStyle(
                                           color: linkColor,
                                         ),
@@ -698,7 +707,7 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                             return null;
                                           },
                                           controller: _addressController,
-                                          decoration: const InputDecoration(
+                                          decoration: InputDecoration(
                                             contentPadding: EdgeInsets.zero,
                                             isDense: true,
                                             border: UnderlineInputBorder(
@@ -707,7 +716,10 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                             hintStyle: TextStyle(
                                               fontSize: 14,
                                             ),
-                                            hintText:
+                                            hintText: languageprovider
+                                                            .getlanguage[
+                                                        'withdraw_detail']
+                                                    ['field1_placeholder'] ??
                                                 "Scan or paste the address",
                                           ),
                                         ),
@@ -726,7 +738,10 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                                     '${data!.text}';
                                               },
                                               child: Text(
-                                                'Paste',
+                                                languageprovider.getlanguage[
+                                                            'withdraw_detail']
+                                                        ['paste_btn'] ??
+                                                    'Paste',
                                                 style: TextStyle(
                                                   fontSize: 14,
                                                   color: linkColor,
@@ -818,7 +833,10 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('Amount'),
+                                    Text(languageprovider
+                                                .getlanguage['withdraw_detail']
+                                            ['amount'] ??
+                                        'Amount'),
                                   ],
                                 ),
                               ),
@@ -894,7 +912,10 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                                         2);
                                               },
                                               child: Text(
-                                                'ALL',
+                                                languageprovider.getlanguage[
+                                                            'withdraw_detail']
+                                                        ['all_btn'] ??
+                                                    'ALL',
                                                 style: TextStyle(
                                                   fontSize: 14,
                                                   color: linkColor,
@@ -921,7 +942,9 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            'Balances',
+                                            languageprovider.getlanguage[
+                                                    'withdraw_detail']['bal'] ??
+                                                'Balances',
                                             style: TextStyle(
                                               fontWeight: FontWeight.w600,
                                             ),
@@ -942,7 +965,10 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            'Available',
+                                            languageprovider.getlanguage[
+                                                        'withdraw_detail']
+                                                    ['available'] ??
+                                                'Available',
                                             style: TextStyle(
                                               fontWeight: FontWeight.w600,
                                             ),
@@ -963,7 +989,10 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            'Freeze',
+                                            languageprovider.getlanguage[
+                                                        'withdraw_detail']
+                                                    ['freeze'] ??
+                                                'Freeze',
                                             style: TextStyle(
                                               fontWeight: FontWeight.w600,
                                             ),
@@ -993,7 +1022,9 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                       child: Align(
                                         alignment: Alignment.centerLeft,
                                         child: Text(
-                                          'Tips',
+                                          languageprovider.getlanguage[
+                                                  'withdraw_detail']['tips'] ??
+                                              'Tips',
                                           style: TextStyle(
                                             fontSize: 12,
                                           ),
@@ -1007,7 +1038,10 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            'Withdrawable',
+                                            languageprovider.getlanguage[
+                                                        'withdraw_detail']
+                                                    ['withdrawable'] ??
+                                                'Withdrawable',
                                             style: TextStyle(
                                               fontWeight: FontWeight.w600,
                                               color: secondaryTextColor,
@@ -1029,7 +1063,10 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            '24h Withdrawal Limit',
+                                            languageprovider.getlanguage[
+                                                        'withdraw_detail']
+                                                    ['limit'] ??
+                                                '24h Withdrawal Limit',
                                             style: TextStyle(
                                               fontWeight: FontWeight.w600,
                                               color: secondaryTextColor,
@@ -1062,7 +1099,10 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                                 ),
                                               ),
                                               Text(
-                                                'Max Limit:',
+                                                languageprovider.getlanguage[
+                                                            'withdraw_detail']
+                                                        ['max_lim'] ??
+                                                    'Max Limit:',
                                                 style: TextStyle(
                                                     color: orangeBGColor),
                                               ),
@@ -1122,7 +1162,9 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                           // );
                         }
                       },
-                      child: Text('Withdraw'),
+                      child: Text(languageprovider
+                              .getlanguage['withdraw_detail']['withdraw_btn'] ??
+                          'Withdraw'),
                     ),
                   ),
           ],

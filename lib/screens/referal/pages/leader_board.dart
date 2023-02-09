@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/referral.dart';
 
 import 'package:lyotrade/screens/common/header.dart';
@@ -37,6 +38,7 @@ class _LeaderBoardState extends State<LeaderBoard> {
   Widget build(BuildContext context) {
     var auth = Provider.of<Auth>(context, listen: false);
     var referalprovider = Provider.of<ReferralProvider>(context, listen: true);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
@@ -61,7 +63,9 @@ class _LeaderBoardState extends State<LeaderBoard> {
                     ),
                   ),
                   Text(
-                    'List of reward rankings',
+                    languageprovider.getlanguage['referral_reward_rank']
+                            ['title'] ??
+                        'List of reward rankings',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -77,7 +81,9 @@ class _LeaderBoardState extends State<LeaderBoard> {
             child: Row(
               children: [
                 Text(
-                  'Reward rankings are updated hourly',
+                  languageprovider.getlanguage['referral_reward_rank']
+                          ['text'] ??
+                      'Reward rankings are updated hourly',
                   style: TextStyle(
                     fontSize: 12,
                     color: secondaryTextColor,

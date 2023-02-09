@@ -73,7 +73,7 @@ class _ChooseLanguageState extends State<ChooseLanguage> {
                               languageprovider.defaultlanguage =
                                   "lan=${currentIndex['id']}";
                               await changelanguage(context);
-                               snackAlert(context, SnackTypes.warning,
+                               snackAlert(context, SnackTypes.success,
                                   "Sucessfully Changed .....");
                             });
                           },

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/screens/common/alert.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
@@ -26,6 +27,7 @@ class _SecurityState extends State<Security> {
   @override
   Widget build(BuildContext context) {
     var auth = Provider.of<Auth>(context, listen: true);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
     return WillPopScope(
       onWillPop: () {
@@ -39,7 +41,9 @@ class _SecurityState extends State<Security> {
           children: [
             ListTile(
               leading: const Icon(Icons.password),
-              title: const Text('Password'),
+              title: Text(languageprovider.getlanguage['security_detail']
+                      ['option1'] ??
+                  'Password'),
               subtitle: const Text('***********'),
               trailing: TextButton(
                 onPressed: () {
@@ -50,7 +54,9 @@ class _SecurityState extends State<Security> {
                         Icons.warning,
                         color: Colors.amber,
                       ),
-                      'Security Reminder',
+                      languageprovider.getlanguage['security_detail']
+                              ['security-reminder']['title'] ??
+                          'Security Reminder',
                       const <Widget>[
                         Text(
                           'For the security of your account, please open at least one verification method',
@@ -85,7 +91,9 @@ class _SecurityState extends State<Security> {
             const Divider(),
             ListTile(
               leading: const Icon(Icons.email),
-              title: const Text('Email'),
+              title: Text(languageprovider.getlanguage['security_detail']
+                      ['option2'] ??
+                  'Email'),
               subtitle: const Text(
                 'Used when logging in, withdrawing and modifying security settings',
                 style: TextStyle(fontSize: 12),
@@ -167,7 +175,9 @@ class _SecurityState extends State<Security> {
             const Divider(),
             ListTile(
               leading: const Icon(Icons.settings_cell),
-              title: const Text('Phone Number'),
+              title: Text(languageprovider.getlanguage['security_detail']
+                      ['option3'] ??
+                  'Phone Number'),
               subtitle: const Text(
                 'Receive verification SMS that is used to withdraw, change the password or security settings',
                 style: TextStyle(fontSize: 12),
@@ -200,7 +210,9 @@ class _SecurityState extends State<Security> {
             const Divider(),
             ListTile(
               leading: const Icon(Icons.security),
-              title: const Text('Google Authenticator'),
+              title: Text(languageprovider.getlanguage['security_detail']
+                      ['option4'] ??
+                  'Google Authenticator'),
               subtitle: const Text(
                 'Receive verification SMS that is used to withdraw, change the password or security settings',
                 style: TextStyle(fontSize: 12),
@@ -226,7 +238,9 @@ class _SecurityState extends State<Security> {
                 Navigator.pushNamed(context, '/disable_account');
               },
               leading: const Icon(Icons.disabled_by_default),
-              title: const Text('Disable my account'),
+              title: Text(languageprovider.getlanguage['security_detail']
+                      ['title'] ??
+                  'Disable my account'),
               subtitle: const Text(
                 'Raise a ticket to disable the account',
                 style: TextStyle(fontSize: 12),

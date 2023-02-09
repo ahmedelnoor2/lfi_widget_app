@@ -1,6 +1,7 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/screens/trade/common/percentage_indicator.dart';
@@ -300,9 +301,11 @@ class _MarginOpenOrdersState extends State<MarginOpenOrders>
   }
 
   Widget noData() {
+   
     return Container(
       padding: EdgeInsets.only(top: 50),
       child: Column(
+        
         children: [
           Icon(
             Icons.folder_off,
@@ -312,7 +315,7 @@ class _MarginOpenOrdersState extends State<MarginOpenOrders>
           Container(
             padding: const EdgeInsets.all(10),
             child: Text(
-              'No Data',
+            'No Data',
               style: TextStyle(
                 color: secondaryTextColor,
                 fontSize: 12,

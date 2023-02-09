@@ -25,15 +25,16 @@ class LanguageChange with ChangeNotifier {
     this._currentLocale = new Locale(_locale);
     notifyListeners();
   }
-  int _activeIndex = 0;
- 
-  int get activeIndex{
-    return  _activeIndex;
-  }
-   void setlangIndex(index){
-_activeIndex=index;
-notifyListeners();
 
+  int _activeIndex = 0;
+
+  int get activeIndex {
+    return _activeIndex;
+  }
+
+  void setlangIndex(index) {
+    _activeIndex = index;
+    notifyListeners();
   }
 
   bool _islanguageloading = false;
@@ -52,7 +53,7 @@ notifyListeners();
 
   Future<void> getlanguageChange(ctx) async {
     _islanguageloading = true;
-    
+
     var url = Uri.https(
       apiUrl,
       '/getLocale',
@@ -68,7 +69,7 @@ notifyListeners();
       if (responseData['code'] == 0) {
         _islanguageloading = false;
         _getlanguage = responseData['data']['mobile'];
-   
+        print(_getlanguage);
 
         return notifyListeners();
       } else {

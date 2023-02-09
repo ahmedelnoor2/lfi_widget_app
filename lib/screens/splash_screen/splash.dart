@@ -115,7 +115,7 @@ class _SpashScreenState extends State<SpashScreen>
   Future<void> getLanguage() async {
     var public = Provider.of<Public>(context, listen: false);
     var languageprovider = Provider.of<LanguageChange>(context, listen: false);
-    await languageprovider.getlanguageChange(context,);
+    await languageprovider.getlanguageChange(context);
   }
 
   @override

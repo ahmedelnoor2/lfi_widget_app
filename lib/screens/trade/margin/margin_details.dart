@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/screens/common/alert.dart';
@@ -150,6 +151,7 @@ class _MarginDetailsState extends State<MarginDetails> {
     var public = Provider.of<Public>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
     var asset = Provider.of<Asset>(context, listen: true);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
     if (_defaultMarginPair.split('/')[0] !=
         public.activeMarket['showName'].split('/')[0]) {
@@ -227,7 +229,7 @@ class _MarginDetailsState extends State<MarginDetails> {
                       ),
                     ),
                     child: Text(
-                      'Transfer',
+                  languageprovider.getlanguage['trade']['transfer_btn']??'Transfer',
                       style: TextStyle(
                         fontSize: 12,
                         color: secondaryTextColor400,
@@ -275,7 +277,7 @@ class _MarginDetailsState extends State<MarginDetails> {
                       ),
                     ),
                     child: Text(
-                      'Borrow',
+                   languageprovider.getlanguage['trade']['borrow_btn']??   'Borrow',
                       style: TextStyle(
                         fontSize: 12,
                         color: secondaryTextColor400,
@@ -291,7 +293,7 @@ class _MarginDetailsState extends State<MarginDetails> {
               Container(
                 padding: EdgeInsets.only(right: 5),
                 child: Text(
-                  'Risk rate:',
+             languageprovider.getlanguage['trade']['risk']??     'Risk rate:',
                   style: TextStyle(
                     color: secondaryTextColor,
                   ),
@@ -334,6 +336,7 @@ class _MarginDetailsState extends State<MarginDetails> {
   Widget borrowAsset(context, public, setState) {
     height = MediaQuery.of(context).size.height;
     var asset = Provider.of<Asset>(context, listen: true);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
     List _marginCoins = _defaultMarginPair.isNotEmpty
         ? _defaultMarginPair.split('/')
@@ -350,8 +353,8 @@ class _MarginDetailsState extends State<MarginDetails> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Borrow',
+               Text(
+             languageprovider.getlanguage['trade']['risk']??   'Borrow',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,

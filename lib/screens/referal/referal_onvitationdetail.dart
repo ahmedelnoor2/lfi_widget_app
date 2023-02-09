@@ -4,6 +4,7 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/referral.dart';
 
 import 'package:lyotrade/screens/common/header.dart';
@@ -49,6 +50,7 @@ class _RefralinvitationState extends State<Refralinvitation> with SingleTickerPr
   Widget build(BuildContext context) {
     var auth = Provider.of<Auth>(context, listen: false);
     var Refralinvitationprovider = Provider.of<ReferralProvider>(context, listen: false);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     final _size = MediaQuery.of(context).size;
@@ -72,7 +74,7 @@ class _RefralinvitationState extends State<Refralinvitation> with SingleTickerPr
                     ),
                   ),
                   Text(
-                    'Invitation Details',
+                languageprovider.getlanguage['invitation_detail']['title']??'Invitation Details',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -118,13 +120,13 @@ class _RefralinvitationState extends State<Refralinvitation> with SingleTickerPr
                           Container(
                             width: _size.width * .4,
                             child: Tab(
-                              text: 'My Invitation',
+                              text: languageprovider.getlanguage['invitation_detail']['header1']['title']??'My Invitation',
                             ),
                           ),
                           Container(
                             width: _size.width * .4,
                             child: Tab(
-                              text: 'My Invitation Rewards',
+                              text: languageprovider.getlanguage['invitation_detail']['header2']['title']??'My Invitation Rewards',
                             ),
                           ),
                         ],

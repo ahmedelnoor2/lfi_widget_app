@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
@@ -41,6 +42,7 @@ class _KycscreenState extends State<Kycscreen>
     final width = MediaQuery.of(context).size.width;
 
     var auth = Provider.of<Auth>(context, listen: true);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
     var _isVerified =
         (auth.userInfo['realAuthType'] == 0 || auth.userInfo['authLevel'] == 0)
@@ -87,7 +89,7 @@ class _KycscreenState extends State<Kycscreen>
                       'assets/img/personal_verfication.png',
                       height: width * 0.1,
                     ),
-                    title: Text('Individual Verification'),
+                    title: Text(languageprovider.getlanguage['KYC_detail']['verification1']??'Individual Verification'),
                     subtitle: Text(
                       auth.userInfo['sumsubLevelName'].isEmpty
                           ? 'Complete your KYC'

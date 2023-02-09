@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/bottomnav.dart';
 import 'package:lyotrade/screens/common/header.dart';
@@ -100,6 +101,7 @@ class _AssetsState extends State<Assets> {
 
     bool _hideBalances = asset.hideBalances;
     String _hideBalanceString = asset.hideBalanceString;
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
     return WillPopScope(
       onWillPop: () {
@@ -221,7 +223,7 @@ class _AssetsState extends State<Assets> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  'Total Valuations',
+                                              languageprovider.getlanguage['assets']['subheader']??'Total Valuations',
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 12,
@@ -274,7 +276,7 @@ class _AssetsState extends State<Assets> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  'Yesterday\'s PNL',
+                                           languageprovider.getlanguage['assets']['subtext']??'Yesterday\'s PNL',
                                                   style: TextStyle(
                                                     fontSize: 10,
                                                   ),
@@ -464,7 +466,7 @@ class _AssetsState extends State<Assets> {
                                         );
                                       }
                                     },
-                                    child: Text('Deposit'),
+                                    child: Text(languageprovider.getlanguage['assets']['deposit_btn']??'Deposit'),
                                   ),
                                 ),
                                 SizedBox(
@@ -476,7 +478,7 @@ class _AssetsState extends State<Assets> {
                                         '/withdraw_assets',
                                       );
                                     },
-                                    child: Text('Withdraw'),
+                                    child: Text(languageprovider.getlanguage['assets']['withdraw_btn']??'Withdraw'),
                                   ),
                                 ),
                                 SizedBox(
@@ -488,7 +490,7 @@ class _AssetsState extends State<Assets> {
                                         '/transfer_assets',
                                       );
                                     },
-                                    child: Text('Transfer'),
+                                    child: Text(languageprovider.getlanguage['assets']['transfer_btn']??'Transfer'),
                                   ),
                                 ),
                               ],

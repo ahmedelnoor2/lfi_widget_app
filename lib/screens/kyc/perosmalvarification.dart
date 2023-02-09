@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/user_kyc.dart';
 
 import 'package:lyotrade/screens/common/header.dart';
@@ -283,6 +284,7 @@ class _personalverificationState extends State<personalverification>
     final width = MediaQuery.of(context).size.width;
 
     var auth = Provider.of<Auth>(context, listen: true);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
     var userInfoList = {};
     if (auth.personalKycTiers.isNotEmpty) {
@@ -366,7 +368,7 @@ class _personalverificationState extends State<personalverification>
                                     ),
                                     Divider(),
                                     Text(
-                                      'Requirements',
+                                   languageprovider.getlanguage['KYC_detail']['personal_verification_detail']['tier1_requirement']??'Requirements',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold),
                                     ),
@@ -404,9 +406,9 @@ class _personalverificationState extends State<personalverification>
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Text('Crypto Deposit Limit'),
+                                              Text(languageprovider.getlanguage['KYC_detail']['personal_verification_detail']['tier1_limit1']??'Crypto Deposit Limit'),
                                               Text(
-                                                'Unlimited',
+                                              languageprovider.getlanguage['KYC_detail']['personal_verification_detail']['tier1_deposit_limit']??  'Unlimited',
                                                 style: TextStyle(
                                                   color: secondaryTextColor,
                                                 ),
@@ -420,7 +422,7 @@ class _personalverificationState extends State<personalverification>
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Text('Crypto Withdrawal Limit'),
+                                              Text(languageprovider.getlanguage['KYC_detail']['personal_verification_detail']['tier1_limit2']??'Crypto Withdrawal Limit'),
                                               Text(
                                                 '${kycTier['withdrawLimitAmount']} ${kycTier['withdrawLimitSymbol']} Daily',
                                                 style: TextStyle(
@@ -436,9 +438,9 @@ class _personalverificationState extends State<personalverification>
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Text('P2P Transaction Limits'),
+                                              Text(languageprovider.getlanguage['KYC_detail']['personal_verification_detail']['tier1_limit3']??'P2P Transaction Limits'),
                                               Text(
-                                                'Unlimited',
+                                              languageprovider.getlanguage['KYC_detail']['personal_verification_detail']['tier1_transaction_limit']??  'Unlimited',
                                                 style: TextStyle(
                                                   color: secondaryTextColor,
                                                 ),
