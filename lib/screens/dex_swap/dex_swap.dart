@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/dex_provider.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/dex_swap/common/exchange_now.dart';
 import 'package:lyotrade/utils/ScreenControl.utils.dart';
@@ -48,6 +49,7 @@ class _DexSwapState extends State<DexSwap> {
 
   @override
   Widget build(BuildContext context) {
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
     return WillPopScope(
       onWillPop: () {
         return onAndroidBackPress(context);
@@ -67,7 +69,7 @@ class _DexSwapState extends State<DexSwap> {
                 Container(
                   padding: EdgeInsets.all(10),
                   child: Text(
-                    'Exchange Now',
+                  languageprovider.getlanguage['swap_detail']['header']??'Exchange Now',
                     style: TextStyle(
                       fontSize: 18,
                     ),
@@ -85,7 +87,7 @@ class _DexSwapState extends State<DexSwap> {
               ],
             ),
             title: Text(
-              'DEX Swap',
+            languageprovider.getlanguage['swap_detail']['title']??'DEX Swap',
               style: TextStyle(
                 fontSize: 20,
                 fontStyle: FontStyle.normal,
