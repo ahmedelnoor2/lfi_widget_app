@@ -59,7 +59,6 @@ class LanguageChange with ChangeNotifier {
       '/getLocale',
     );
     headers['cookie'] = defaultlanguage;
-    print(headers['cookie']);
 
     try {
       final response = await http.get(url, headers: headers);

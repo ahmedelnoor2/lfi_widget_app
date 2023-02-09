@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:ffi';
+
 
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
@@ -11,6 +11,7 @@ import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/dex_swap/common/exchange_now.dart';
 import 'package:lyotrade/utils/Coins.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
+
 import 'package:lyotrade/utils/ScreenControl.utils.dart';
 import 'package:provider/provider.dart';
 
@@ -91,7 +92,7 @@ class _BuyCardState extends State<BuyCard> {
     var asset = Provider.of<Asset>(context, listen: false);
 
     var userid = await auth.userInfo['id'];
-    print(auth.userInfo['email']);
+    //print(auth.userInfo['email']);
 
     await giftcardprovider.getDoVerify(context, auth, userid, {
       "address": asset.changeAddress['addressStr'],
@@ -118,7 +119,7 @@ class _BuyCardState extends State<BuyCard> {
       "smsValidCode": verifitypre == 'smsValidCode' ? _optcontroller.text : "",
       "googleCode": _googlecodecontroller.text
     });
-    print(withdrwalResponse);
+   // print(withdrwalResponse);
   }
 
   Future<void> dotransaction(productid, amount) async {
@@ -136,6 +137,7 @@ class _BuyCardState extends State<BuyCard> {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
+        var asset = Provider.of<Asset>(context, listen: true);
     final args = ModalRoute.of(context)!.settings.arguments as BuyCard;
     return Scaffold(
         appBar: AppBar(
@@ -236,8 +238,15 @@ class _BuyCardState extends State<BuyCard> {
                               fontSize: 32, fontWeight: FontWeight.bold),
                         )),
                     Container(
-                        padding: EdgeInsets.only(bottom: 30),
+                        padding: EdgeInsets.only(bottom: 10),
                         child: Text('Amount')),
+                    Container(
+                      padding: EdgeInsets.only(bottom: 10),
+                      child: Text(
+                        
+                        'WithDrawal Fee:'+'${asset.getCost['defaultFee']??''}',
+                        style: TextStyle(color: warningColor),
+                        ),)
                   ],
                 ),
               ),
@@ -417,7 +426,7 @@ class _BuyCardState extends State<BuyCard> {
                                                   validator: (value) {
                                                     if (value == null ||
                                                         value.isEmpty) {
-                                                      return 'Please Google authenticator code';
+                                                      return 'Please Enter Google Authenticator Code';
                                                     }
 
                                                     return null;
@@ -444,7 +453,7 @@ class _BuyCardState extends State<BuyCard> {
                                                               5),
                                                     ),
                                                     hintText:
-                                                        'Please Google  authenticator code',
+                                                        'Please enter google authenticator code',
 
                                                     // errorText: _errorText,
                                                   ),

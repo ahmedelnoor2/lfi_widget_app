@@ -64,7 +64,8 @@ class _GiftDetailState extends State<GiftDetail> {
             '${public.publicInfoMarket['market']['coinList'][asset.selectedAsset['coin']]['name']}';
       });
     }
-    await asset.getAccountBalance(context, auth, "");
+    await asset.getAccountBalance(context, auth, _defaultCoin);
+
     await getCoinCosts(_coinShowName);
     await asset.getChangeAddress(context, auth, _defaultCoin);
   }
@@ -156,10 +157,10 @@ class _GiftDetailState extends State<GiftDetail> {
 
     final arguments = (ModalRoute.of(context)?.settings.arguments ??
         <String, dynamic>{}) as Map;
-  
+
     // print(asset.getCost['withdraw_min']);
 
-   // print('${asset.getCost['defaultFee']}');
+    // print('${asset.getCost['defaultFee']}');
     return Scaffold(
       key: _scaffoldKey,
       drawer: drawer(
@@ -401,8 +402,8 @@ class _GiftDetailState extends State<GiftDetail> {
                                   style:
                                       TextStyle(color: secondaryTextColor400),
                                 ),
-                                Text(asset.accountBalance['totalBalance']
-                                    .toString())
+                                Text(asset.accountBalance['allCoinMap']==null?'':asset.accountBalance['allCoinMap']
+                                        [_coinShowName]['allBalance'].toString())
                               ]),
                         ),
                         Padding(
@@ -451,8 +452,8 @@ class _GiftDetailState extends State<GiftDetail> {
                               ),
                         LyoButton(
                           onPressed: (() async {
-                            print(double.parse(double.parse('${estimateprice}')
-                                .toStringAsFixed(4)));
+                            // print(double.parse(double.parse('${estimateprice}')
+                            //     .toStringAsFixed(4)));
                             if (_formKey.currentState!.validate()) {
                               Navigator.pushNamed(context, '/buy_card',
                                   arguments: BuyCard(

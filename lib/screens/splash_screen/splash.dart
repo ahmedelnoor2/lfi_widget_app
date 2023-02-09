@@ -32,6 +32,12 @@ class _SpashScreenState extends State<SpashScreen>
     _controller = AnimationController(vsync: this);
     
     waitCalls();
+    // getLanguage();
+  }
+
+  Future<void> getLanguage() async {
+    var languageprovider = Provider.of<LanguageChange>(context, listen: false);
+    await languageprovider.getlanguageChange(context);
   }
 
   
