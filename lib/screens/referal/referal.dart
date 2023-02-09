@@ -6,10 +6,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_share/flutter_share.dart';
 
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/referral.dart';
 
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
+import 'package:lyotrade/utils/AppConstant.utils.dart';
 
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
@@ -73,6 +75,7 @@ class _ReferalState extends State<Referal> {
   Widget build(BuildContext context) {
     var auth = Provider.of<Auth>(context, listen: false);
     var referalprovider = Provider.of<ReferralProvider>(context, listen: true);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
@@ -105,7 +108,7 @@ class _ReferalState extends State<Referal> {
                             ),
                           ),
                           Text(
-                            'Referral',
+                        languageprovider.getlanguage['referral_detail']['title']??    'Referral',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -163,7 +166,7 @@ class _ReferalState extends State<Referal> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  'Top Referrer Bonus(USDT) ',
+                             languageprovider.getlanguage['referral_detail']['sub_header1']??     'Top Referrer Bonus(USDT) ',
                                   style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w400),
@@ -173,7 +176,7 @@ class _ReferalState extends State<Referal> {
                                     _buildBottomSheet(context);
                                   },
                                   child: Text(
-                                    'Info',
+                                 languageprovider.getlanguage['referral_detail']['info']['title']??   'Info',
                                     style: TextStyle(
                                         color: linkColor,
                                         fontWeight: FontWeight.w400),
@@ -201,7 +204,7 @@ class _ReferalState extends State<Referal> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text('Friends',
+                                      Text(languageprovider.getlanguage['referral_detail']['sub_text1']?? 'Friends',
                                           style: TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.w400)),
@@ -223,7 +226,7 @@ class _ReferalState extends State<Referal> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text('Rewards(USDT)',
+                                        Text(languageprovider.getlanguage['referral_detail']['sub_text2']??'Rewards(USDT)',
                                             style: TextStyle(
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w400)),
@@ -251,7 +254,7 @@ class _ReferalState extends State<Referal> {
                         Image.asset('assets/img/ref-icon1.png'),
                         Container(
                           padding: EdgeInsets.only(left: 8),
-                          child: Text('How to get rebate income?',
+                          child: Text(languageprovider.getlanguage['referral_detail']['sub_header2']??'How to get rebate income?',
                               style: TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w400)),
                         ),
@@ -287,7 +290,7 @@ class _ReferalState extends State<Referal> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        ' Send invitation',
+                                    languageprovider.getlanguage['referral_detail']['step1']??    ' Send invitation',
                                         textAlign: TextAlign.center,
                                         style: TextStyle(fontSize: 14),
                                       ),
@@ -329,7 +332,7 @@ class _ReferalState extends State<Referal> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        ' Friends complete registration and trade',
+                                 languageprovider.getlanguage['referral_detail']['step2']??' Friends complete registration and trade',
                                         textAlign: TextAlign.center,
                                         style: TextStyle(fontSize: 14),
                                       ),
@@ -377,7 +380,7 @@ class _ReferalState extends State<Referal> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        ' Get rebate income',
+                                 languageprovider.getlanguage['referral_detail']['step3']??' Get rebate income',
                                         textAlign: TextAlign.center,
                                         style: TextStyle(fontSize: 14),
                                       ),
@@ -431,7 +434,7 @@ class _ReferalState extends State<Referal> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Invitation code',
+                           languageprovider.getlanguage['referral_detail']['invitation-code']??   'Invitation code',
                             ),
                             Row(
                               children: [
@@ -487,7 +490,7 @@ class _ReferalState extends State<Referal> {
                           children: [
                             SizedBox(
                               child: Text(
-                                'Referral Link',
+                              languageprovider.getlanguage['referral_detail']['referral-link']??  'Referral Link',
                                 style: TextStyle(fontSize: 14),
                               ),
                             ),
@@ -545,7 +548,7 @@ class _ReferalState extends State<Referal> {
                                 '${referalprovider.referralinvitationdata['inviteUrl']}',
                               );
                             },
-                      text: 'Invite Friends',
+                      text:languageprovider.getlanguage['referral_detail']['invite-button']?? 'Invite Friends',
                       active: true,
                       activeColor: linkColor,
                       activeTextColor: Colors.black,
@@ -560,6 +563,8 @@ class _ReferalState extends State<Referal> {
 }
 
 Future _buildBottomSheet(BuildContext context) {
+  var languageprovider = Provider.of<LanguageChange>(context, listen: false);
+
   return showModalBottomSheet(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
@@ -595,12 +600,12 @@ Future _buildBottomSheet(BuildContext context) {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Reward distribution condition:',
+                    Text(languageprovider.getlanguage['referral_detail']['info']['heading']??'Reward distribution condition:',
                         style: TextStyle(color: linkColor)),
                     Container(
                       padding: EdgeInsets.only(top: 15),
                       child: Text(
-                          'Friends who complete the following tasks within 30 days after registration, you can get the corresponding inviter rewards',
+                       languageprovider.getlanguage['referral_detail']['info']['info1']??   'Friends who complete the following tasks within 30 days after registration, you can get the corresponding inviter rewards',
                           style: TextStyle()),
                     ),
                     Container(
@@ -612,7 +617,7 @@ Future _buildBottomSheet(BuildContext context) {
                             size: 14,
                             color: linkColor,
                           ),
-                          Text('Complete identity verification',
+                          Text(languageprovider.getlanguage['referral_detail']['info']['task1']??'Complete identity verification',
                               style: TextStyle(color: seconadarytextcolour)),
                         ],
                       ),
@@ -623,7 +628,7 @@ Future _buildBottomSheet(BuildContext context) {
                         children: [
                           Icon(Icons.star_border_outlined,
                               size: 14, color: linkColor),
-                          Text('Recharge amount≥25USDT',
+                          Text(languageprovider.getlanguage['referral_detail']['info']['task2']??'Recharge amount≥25USDT',
                               style: TextStyle(color: seconadarytextcolour)),
                         ],
                       ),
@@ -636,7 +641,7 @@ Future _buildBottomSheet(BuildContext context) {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Inviter Reward Amount:',
+                                Text(languageprovider.getlanguage['referral_detail']['info']['reward1-title']??'Inviter Reward Amount:',
                                     style: TextStyle(color: linkColor)),
                                 Container(
                                   padding: EdgeInsets.only(top: 0),
@@ -644,7 +649,7 @@ Future _buildBottomSheet(BuildContext context) {
                                     children: [
                                       Icon(Icons.star_border_outlined,
                                           size: 14, color: linkColor),
-                                      Text('Inviter Reward Amount',
+                                      Text(languageprovider.getlanguage['referral_detail']['info']['reward1-title']??'Inviter Reward Amount',
                                           style: TextStyle(
                                             color: seconadarytextcolour,
                                           )),
@@ -664,7 +669,7 @@ Future _buildBottomSheet(BuildContext context) {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Registrant Reward Amount:',
+                          Text(languageprovider.getlanguage['referral_detail']['info']['reward2-title']??'Registrant Reward Amount:',
                               style: TextStyle(
                                 color: linkColor,
                               )),
@@ -674,7 +679,7 @@ Future _buildBottomSheet(BuildContext context) {
                               children: [
                                 Icon(Icons.star_border_outlined,
                                     size: 14, color: linkColor),
-                                Text('Registrant Reward Amount',
+                                Text(languageprovider.getlanguage['referral_detail']['info']['reward2-title']??'Registrant Reward Amount',
                                     style: TextStyle(
                                       color: seconadarytextcolour,
                                     )),
@@ -691,7 +696,7 @@ Future _buildBottomSheet(BuildContext context) {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Reward Distribution Method:',
+                          Text(languageprovider.getlanguage['referral_detail']['info']['reward-method']??'Reward Distribution Method:',
                               style: TextStyle(color: linkColor)),
                           Container(
                             padding: EdgeInsets.only(top: 4, bottom: 10),
@@ -699,10 +704,13 @@ Future _buildBottomSheet(BuildContext context) {
                               children: [
                                 Icon(Icons.star_border_outlined,
                                     size: 14, color: linkColor),
-                                Text(
-                                    'After meeting the reward conditions,T+2 Days',
-                                    style:
-                                        TextStyle(color: seconadarytextcolour)),
+                                Container(
+                                  width: 300,
+                                  child: Text(
+                                   languageprovider.getlanguage['referral_detail']['info']['method-text']??   'After meeting the reward conditions,T+2 Days',
+                                      style:
+                                          TextStyle(color: seconadarytextcolour)),
+                                ),
                               ],
                             ),
                           ),

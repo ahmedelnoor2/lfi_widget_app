@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/future_market.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/screens/future_trade/common/leverage_level.dart';
@@ -242,6 +243,7 @@ class _FutureHeaderDetailsState extends State<FutureHeaderDetails>
   Widget build(BuildContext context) {
     var auth = Provider.of<Auth>(context, listen: true);
     var futureMarket = Provider.of<FutureMarket>(context, listen: true);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
     return Container(
       padding: EdgeInsets.all(10),

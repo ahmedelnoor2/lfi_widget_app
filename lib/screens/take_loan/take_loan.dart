@@ -7,6 +7,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/loan_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/header.dart';
@@ -142,6 +143,7 @@ class _TakeLoanState extends State<TakeLoan> {
     width = MediaQuery.of(context).size.width;
 
     var loanProvider = Provider.of<LoanProvider>(context, listen: false);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -168,7 +170,7 @@ class _TakeLoanState extends State<TakeLoan> {
                           ),
                         ),
                         Text(
-                          'Borrow Against Crypto',
+                       languageprovider.getlanguage['crypto_loan_detail']['title']??   'Borrow Against Crypto',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -209,7 +211,7 @@ class _TakeLoanState extends State<TakeLoan> {
                               Container(
                                 padding: EdgeInsets.only(top: 5, bottom: 5),
                                 child: Text(
-                                  'Your Collateral',
+                             languageprovider.getlanguage['crypto_loan_detail']['collateral']??     'Your Collateral',
                                 ),
                               ),
                               Container(
@@ -327,7 +329,7 @@ class _TakeLoanState extends State<TakeLoan> {
                               Container(
                                 padding: EdgeInsets.only(top: 20, bottom: 5),
                                 child: Text(
-                                  'Your Loan',
+                                 languageprovider.getlanguage['crypto_loan_detail']['loan']?? 'Your Loan',
                                 ),
                               ),
                               Container(
@@ -550,12 +552,12 @@ class _TakeLoanState extends State<TakeLoan> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        'Loan Term',
+                                     languageprovider.getlanguage['crypto_loan_detail']['info1']??   'Loan Term',
                                         style: TextStyle(
                                           color: secondaryTextColor,
                                         ),
                                       ),
-                                      Text('Unlimited'),
+                                      Text(languageprovider.getlanguage['crypto_loan_detail']['term']??'Unlimited'),
                                     ],
                                   ),
                                 ),
@@ -566,7 +568,7 @@ class _TakeLoanState extends State<TakeLoan> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        'Monthly Interest',
+                                     languageprovider.getlanguage['crypto_loan_detail']['info2']??   'Monthly Interest',
                                         style: TextStyle(
                                           color: secondaryTextColor,
                                         ),
@@ -584,7 +586,7 @@ class _TakeLoanState extends State<TakeLoan> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        'Liquidation Price',
+                                       languageprovider.getlanguage['crypto_loan_detail']['info3']?? 'Liquidation Price',
                                         style: TextStyle(
                                           color: secondaryTextColor,
                                         ),
@@ -611,7 +613,7 @@ class _TakeLoanState extends State<TakeLoan> {
                 onPressed: () {
                   formValidation();
                 },
-                text: 'Get Loan',
+                text: languageprovider.getlanguage['crypto_loan_detail']['get_loan_btn']??'Get Loan',
                 active: true,
                 isLoading: false,
               ),
@@ -626,6 +628,7 @@ class _TakeLoanState extends State<TakeLoan> {
     height = MediaQuery.of(context).size.height;
 
     var loanProvider = Provider.of<LoanProvider>(context, listen: false);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: false);
 
     return SizedBox(
       height: height * 0.9,
@@ -642,8 +645,8 @@ class _TakeLoanState extends State<TakeLoan> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Get history on your email',
+                     Text(
+                  languageprovider.getlanguage['crypto_loan_detail']['history']['title']??    'Get history on your email',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -715,7 +718,7 @@ class _TakeLoanState extends State<TakeLoan> {
                         Navigator.of(context).pop();
                       }
                     },
-                    text: 'Submit',
+                    text: languageprovider.getlanguage['crypto_loan_detail']['history']['submit_btn']??'Submit',
                     active: true,
                     isLoading: false,
                   ),

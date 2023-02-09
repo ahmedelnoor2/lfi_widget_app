@@ -1,6 +1,7 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/screens/trade/common/percentage_indicator.dart';
@@ -101,6 +102,7 @@ class _OpenOrdersState extends State<OpenOrders>
     var auth = Provider.of<Auth>(context, listen: true);
     var trading = Provider.of<Trading>(context, listen: true);
     var public = Provider.of<Public>(context, listen: true);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
     return Column(
       children: [
@@ -119,7 +121,10 @@ class _OpenOrdersState extends State<OpenOrders>
                   }),
                   tabs: <Tab>[
                     Tab(text: 'Open Orders(${trading.openOrders.length})'),
-                    Tab(text: 'Funds'),
+                    Tab(
+                        text: languageprovider.getlanguage['trade']['funds']
+                                ['title'] ??
+                            'Funds'),
                   ],
                   controller: _tabOpenOrderController,
                 ),

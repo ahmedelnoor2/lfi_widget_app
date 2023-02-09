@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/screens/assets/assets.dart';
@@ -249,6 +250,7 @@ class _TransferAssetsState extends State<TransferAssets> {
 
     var public = Provider.of<Public>(context, listen: true);
     var asset = Provider.of<Asset>(context, listen: true);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
     // print(asset.p2pBalance);
     // print(_availableBalanceTo);
@@ -303,7 +305,7 @@ class _TransferAssetsState extends State<TransferAssets> {
                               ),
                             ),
                             Text(
-                              'Transfer',
+                          languageprovider.getlanguage['transfer_detail']['title']??'Transfer',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -390,7 +392,7 @@ class _TransferAssetsState extends State<TransferAssets> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Available From:',
+                           languageprovider.getlanguage['transfer_detail']['avl_from']??'Available From:',
                                 style: TextStyle(
                                   color: secondaryTextColor,
                                   fontWeight: FontWeight.w600,
@@ -410,7 +412,7 @@ class _TransferAssetsState extends State<TransferAssets> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Available To:',
+                           languageprovider.getlanguage['transfer_detail']['avl_to']??'Available To:',
                               style: TextStyle(
                                 color: secondaryTextColor,
                                 fontWeight: FontWeight.w600,
@@ -513,7 +515,7 @@ class _TransferAssetsState extends State<TransferAssets> {
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        'Coins',
+                    languageprovider.getlanguage['transfer_detail']['coin']??    'Coins',
                         style: TextStyle(
                           color: secondaryTextColor,
                         ),
@@ -597,7 +599,7 @@ class _TransferAssetsState extends State<TransferAssets> {
                         Container(
                           padding: EdgeInsets.only(bottom: 5),
                           child: Text(
-                            'The number of tranfers',
+                         languageprovider.getlanguage['transfer_detail']['num']??   'The number of tranfers',
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                             ),
@@ -638,7 +640,7 @@ class _TransferAssetsState extends State<TransferAssets> {
                                       hintStyle: TextStyle(
                                         fontSize: 14,
                                       ),
-                                      hintText:
+                                      hintText:languageprovider.getlanguage['transfer_detail']['placeholder']??
                                           "Please enter the number of transfers",
                                     ),
                                   ),
@@ -653,7 +655,7 @@ class _TransferAssetsState extends State<TransferAssets> {
                                               _availableBalanceFrom;
                                         },
                                         child: Text(
-                                          'ALL',
+                                     languageprovider.getlanguage['transfer_detail']['all_btn']??     'ALL',
                                           style: TextStyle(
                                             fontSize: 14,
                                             color: linkColor,
@@ -704,7 +706,7 @@ class _TransferAssetsState extends State<TransferAssets> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Available:',
+                             languageprovider.getlanguage['transfer_detail']['available']??    'Available:',
                                 style: TextStyle(
                                   color: secondaryTextColor,
                                   fontWeight: FontWeight.w600,
@@ -736,7 +738,7 @@ class _TransferAssetsState extends State<TransferAssets> {
                         },
                   child: _processTransfer
                       ? const CircularProgressIndicator.adaptive()
-                      : const Text('Transfer'),
+                      : Text(languageprovider.getlanguage['transfer_detail']['transfer_btn']?? 'Transfer'),
                 ),
               ),
             ],

@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/dex_provider.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/alert.dart';
 import 'package:lyotrade/screens/common/header.dart';
@@ -313,6 +314,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
     var dexProvider = Provider.of<DexProvider>(context, listen: true);
     var asset = Provider.of<Asset>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
     return dexProvider.processPayment.isNotEmpty
         ? sendingWidget(context, dexProvider)
@@ -608,7 +610,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                                     ),
                                   ),
                                   Text(
-                                    'Exchange rate (expected)',
+                                 languageprovider.getlanguage['swap_detail']['rate']??   'Exchange rate (expected)',
                                     style: TextStyle(fontSize: 12),
                                   ),
                                 ],
@@ -688,7 +690,7 @@ class _ExchangeNowState extends State<ExchangeNow> {
                                   width: 25,
                                 )
                               : Text(
-                                  'SWAP Now',
+                              languageprovider.getlanguage['swap_detail']['swap_btn']??'SWAP Now',
                                   style: TextStyle(
                                     fontSize: 20,
                                     color: (_loadingExchnageRate)

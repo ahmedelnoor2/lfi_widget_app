@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/assets/transactions/deposit_lists.dart';
 import 'package:lyotrade/screens/assets/transactions/financial_records.dart';
@@ -175,6 +176,7 @@ class _TransactionsState extends State<Transactions>
 
     var asset = Provider.of<Asset>(context, listen: true);
     var public = Provider.of<Public>(context, listen: true);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
     return Scaffold(
       key: _scaffoldKey,
@@ -209,7 +211,7 @@ class _TransactionsState extends State<Transactions>
                       icon: Icon(Icons.chevron_left),
                     ),
                     Text(
-                      'Transaction History',
+                    languageprovider.getlanguage['history_detail']['title']??  'Transaction History',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -292,10 +294,10 @@ class _TransactionsState extends State<Transactions>
                   // _tabIndicatorColor = value == 0 ? Colors.green : Colors.red;
                 }),
                 tabs: <Tab>[
-                  Tab(text: 'Deposits'),
-                  Tab(text: 'Withdrawals'),
-                  Tab(text: 'Other'),
-                  Tab(text: 'Financial Records'),
+                  Tab(text:languageprovider.getlanguage['history_detail']['option1']['title']?? 'Deposits'),
+                  Tab(text:languageprovider.getlanguage['history_detail']['option2']['title']??  'Withdrawals'),
+                  Tab(text:languageprovider.getlanguage['history_detail']['option3']['title']?? 'Other'),
+                  Tab(text: languageprovider.getlanguage['history_detail']['option4']['title']??'Financial Records'),
                 ],
                 controller: _tabTxHistoryController,
               ),

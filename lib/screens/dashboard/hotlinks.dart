@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:provider/provider.dart';
@@ -20,6 +21,7 @@ class _HotlinksState extends State<Hotlinks> {
   @override
   Widget build(BuildContext context) {
     var auth = Provider.of<Auth>(context, listen: true);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
     return Container(
       padding: EdgeInsets.all(12),
@@ -44,7 +46,7 @@ class _HotlinksState extends State<Hotlinks> {
                   ),
                 ),
                 Text(
-                  'New Listing',
+               languageprovider.getlanguage['home']['menu_item1']?? 'New Listing',
                   style: TextStyle(
                     fontSize: 12,
                   ),
@@ -72,7 +74,7 @@ class _HotlinksState extends State<Hotlinks> {
                   ),
                 ),
                 Text(
-                  'Referral',
+               languageprovider.getlanguage['home']['menu_item2']??   'Referral',
                   style: TextStyle(
                     fontSize: 12,
                   ),
@@ -109,7 +111,7 @@ class _HotlinksState extends State<Hotlinks> {
                   ),
                 ),
                 Text(
-                  'Deposit',
+            languageprovider.getlanguage['home']['menu_item3']??      'Deposit',
                   style: TextStyle(
                     fontSize: 12,
                   ),
@@ -139,7 +141,7 @@ class _HotlinksState extends State<Hotlinks> {
                   ),
                 ),
                 Text(
-                  'Crypto Loan',
+              languageprovider.getlanguage['home']['menu_item4']??     'Crypto Loan',
                   style: TextStyle(
                     fontSize: 12,
                   ),
@@ -176,7 +178,7 @@ class _HotlinksState extends State<Hotlinks> {
                   ),
                 ),
                 Text(
-                  'Swap',
+              languageprovider.getlanguage['home']['menu_item5']??    'Swap',
                   style: TextStyle(
                     fontSize: 12,
                   ),

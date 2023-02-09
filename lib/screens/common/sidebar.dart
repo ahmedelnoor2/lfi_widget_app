@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/user.dart';
 import 'package:lyotrade/screens/common/alert.dart';
@@ -37,6 +38,7 @@ class _SideBarState extends State<SideBar> {
   bool _processLogout = false;
 
   String _versionNumber = '0.0';
+  languageItem? selectedMenu;
 
   @override
   void initState() {
@@ -122,12 +124,15 @@ class _SideBarState extends State<SideBar> {
     }
   }
 
+ 
+
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
 
     var public = Provider.of<Public>(context, listen: true);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
     var user = Provider.of<User>(context, listen: true);
 
@@ -155,10 +160,9 @@ class _SideBarState extends State<SideBar> {
                             },
                             icon: const Icon(Icons.close),
                           ),
-                           Row(
+                          Row(
                             children: [
                               InkWell(
-                                  
                                   onTap: () {
                                     if (auth.thMode == ThemeMode.light) {
                                       auth.setThMode(ThemeMode.dark);
@@ -178,7 +182,6 @@ class _SideBarState extends State<SideBar> {
                               )
                             ],
                           )
-                         
                         ],
                       ),
                     ),
@@ -190,11 +193,16 @@ class _SideBarState extends State<SideBar> {
                             leading: const CircleAvatar(
                               child: Icon(Icons.account_circle),
                             ),
-                            title: const Text(
-                              'Login',
+                            title: Text(
+                              languageprovider.getlanguage['leftbar']
+                                      ['login_tab']['title'] ??
+                                  'Login',
                               style: TextStyle(fontSize: 20),
                             ),
-                            subtitle: const Text('Welcome to LYOTRADE'),
+                            subtitle: Text(
+                                languageprovider.getlanguage['leftbar']
+                                        ['login_tab']['text'] ??
+                                    'Welcome to LYOTRADE'),
                             trailing: const Icon(
                               Icons.chevron_right,
                             ),
@@ -279,9 +287,12 @@ class _SideBarState extends State<SideBar> {
                     Navigator.pushNamed(context, '/authentication');
                   }
                 },
-                title: Text('Referral Program'),
+                title: Text(languageprovider.getlanguage['leftbar']
+                        ['referral_title'] ??
+                    'Referral Program'),
                 subtitle: Text(
-                  'Refer friends and get rewards',
+                  languageprovider.getlanguage['leftbar']['referral_text'] ??
+                      'Refer friends and get rewards',
                   style: TextStyle(
                     fontSize: 12,
                   ),
@@ -297,7 +308,8 @@ class _SideBarState extends State<SideBar> {
                     child: ListTile(
                       title: Text('KYC'),
                       subtitle: Text(
-                        'Complete your KYC',
+                        languageprovider.getlanguage['leftbar']['kyc_text'] ??
+                            'Complete your KYC',
                         style: TextStyle(
                           fontSize: 12,
                         ),
@@ -325,7 +337,9 @@ class _SideBarState extends State<SideBar> {
                       }
                     },
                     leading: const Icon(Icons.list_alt),
-                    title: const Text('History'),
+                    title: Text(languageprovider.getlanguage['leftbar']
+                            ['history_title'] ??
+                        'History'),
                     trailing: const Icon(Icons.chevron_right),
                   ),
                   ListTile(
@@ -333,7 +347,9 @@ class _SideBarState extends State<SideBar> {
                       _launchURL();
                     }),
                     leading: const Icon(Icons.percent),
-                    title: const Text('Trading Fee Level'),
+                    title: Text(languageprovider.getlanguage['leftbar']
+                            ['trading_title'] ??
+                        'Trading Fee Level'),
                     trailing: Text(
                       'Current Level: ${auth.userInfo['accountStatus'] ?? '--'}',
                       style: TextStyle(
@@ -344,9 +360,13 @@ class _SideBarState extends State<SideBar> {
                   ),
                   ListTile(
                     leading: const Icon(Icons.percent),
-                    title: const Text('Pay with your LYO Credit'),
+                    title: Text(languageprovider.getlanguage['leftbar']
+                            ['LYO_credit_title'] ??
+                        'Pay with your LYO Credit'),
                     subtitle: Text(
-                      'Used as an exchange market, trading currency unit',
+                      languageprovider.getlanguage['leftbar']
+                              ['LYO_credit_text'] ??
+                          'Used as an exchange market, trading currency unit',
                       style: TextStyle(
                         color: secondaryTextColor,
                         fontSize: 12,
@@ -376,9 +396,13 @@ class _SideBarState extends State<SideBar> {
                 children: [
                   ListTile(
                     leading: const Icon(Icons.security),
-                    title: const Text('Security'),
+                    title: Text(languageprovider.getlanguage['leftbar']
+                            ['security_tab']['option1'] ??
+                        'Security'),
                     trailing: Text(
-                      'Payment and Password',
+                      languageprovider.getlanguage['leftbar']['security_tab']
+                              ['text1'] ??
+                          'Payment and Password',
                       style: TextStyle(
                         color: secondaryTextColor,
                         fontSize: 12,
@@ -395,7 +419,9 @@ class _SideBarState extends State<SideBar> {
                   ),
                   ListTile(
                     leading: const Icon(Icons.attach_money),
-                    title: const Text('Currency'),
+                    title: Text(languageprovider.getlanguage['leftbar']
+                            ['security_tab']['option2'] ??
+                        'Currency'),
                     trailing: DropdownButton<String>(
                       icon: Container(),
                       isDense: true,
@@ -423,14 +449,26 @@ class _SideBarState extends State<SideBar> {
                       Navigator.pushNamed(context, '/setting');
                     },
                     leading: Icon(Icons.settings),
-                    title: Text('Settings'),
+                    title: Text(languageprovider.getlanguage['leftbar']
+                            ['security_tab']['option3'] ??
+                        'Settings'),
+                  ),
+                  ListTile(
+                    onTap: () {
+                      Navigator.pushNamed(context, '/chooseLanguage');
+                    },
+                    leading: const Icon(Icons.language),
+                    title: const Text('Language'),
+                   
                   ),
                   ListTile(
                     onTap: () {
                       _supportAndFaqs();
                     },
                     leading: Icon(Icons.support),
-                    title: Text('Support & FAQ'),
+                    title: Text(languageprovider.getlanguage['leftbar']
+                            ['security_tab']['option4'] ??
+                        'Support & FAQ'),
                   ),
                 ],
               ),
@@ -481,3 +519,5 @@ class _SideBarState extends State<SideBar> {
     }
   }
 }
+
+enum languageItem { English, Spanish }

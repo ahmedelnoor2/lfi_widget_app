@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/assets/skeleton/deposit_skull.dart';
 import 'package:lyotrade/screens/common/drawer.dart';
@@ -222,6 +223,7 @@ class _DepositAssetsState extends State<DepositAssets> {
 
     var asset = Provider.of<Asset>(context, listen: true);
     var public = Provider.of<Public>(context, listen: true);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
     return Scaffold(
       key: _scaffoldKey,
@@ -269,7 +271,7 @@ class _DepositAssetsState extends State<DepositAssets> {
                               ),
                             ),
                             Text(
-                              'Deposit',
+                         languageprovider.getlanguage['deposit_detail']['title'] ??    'Deposit',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -344,7 +346,7 @@ class _DepositAssetsState extends State<DepositAssets> {
                       children: [
                         Container(
                           padding: EdgeInsets.only(right: 5),
-                          child: Text('Chain name'),
+                          child: Text(languageprovider.getlanguage['deposit_detail']['cname']??'Chain name'),
                         ),
                         Container(
                           padding: EdgeInsets.only(right: 5),
@@ -424,7 +426,7 @@ class _DepositAssetsState extends State<DepositAssets> {
                           Container(
                             padding: EdgeInsets.only(bottom: 10),
                             child: Text(
-                              'Deposit Address',
+                            languageprovider.getlanguage['deposit_detail']['deposit_addr']??  'Deposit Address',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -460,7 +462,7 @@ class _DepositAssetsState extends State<DepositAssets> {
                       top: 10,
                       bottom: 10,
                     ),
-                    child: Text('Wallet Address:'),
+                    child: Text(languageprovider.getlanguage['deposit_detail']['wallet_addr']?? 'Wallet Address:'),
                   ),
                   Container(
                     width: width,
@@ -683,7 +685,7 @@ class _DepositAssetsState extends State<DepositAssets> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Balances',
+                           languageprovider.getlanguage['deposit_detail']['bal']??      'Balance',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -703,7 +705,7 @@ class _DepositAssetsState extends State<DepositAssets> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Available',
+                               languageprovider.getlanguage['deposit_detail']['available']??    'Available',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -723,7 +725,7 @@ class _DepositAssetsState extends State<DepositAssets> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Freeze',
+                              languageprovider.getlanguage['deposit_detail']['freeze']??     'Freeze',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -757,7 +759,7 @@ class _DepositAssetsState extends State<DepositAssets> {
                                       snackAlert(context, SnackTypes.success,
                                           'Address saved to Gallery or Photos.');
                                     },
-                                    child: const Text('Save Address'),
+                                    child:  Text(languageprovider.getlanguage['deposit_detail']['save_btn']??'Save Address'),
                                   ),
                                 ),
                                 SizedBox(
@@ -769,7 +771,7 @@ class _DepositAssetsState extends State<DepositAssets> {
                                         asset.changeAddress['addressStr'],
                                       );
                                     },
-                                    child: const Text('Share Address'),
+                                    child:  Text(languageprovider.getlanguage['deposit_detail']['share_btn']??'Share Address'),
                                   ),
                                 ),
                               ],

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
@@ -32,18 +33,21 @@ class _BuyCrptoySliderState extends State<BuyCrptoySlider> {
       "img": 'assets/img/buy_crypto.png',
       "name": "Buy Crypto",
       "title": 'SEPA, VISA, MC',
+      "lan_text": "service_1",
     },
     {
       "index": 1,
       "img": 'assets/img/deposit.png',
       "name": "Deposit",
       "title": 'BTC, ETH, LYO',
+      "lan_text": "service_2",
     },
     {
       "index": 2,
       "img": 'assets/img/earn.png',
       "name": "To Earn",
       "title": 'APY up to 72%!',
+      "lan_text": "service_3",
     },
   ];
 
@@ -54,6 +58,7 @@ class _BuyCrptoySliderState extends State<BuyCrptoySlider> {
 
     var public = Provider.of<Public>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
     return Column(
       children: [
@@ -79,7 +84,7 @@ class _BuyCrptoySliderState extends State<BuyCrptoySlider> {
                       }),
                   items: _sliderFrames.map(
                     (slider) {
-                      // var slider = _sliderFrames[i];
+                     
                       return Builder(
                         builder: (BuildContext context) {
                           return InkWell(
@@ -141,7 +146,7 @@ class _BuyCrptoySliderState extends State<BuyCrptoySlider> {
                                       FittedBox(
                                         fit: BoxFit.fitWidth,
                                         child: Text(
-                                          slider['name'] ?? '',
+                                   languageprovider.getlanguage['home']['${slider['lan_text']}'] ?? '',
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16,

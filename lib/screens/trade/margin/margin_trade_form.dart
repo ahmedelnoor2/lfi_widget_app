@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
@@ -192,6 +193,7 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
     var public = Provider.of<Public>(context, listen: true);
     var asset = Provider.of<Asset>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
     if (public.amountFieldUpdate) {
       setPriceField();
@@ -231,7 +233,7 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
                       setAvailalbePrice();
                     },
                     child: Text(
-                      'Buy',
+                   languageprovider.getlanguage['trade']['buy_btn']??   'Buy',
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
@@ -250,7 +252,7 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
                       setAvailalbePrice();
                     },
                     child: Text(
-                      'Sell',
+                   languageprovider.getlanguage['trade']['sell_btn']??     'Sell',
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
@@ -275,7 +277,7 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    _orderType == 1 ? 'Limit' : 'Market',
+                    _orderType == 1 ? languageprovider.getlanguage['trade']['dropdown1']??  'Limit' : languageprovider.getlanguage['trade']['dropdown2']?? 'Market',
                     style: TextStyle(fontSize: 16),
                   ),
                   Icon(
@@ -291,8 +293,8 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
               });
             },
             itemBuilder: (ctx) => [
-              _buildPopupMenuItem('Limit', 1),
-              _buildPopupMenuItem('Market', 2),
+              _buildPopupMenuItem(languageprovider.getlanguage['trade']['dropdown1']?? 'Limit', 1),
+              _buildPopupMenuItem(languageprovider.getlanguage['trade']['dropdown2']?? 'Market', 2),
             ],
           ),
           (_orderType == 2)
@@ -577,7 +579,7 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
               ),
               child: Text(
                 auth.isAuthenticated
-                    ? '${_isBuy ? 'Buy' : 'Sell'} ${public.activeMarket['showName'].split('/')[0]}'
+                    ? '${_isBuy ?languageprovider.getlanguage['trade']['buy_btn']??  'Buy' : languageprovider.getlanguage['trade']['sell_btn']??'Sell'} ${public.activeMarket['showName'].split('/')[0]}'
                     : 'Login / Sign Up',
                 style: TextStyle(color: Colors.white),
               ),

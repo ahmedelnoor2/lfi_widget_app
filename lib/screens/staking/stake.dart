@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/no_data.dart';
 import 'package:lyotrade/screens/staking/common/all_stake.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/ScreenControl.utils.dart';
+import 'package:provider/provider.dart';
 
 class Stake extends StatefulWidget {
   static const routeName = '/staking';
@@ -21,6 +23,8 @@ class _StakeState extends State<Stake> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
+
 
     return WillPopScope(
       onWillPop: () {
@@ -47,7 +51,7 @@ class _StakeState extends State<Stake> with SingleTickerProviderStateMixin {
                         ),
                       ),
                       Text(
-                        'Staking',
+                      languageprovider.getlanguage['staking_detail']['title']??  'Staking',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -72,9 +76,9 @@ class _StakeState extends State<Stake> with SingleTickerProviderStateMixin {
                     // });
                   },
                   tabs: <Tab>[
-                    Tab(text: 'All'),
-                    Tab(text: 'Lock-up wealth management'),
-                    Tab(text: 'Holding wealth management'),
+                    Tab(text:languageprovider.getlanguage['staking_detail']['tab1']??  'All'),
+                    Tab(text: languageprovider.getlanguage['staking_detail']['tab2']??'Lock-up wealth management'),
+                    Tab(text: languageprovider.getlanguage['staking_detail']['tab3']??'Holding wealth management'),
                   ],
                   controller: _tabStakeController,
                 ),

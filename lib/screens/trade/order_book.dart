@@ -260,9 +260,11 @@ class _OrderBookState extends State<OrderBook> {
                     )),
               )
             : ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
+                //physics: const NeverScrollableScrollPhysics(),
+                physics: BouncingScrollPhysics(),
                 shrinkWrap: true,
                 padding: EdgeInsets.zero,
+                
                 itemCount: bids.length,
                 itemBuilder: (BuildContext context, int index) {
                   return InkWell(

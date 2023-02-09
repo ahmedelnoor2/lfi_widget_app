@@ -7,6 +7,7 @@ import 'package:just_the_tooltip/just_the_tooltip.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/future_market.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
@@ -63,19 +64,19 @@ class _FutureTradeFormState extends State<FutureTradeForm> {
 
   //TP/SL Options
   bool _tpSlOptions = false;
-final tooltipController = JustTheController();
+  final tooltipController = JustTheController();
 
   @override
   void initState() {
     setAvailalbePrice();
-     Future.delayed(const Duration(seconds: 1), () {
-    tooltipController.showTooltip(immediately: false);
-  });
+    Future.delayed(const Duration(seconds: 1), () {
+      tooltipController.showTooltip(immediately: false);
+    });
 
-  tooltipController.addListener(() {
-    // Prints the enum value of [TooltipStatus.isShowing] or [TooltipStatus.isHiding]
-    print('controller: ${tooltipController.value}');
-  });
+    tooltipController.addListener(() {
+      // Prints the enum value of [TooltipStatus.isShowing] or [TooltipStatus.isHiding]
+      print('controller: ${tooltipController.value}');
+    });
     super.initState();
   }
 
@@ -288,8 +289,6 @@ final tooltipController = JustTheController();
   //   });
   //   calculateTotal('price');
   // }
- 
-
 
   @override
   Widget build(BuildContext context) {
@@ -298,6 +297,7 @@ final tooltipController = JustTheController();
 
     var futureMarket = Provider.of<FutureMarket>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
     return Form(
       key: _formTradeKey3,
@@ -323,7 +323,9 @@ final tooltipController = JustTheController();
                       // setAvailalbePrice();
                     },
                     child: Text(
-                      'Open',
+                      languageprovider.getlanguage['futures']['section2']
+                              ['open_btn'] ??
+                          'Open',
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
@@ -342,7 +344,9 @@ final tooltipController = JustTheController();
                       // setAvailalbePrice();
                     },
                     child: Text(
-                      'Close',
+                      languageprovider.getlanguage['futures']['section2']
+                              ['close_btn'] ??
+                          'Close',
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
@@ -368,10 +372,16 @@ final tooltipController = JustTheController();
                 children: [
                   Text(
                     _orderType == 1
-                        ? 'Limit Order'
+                        ? languageprovider.getlanguage['futures']['section2']
+                                ['dropdown1'] ??
+                            'Limit Order'
                         : _orderType == 2
-                            ? 'Market Order'
-                            : 'Stop Order',
+                            ? languageprovider.getlanguage['futures']
+                                    ['section2']['dropdown2'] ??
+                                'Market Order'
+                            : languageprovider.getlanguage['futures']
+                                    ['section2']['dropdown3'] ??
+                                'Stop Order',
                     style: TextStyle(fontSize: 16),
                   ),
                   Icon(
@@ -387,9 +397,21 @@ final tooltipController = JustTheController();
               });
             },
             itemBuilder: (ctx) => [
-              _buildPopupMenuItem('Limit Order', 1),
-              _buildPopupMenuItem('Market Order', 2),
-              _buildPopupMenuItem('Stop Order', 6),
+              _buildPopupMenuItem(
+                  languageprovider.getlanguage['futures']['section2']
+                          ['dropdown1'] ??
+                      'Limit Order',
+                  1),
+              _buildPopupMenuItem(
+                  languageprovider.getlanguage['futures']['section2']
+                          ['dropdown2'] ??
+                      'Market Order',
+                  2),
+              _buildPopupMenuItem(
+                  languageprovider.getlanguage['futures']['section2']
+                          ['dropdown3'] ??
+                      'Stop Order',
+                  6),
             ],
           ),
           Container(
@@ -403,8 +425,7 @@ final tooltipController = JustTheController();
                   'Transfer assets into your Future wallet here',
                 ),
               ),
-              
-            preferredDirection: AxisDirection.down,
+              preferredDirection: AxisDirection.down,
               controller: tooltipController,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -768,7 +789,9 @@ final tooltipController = JustTheController();
                               });
                             },
                             child: Text(
-                              'Advance Options',
+                              languageprovider.getlanguage['futures']
+                                      ['section2']['checkbox1'] ??
+                                  'Advance Options',
                               style: TextStyle(
                                 fontSize: 12,
                               ),
@@ -897,7 +920,9 @@ final tooltipController = JustTheController();
                         });
                       },
                       child: Text(
-                        'TP/SL',
+                        languageprovider.getlanguage['futures']['section2']
+                                ['checkbox2'] ??
+                            'TP/SL',
                         style: TextStyle(
                           fontSize: 12,
                         ),
@@ -1044,7 +1069,10 @@ final tooltipController = JustTheController();
                               Container(
                                 padding: EdgeInsets.only(right: 5),
                                 child: Text(
-                                  'Max Buy:',
+                                  languageprovider.getlanguage['futures']
+                                              ['section2']['max_buy'] +
+                                          ":" ??
+                                      'Max Buy:',
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: greenIndicator,
@@ -1064,7 +1092,10 @@ final tooltipController = JustTheController();
                               Container(
                                 padding: EdgeInsets.only(right: 5),
                                 child: Text(
-                                  'Max Sell:',
+                                  languageprovider.getlanguage['futures']
+                                              ['section2']['max_sell'] +
+                                          ": " ??
+                                      'Max Sell:',
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: redIndicator,
@@ -1099,7 +1130,8 @@ final tooltipController = JustTheController();
                         Container(
                           padding: EdgeInsets.only(right: 5),
                           child: Text(
-                            'Cost:',
+                        languageprovider.getlanguage['futures']
+                                              ['section2']['cost']+":"??'Cost:',
                             style: TextStyle(
                               fontSize: 12,
                               color: secondaryTextColor,
@@ -1195,7 +1227,9 @@ final tooltipController = JustTheController();
                               : null,
                         ),
                         child: Text(
-                          '${_isBuy ? 'Open Short' : 'Close Long'}',
+                          '${_isBuy ? languageprovider.getlanguage['futures']
+                                              ['section2']['open_btn1']?? 'Open Short' :languageprovider.getlanguage['futures']
+                                              ['section2']['open_btn2']?? 'Close Long'}',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 13,

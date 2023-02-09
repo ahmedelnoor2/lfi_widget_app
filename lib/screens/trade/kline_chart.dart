@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:archive/archive.dart';
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/bottomnav.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
@@ -263,6 +264,7 @@ class _KlineChartState extends State<KlineChart>
 
     var public = Provider.of<Public>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
     List? asks = public.asks;
     List? bids = public.bids;
@@ -634,7 +636,7 @@ class _KlineChartState extends State<KlineChart>
                     ),
                   ),
                 ),
-                SizedBox(
+               SizedBox(
                   height: height,
                   child: Card(
                     margin: EdgeInsets.zero,
@@ -646,8 +648,8 @@ class _KlineChartState extends State<KlineChart>
                           },
                           controller: _tabController,
                           tabs: [
-                            Tab(text: 'Order Book'),
-                            Tab(text: 'Trades'),
+                            Tab(text:languageprovider.getlanguage['coin_details']['tab1']['title']?? 'Order Book'),
+                            Tab(text: languageprovider.getlanguage['coin_details']['tab2']['title']??'Trades'),
                           ],
                         ),
                         SizedBox(
@@ -666,7 +668,7 @@ class _KlineChartState extends State<KlineChart>
                                             EdgeInsets.only(left: 10, top: 10),
                                         width: width * 0.5,
                                         child: Text(
-                                          'Bid',
+                                    languageprovider.getlanguage['coin_details']['tab1']['table_header1']??      'Bid',
                                           style: TextStyle(
                                               color: secondaryTextColor),
                                         ),
@@ -675,7 +677,7 @@ class _KlineChartState extends State<KlineChart>
                                         padding: EdgeInsets.only(top: 10),
                                         width: width * 0.5,
                                         child: Text(
-                                          'Ask',
+                                      languageprovider.getlanguage['coin_details']['tab1']['table_header3']??    'Ask',
                                           style: TextStyle(
                                               color: secondaryTextColor),
                                         ),
@@ -841,7 +843,7 @@ class _KlineChartState extends State<KlineChart>
                                             EdgeInsets.only(left: 10, top: 10),
                                         width: width * 0.33,
                                         child: Text(
-                                          'Time',
+                                     languageprovider.getlanguage['coin_details']['tab2']['table_header1']??     'Time',
                                           style: TextStyle(
                                               color: secondaryTextColor),
                                         ),
@@ -852,7 +854,7 @@ class _KlineChartState extends State<KlineChart>
                                         child: Align(
                                           alignment: Alignment.center,
                                           child: Text(
-                                            'Price',
+                                          languageprovider.getlanguage['coin_details']['tab2']['table_header2']??  'Price',
                                             style: TextStyle(
                                                 color: secondaryTextColor),
                                           ),
@@ -865,7 +867,7 @@ class _KlineChartState extends State<KlineChart>
                                         child: Align(
                                           alignment: Alignment.centerRight,
                                           child: Text(
-                                            'Quantity',
+                                           languageprovider.getlanguage['coin_details']['tab2']['table_header3']??  'Quantity',
                                             style: TextStyle(
                                                 color: secondaryTextColor),
                                           ),
@@ -967,7 +969,7 @@ class _KlineChartState extends State<KlineChart>
                           ),
                         );
                       },
-                      text: 'Buy',
+                      text:languageprovider.getlanguage['coin_details']['buy_btn']??  'Buy',
                       active: true,
                       activeColor: greenIndicator,
                       isLoading: false,
@@ -992,7 +994,7 @@ class _KlineChartState extends State<KlineChart>
                           ),
                         );
                       },
-                      text: 'Sell',
+                      text:languageprovider.getlanguage['coin_details']['sell_btn']?? 'Sell',
                       active: true,
                       activeColor: redIndicator,
                       isLoading: false,

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:archive/archive.dart';
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
@@ -100,6 +101,7 @@ class _MarketSearchState extends State<MarketSearch>
     height = MediaQuery.of(context).size.height;
 
     var public = Provider.of<Public>(context, listen: true);
+    var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
     return Scaffold(
       appBar: hiddenAppBar(),
@@ -112,8 +114,8 @@ class _MarketSearchState extends State<MarketSearch>
               children: [
                 Container(
                   padding: const EdgeInsets.only(left: 20),
-                  child: const Text(
-                    'Markets',
+                  child:  Text(
+                  languageprovider.getlanguage['markets']['title']??  'Markets',
                     style: TextStyle(
                       fontSize: 20,
                     ),
