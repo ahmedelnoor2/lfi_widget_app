@@ -30,17 +30,10 @@ class _SpashScreenState extends State<SpashScreen>
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this);
-    
+
     waitCalls();
     // getLanguage();
   }
-
-  Future<void> getLanguage() async {
-    var languageprovider = Provider.of<LanguageChange>(context, listen: false);
-    await languageprovider.getlanguageChange(context);
-  }
-
-  
 
   Future<void> waitCalls() async {
     await getPublicInfo();
@@ -50,7 +43,6 @@ class _SpashScreenState extends State<SpashScreen>
     Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
   }
 
-
   Future<void> getAssetsRate() async {
     var public = Provider.of<Public>(context, listen: false);
     await public.assetsRate();
@@ -58,6 +50,7 @@ class _SpashScreenState extends State<SpashScreen>
     await public.getPublicInfoMarket();
     if (public.headerSymbols.isEmpty) {
       await setHeaderSymbols();
+      
     }
     return;
   }
@@ -118,6 +111,7 @@ class _SpashScreenState extends State<SpashScreen>
     await public.getBanners();
     return;
   }
+
   Future<void> getLanguage() async {
     var public = Provider.of<Public>(context, listen: false);
     var languageprovider = Provider.of<LanguageChange>(context, listen: false);
