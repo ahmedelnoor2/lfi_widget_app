@@ -15,8 +15,9 @@ import 'package:provider/provider.dart';
 
 class GiftDetail extends StatefulWidget {
   static const routeName = '/gift_detail';
-  const GiftDetail({Key? key}) : super(key: key);
-
+  GiftDetail({Key? key, this.data, this.isEqualMinMax}) : super(key: key);
+  final data;
+  final isEqualMinMax;
   @override
   State<GiftDetail> createState() => _GiftDetailState();
 }
@@ -57,6 +58,27 @@ class _GiftDetailState extends State<GiftDetail> {
     var auth = Provider.of<Auth>(context, listen: false);
     var public = Provider.of<Public>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
+    if (widget.isEqualMinMax == false) {
+      _amountcontroller.text = widget.data['max'];
+      var giftcardprovider =
+          Provider.of<GiftCardProvider>(context, listen: false);
+      var userid = await auth.userInfo['id'];
+      await giftcardprovider.getEstimateRate(context, auth, userid, {
+        "currency": "${widget.data['currency']['code']}",
+        "payment": widget.data['max'],
+        "productID": widget.data['BillerID']
+      });
+      setState(() {
+        estprice = double.parse(widget.data['max']);
+
+        var price = giftcardprovider.amountsystm / estprice;
+
+        var finalprice = estprice / price;
+        estimateprice = finalprice /
+            public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()]
+                [_defaultCoin];
+      });
+    }
 
     if (asset.selectedAsset.isNotEmpty) {
       setState(() {
@@ -147,6 +169,15 @@ class _GiftDetailState extends State<GiftDetail> {
 
   String? _errorText = '';
 
+  ///Check minMax Value equally//
+  ///
+  // bool checkMinMax(minValue, maxValue) {
+  //   var min = double.parse(minValue['data']['min'].replaceAll(',', ""));
+  //   var max = double.parse(maxValue['data']['max'].replaceAll(',', ""));
+
+  //   return min == max ? true : false;
+  // }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -155,12 +186,9 @@ class _GiftDetailState extends State<GiftDetail> {
     var asset = Provider.of<Asset>(context, listen: true);
     var public = Provider.of<Public>(context, listen: true);
 
-    final arguments = (ModalRoute.of(context)?.settings.arguments ??
-        <String, dynamic>{}) as Map;
+    // print(widget.data);
+    // print(widget.isEqualMinMax);
 
-    // print(asset.getCost['withdraw_min']);
-
-    // print('${asset.getCost['defaultFee']}');
     return Scaffold(
       key: _scaffoldKey,
       drawer: drawer(
@@ -217,7 +245,7 @@ class _GiftDetailState extends State<GiftDetail> {
                   child: Column(
                     children: [
                       Text(
-                        arguments['data']['name'] ?? '',
+                        widget.data['name'] ?? '',
                         style: TextStyle(fontSize: 18),
                       ),
                       Text('Receive a reward of up to x times your entry fee!'),
@@ -331,11 +359,12 @@ class _GiftDetailState extends State<GiftDetail> {
                           key: _formKey,
                           child: TextFormField(
                             controller: _amountcontroller,
+                            enabled: widget.isEqualMinMax,
                             validator: (value) {
                               var min = double.parse(
-                                  arguments['data']['min'].replaceAll(',', ""));
+                                  widget.data['min'].replaceAll(',', ""));
                               var max = double.parse(
-                                  arguments['data']['max'].replaceAll(',', ""));
+                                  widget.data['max'].replaceAll(',', ""));
 
                               if (value == null || value.isEmpty) {
                                 return 'Please enter Amount';
@@ -353,9 +382,9 @@ class _GiftDetailState extends State<GiftDetail> {
                             onChanged: ((value) async {
                               if (value.isNotEmpty) {
                                 await getEstimateRate(
-                                    arguments['data']['BillerID'],
+                                    widget.data['BillerID'],
                                     _amountcontroller.text,
-                                    arguments['data']['currency']['code']);
+                                    widget.data['currency']['code']);
                                 setState(() {
                                   estprice = double.parse(value);
 
@@ -402,8 +431,11 @@ class _GiftDetailState extends State<GiftDetail> {
                                   style:
                                       TextStyle(color: secondaryTextColor400),
                                 ),
-                                Text(asset.accountBalance['allCoinMap']==null?'':asset.accountBalance['allCoinMap']
-                                        [_coinShowName]['allBalance'].toString())
+                                Text(asset.accountBalance['allCoinMap'] == null
+                                    ? ''
+                                    : asset.accountBalance['allCoinMap']
+                                            [_coinShowName]['allBalance']
+                                        .toString())
                               ]),
                         ),
                         Padding(
@@ -423,17 +455,15 @@ class _GiftDetailState extends State<GiftDetail> {
                                         getCoinName(_defaultCoin.toString()))
                               ]),
                         ),
-                        arguments['data']['is_a_range']
+                        widget.data['is_a_range']
                             ? Container(
                                 padding: EdgeInsets.only(bottom: 30),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                        'Min price: ${arguments['data']['min']}'),
-                                    Text(
-                                        'Max price: ${arguments['data']['max']}'),
+                                    Text('Min price: ${widget.data['min']}'),
+                                    Text('Max price: ${widget.data['max']}'),
                                   ],
                                 ),
                               )
@@ -443,15 +473,15 @@ class _GiftDetailState extends State<GiftDetail> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                        'Min price: ${arguments['data']['min']}'),
-                                    Text(
-                                        'Max price: ${arguments['data']['max']}'),
+                                    Text('Min price: ${widget.data['min']}'),
+                                    Text('Max price: ${widget.data['max']}'),
                                   ],
                                 ),
                               ),
                         LyoButton(
                           onPressed: (() async {
+                            print(_amountcontroller.text);
+                            print(estimateprice);
                             // print(double.parse(double.parse('${estimateprice}')
                             //     .toStringAsFixed(4)));
                             if (_formKey.currentState!.validate()) {
@@ -462,8 +492,8 @@ class _GiftDetailState extends State<GiftDetail> {
                                           double.parse('${estimateprice}')
                                               .toStringAsFixed(4)),
                                       defaultcoin: _defaultCoin,
-                                      productID: arguments['data']['BillerID']
-                                          .toString()));
+                                      productID:
+                                          widget.data['BillerID'].toString()));
                             }
                           }),
                           text: 'Continue',

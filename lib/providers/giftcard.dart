@@ -252,6 +252,7 @@ class GiftCardProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
+      print(responseData);
 
       if (responseData['code'] == 200) {
         isEstimate = false;

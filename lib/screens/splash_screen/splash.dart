@@ -50,7 +50,6 @@ class _SpashScreenState extends State<SpashScreen>
     await public.getPublicInfoMarket();
     if (public.headerSymbols.isEmpty) {
       await setHeaderSymbols();
-      
     }
     return;
   }

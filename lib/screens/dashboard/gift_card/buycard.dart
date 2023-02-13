@@ -139,6 +139,7 @@ class _BuyCardState extends State<BuyCard> {
     var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
         var asset = Provider.of<Asset>(context, listen: true);
     final args = ModalRoute.of(context)!.settings.arguments as BuyCard;
+    print(args.totalprice);
     return Scaffold(
         appBar: AppBar(
           leading: IconButton(

@@ -208,7 +208,7 @@ class MyApp extends StatelessWidget {
               FutureMarketTransaction.routeName: (context) =>
                   const FutureMarketTransaction(),
               GiftCard.routeName: (context) => const GiftCard(),
-              GiftDetail.routeName: (context) => const GiftDetail(),
+              GiftDetail.routeName: (context) =>  GiftDetail(),
               TradeChallengeScreen.routeName: (context) =>
                   const TradeChallengeScreen(),
               RewardCenterScreen.routeName: (context) =>

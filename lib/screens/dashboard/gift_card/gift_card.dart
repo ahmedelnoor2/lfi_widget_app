@@ -10,6 +10,7 @@ import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/screens/dashboard/gift_card/catalog.dart';
 import 'package:lyotrade/screens/dashboard/gift_card/country_drawer.dart';
+import 'package:lyotrade/screens/dashboard/gift_card/gift_detail.dart';
 
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
@@ -446,11 +447,35 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
 
                                     return ListTile(
                                       onTap: () {
-                                        Navigator.pushNamed(
+                                        var min = double.parse(
+                                            currentindex['min']
+                                                .replaceAll(',', ""));
+                                        var max = double.parse(
+                                            currentindex['max']
+                                                .replaceAll(',', ""));
+                                        print(min == max);
+                                        Navigator.push(
                                           context,
-                                          '/gift_detail',
-                                          arguments: {'data': currentindex},
+                                          PageRouteBuilder(
+                                            settings: RouteSettings(
+                                              name: GiftDetail.routeName,
+                                            ),
+                                            pageBuilder: (context, animation1,
+                                                    animation2) =>
+                                                GiftDetail(
+                                              data: currentindex,
+                                              isEqualMinMax:
+                                                  min == max ? false : true,
+                                            ),
+                                            transitionDuration:
+                                                Duration(seconds: 0),
+                                          ),
                                         );
+                                        // Navigator.pushNamed(
+                                        //   context,
+                                        //   '/gift_detail',
+                                        //   arguments: {'data': currentindex,'isEqualMinMax':min==max?false:true},
+                                        // );
                                       },
                                       leading: Container(
                                         width: 100,
