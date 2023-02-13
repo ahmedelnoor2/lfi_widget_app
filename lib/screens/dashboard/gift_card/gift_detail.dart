@@ -28,7 +28,7 @@ class _GiftDetailState extends State<GiftDetail> {
   List _allNetworks = [];
   String _defaultNetwork = 'BSC';
   String _coinShowName = 'USDT';
-  double? estimateprice = 0.0;
+  double estimateprice = 0.0;
   double estprice = 0.0;
 
   final TextEditingController _searchController = TextEditingController();
@@ -321,7 +321,7 @@ class _GiftDetailState extends State<GiftDetail> {
                                     Container(
                                       padding: EdgeInsets.only(right: 5),
                                       child: Text(
-                                        getCoinName(_defaultCoin),
+                                        _coinShowName,
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
@@ -431,11 +431,20 @@ class _GiftDetailState extends State<GiftDetail> {
                                   style:
                                       TextStyle(color: secondaryTextColor400),
                                 ),
-                                Text(asset.accountBalance['allCoinMap'] == null
-                                    ? ''
-                                    : asset.accountBalance['allCoinMap']
-                                            [_coinShowName]['allBalance']
-                                        .toString())
+                                Row(
+                                  children: [
+                                    Text(asset.accountBalance['allCoinMap'] == null
+                                        ? ''
+                                        : asset.accountBalance['allCoinMap']
+                                                [_coinShowName]['allBalance']
+                                            .toString()),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 4),
+                                    child: Text(
+                                          _coinShowName),
+                                  )
+                                  ],
+                                )
                               ]),
                         ),
                         Padding(
@@ -450,9 +459,9 @@ class _GiftDetailState extends State<GiftDetail> {
                                 ),
                                 giftcardprovider.isEstimate
                                     ? CircularProgressIndicator()
-                                    : Text('${estimateprice}'
+                                    : Text('${estimateprice.toStringAsFixed(4)}'
                                             ' ' +
-                                        getCoinName(_defaultCoin.toString()))
+                                        _coinShowName)
                               ]),
                         ),
                         widget.data['is_a_range']
@@ -485,6 +494,7 @@ class _GiftDetailState extends State<GiftDetail> {
                             // print(double.parse(double.parse('${estimateprice}')
                             //     .toStringAsFixed(4)));
                             if (_formKey.currentState!.validate()) {
+                              print(_coinShowName);
                               Navigator.pushNamed(context, '/buy_card',
                                   arguments: BuyCard(
                                       amount: _amountcontroller.text,
@@ -492,6 +502,7 @@ class _GiftDetailState extends State<GiftDetail> {
                                           double.parse('${estimateprice}')
                                               .toStringAsFixed(4)),
                                       defaultcoin: _defaultCoin,
+                                      ShowName: _coinShowName,
                                       productID:
                                           widget.data['BillerID'].toString()));
                             }

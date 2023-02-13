@@ -1,6 +1,5 @@
 import 'dart:async';
 
-
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
@@ -22,12 +21,14 @@ class BuyCard extends StatefulWidget {
       this.amount,
       this.totalprice,
       this.defaultcoin,
+      this.ShowName,
       this.productID})
       : super(key: key);
 
   final String? amount;
   final double? totalprice;
   final String? defaultcoin;
+  final String? ShowName;
   final String? productID;
 
   @override
@@ -119,7 +120,7 @@ class _BuyCardState extends State<BuyCard> {
       "smsValidCode": verifitypre == 'smsValidCode' ? _optcontroller.text : "",
       "googleCode": _googlecodecontroller.text
     });
-   // print(withdrwalResponse);
+    // print(withdrwalResponse);
   }
 
   Future<void> dotransaction(productid, amount) async {
@@ -137,9 +138,10 @@ class _BuyCardState extends State<BuyCard> {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
-        var asset = Provider.of<Asset>(context, listen: true);
+    var asset = Provider.of<Asset>(context, listen: true);
     final args = ModalRoute.of(context)!.settings.arguments as BuyCard;
-    print(args.totalprice);
+
+    //print(args.ShowName);
     return Scaffold(
         appBar: AppBar(
           leading: IconButton(
@@ -234,7 +236,7 @@ class _BuyCardState extends State<BuyCard> {
                         child: Text(
                           '${double.parse(args.totalprice.toString()).toStringAsPrecision(7)}' +
                               ' ' +
-                              getCoinName(args.defaultcoin.toString()),
+                              args.ShowName.toString(),
                           style: TextStyle(
                               fontSize: 32, fontWeight: FontWeight.bold),
                         )),
@@ -244,10 +246,11 @@ class _BuyCardState extends State<BuyCard> {
                     Container(
                       padding: EdgeInsets.only(bottom: 10),
                       child: Text(
-                        
-                        'WithDrawal Fee:'+'${asset.getCost['defaultFee']??''}',
+                        'WithDrawal Fee:' +
+                            '${asset.getCost['defaultFee'] ?? ''}',
                         style: TextStyle(color: warningColor),
-                        ),)
+                      ),
+                    )
                   ],
                 ),
               ),
