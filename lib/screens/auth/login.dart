@@ -238,6 +238,7 @@ class _Login extends State<Login> {
                   )
                 : Captcha(
                     onCaptchaVerification: (value) {
+                      print(value);
                       toggleLoginButton(true);
                       if (value.containsKey('sig')) {
                       } else {

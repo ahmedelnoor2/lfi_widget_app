@@ -166,7 +166,7 @@ class MyApp extends StatelessWidget {
               Security.routeName: (context) => const Security(),
               Phone.routeName: (context) => const Phone(),
               Password.routeName: (context) => const Password(),
-              Forgotpassword.routeName: (context) => const Forgotpassword(),
+              Forgotpassword.routeName: (context) =>  Forgotpassword(),
               GoogleAuth.routeName: (context) => const GoogleAuth(),
               EmailChange.routeName: (context) => const EmailChange(),
               Transactions.routeName: (context) => const Transactions(),

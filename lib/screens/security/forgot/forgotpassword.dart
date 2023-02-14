@@ -11,7 +11,7 @@ import 'forgotlphoneform.dart';
 
 class Forgotpassword extends StatefulWidget {
   static const routeName = '/forgotForgotpassword';
-  const Forgotpassword({Key? key}) : super(key: key);
+  const Forgotpassword({Key? key,}) : super(key: key);
 
   @override
   State<Forgotpassword> createState() => _ForgotpasswordState();
@@ -157,6 +157,7 @@ class _ForgotpasswordState extends State<Forgotpassword>
                       ),
                       Expanded(
                         child: TabBarView(
+                          physics: NeverScrollableScrollPhysics(),
                           controller: _tabController,
                           children: _pages.map((
                             Widget tab,

@@ -1,12 +1,20 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_aliyun_captcha/flutter_aliyun_captcha.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/screens/common/captcha.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:webviewx/webviewx.dart';
 
 import '../../../utils/Colors.utils.dart';
 
@@ -24,13 +32,50 @@ class _ForgotemailformState extends State<Forgotemailform> {
   final TextEditingController _emailcontroller = TextEditingController();
   final TextEditingController _smscontroller = TextEditingController();
 
+  Map _captchaVerification = {};
   late Timer _timer;
   int _start = 90;
   bool _startTimer = false;
+  var uuid = const Uuid();
+  var _channel;
+  String _verificationType = '';
+  WebViewXController? _controller;
+  static final AliyunCaptchaController _captchaController =
+      AliyunCaptchaController();
+  bool _enableLogin = true;
+  String _sessionId = '';
 
   @override
   void initState() {
     super.initState();
+    setState(() {
+      _sessionId = uuid.v1();
+    });
+    if (kIsWeb) {
+      connectWebSocket();
+    }
+    checkVerificationMethod();
+  }
+
+  Future<void> connectWebSocket() async {
+    _channel = WebSocketChannel.connect(
+      Uri.parse('wss://api.m.lyotrade.com:8060/'),
+    );
+
+    _channel.sink.add(_sessionId);
+
+    _channel.stream.listen((message) {
+      extractStreamData(message);
+    });
+  }
+
+  void extractStreamData(streamData) async {
+    if (streamData != null) {
+      final data = jsonDecode(streamData);
+      setState(() {
+        _captchaVerification = data['data'];
+      });
+    }
   }
 
   @override
@@ -38,7 +83,9 @@ class _ForgotemailformState extends State<Forgotemailform> {
     _gauthController.dispose();
     _emailcontroller.dispose();
     _smscontroller.dispose();
-
+    if (_channel != null) {
+      _channel.sink.close();
+    }
     super.dispose();
   }
 
@@ -65,15 +112,30 @@ class _ForgotemailformState extends State<Forgotemailform> {
     );
   }
 
+  void checkVerificationMethod() {
+    var auth = Provider.of<Auth>(context, listen: false);
+    auth.setGoogleAuth(false);
+    var public = Provider.of<Public>(context, listen: false);
+
+    if (public.publicInfo.isNotEmpty) {
+      setState(() {
+        _verificationType = public.publicInfo['switch']['verificationType'];
+      });
+    }
+  }
+
   Future<void> forgotPasswordStepOne() async {
     var auth = Provider.of<Auth>(context, listen: false);
     await auth.forgotPasswordStepOne(context, {
-      'geetest_challenge': 'sys_conf_validate',
-      'geetest_seccode': 'sys_conf_validate',
-      'geetest_validate': 'sys_conf_validate',
       'token': true,
-      'verificationType': '0',
+      'verificationType': _verificationType,
       'email': _emailcontroller.text,
+      'csessionid': kIsWeb
+          ? _captchaVerification['csessionid']
+          : _captchaVerification['sessionId'],
+      'sig': _captchaVerification['sig'],
+      'token': _captchaVerification['token'],
+      "scene": "other"
     });
   }
 
@@ -97,6 +159,12 @@ class _ForgotemailformState extends State<Forgotemailform> {
       'token': auth.forgotStepOne['token'],
     });
     _timer.cancel();
+  }
+
+  void toggleLoginButton(value) {
+    setState(() {
+      _enableLogin = value;
+    });
   }
 
   @override
@@ -184,6 +252,39 @@ class _ForgotemailformState extends State<Forgotemailform> {
               ),
             ),
           ),
+          InkWell(
+            onTap: () {
+              FocusManager.instance.primaryFocus?.unfocus();
+            },
+            child: Container(
+              padding: EdgeInsets.all(width * 0.03),
+              child: _verificationType == '1'
+                  ? kIsWeb
+                      ? Align(
+                          alignment: Alignment.center,
+                          child: Container(
+                            width: width,
+                            padding:
+                                EdgeInsets.only(left: 10, top: 10, right: 10),
+                            child: _buildCaptchaView(),
+                          ),
+                        )
+                      : Captcha(
+                          onCaptchaVerification: (value) {
+                            toggleLoginButton(true);
+                            if (value.containsKey('sig')) {
+                            } else {
+                              toggleLoginButton(false);
+                            }
+                            setState(() {
+                              _captchaVerification = value;
+                            });
+                          },
+                          captchaController: _captchaController,
+                        )
+                  : Container(),
+            ),
+          ),
           Container(
             width: width * 0.93,
             child: LyoButton(
@@ -212,6 +313,26 @@ class _ForgotemailformState extends State<Forgotemailform> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildCaptchaView() {
+    return WebViewX(
+      key: const ValueKey('webviewx'),
+      height: height,
+      width: width,
+      initialContent: '<div></div>',
+      initialSourceType: SourceType.html,
+      onWebViewCreated: (controller) async {
+        _controller = controller;
+        await _controller!.loadContent(
+            'https://captcha.m.lyotrade.com?userId=$_sessionId',
+            SourceType.url);
+      },
+      onPageStarted: (src) =>
+          debugPrint('A new page has started loading: $src\n'),
+      onPageFinished: (src) =>
+          debugPrint('The page has finished loading: $src\n'),
     );
   }
 }
