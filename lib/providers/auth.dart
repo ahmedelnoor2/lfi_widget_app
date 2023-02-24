@@ -138,6 +138,7 @@ class Auth with ChangeNotifier {
     await checkLoginSession(ctx);
     notifyListeners();
   }
+
   Future<bool> checkLoginSession(ctx) async {
     final prefs = await SharedPreferences.getInstance();
     final String? catchedAuthToken = prefs.getString('authToken');
@@ -542,7 +543,7 @@ class Auth with ChangeNotifier {
       'googleCode': formData['googleCode'],
       'smsAuthCode': formData['smsAuthCode'],
     });
-print(formData);
+    print(formData);
 
     try {
       final response = await http.post(url, body: postData, headers: headers);

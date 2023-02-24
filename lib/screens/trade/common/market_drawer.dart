@@ -5,13 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/trade.dart';
+import 'package:lyotrade/screens/trade/trade_form.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class MarketDrawer extends StatefulWidget {
-  const MarketDrawer({
+ 
+   MarketDrawer({
     Key? key,
     this.scaffoldKey,
     this.updateMarket,
@@ -26,6 +28,7 @@ class MarketDrawer extends StatefulWidget {
 
 class _MarketDrawerState extends State<MarketDrawer>
     with SingleTickerProviderStateMixin {
+       TradeForm myclass=TradeForm();
   TabController? _tabController;
   final TextEditingController _searchController = TextEditingController();
 
@@ -210,6 +213,7 @@ class _MarketDrawerState extends State<MarketDrawer>
                           setState(() {
                             _loadMarketChange = true;
                           });
+                          public.clearpriceFieldText();   ///price controller clear textSS
                           await public.setActiveMarket(_market);
                           trading.setPrecessionValue(public
                                                   .publicInfoMarket['market']

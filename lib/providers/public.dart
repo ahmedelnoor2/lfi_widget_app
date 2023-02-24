@@ -13,6 +13,24 @@ import 'package:lyotrade/utils/Translate.utils.dart';
 import 'package:vibration/vibration.dart';
 
 class Public with ChangeNotifier {
+  final TextEditingController _priceField = TextEditingController();
+  //final TextEditingController _totalField = TextEditingController();
+
+  TextEditingController get priceField => _priceField;
+  
+  //TextEditingController get totalField => _totalField;
+
+  void clearpriceFieldText() {
+    _priceField.clear();
+ ///   _totalField.clear();
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _priceField.dispose();
+    super.dispose();
+  }
   Map<String, String> headers = {
     'Content-type': 'application/json;charset=utf-8',
     'Accept': 'application/json',

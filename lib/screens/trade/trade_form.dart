@@ -32,7 +32,7 @@ class TradeForm extends StatefulWidget {
 class _TradeFormState extends State<TradeForm> {
   final _formTradeKey = GlobalKey<FormState>();
   final TextEditingController _amountField = TextEditingController();
-  final TextEditingController _priceField = TextEditingController();
+
   final TextEditingController _totalField = TextEditingController();
 
   var _timer;
@@ -57,8 +57,9 @@ class _TradeFormState extends State<TradeForm> {
 
   @override
   void dispose() {
+    var public = Provider.of<Public>(context, listen: false);
     _amountField.dispose();
-    _priceField.dispose();
+    public.dispose();
     _totalField.dispose();
     if (_timer != null) {
       _timer.cancel();
@@ -67,7 +68,8 @@ class _TradeFormState extends State<TradeForm> {
   }
 
   void updateLastPrice() {
-    _priceField.text = widget.lastPrice;
+    var public = Provider.of<Public>(context, listen: false);
+    public.priceField.text = widget.lastPrice;
     setState(() {
       _price = double.parse(widget.lastPrice);
     });
@@ -122,13 +124,13 @@ class _TradeFormState extends State<TradeForm> {
       }
     }
     if (field == 'price') {
-      if (_priceField.text.isNotEmpty) {
+      if (public.priceField.text.isNotEmpty) {
         setState(() {
-          _price = double.parse(_priceField.text);
-          _total = double.parse(_priceField.text) * _amount;
+          _price = double.parse(public.priceField.text);
+          _total = double.parse(public.priceField.text) * _amount;
         });
         _totalField.text = truncateTo(
-            '${double.parse(_priceField.text) * _amount}',
+            '${double.parse(public.priceField.text) * _amount}',
             public.activeMarket.isNotEmpty ? public.activeMarket['price'] : 4);
       } else {
         setState(() {
@@ -156,7 +158,7 @@ class _TradeFormState extends State<TradeForm> {
 
   Future<void> setPriceField() async {
     var public = Provider.of<Public>(context, listen: false);
-    _priceField.text = public.amountField;
+    public.priceField.text = public.amountField;
     _timer = Timer(Duration(milliseconds: 400), () async {
       await public.amountFieldDisable();
     });
@@ -167,13 +169,16 @@ class _TradeFormState extends State<TradeForm> {
     double minSell = public.activeMarket.isNotEmpty
         ? public.activeMarket['marketSellMin']
         : 0.00;
+    String marketSellMin = public.activeMarket['multiple'].toString();
 
+    print(marketSellMin);
     var amountValue = (double.parse(asset.accountBalance['allCoinMap']
             [public.activeMarket['name'].split('/')[0]]['normal_balance']) *
         percentage);
     if (amountValue >= minSell) {
+      print(amountValue);
       return truncateTo('$amountValue',
-          public.activeMarket.isNotEmpty ? public.activeMarket['price'] : 4);
+          public.activeMarket.isNotEmpty ? int.parse(marketSellMin) : 4);
     } else {
       return '0.00';
     }
@@ -200,7 +205,7 @@ class _TradeFormState extends State<TradeForm> {
     var public = Provider.of<Public>(context, listen: false);
     var formData = {
       "price": _orderType == 1
-          ? _priceField.text
+          ? public.priceField.text
           : (_orderType == 2)
               ? null
               : public.lastPrice,
@@ -210,7 +215,7 @@ class _TradeFormState extends State<TradeForm> {
       "volume":
           (_orderType == 2 && _isBuy) ? _totalField.text : _amountField.text,
     };
-
+    print(formData);
     await trading.createOrder(context, auth, formData);
     getOpenOrders();
     setAvailalbePrice();
@@ -271,7 +276,7 @@ class _TradeFormState extends State<TradeForm> {
                       setAvailalbePrice();
                     },
                     child: Text(
-                 languageprovider.getlanguage['trade']['buy_btn']??'Buy',
+                      languageprovider.getlanguage['trade']['buy_btn'] ?? 'Buy',
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
@@ -293,7 +298,8 @@ class _TradeFormState extends State<TradeForm> {
                       setAvailalbePrice();
                     },
                     child: Text(
-                  languageprovider.getlanguage['trade']['sell_btn']?? 'Sell',
+                      languageprovider.getlanguage['trade']['sell_btn'] ??
+                          'Sell',
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
@@ -318,7 +324,11 @@ class _TradeFormState extends State<TradeForm> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    _orderType == 1 ?languageprovider.getlanguage['trade']['dropdown1']?? 'Limit' :languageprovider.getlanguage['trade']['dropdown2']??  'Market',
+                    _orderType == 1
+                        ? languageprovider.getlanguage['trade']['dropdown1'] ??
+                            'Limit'
+                        : languageprovider.getlanguage['trade']['dropdown2'] ??
+                            'Market',
                     style: TextStyle(fontSize: 16),
                   ),
                   Icon(
@@ -334,8 +344,10 @@ class _TradeFormState extends State<TradeForm> {
               });
             },
             itemBuilder: (ctx) => [
-              _buildPopupMenuItem(languageprovider.getlanguage['trade']['dropdown1'], 1),
-              _buildPopupMenuItem(languageprovider.getlanguage['trade']['dropdown2'], 2),
+              _buildPopupMenuItem(
+                  languageprovider.getlanguage['trade']['dropdown1'], 1),
+              _buildPopupMenuItem(
+                  languageprovider.getlanguage['trade']['dropdown2'], 2),
             ],
           ),
           (_orderType == 2)
@@ -390,7 +402,7 @@ class _TradeFormState extends State<TradeForm> {
                             calculateTotal('price');
                           },
                           onTap: () {
-                            if (_priceField.text.isEmpty) {
+                            if (public.priceField.text.isEmpty) {
                               updateLastPrice();
                             }
                           },
@@ -404,7 +416,7 @@ class _TradeFormState extends State<TradeForm> {
                             }
                             return null;
                           },
-                          controller: _priceField,
+                          controller: public.priceField,
                           style: TextStyle(fontSize: 16),
                           inputFormatters: [
                             DecimalTextInputFormatter(
