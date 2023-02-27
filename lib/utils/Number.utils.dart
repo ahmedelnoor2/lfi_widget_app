@@ -44,5 +44,7 @@ String truncateTo(String stringValue, int maxLength) => stringValue
         2
     ? (stringValue.split('.')[1].length <= maxLength)
         ? stringValue
-        : '${stringValue.split('.')[0]}.${stringValue.split('.')[1].substring(0, maxLength)}'
+        : maxLength <= 0
+            ? stringValue.split('.')[0]
+            : '${stringValue.split('.')[0]}.${stringValue.split('.')[1].substring(0, maxLength)}'
     : stringValue;

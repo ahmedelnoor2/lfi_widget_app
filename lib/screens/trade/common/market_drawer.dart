@@ -12,8 +12,7 @@ import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class MarketDrawer extends StatefulWidget {
- 
-   MarketDrawer({
+  MarketDrawer({
     Key? key,
     this.scaffoldKey,
     this.updateMarket,
@@ -28,7 +27,7 @@ class MarketDrawer extends StatefulWidget {
 
 class _MarketDrawerState extends State<MarketDrawer>
     with SingleTickerProviderStateMixin {
-       TradeForm myclass=TradeForm();
+  TradeForm myclass = TradeForm();
   TabController? _tabController;
   final TextEditingController _searchController = TextEditingController();
 
@@ -213,7 +212,10 @@ class _MarketDrawerState extends State<MarketDrawer>
                           setState(() {
                             _loadMarketChange = true;
                           });
-                          public.clearpriceFieldText();   ///price controller clear textSS
+                          print(public.activeMarket);
+                          public.clearpriceFieldText();
+
+                          ///price controller clear textSS
                           await public.setActiveMarket(_market);
                           trading.setPrecessionValue(public
                                                   .publicInfoMarket['market']

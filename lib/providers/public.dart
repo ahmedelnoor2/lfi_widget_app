@@ -31,6 +31,7 @@ class Public with ChangeNotifier {
     _priceField.dispose();
     super.dispose();
   }
+  
   Map<String, String> headers = {
     'Content-type': 'application/json;charset=utf-8',
     'Accept': 'application/json',

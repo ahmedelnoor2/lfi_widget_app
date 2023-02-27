@@ -172,6 +172,8 @@ class _TradeFormState extends State<TradeForm> {
     String marketSellMin = public.activeMarket['multiple'].toString();
 
     print(marketSellMin);
+    print(public.activeMarket);
+
     var amountValue = (double.parse(asset.accountBalance['allCoinMap']
             [public.activeMarket['name'].split('/')[0]]['normal_balance']) *
         percentage);
@@ -477,6 +479,8 @@ class _TradeFormState extends State<TradeForm> {
                         width: 100,
                         child: TextFormField(
                           onChanged: (value) {
+                            print('click');
+                            print(value);
                             calculateTotal('amount');
                           },
                           textAlign: TextAlign.center,
@@ -493,13 +497,13 @@ class _TradeFormState extends State<TradeForm> {
                           style: TextStyle(fontSize: 16),
                           inputFormatters: [
                             FilteringTextInputFormatter.allow(
-                                RegExp(r'^\d*\.?\d{0,2}')),
+                                RegExp(r'^\d*\.?\d{0,9}')),
                             DecimalTextInputFormatter(
                                 decimalRange:
-                                    public.activeMarket['volume'] == null ||
-                                            public.activeMarket['volume'] == 0
+                                    public.activeMarket['multiple'] == null ||
+                                            public.activeMarket['multiple'] == 0
                                         ? 4
-                                        : public.activeMarket['volume'],
+                                        : public.activeMarket['multiple'],
                                 coUnit: 2),
                           ],
                           keyboardType:
