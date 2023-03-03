@@ -456,7 +456,7 @@ class _TransferAssetsState extends State<TransferAssets> {
                                           builder: (BuildContext context) {
                                             return StatefulBuilder(
                                               builder: (BuildContext context,
-                                                  StateSetter setState) {
+                                                  StateSetter ) {
                                                 return selectPair(context,
                                                     public, asset, setState);
                                               },

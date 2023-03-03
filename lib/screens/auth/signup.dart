@@ -40,7 +40,8 @@ class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
   static final AliyunCaptchaController _captchaController =
       AliyunCaptchaController();
   late final TabController _tabController =
-      TabController(length: 2, vsync: this);
+      TabController(length: 1, vsync: this);
+
   bool _enableSignup = true;
   final _formKey = GlobalKey<FormState>();
 
@@ -52,7 +53,7 @@ class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
 
   bool _readPassword = true;
   bool _readConfirmPassword = true;
-  
+
   String _sessionId = '';
 
   late TextEditingController _emailOrPhone;
@@ -108,7 +109,7 @@ class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
   }
 
   void checkVerificationMethod() {
-    var auth  =Provider.of<Auth>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
     auth.setGoogleAuth(false);
     var public = Provider.of<Public>(context, listen: false);
 
@@ -129,7 +130,7 @@ class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
-var auth=Provider.of<Auth>(context,listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -143,7 +144,7 @@ var auth=Provider.of<Auth>(context,listen: false);
                 child: const Text(
                   'Sign Up',
                   style: TextStyle(
-                    fontSize: 32,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -178,10 +179,10 @@ var auth=Provider.of<Auth>(context,listen: false);
               padding: EdgeInsets.only(right: 25),
               child: Tab(text: 'Email'),
             ),
-            Padding(
-              padding: EdgeInsets.only(right: 25),
-              child: Tab(text: 'Mobile Phone'),
-            ),
+            // Padding(
+            //   padding: EdgeInsets.only(right: 25),
+            //   child: Tab(text: ''),
+            // ),
           ],
           controller: _tabController,
         ),
@@ -208,58 +209,58 @@ var auth=Provider.of<Auth>(context,listen: false);
                         ),
                         controller: _emailOrPhone,
                       ),
-                      Column(
-                        children: [
-                          FormField<String>(
-                            builder: (FormFieldState<String> state) {
-                              return InputDecorator(
-                                decoration: const InputDecoration(
-                                  errorStyle: TextStyle(
-                                    color: Colors.redAccent,
-                                    fontSize: 12,
-                                  ),
-                                  hintText: 'Please select expense',
-                                ),
-                                isEmpty: countries[0]['country'] == 0,
-                                child: DropdownButtonHideUnderline(
-                                  child: FittedBox(
-                                    child: DropdownButton<String>(
-                                      isExpanded: false,
-                                      value: _currentCoutnry,
-                                      isDense: true,
-                                      onChanged: (newValue) {
-                                        setState(() {
-                                          _currentCoutnry = '$newValue';
-                                        });
-                                      },
-                                      items: countries.map((value) {
-                                        return DropdownMenuItem<String>(
-                                          value: '${value['code']}',
-                                          child: Text(
-                                              '${value['country']} ${value['code']}'),
-                                        );
-                                      }).toList(),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                          TextFormField(
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter phone number';
-                              }
-                              return null;
-                            },
-                            keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                              labelText: 'Phone Number',
-                            ),
-                            controller: _emailOrPhone,
-                          ),
-                        ],
-                      ),
+                      // Column(
+                      //   children: [
+                      //     FormField<String>(
+                      //       builder: (FormFieldState<String> state) {
+                      //         return InputDecorator(
+                      //           decoration: const InputDecoration(
+                      //             errorStyle: TextStyle(
+                      //               color: Colors.redAccent,
+                      //               fontSize: 12,
+                      //             ),
+                      //             hintText: 'Please select expense',
+                      //           ),
+                      //           isEmpty: countries[0]['country'] == 0,
+                      //           child: DropdownButtonHideUnderline(
+                      //             child: FittedBox(
+                      //               child: DropdownButton<String>(
+                      //                 isExpanded: false,
+                      //                 value: _currentCoutnry,
+                      //                 isDense: true,
+                      //                 onChanged: (newValue) {
+                      //                   setState(() {
+                      //                     _currentCoutnry = '$newValue';
+                      //                   });
+                      //                 },
+                      //                 items: countries.map((value) {
+                      //                   return DropdownMenuItem<String>(
+                      //                     value: '${value['code']}',
+                      //                     child: Text(
+                      //                         '${value['country']} ${value['code']}'),
+                      //                   );
+                      //                 }).toList(),
+                      //               ),
+                      //             ),
+                      //           ),
+                      //         );
+                      //       },
+                      //     ),
+                      //     TextFormField(
+                      //       validator: (value) {
+                      //         if (value == null || value.isEmpty) {
+                      //           return 'Please enter phone number';
+                      //         }
+                      //         return null;
+                      //       },
+                      //       keyboardType: TextInputType.number,
+                      //       decoration: const InputDecoration(
+                      //         labelText: 'Phone Number',
+                      //       ),
+                      //       controller: _emailOrPhone,
+                      //     ),
+                      //   ],
+                      // ),
                     ],
                   ),
                 ),
@@ -334,7 +335,7 @@ var auth=Provider.of<Auth>(context,listen: false);
                 ),
                 Container(
                   width: width,
-                  padding: const EdgeInsets.only(top: 10),
+                  padding: const EdgeInsets.only(top: 5),
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -432,7 +433,7 @@ var auth=Provider.of<Auth>(context,listen: false);
                     alignment: Alignment.center,
                     child: Container(
                       width: width,
-                      padding: EdgeInsets.only(left: 10, top: 10, right: 10),
+                      padding: EdgeInsets.only(left: 10, top: 0, right: 10),
                       child: _buildCaptchaView(),
                     ),
                   )
@@ -448,7 +449,7 @@ var auth=Provider.of<Auth>(context,listen: false);
                   )
             : Container(),
         Container(
-          padding: EdgeInsets.only(top: 20),
+          padding: EdgeInsets.only(top: 10),
           child: LyoButton(
             text: 'Sign Up',
             active: (_enableSignup && termsAndCondition),
@@ -458,10 +459,8 @@ var auth=Provider.of<Auth>(context,listen: false);
             onPressed: (_enableSignup && termsAndCondition)
                 ? () {
                     if (_formKey.currentState!.validate()) {
-                    
                       //snackAlert(context, SnackTypes.warning, 'Processing...');
                       setState(() {
-                      
                         _enableSignup = false;
                       });
 
@@ -496,6 +495,7 @@ var auth=Provider.of<Auth>(context,listen: false);
       ],
     );
   }
+
   Widget _buildCaptchaView() {
     return WebViewX(
       key: const ValueKey('webviewx'),

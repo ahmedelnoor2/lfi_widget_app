@@ -79,7 +79,7 @@ class _TopGatewayState extends State<TopGateway>
                     tileMode: TileMode.mirror,
                   ),
                 ),
-                padding: EdgeInsets.only(right: 12, left: 12),
+                padding: EdgeInsets.only(right: 4, left: 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

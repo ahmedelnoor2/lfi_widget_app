@@ -249,7 +249,7 @@ class _AuthenticationState extends State<Authentication> {
                 child: CircularProgressIndicator(),
               )
             : Container(
-                padding: EdgeInsets.only(top: width * 0.06),
+                padding: EdgeInsets.only(top: width * 0.01),
                 child: Container(
                   padding: EdgeInsets.only(top: width * 0.1),
                   child: Column(
@@ -258,7 +258,7 @@ class _AuthenticationState extends State<Authentication> {
                     children: [
                       Container(
                         padding: const EdgeInsets.only(left: 10),
-                        height: height * 0.17,
+                        height: height * 0.10,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -282,7 +282,7 @@ class _AuthenticationState extends State<Authentication> {
                                 children: [
                                   const Image(
                                     image: AssetImage('assets/img/logo_s.png'),
-                                    width: 100,
+                                    width: 50,
                                   ),
                                   Text('v$_versionNumber'),
                                 ],
@@ -385,7 +385,7 @@ class _AuthenticationState extends State<Authentication> {
                                 ),
                         ),
                       ),
-                      Spacer()
+                      
                     ],
                   ),
                 ),
