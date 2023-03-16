@@ -68,7 +68,6 @@ class _SettingState extends State<Setting> {
     var auth = Provider.of<Auth>(context, listen: true);
     var languageprovider = Provider.of<LanguageChange>(context, listen: true);
 
-
     return Scaffold(
       appBar: appBar(context, null),
       body: SizedBox(
@@ -80,9 +79,13 @@ class _SettingState extends State<Setting> {
               Card(
                 child: ListTile(
                   leading: const Icon(Icons.notifications),
-                  title:  Text(languageprovider.getlanguage['setting_detail']['option1']['title']??'Notification'),
+                  title: Text(languageprovider.getlanguage['setting_detail']
+                          ['option1']['title'] ??
+                      'Notification'),
                   subtitle: Text(
-                languageprovider.getlanguage['setting_detail']['option1']['text']??    'Turn on receive notfications in my application',
+                    languageprovider.getlanguage['setting_detail']['option1']
+                            ['text'] ??
+                        'Turn on receive notfications in my application',
                     style: TextStyle(
                       color: secondaryTextColor,
                       fontSize: 12,
@@ -142,7 +145,9 @@ class _SettingState extends State<Setting> {
                     _launchHelpSupport();
                   }),
                   leading: const Icon(Icons.support),
-                  title:  Text(languageprovider.getlanguage['setting_detail']['option1']['option2']['title']??'Help Center / Support'),
+                  title: Text(languageprovider.getlanguage['setting_detail']
+                          ['option2']['title'] ??
+                      'Help Center / Support'),
                 ),
               ),
               Card(
@@ -151,7 +156,9 @@ class _SettingState extends State<Setting> {
                     _launchPrivacy();
                   }),
                   leading: const Icon(Icons.policy),
-                  title:  Text(languageprovider.getlanguage['setting_detail']['option1']['option3']['title']??'Privacy Policy'),
+                  title: Text(languageprovider.getlanguage['setting_detail']
+                         ['option3']['title'] ??
+                      'Privacy Policy'),
                 ),
               ),
               Card(
@@ -160,7 +167,9 @@ class _SettingState extends State<Setting> {
                     _launchTermsAndConditons();
                   }),
                   leading: const Icon(Icons.book),
-                  title:  Text(languageprovider.getlanguage['setting_detail']['option1']['option4']['title']??'Terms And Conditions'),
+                  title: Text(languageprovider.getlanguage['setting_detail']
+                          ['option4']['title'] ??
+                      'Terms And Conditions'),
                 ),
               ),
               Card(
@@ -170,7 +179,9 @@ class _SettingState extends State<Setting> {
                         'Cache cleared successfully');
                   }),
                   leading: const Icon(Icons.cached),
-                  title:  Text(languageprovider.getlanguage['setting_detail']['option1']['option5']['title']??'Clear Cache'),
+                  title: Text(languageprovider.getlanguage['setting_detail']
+                        ['option5']['title'] ??
+                      'Clear Cache'),
                 ),
               ),
             ],

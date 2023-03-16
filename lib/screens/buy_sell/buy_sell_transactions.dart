@@ -55,6 +55,7 @@ class _BuySellTransactionsState extends State<BuySellTransactions> {
         ),
       ),
       body: ListView.builder(
+        reverse: true,
         itemCount: payments.allTransactions.length,
         itemBuilder: (context, index) {
           var transaction = payments.allTransactions[index];

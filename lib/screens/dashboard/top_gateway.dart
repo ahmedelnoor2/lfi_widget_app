@@ -105,8 +105,8 @@ class _TopGatewayState extends State<TopGateway>
                                           ['deposit_text'] ??
                                       'Bank Transfer',
                                   softWrap: false,
-                                                          maxLines: 2,
-                                                          overflow: TextOverflow.ellipsis, 
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
@@ -233,14 +233,6 @@ class _TopGatewayState extends State<TopGateway>
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Text(
-                              'Easy & Secure',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: secondaryTextColor,
-                              ),
-                            )
                           ],
                         ),
                       ],

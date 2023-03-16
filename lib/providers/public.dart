@@ -17,12 +17,13 @@ class Public with ChangeNotifier {
   //final TextEditingController _totalField = TextEditingController();
 
   TextEditingController get priceField => _priceField;
-  
+
   //TextEditingController get totalField => _totalField;
 
   void clearpriceFieldText() {
     _priceField.clear();
- ///   _totalField.clear();
+
+    ///   _totalField.clear();
     notifyListeners();
   }
 
@@ -31,7 +32,7 @@ class Public with ChangeNotifier {
     _priceField.dispose();
     super.dispose();
   }
-  
+
   Map<String, String> headers = {
     'Content-type': 'application/json;charset=utf-8',
     'Accept': 'application/json',
@@ -294,17 +295,19 @@ class Public with ChangeNotifier {
   Map get publicInfo {
     return _publicInfo;
   }
+
   List _language = [];
 
   List get language {
     return _language;
   }
+
   String _defaultLanguage = '';
 
   String get defaultLanguage {
     return _defaultLanguage;
   }
-  
+
   Future<void> getPublicInfo() async {
     var url = Uri.https(
       lyoApiUrl,
@@ -320,8 +323,8 @@ class Public with ChangeNotifier {
       final responseData = json.decode(response.body);
       // print(json.decode(response.body.split('window.publicInfo=')[1]));
       _publicInfo = responseData;
-      _language=_publicInfo['lan']['lanList'];
-      _defaultLanguage=publicInfo['lan']['defLan'];
+      _language = _publicInfo['lan']['lanList'];
+      _defaultLanguage = publicInfo['lan']['defLan'];
       return notifyListeners();
     } catch (error) {
       print(error);
@@ -475,7 +478,7 @@ class Public with ChangeNotifier {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
-     
+
       if (responseData['code'] == "0") {
         _rate = responseData['data']['rate'];
         return notifyListeners();
@@ -815,6 +818,7 @@ class Public with ChangeNotifier {
       // throw error;
     }
   }
+
   void vibrateOn() async {
     bool? canVibrate = await Vibration.hasVibrator();
     if (canVibrate != null) {

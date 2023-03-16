@@ -16,6 +16,8 @@ class GiftCardProvider with ChangeNotifier {
     'userId': '',
   };
   String paymentstatus = 'Waiting for payment';
+ 
+
   //// Get Wallet//
   List _allwallet = [];
 
@@ -197,8 +199,8 @@ class GiftCardProvider with ChangeNotifier {
     var name = _toActiveCatalog['brand'].split(" ")[0];
     print(name);
 
-    var url =
-        Uri.https(lyoApiUrl, 'gift-card/cards/$catid/$countrycode', {'name': '$name'});
+    var url = Uri.https(
+        lyoApiUrl, 'gift-card/cards/$catid/$countrycode', {'name': '$name'});
     //  print(url);
 
     try {
@@ -453,7 +455,9 @@ class GiftCardProvider with ChangeNotifier {
         dotransactionloading = false;
         _doTransaction = responseData;
         paymentstatus = 'Completed';
+
         snackAlert(ctx, SnackTypes.success, responseData['msg']);
+        Navigator.pushNamed(ctx, '/gift_transaction_detail');
 
         return notifyListeners();
       } else {
@@ -506,7 +510,7 @@ class GiftCardProvider with ChangeNotifier {
 
       if (responseData['code'] == '200' || responseData['code'] == 200) {
         istransactionloading = false;
-        _transaction = responseData['data'];
+        _transaction = responseData['data'].reversed.toList();
 
         return notifyListeners();
       } else {

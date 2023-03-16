@@ -148,9 +148,10 @@ class _Login extends State<Login> {
             children: [
               Container(
                 padding: const EdgeInsets.only(bottom: 10),
-                child:  Text(
-                  languageprovider.getlanguage.isEmpty?'Sign In':
-                 languageprovider.getlanguage['login_detail']['title'],
+                child: Text(
+                  languageprovider.getlanguage.isEmpty
+                      ? 'Sign In'
+                      : languageprovider.getlanguage['login_detail']['title'],
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
@@ -160,7 +161,8 @@ class _Login extends State<Login> {
               Container(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Text(
-                languageprovider.getlanguage['login_detail']['text']??'Sign In to access your account',
+                  languageprovider.getlanguage['login_detail']['text'] ??
+                      'Sign In to access your account',
                   style: TextStyle(
                     color: secondaryTextColor,
                     fontSize: 16,
@@ -181,8 +183,10 @@ class _Login extends State<Login> {
                   }
                   return null;
                 },
-                decoration:  InputDecoration(
-                  label: Text(languageprovider.getlanguage['login_detail']['field1_placeholder']??"Email or phone number"),
+                decoration: InputDecoration(
+                  label: Text(languageprovider.getlanguage['login_detail']
+                          ['field1_placeholder'] ??
+                      "Email or phone number"),
                   hintText: "Enter your phone number or email",
                 ),
                 controller: _mobileNumber,
@@ -198,7 +202,9 @@ class _Login extends State<Login> {
                   },
                   obscureText: _readPassword,
                   decoration: InputDecoration(
-                    label:  Text(languageprovider.getlanguage['login_detail']['field2_placeholder']??"Password"),
+                    label: Text(languageprovider.getlanguage['login_detail']
+                            ['field2_placeholder'] ??
+                        "Password"),
                     hintText: "Password",
                     suffix: SizedBox(
                       width: 20,
@@ -252,7 +258,8 @@ class _Login extends State<Login> {
         Container(
           padding: EdgeInsets.only(top: 20),
           child: LyoButton(
-            text: languageprovider.getlanguage['login_detail']['login_btn']??'Login',
+            text: languageprovider.getlanguage['login_detail']['login_btn'] ??
+                'Login',
             active: (_enableLogin || kIsWeb),
             isLoading: auth.isLoginloader,
             activeColor: linkColor,
@@ -281,7 +288,8 @@ class _Login extends State<Login> {
                 Navigator.pushNamed(context, '/forgotForgotpassword');
               },
               child: Text(
-           languageprovider.getlanguage['login_detail']['forgot_pwd']?? 'Forgot password?',
+                languageprovider.getlanguage['login_detail']['forgot_pwd'] ??
+                    'Forgot password?',
                 style: TextStyle(
                   color: linkColor,
                   fontWeight: FontWeight.bold,

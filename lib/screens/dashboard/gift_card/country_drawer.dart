@@ -128,20 +128,25 @@ class _CountryDrawerState extends State<CountryDrawer> {
                       itemBuilder: (context, index) {
                         var data = _foundCountry[index];
 
-                        //print(data);
+                    ///  print(data['rate']['rate']);
 
                         return ListTile(
                           onTap: () async {
                             giftcardprovider.setActiveCountry(data);
+
                             searchController.clear();
                             var userid = await auth.userInfo['id'];
                             Navigator.pop(context);
                             await giftcardprovider.getAllCatalog(
-                                context, auth, userid, {
-                              "country":
-                                  giftcardprovider.toActiveCountry['iso2']
-                            }, true);
-                            
+                                context,
+                                auth,
+                                userid,
+                                {
+                                  "country":
+                                      giftcardprovider.toActiveCountry['iso2']
+                                },
+                                true);
+
                             await giftcardprovider.getAllCard(
                                 context, auth, userid);
                           },

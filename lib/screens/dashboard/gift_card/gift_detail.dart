@@ -361,10 +361,13 @@ class _GiftDetailState extends State<GiftDetail> {
                             controller: _amountcontroller,
                             enabled: widget.isEqualMinMax,
                             validator: (value) {
-                              var min = double.parse(
-                                  widget.data['min'].replaceAll(',', ""));
+                              var min = double.parse(widget.data['min']) *
+                                  giftcardprovider.toActiveCountry['rate']
+                                      ['rate'];
                               var max = double.parse(
-                                  widget.data['max'].replaceAll(',', ""));
+                                      widget.data['max'].replaceAll(',', "")) *
+                                  giftcardprovider.toActiveCountry['rate']
+                                      ['rate'];
 
                               if (value == null || value.isEmpty) {
                                 return 'Please enter Amount';
@@ -433,16 +436,16 @@ class _GiftDetailState extends State<GiftDetail> {
                                 ),
                                 Row(
                                   children: [
-                                    Text(asset.accountBalance['allCoinMap'] == null
+                                    Text(asset.accountBalance['allCoinMap'] ==
+                                            null
                                         ? ''
                                         : asset.accountBalance['allCoinMap']
                                                 [_coinShowName]['allBalance']
                                             .toString()),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 4),
-                                    child: Text(
-                                          _coinShowName),
-                                  )
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 4),
+                                      child: Text(_coinShowName),
+                                    )
                                   ],
                                 )
                               ]),
@@ -471,8 +474,10 @@ class _GiftDetailState extends State<GiftDetail> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('Min price: ${widget.data['min']}'),
-                                    Text('Max price: ${widget.data['max']}'),
+                                    Text(
+                                        'Min price: ${double.parse(widget.data['min']) * giftcardprovider.toActiveCountry['rate']['rate']}   ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                                    Text(
+                                        'Max price: ${double.parse(widget.data['max'].replaceAll(',', "")) * giftcardprovider.toActiveCountry['rate']['rate']}   ${giftcardprovider.toActiveCountry['currency']['code']}'),
                                   ],
                                 ),
                               )
@@ -489,12 +494,9 @@ class _GiftDetailState extends State<GiftDetail> {
                               ),
                         LyoButton(
                           onPressed: (() async {
-                            print(_amountcontroller.text);
-                            print(estimateprice);
                             // print(double.parse(double.parse('${estimateprice}')
                             //     .toStringAsFixed(4)));
                             if (_formKey.currentState!.validate()) {
-                              print(_coinShowName);
                               Navigator.pushNamed(context, '/buy_card',
                                   arguments: BuyCard(
                                       amount: _amountcontroller.text,

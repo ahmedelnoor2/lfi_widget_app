@@ -9,6 +9,7 @@ import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/common/no_data.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../utils/AppConstant.utils.dart';
@@ -27,6 +28,7 @@ class _GiftCardTransactionState extends State<GiftCardTransaction> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
     getAllTransaction();
   }
 
@@ -177,6 +179,21 @@ class _GiftCardTransactionState extends State<GiftCardTransaction> {
                                                                   ),
                                                                 ),
                                                               ),
+                                                              SizedBox(
+                                                                height: 5,
+                                                              ),
+                                                              SizedBox(
+                                                                child: Text(
+                                                                  'Expiration Date :',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        12,
+                                                                    color:
+                                                                        secondaryTextColor,
+                                                                  ),
+                                                                ),
+                                                              ),
                                                             ],
                                                           ),
                                                         ),
@@ -241,6 +258,19 @@ class _GiftCardTransactionState extends State<GiftCardTransaction> {
                                                   ),
                                                 ),
                                               ),
+                                              Container(
+                                                padding:
+                                                    EdgeInsets.only(right: 5),
+                                                child: Text(
+                                                  currentIndex[
+                                                              'giftCardDetails']
+                                                          [0]['Expiration Date']
+                                                      .toString(),
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              ),
                                             ],
                                           ),
                                         )
@@ -255,48 +285,67 @@ class _GiftCardTransactionState extends State<GiftCardTransaction> {
                                       child: Container(
                                         padding: EdgeInsets.only(left: 5),
                                         child: LyoButton(
-                                          onPressed: () {
-                                            showModalBottomSheet(
-                                              context: context,
-                                              isScrollControlled: true,
-                                              builder: (builder) {
-                                                return new Container(
-                                                  height: MediaQuery.of(context)
-                                                          .size
-                                                          .height /
-                                                      1.1,
-                                                  child: new Container(
-                                                    decoration: new BoxDecoration(
-                                                        borderRadius: new BorderRadius
-                                                                .only(
-                                                            topLeft: const Radius
-                                                                .circular(20.0),
-                                                            topRight: const Radius
-                                                                    .circular(
-                                                                20.0))),
-                                                    child: Container(
-                                                        child: WebView(
-                                                      initialUrl: currentIndex[
-                                                              'giftCardDetails']
-                                                          [0]['Redemption URL'],
-                                                      javascriptMode:
-                                                          JavascriptMode
-                                                              .unrestricted,
-                                                      onPageStarted: (url) {
-                                                        setState(() {
-                                                          isLoading = true;
-                                                        });
-                                                      },
-                                                      onPageFinished: (finish) {
-                                                        setState(() {
-                                                          isLoading = false;
-                                                        });
-                                                      },
-                                                    )),
-                                                  ),
-                                                );
-                                              },
-                                            );
+                                          onPressed: () async {
+                                            _launchPDF(
+                                                currentIndex['giftCardDetails']
+                                                    [0]['Redemption URL']);
+                                            // print('i am calling ');
+                                            // ///   print(currentIndex);
+                                            // print(
+                                            //     currentIndex['giftCardDetails']
+                                            //         [0]['Redemption URL']);
+                                            // // showModalBottomSheet(
+                                            // //   context: context,
+                                            // //   isScrollControlled: true,
+                                            // //   builder: (builder) {
+                                            // //     return new Container(
+                                            // //       height: MediaQuery.of(context)
+                                            // //               .size
+                                            // //               .height /
+                                            // //           1.1,
+                                            // //       child: Stack(
+                                            // //         children: [
+                                            // //           new Container(
+                                            // //             decoration: new BoxDecoration(
+                                            // //                 borderRadius: new BorderRadius
+                                            // //                         .only(
+                                            // //                     topLeft:
+                                            // //                         const Radius
+                                            // //                                 .circular(
+                                            // //                             20.0),
+                                            // //                     topRight:
+                                            // //                         const Radius
+                                            // //                                 .circular(
+                                            // //                             20.0))),
+                                            // //             child: Container(
+                                            // //                 child: WebView(
+                                            // //               initialUrl: currentIndex[
+                                            // //                       'giftCardDetails'][0]
+                                            // //                   [
+                                            // //                   'Redemption URL'],
+                                            // //               javascriptMode:
+                                            // //                   JavascriptMode
+                                            // //                       .unrestricted,
+                                            // //               onPageStarted: (url) {
+                                            // //                 setState(() {
+                                            // //                   isLoading = true;
+                                            // //                 });
+                                            // //               },
+                                            // //               onPageFinished:
+                                            // //                   (finish) {
+                                            // //                 setState(() {
+                                            // //                   isLoading = false;
+                                            // //                   print(isLoading);
+                                            // //                 });
+                                            // //               },
+                                            // //             )),
+                                            // //           ),
+
+                                            // //         ],
+                                            // //       ),
+                                            // //     );
+                                            // //   },
+                                            // //  );
                                           },
                                           text: 'Redeem',
                                           active: true,
@@ -317,5 +366,14 @@ class _GiftCardTransactionState extends State<GiftCardTransaction> {
         ),
       ),
     );
+  }
+
+  Future<void> _launchPDF(url) async {
+    var _url = Uri.parse(url);
+    if (await canLaunch(url)) {
+      await launchUrl(_url, mode: LaunchMode.externalApplication);
+    } else {
+      throw 'Could not launch PDF';
+    }
   }
 }

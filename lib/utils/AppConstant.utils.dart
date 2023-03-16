@@ -30,6 +30,7 @@ var getfavmarkert = '/admin';
 var incrementApi = kIsWeb ? '/api/fe-increment-api' : '/fe-increment-api';
 var openApiUrl = 'openapi.lyotrade.com';
 var rewardcenterApi='fe-task-api';
+var binacebase_api='binance.com';
 
 var dexSwapApi = kIsWeb ? 'api.m.lyotrade.com' : 'api.changenow.io';
 var exDexSwap = kIsWeb ? '/changenow' : '';

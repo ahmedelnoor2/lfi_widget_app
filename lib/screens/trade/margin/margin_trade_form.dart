@@ -233,7 +233,7 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
                       setAvailalbePrice();
                     },
                     child: Text(
-                   languageprovider.getlanguage['trade']['buy_btn']??   'Buy',
+                      languageprovider.getlanguage['trade']['buy_btn'] ?? 'Buy',
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
@@ -252,7 +252,8 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
                       setAvailalbePrice();
                     },
                     child: Text(
-                   languageprovider.getlanguage['trade']['sell_btn']??     'Sell',
+                      languageprovider.getlanguage['trade']['sell_btn'] ??
+                          'Sell',
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
@@ -277,7 +278,11 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    _orderType == 1 ? languageprovider.getlanguage['trade']['dropdown1']??  'Limit' : languageprovider.getlanguage['trade']['dropdown2']?? 'Market',
+                    _orderType == 1
+                        ? languageprovider.getlanguage['trade']['dropdown1'] ??
+                            'Limit'
+                        : languageprovider.getlanguage['trade']['dropdown2'] ??
+                            'Market',
                     style: TextStyle(fontSize: 16),
                   ),
                   Icon(
@@ -293,8 +298,13 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
               });
             },
             itemBuilder: (ctx) => [
-              _buildPopupMenuItem(languageprovider.getlanguage['trade']['dropdown1']?? 'Limit', 1),
-              _buildPopupMenuItem(languageprovider.getlanguage['trade']['dropdown2']?? 'Market', 2),
+              _buildPopupMenuItem(
+                  languageprovider.getlanguage['trade']['dropdown1'] ?? 'Limit',
+                  1),
+              _buildPopupMenuItem(
+                  languageprovider.getlanguage['trade']['dropdown2'] ??
+                      'Market',
+                  2),
             ],
           ),
           (_orderType == 2)
@@ -579,7 +589,7 @@ class _MarginTradeFormState extends State<MarginTradeForm> {
               ),
               child: Text(
                 auth.isAuthenticated
-                    ? '${_isBuy ?languageprovider.getlanguage['trade']['buy_btn']??  'Buy' : languageprovider.getlanguage['trade']['sell_btn']??'Sell'} ${public.activeMarket['showName'].split('/')[0]}'
+                    ? '${_isBuy ? languageprovider.getlanguage['trade']['buy_btn'] ?? 'Buy' : languageprovider.getlanguage['trade']['sell_btn'] ?? 'Sell'} ${public.activeMarket['showName'].split('/')[0]}'
                     : 'Login / Sign Up',
                 style: TextStyle(color: Colors.white),
               ),

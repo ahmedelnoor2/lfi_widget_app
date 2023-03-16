@@ -82,6 +82,7 @@ dependencies:
   vibration: ^1.7.6
   universal_html: ^2.0.5
   percent_indicator: ^4.0.1
+  syncfusion_flutter_pdfviewer: ^20.4.53
 
   
   
