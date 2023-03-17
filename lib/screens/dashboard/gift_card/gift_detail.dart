@@ -59,7 +59,7 @@ class _GiftDetailState extends State<GiftDetail> {
     var public = Provider.of<Public>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
     if (widget.isEqualMinMax == false) {
-      _amountcontroller.text = widget.data['max'];
+      _amountcontroller.text = widget.data['max'].replaceAll(',', '');
       var giftcardprovider =
           Provider.of<GiftCardProvider>(context, listen: false);
       var userid = await auth.userInfo['id'];
@@ -185,9 +185,7 @@ class _GiftDetailState extends State<GiftDetail> {
     var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
     var asset = Provider.of<Asset>(context, listen: true);
     var public = Provider.of<Public>(context, listen: true);
-
-    // print(widget.data);
-    // print(widget.isEqualMinMax);
+//print(giftcardprovider.toActiveCountry);
 
     return Scaffold(
       key: _scaffoldKey,
@@ -361,7 +359,8 @@ class _GiftDetailState extends State<GiftDetail> {
                             controller: _amountcontroller,
                             enabled: widget.isEqualMinMax,
                             validator: (value) {
-                              var min = double.parse(widget.data['min']) *
+                              var min = double.parse(
+                                      widget.data['min'].replaceAll(',', "")) *
                                   giftcardprovider.toActiveCountry['rate']
                                       ['rate'];
                               var max = double.parse(
@@ -377,7 +376,7 @@ class _GiftDetailState extends State<GiftDetail> {
                                 return 'Max Amount:$max';
                               } else if (double.parse(value) <
                                   asset.getCost['withdraw_min']) {
-                                return 'Minimum withdrawal amount is ${asset.getCost['withdraw_min']}';
+                                return 'Minimum withdrawal amount is ${asset.getCost['withdraw_min'] * giftcardprovider.toActiveCountry['rate']['rate']} ${giftcardprovider.toActiveCountry['currency']['code']}';
                               }
 
                               return null;
@@ -475,9 +474,9 @@ class _GiftDetailState extends State<GiftDetail> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                        'Min price: ${double.parse(widget.data['min']) * giftcardprovider.toActiveCountry['rate']['rate']}   ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                                        'Min price: ${(num.parse(widget.data['min']) * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsFixed(2)}   ${giftcardprovider.toActiveCountry['currency']['code']}'),
                                     Text(
-                                        'Max price: ${double.parse(widget.data['max'].replaceAll(',', "")) * giftcardprovider.toActiveCountry['rate']['rate']}   ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                                        'Max price: ${(num.parse(widget.data['max'].replaceAll(',', "")) * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsFixed(2)}   ${giftcardprovider.toActiveCountry['currency']['code']}'),
                                   ],
                                 ),
                               )
@@ -487,8 +486,10 @@ class _GiftDetailState extends State<GiftDetail> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('Min price: ${widget.data['min']}'),
-                                    Text('Max price: ${widget.data['max']}'),
+                                    Text(
+                                        'Min price: ${(num.parse(widget.data['min']) * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsFixed(2)}   ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                                    Text(
+                                        'Max price: ${(num.parse(widget.data['max'].replaceAll(',', "")) * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsFixed(2)}   ${giftcardprovider.toActiveCountry['currency']['code']}'),
                                   ],
                                 ),
                               ),

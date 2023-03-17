@@ -157,7 +157,7 @@ class _SettingState extends State<Setting> {
                   }),
                   leading: const Icon(Icons.policy),
                   title: Text(languageprovider.getlanguage['setting_detail']
-                         ['option3']['title'] ??
+                          ['option3']['title'] ??
                       'Privacy Policy'),
                 ),
               ),
@@ -180,7 +180,7 @@ class _SettingState extends State<Setting> {
                   }),
                   leading: const Icon(Icons.cached),
                   title: Text(languageprovider.getlanguage['setting_detail']
-                        ['option5']['title'] ??
+                          ['option5']['title'] ??
                       'Clear Cache'),
                 ),
               ),

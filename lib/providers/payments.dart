@@ -1120,7 +1120,6 @@ class Payments with ChangeNotifier {
       print(responseData);
       if (responseData['code'] == '0') {
         _cpf = responseData;
-
         Navigator.pushNamed(ctx, '/pix_payment_details');
         setCpfStatus(false);
         _isCpfLoading = false;
