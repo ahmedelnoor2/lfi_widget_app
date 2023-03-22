@@ -16,7 +16,6 @@ class GiftCardProvider with ChangeNotifier {
     'userId': '',
   };
   String paymentstatus = 'Waiting for payment';
- 
 
   //// Get Wallet//
   List _allwallet = [];
@@ -380,6 +379,7 @@ class GiftCardProvider with ChangeNotifier {
     headers['userid'] = '${userid}';
 
     var mydata = json.encode(postdata);
+    print("with drwawal response...");
     print(mydata);
 
     var url = Uri.https(lyoApiUrl, 'gift-card/withdraw');
@@ -409,7 +409,6 @@ class GiftCardProvider with ChangeNotifier {
         snackAlert(ctx, SnackTypes.warning, responseData['msg']);
         _iswithdrwal = false;
         _doverify = {};
-
         notifyListeners();
         return false;
       }
@@ -449,7 +448,8 @@ class GiftCardProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-      //  print(responseData);
+      print("Transactopn data...");
+      print(responseData);
 
       if (responseData['code'] == '200' || responseData['code'] == 200) {
         dotransactionloading = false;

@@ -11,6 +11,7 @@ import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../../utils/AppConstant.utils.dart';
 
@@ -24,6 +25,9 @@ class GiftCardTransaction extends StatefulWidget {
 
 class _GiftCardTransactionState extends State<GiftCardTransaction> {
   bool isLoading = true;
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
+  GlobalKey _refresherKey = GlobalKey();
   @override
   void initState() {
     // TODO: implement initState
@@ -83,283 +87,302 @@ class _GiftCardTransactionState extends State<GiftCardTransaction> {
                       ? Center(
                           child: noData("No Transaction."),
                         )
-                      : ListView.builder(
-                          itemCount: giftcardprovider.transaction.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            var currentIndex =
-                                giftcardprovider.transaction[index];
+                      : SmartRefresher(
+                          key: _refresherKey,
+                          controller: _refreshController,
+                          enablePullDown: true,
+                          enablePullUp: false,
+                          physics: BouncingScrollPhysics(),
+                          footer: ClassicFooter(
+                            loadStyle: LoadStyle.ShowWhenLoading,
+                            completeDuration: Duration(milliseconds: 500),
+                          ),
+                          onRefresh: () {
+                            setState(() {
+                              getAllTransaction();
+                              
+                            });
+                          },
+                          child: ListView.builder(
+                            itemCount: giftcardprovider.transaction.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              var currentIndex =
+                                  giftcardprovider.transaction[index];
 
-                            return Card(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  children: [
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        SizedBox(
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Container(
-                                                padding:
-                                                    EdgeInsets.only(left: 15),
-                                                child: Column(
-                                                  children: [
-                                                    Row(
-                                                      children: [
-                                                        SizedBox(
-                                                          child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Container(
-                                                                padding: EdgeInsets
-                                                                    .only(
-                                                                        bottom:
-                                                                            5),
-                                                                child: Text(
-                                                                  'TRX ID :',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        12,
-                                                                    color: Colors
-                                                                        .white,
+                              return Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    children: [
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          SizedBox(
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Container(
+                                                  padding:
+                                                      EdgeInsets.only(left: 15),
+                                                  child: Column(
+                                                    children: [
+                                                      Row(
+                                                        children: [
+                                                          SizedBox(
+                                                            child: Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Container(
+                                                                  padding: EdgeInsets
+                                                                      .only(
+                                                                          bottom:
+                                                                              5),
+                                                                  child: Text(
+                                                                    'TRX ID :',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          12,
+                                                                      color: Colors
+                                                                          .white,
+                                                                    ),
                                                                   ),
                                                                 ),
-                                                              ),
-                                                              Container(
-                                                                padding: EdgeInsets
-                                                                    .only(
-                                                                        bottom:
-                                                                            5),
-                                                                child: Text(
-                                                                  'Name',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        12,
-                                                                    color:
-                                                                        secondaryTextColor,
+                                                                Container(
+                                                                  padding: EdgeInsets
+                                                                      .only(
+                                                                          bottom:
+                                                                              5),
+                                                                  child: Text(
+                                                                    'Name',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          12,
+                                                                      color:
+                                                                          secondaryTextColor,
+                                                                    ),
                                                                   ),
                                                                 ),
-                                                              ),
-                                                              Container(
-                                                                padding: EdgeInsets
-                                                                    .only(
-                                                                        bottom:
-                                                                            5),
-                                                                child: Text(
-                                                                  'Total Amount',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        12,
-                                                                    color:
-                                                                        secondaryTextColor,
+                                                                Container(
+                                                                  padding: EdgeInsets
+                                                                      .only(
+                                                                          bottom:
+                                                                              5),
+                                                                  child: Text(
+                                                                    'Total Amount',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          12,
+                                                                      color:
+                                                                          secondaryTextColor,
+                                                                    ),
                                                                   ),
                                                                 ),
-                                                              ),
-                                                              SizedBox(
-                                                                child: Text(
-                                                                  'Created Date :',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        12,
-                                                                    color:
-                                                                        secondaryTextColor,
+                                                                SizedBox(
+                                                                  child: Text(
+                                                                    'Created Date :',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          12,
+                                                                      color:
+                                                                          secondaryTextColor,
+                                                                    ),
                                                                   ),
                                                                 ),
-                                                              ),
-                                                              SizedBox(
-                                                                height: 5,
-                                                              ),
-                                                              SizedBox(
-                                                                child: Text(
-                                                                  'Expiration Date :',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        12,
-                                                                    color:
-                                                                        secondaryTextColor,
+                                                                SizedBox(
+                                                                  height: 5,
+                                                                ),
+                                                                SizedBox(
+                                                                  child: Text(
+                                                                    'Expiration Date :',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          12,
+                                                                      color:
+                                                                          secondaryTextColor,
+                                                                    ),
                                                                   ),
                                                                 ),
-                                                              ),
-                                                            ],
+                                                              ],
+                                                            ),
                                                           ),
-                                                        ),
-                                                      ],
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            children: [
-                                              Container(
-                                                padding: EdgeInsets.only(
-                                                    bottom: 5, right: 5),
-                                                child: Text(
-                                                  currentIndex['transactionID']
-                                                      .toString(),
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.white,
+                                                        ],
+                                                      )
+                                                    ],
                                                   ),
                                                 ),
-                                              ),
-                                              Container(
-                                                padding:
-                                                    EdgeInsets.only(bottom: 5),
-                                                child: Text(
-                                                  currentIndex['name'] ?? '',
-                                                  style: TextStyle(
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              children: [
+                                                Container(
+                                                  padding: EdgeInsets.only(
+                                                      bottom: 5, right: 5),
+                                                  child: Text(
+                                                    currentIndex[
+                                                            'transactionID']
+                                                        .toString(),
+                                                    style: TextStyle(
                                                       fontSize: 12,
-                                                      color: redIndicator),
-                                                ),
-                                              ),
-                                              Container(
-                                                padding: EdgeInsets.only(
-                                                    bottom: 5, right: 5),
-                                                child: Row(
-                                                  children: [
-                                                    Text(
-                                                      currentIndex['summary'][
-                                                              'totalCustomerCostUSD']
-                                                          .toString(),
-                                                      style: TextStyle(
-                                                        fontSize: 12,
-                                                      ),
+                                                      color: Colors.white,
                                                     ),
-                                                  ],
-                                                ),
-                                              ),
-                                              Container(
-                                                padding:
-                                                    EdgeInsets.only(right: 5),
-                                                child: Text(
-                                                  '${DateFormat('dd-MM-y H:mm').format(DateTime.parse(currentIndex['createdAt']))}',
-                                                  style: TextStyle(
-                                                    fontSize: 12,
                                                   ),
                                                 ),
-                                              ),
-                                              Container(
-                                                padding:
-                                                    EdgeInsets.only(right: 5),
-                                                child: Text(
-                                                  currentIndex[
-                                                              'giftCardDetails']
-                                                          [0]['Expiration Date']
-                                                      .toString(),
-                                                  style: TextStyle(
-                                                    fontSize: 12,
+                                                Container(
+                                                  padding: EdgeInsets.only(
+                                                      bottom: 5),
+                                                  child: Text(
+                                                    currentIndex['name'] ?? '',
+                                                    style: TextStyle(
+                                                        fontSize: 12,
+                                                        color: redIndicator),
                                                   ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 8,
-                                          right: 8,
-                                          top: 16,
-                                          bottom: 8),
-                                      child: Container(
-                                        padding: EdgeInsets.only(left: 5),
-                                        child: LyoButton(
-                                          onPressed: () async {
-                                            _launchPDF(
-                                                currentIndex['giftCardDetails']
-                                                    [0]['Redemption URL']);
-                                            // print('i am calling ');
-                                            // ///   print(currentIndex);
-                                            // print(
-                                            //     currentIndex['giftCardDetails']
-                                            //         [0]['Redemption URL']);
-                                            // // showModalBottomSheet(
-                                            // //   context: context,
-                                            // //   isScrollControlled: true,
-                                            // //   builder: (builder) {
-                                            // //     return new Container(
-                                            // //       height: MediaQuery.of(context)
-                                            // //               .size
-                                            // //               .height /
-                                            // //           1.1,
-                                            // //       child: Stack(
-                                            // //         children: [
-                                            // //           new Container(
-                                            // //             decoration: new BoxDecoration(
-                                            // //                 borderRadius: new BorderRadius
-                                            // //                         .only(
-                                            // //                     topLeft:
-                                            // //                         const Radius
-                                            // //                                 .circular(
-                                            // //                             20.0),
-                                            // //                     topRight:
-                                            // //                         const Radius
-                                            // //                                 .circular(
-                                            // //                             20.0))),
-                                            // //             child: Container(
-                                            // //                 child: WebView(
-                                            // //               initialUrl: currentIndex[
-                                            // //                       'giftCardDetails'][0]
-                                            // //                   [
-                                            // //                   'Redemption URL'],
-                                            // //               javascriptMode:
-                                            // //                   JavascriptMode
-                                            // //                       .unrestricted,
-                                            // //               onPageStarted: (url) {
-                                            // //                 setState(() {
-                                            // //                   isLoading = true;
-                                            // //                 });
-                                            // //               },
-                                            // //               onPageFinished:
-                                            // //                   (finish) {
-                                            // //                 setState(() {
-                                            // //                   isLoading = false;
-                                            // //                   print(isLoading);
-                                            // //                 });
-                                            // //               },
-                                            // //             )),
-                                            // //           ),
+                                                Container(
+                                                  padding: EdgeInsets.only(
+                                                      bottom: 5, right: 5),
+                                                  child: Row(
+                                                    children: [
+                                                      Text(
+                                                        currentIndex['summary'][
+                                                                'totalCustomerCostUSD']
+                                                            .toString(),
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Container(
+                                                  padding:
+                                                      EdgeInsets.only(right: 5),
+                                                  child: Text(
+                                                    '${DateFormat('dd-MM-y H:mm').format(DateTime.parse(currentIndex['createdAt']))}',
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Container(
+                                                  padding:
+                                                      EdgeInsets.only(right: 5),
+                                                  child: Text(
+                                                    currentIndex['giftCardDetails']
+                                                                [0]
+                                                            ['Expiration Date']
+                                                        .toString(),
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 8,
+                                            right: 8,
+                                            top: 16,
+                                            bottom: 8),
+                                        child: Container(
+                                          padding: EdgeInsets.only(left: 5),
+                                          child: LyoButton(
+                                            onPressed: () async {
+                                              _launchPDF(currentIndex[
+                                                      'giftCardDetails'][0]
+                                                  ['Redemption URL']);
+                                              // print('i am calling ');
+                                              // ///   print(currentIndex);
+                                              // print(
+                                              //     currentIndex['giftCardDetails']
+                                              //         [0]['Redemption URL']);
+                                              // // showModalBottomSheet(
+                                              // //   context: context,
+                                              // //   isScrollControlled: true,
+                                              // //   builder: (builder) {
+                                              // //     return new Container(
+                                              // //       height: MediaQuery.of(context)
+                                              // //               .size
+                                              // //               .height /
+                                              // //           1.1,
+                                              // //       child: Stack(
+                                              // //         children: [
+                                              // //           new Container(
+                                              // //             decoration: new BoxDecoration(
+                                              // //                 borderRadius: new BorderRadius
+                                              // //                         .only(
+                                              // //                     topLeft:
+                                              // //                         const Radius
+                                              // //                                 .circular(
+                                              // //                             20.0),
+                                              // //                     topRight:
+                                              // //                         const Radius
+                                              // //                                 .circular(
+                                              // //                             20.0))),
+                                              // //             child: Container(
+                                              // //                 child: WebView(
+                                              // //               initialUrl: currentIndex[
+                                              // //                       'giftCardDetails'][0]
+                                              // //                   [
+                                              // //                   'Redemption URL'],
+                                              // //               javascriptMode:
+                                              // //                   JavascriptMode
+                                              // //                       .unrestricted,
+                                              // //               onPageStarted: (url) {
+                                              // //                 setState(() {
+                                              // //                   isLoading = true;
+                                              // //                 });
+                                              // //               },
+                                              // //               onPageFinished:
+                                              // //                   (finish) {
+                                              // //                 setState(() {
+                                              // //                   isLoading = false;
+                                              // //                   print(isLoading);
+                                              // //                 });
+                                              // //               },
+                                              // //             )),
+                                              // //           ),
 
-                                            // //         ],
-                                            // //       ),
-                                            // //     );
-                                            // //   },
-                                            // //  );
-                                          },
-                                          text: 'Redeem',
-                                          active: true,
-                                          activeColor: linkColor,
-                                          activeTextColor: Colors.black,
-                                          isLoading: false,
+                                              // //         ],
+                                              // //       ),
+                                              // //     );
+                                              // //   },
+                                              // //  );
+                                            },
+                                            text: 'Redeem',
+                                            active: true,
+                                            activeColor: linkColor,
+                                            activeTextColor: Colors.black,
+                                            isLoading: false,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         ),
             ),
           ],

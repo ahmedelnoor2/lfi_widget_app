@@ -47,9 +47,12 @@ Future<void> showAlert(context, icon, title, message, action) async {
         actions: <Widget>[
           TextButton(
             child: Text('$action'),
+            
             onPressed: () {
               if (action == 'Settings') {
                 Navigator.pushNamed(context, '/security');
+              } else if (action == 'KYC Verify') {
+                Navigator.pushNamed(context, '/kyc_screen');
               } else if (action == 'Exit') {
                 exit(0);
               } else if (action == 'Cancel Transaction') {

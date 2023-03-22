@@ -128,10 +128,10 @@ class _BuyCardState extends State<BuyCard> {
         Provider.of<GiftCardProvider>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
     var userid = await auth.userInfo['id'];
-
-    await giftcardprovider.getDoTransaction(context, auth, userid,
-        {"productID": "$productid", "amount": "$amount", "quantity": 1});
-    
+    if (withdrwalResponse == true) {
+      await giftcardprovider.getDoTransaction(context, auth, userid,
+          {"productID": "$productid", "amount": "$amount", "quantity": 1});
+    }
   }
 
   @override
@@ -479,19 +479,13 @@ class _BuyCardState extends State<BuyCard> {
                                             if (_formKey.currentState!
                                                 .validate()) {
                                               await withDrawal(
-                                                      args.defaultcoin,
-                                                      args.totalprice,
-                                                      giftcardprovider.doverify[
-                                                          'verificationType'])
-                                                  .whenComplete(() async => {
-                                                        if (withdrwalResponse ==
-                                                            true)
-                                                          {
-                                                            await dotransaction(
-                                                                args.productID,
-                                                                args.amount),
-                                                          }
-                                                      });
+                                                  args.defaultcoin,
+                                                  args.totalprice,
+                                                  giftcardprovider.doverify[
+                                                      'verificationType']);
+
+                                              await dotransaction(
+                                                  args.productID, args.amount);
                                             }
                                           }),
                                           text: 'Buy Now',
@@ -511,7 +505,4 @@ class _BuyCardState extends State<BuyCard> {
           ),
         ));
   }
-
- 
-  
 }

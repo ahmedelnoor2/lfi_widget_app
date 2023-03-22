@@ -359,7 +359,7 @@ class Auth with ChangeNotifier {
       emailSignupLoader = false;
       notifyListeners();
       final responseData = json.decode(response.body);
-      if (responseData['code'] == '0') {
+      if (responseData['code'] == '0' || responseData['code'] == 0) {
         _emailVerificationToken = responseData['data']['token'];
         _loginVerificationToken = _emailVerificationToken;
         return _emailVerificationToken;
@@ -593,7 +593,7 @@ class Auth with ChangeNotifier {
       return responseData['code'];
     } catch (error) {
       print(error);
-      snackAlert(ctx, SnackTypes.errors, 'Server Error!');
+      //  snackAlert(ctx, SnackTypes.errors, 'Server Error!');
       return '0';
       // throw error;
     }
@@ -623,7 +623,6 @@ class Auth with ChangeNotifier {
       } else {
         snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
-
       return responseData['code'];
     } catch (error) {
       print(error);

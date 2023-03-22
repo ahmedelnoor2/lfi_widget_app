@@ -311,7 +311,8 @@ class _PixPaymentState extends State<PixPayment>
   Future<void> getminimumWithDrawalAmount() async {
     var payment = Provider.of<Payments>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
-    await payment.getminimumWithDrawalAmount(auth, {"uaTime": "2022-11-23 11:20:07"});
+    await payment
+        .getminimumWithDrawalAmount(auth, {"uaTime": "2022-11-23 11:20:07"});
 
     print(payment.minimumWithdarwalAmt['cpfStatus']);
 

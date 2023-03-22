@@ -463,7 +463,6 @@ class _Signup extends State<Signup> with SingleTickerProviderStateMixin {
                       setState(() {
                         _enableSignup = false;
                       });
-
                       if (_emailSignup) {
                         widget.onRegister({
                           'email': _emailOrPhone.text,

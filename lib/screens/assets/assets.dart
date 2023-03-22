@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/screens/common/alert.dart';
 import 'package:lyotrade/screens/common/bottomnav.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/providers/auth.dart';
@@ -223,7 +224,10 @@ class _AssetsState extends State<Assets> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                              languageprovider.getlanguage['assets']['subheader']??'Total Valuations',
+                                                  languageprovider.getlanguage[
+                                                              'assets']
+                                                          ['subheader'] ??
+                                                      'Total Valuations',
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 12,
@@ -235,7 +239,7 @@ class _AssetsState extends State<Assets> {
                                                       padding: EdgeInsets.only(
                                                           right: 10),
                                                       child: Text(
-                                                        '${_hideBalances ? _hideBalanceString : asset.totalAccountBalance['totalbalance'] ??''} $_totalBalanceSymbol',
+                                                        '${_hideBalances ? _hideBalanceString : asset.totalAccountBalance['totalbalance'] ?? ''} $_totalBalanceSymbol',
                                                         style: TextStyle(
                                                             fontSize: 20,
                                                             fontWeight:
@@ -276,7 +280,10 @@ class _AssetsState extends State<Assets> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                           languageprovider.getlanguage['assets']['subtext']??'Yesterday\'s PNL',
+                                                  languageprovider.getlanguage[
+                                                              'assets']
+                                                          ['subtext'] ??
+                                                      'Yesterday\'s PNL',
                                                   style: TextStyle(
                                                     fontSize: 10,
                                                   ),
@@ -366,9 +373,9 @@ class _AssetsState extends State<Assets> {
                                 itemBuilder: (BuildContext context, int index) {
                                   return InkWell(
                                     onTap: () {
-                                        asset.setSearchAllCoin();
-                                        Navigator.pushNamed(context,
-                                            '${_accounts[index]['path']}');
+                                      asset.setSearchAllCoin();
+                                      Navigator.pushNamed(context,
+                                          '${_accounts[index]['path']}');
                                     },
                                     child: Card(
                                       child: ListTile(
@@ -457,8 +464,23 @@ class _AssetsState extends State<Assets> {
                                     onPressed: () {
                                       if (auth.userInfo['realAuthType'] == 0 ||
                                           auth.userInfo['authLevel'] == 0) {
-                                        snackAlert(context, SnackTypes.warning,
-                                            'Deposit limited (Please check KYC status)');
+                                        showAlert(
+                                          context,
+                                          Icon(
+                                            Icons.featured_play_list,
+                                          ),
+                                          'Tips',
+                                          const <Widget>[
+                                            Text(
+                                              'Verification Required to protect your assets, all new and existing users are required to complete Identity Verification to access the full range of our products and services.',
+                                              style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w400),
+                                            ),
+                                            Divider(),
+                                          ],
+                                          'KYC Verify',
+                                        );
                                       } else {
                                         Navigator.pushNamed(
                                           context,
@@ -466,7 +488,10 @@ class _AssetsState extends State<Assets> {
                                         );
                                       }
                                     },
-                                    child: Text(languageprovider.getlanguage['assets']['deposit_btn']??'Deposit'),
+                                    child: Text(
+                                        languageprovider.getlanguage['assets']
+                                                ['deposit_btn'] ??
+                                            'Deposit'),
                                   ),
                                 ),
                                 SizedBox(
@@ -478,7 +503,10 @@ class _AssetsState extends State<Assets> {
                                         '/withdraw_assets',
                                       );
                                     },
-                                    child: Text(languageprovider.getlanguage['assets']['withdraw_btn']??'Withdraw'),
+                                    child: Text(
+                                        languageprovider.getlanguage['assets']
+                                                ['withdraw_btn'] ??
+                                            'Withdraw'),
                                   ),
                                 ),
                                 SizedBox(
@@ -490,7 +518,10 @@ class _AssetsState extends State<Assets> {
                                         '/transfer_assets',
                                       );
                                     },
-                                    child: Text(languageprovider.getlanguage['assets']['transfer_btn']??'Transfer'),
+                                    child: Text(
+                                        languageprovider.getlanguage['assets']
+                                                ['transfer_btn'] ??
+                                            'Transfer'),
                                   ),
                                 ),
                               ],
@@ -500,7 +531,10 @@ class _AssetsState extends State<Assets> {
                       ),
                     ),
                   ),
-        bottomNavigationBar: bottomNav(context, auth,),
+        bottomNavigationBar: bottomNav(
+          context,
+          auth,
+        ),
       ),
     );
   }
