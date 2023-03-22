@@ -614,19 +614,21 @@ class Auth with ChangeNotifier {
       final response = await http.post(url, body: postData, headers: headers);
 
       final responseData = json.decode(response.body);
-
-      if (responseData['code'] == '0') {
+    
+      print(responseData);
+      if (responseData['code'] == '0' || responseData['code'] == 0) {
         _loginVerificationToken = responseData['data']['token'];
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('authToken', _loginVerificationToken);
+      
         snackAlert(ctx, SnackTypes.success, 'Email is successfully verified.');
       } else {
         snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
-      return responseData['code'];
+      return responseData['code'].toString();
     } catch (error) {
       print(error);
-      snackAlert(ctx, SnackTypes.errors, 'Server Error!');
+    snackAlert(ctx, SnackTypes.errors, 'Server Error!');
       return '0';
       // throw error;
     }
@@ -749,10 +751,8 @@ class Auth with ChangeNotifier {
     isforgotloader = true;
     notifyListeners();
     var postData = json.encode(formData);
-
     try {
       final response = await http.post(url, body: postData, headers: headers);
-
       final responseData = json.decode(response.body);
       if (responseData['code'] == '0') {
         _forgotStepOne = responseData['data'];
@@ -765,7 +765,6 @@ class Auth with ChangeNotifier {
         notifyListeners();
         snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
       }
-
       return;
     } catch (error) {
       isforgotloader = false;
@@ -911,7 +910,7 @@ class Auth with ChangeNotifier {
         _emailValidredponse = {};
         _smsValidredponse = {};
         _resetResponseStepTwo = {};
-        snackAlert(ctx, SnackTypes.success, 'Sucessfully reseted password');
+        snackAlert(ctx, SnackTypes.success, 'Sucessfully reset password');
         Navigator.pop(ctx);
         Navigator.pop(ctx);
 

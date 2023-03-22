@@ -108,6 +108,7 @@ class _AuthenticationState extends State<Authentication> {
           'token': _captchaVerification['token'],
           'verificationType': '1',
         };
+        print(_formParams);
       } else {
         _formParams = {
           'geetest_challenge': "sys_conf_validate",
