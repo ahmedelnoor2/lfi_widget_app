@@ -16,6 +16,7 @@ class GiftCardProvider with ChangeNotifier {
     'userId': '',
   };
   String paymentstatus = 'Waiting for payment';
+  
 
   //// Get Wallet//
   List _allwallet = [];

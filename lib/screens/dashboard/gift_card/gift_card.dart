@@ -409,7 +409,7 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                  'Min price: ${(num.parse(currentindex['min']) * giftcardprovider.toActiveCountry['rate']['rate'])..toStringAsFixed(2)}   ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                                                  'Min price: ${(num.parse(currentindex['min'].replaceAll(',', "")) * giftcardprovider.toActiveCountry['rate']['rate'])..toStringAsFixed(2)}   ${giftcardprovider.toActiveCountry['currency']['code']}'),
                                               Text(
                                                   'Max price: ${(num.parse(currentindex['max'].replaceAll(',', "")) * giftcardprovider.toActiveCountry['rate']['rate'])..toStringAsFixed(2)}   ${giftcardprovider.toActiveCountry['currency']['code']}'),
                                             ],

@@ -469,13 +469,13 @@ class _AssetsState extends State<Assets> {
                                           Icon(
                                             Icons.featured_play_list,
                                           ),
-                                          'Tips',
+                                          'Verification Required',
                                           const <Widget>[
                                             Text(
-                                              'Verification Required to protect your assets, all new and existing users are required to complete Identity Verification to access the full range of our products and services.',
+                                              'To protect your assets, all new and existing users are required to complete Identity Verification to access the full range of our products and services.',
                                               style: TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w400),
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w600),
                                             ),
                                             Divider(),
                                           ],

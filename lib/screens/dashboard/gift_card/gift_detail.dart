@@ -59,7 +59,7 @@ class _GiftDetailState extends State<GiftDetail> {
     var public = Provider.of<Public>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
     if (widget.isEqualMinMax == false) {
-      _amountcontroller.text = widget.data['max'].replaceAll(',', '');
+      _amountcontroller.text = widget.data['max'].replaceAll(',', "");
       var giftcardprovider =
           Provider.of<GiftCardProvider>(context, listen: false);
       var userid = await auth.userInfo['id'];
@@ -69,10 +69,8 @@ class _GiftDetailState extends State<GiftDetail> {
         "productID": widget.data['BillerID']
       });
       setState(() {
-        estprice = double.parse(widget.data['max']);
-
+        estprice = double.parse(widget.data['max'].replaceAll(',', ""));
         var price = giftcardprovider.amountsystm / estprice;
-
         var finalprice = estprice / price;
         estimateprice = finalprice /
             public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()]
@@ -167,16 +165,12 @@ class _GiftDetailState extends State<GiftDetail> {
     asset.setDigAssets(_digitialAss);
   }
 
-  String? _errorText = '';
-
-  ///Check minMax Value equally//
-  ///
-  // bool checkMinMax(minValue, maxValue) {
-  //   var min = double.parse(minValue['data']['min'].replaceAll(',', ""));
-  //   var max = double.parse(maxValue['data']['max'].replaceAll(',', ""));
-
-  //   return min == max ? true : false;
-  // }
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _amountcontroller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +180,6 @@ class _GiftDetailState extends State<GiftDetail> {
     var asset = Provider.of<Asset>(context, listen: true);
     var public = Provider.of<Public>(context, listen: true);
 //print(giftcardprovider.toActiveCountry);
-
     return Scaffold(
       key: _scaffoldKey,
       drawer: drawer(
@@ -288,8 +281,8 @@ class _GiftDetailState extends State<GiftDetail> {
                           onTap: () {
                             _scaffoldKey.currentState!.openDrawer();
                             setState(() {
-                              estimateprice = 0.0;
-                              _amountcontroller.clear();
+                              // estimateprice = 0.0;
+                              // _amountcontroller.clear();
                             });
                           },
                           child: Container(
@@ -378,7 +371,6 @@ class _GiftDetailState extends State<GiftDetail> {
                                   asset.getCost['withdraw_min']) {
                                 return 'Minimum withdrawal amount is ${asset.getCost['withdraw_min'] * giftcardprovider.toActiveCountry['rate']['rate']} ${giftcardprovider.toActiveCountry['currency']['code']}';
                               }
-
                               return null;
                             },
                             onChanged: ((value) async {
@@ -389,7 +381,6 @@ class _GiftDetailState extends State<GiftDetail> {
                                     widget.data['currency']['code']);
                                 setState(() {
                                   estprice = double.parse(value);
-
                                   var price =
                                       giftcardprovider.amountsystm / estprice;
 
@@ -487,7 +478,7 @@ class _GiftDetailState extends State<GiftDetail> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                        'Min price: ${(num.parse(widget.data['min']) * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsFixed(2)}   ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                                        'Min price: ${(num.parse(widget.data['min'].replaceAll(',', "")) * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsFixed(2)}   ${giftcardprovider.toActiveCountry['currency']['code']}'),
                                     Text(
                                         'Max price: ${(num.parse(widget.data['max'].replaceAll(',', "")) * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsFixed(2)}   ${giftcardprovider.toActiveCountry['currency']['code']}'),
                                   ],
@@ -495,8 +486,6 @@ class _GiftDetailState extends State<GiftDetail> {
                               ),
                         LyoButton(
                           onPressed: (() async {
-                            // print(double.parse(double.parse('${estimateprice}')
-                            //     .toStringAsFixed(4)));
                             if (_formKey.currentState!.validate()) {
                               Navigator.pushNamed(context, '/buy_card',
                                   arguments: BuyCard(
