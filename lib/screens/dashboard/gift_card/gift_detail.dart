@@ -58,23 +58,26 @@ class _GiftDetailState extends State<GiftDetail> {
     var auth = Provider.of<Auth>(context, listen: false);
     var public = Provider.of<Public>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
+
+    var giftcardprovider =
+        Provider.of<GiftCardProvider>(context, listen: false);
+    var cardrate = widget.data['max'].replaceAll(',', "");
+    var _payment = double.parse(cardrate);
     if (widget.isEqualMinMax == false) {
-      _amountcontroller.text = widget.data['max'].replaceAll(',', "");
-      var giftcardprovider =
-          Provider.of<GiftCardProvider>(context, listen: false);
+      _amountcontroller.text = cardrate.toString();
+
       var userid = await auth.userInfo['id'];
       await giftcardprovider.getEstimateRate(context, auth, userid, {
         "currency": "${widget.data['currency']['code']}",
-        "payment": widget.data['max'],
+        "payment": _payment,
         "productID": widget.data['BillerID']
       });
+
+      estprice = double.parse(widget.data['max'].replaceAll(',', ""));
+      var price = giftcardprovider.amountsystm / estprice;
+      var finalprice = estprice / price;
       setState(() {
-        estprice = double.parse(widget.data['max'].replaceAll(',', ""));
-        var price = giftcardprovider.amountsystm / estprice;
-        var finalprice = estprice / price;
-        estimateprice = finalprice /
-            public.rate[public.activeCurrency['fiat_symbol'].toUpperCase()]
-                [_defaultCoin];
+        estimateprice = finalprice;
       });
     }
 
@@ -353,14 +356,9 @@ class _GiftDetailState extends State<GiftDetail> {
                             enabled: widget.isEqualMinMax,
                             validator: (value) {
                               var min = double.parse(
-                                      widget.data['min'].replaceAll(',', "")) *
-                                  giftcardprovider.toActiveCountry['rate']
-                                      ['rate'];
+                                  widget.data['min'].replaceAll(',', ""));
                               var max = double.parse(
-                                      widget.data['max'].replaceAll(',', "")) *
-                                  giftcardprovider.toActiveCountry['rate']
-                                      ['rate'];
-
+                                  widget.data['max'].replaceAll(',', ""));
                               if (value == null || value.isEmpty) {
                                 return 'Please enter Amount';
                               } else if (double.parse(value.toString()) < min) {
@@ -369,7 +367,7 @@ class _GiftDetailState extends State<GiftDetail> {
                                 return 'Max Amount:$max';
                               } else if (double.parse(value) <
                                   asset.getCost['withdraw_min']) {
-                                return 'Minimum withdrawal amount is ${asset.getCost['withdraw_min'] * giftcardprovider.toActiveCountry['rate']['rate']} ${giftcardprovider.toActiveCountry['currency']['code']}';
+                                return 'Minimum withdrawal amount is ${asset.getCost['withdraw_min']} ${giftcardprovider.toActiveCountry['currency']['code']}';
                               }
                               return null;
                             },
@@ -379,16 +377,14 @@ class _GiftDetailState extends State<GiftDetail> {
                                     widget.data['BillerID'],
                                     _amountcontroller.text,
                                     widget.data['currency']['code']);
-                                setState(() {
-                                  estprice = double.parse(value);
-                                  var price =
-                                      giftcardprovider.amountsystm / estprice;
+                                print(widget.data['currency']['code']);
 
-                                  var finalprice = estprice / price;
-                                  estimateprice = finalprice /
-                                      public.rate[public
-                                          .activeCurrency['fiat_symbol']
-                                          .toUpperCase()][_defaultCoin];
+                                estprice = double.parse(value);
+                                var price =
+                                    giftcardprovider.amountsystm / estprice;
+                                var finalprice = estprice / price;
+                                setState(() {
+                                  estimateprice = finalprice;
                                 });
                               } else {
                                 estimateprice = 0.0;
@@ -465,9 +461,9 @@ class _GiftDetailState extends State<GiftDetail> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                        'Min price: ${(num.parse(widget.data['min']) * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsFixed(2)}   ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                                        'Min price: ${widget.data['min'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
                                     Text(
-                                        'Max price: ${(num.parse(widget.data['max'].replaceAll(',', "")) * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsFixed(2)}   ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                                        'Max price: ${widget.data['max'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
                                   ],
                                 ),
                               )
@@ -478,9 +474,9 @@ class _GiftDetailState extends State<GiftDetail> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                        'Min price: ${(num.parse(widget.data['min'].replaceAll(',', "")) * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsFixed(2)}   ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                                        'Min price: ${widget.data['min'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
                                     Text(
-                                        'Max price: ${(num.parse(widget.data['max'].replaceAll(',', "")) * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsFixed(2)}   ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                                        'Max price: ${widget.data['max'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
                                   ],
                                 ),
                               ),

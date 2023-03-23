@@ -16,7 +16,6 @@ class GiftCardProvider with ChangeNotifier {
     'userId': '',
   };
   String paymentstatus = 'Waiting for payment';
-  
 
   //// Get Wallet//
   List _allwallet = [];
@@ -237,6 +236,7 @@ class GiftCardProvider with ChangeNotifier {
   }
 
   Future<void> getEstimateRate(ctx, auth, userid, postdata) async {
+    print(postdata);
     isEstimate = true;
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
@@ -254,7 +254,8 @@ class GiftCardProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-      print(responseData);
+
+      print('estimate response:${responseData}');
 
       if (responseData['code'] == 200) {
         isEstimate = false;
@@ -432,6 +433,8 @@ class GiftCardProvider with ChangeNotifier {
   }
 
   Future<void> getDoTransaction(ctx, auth, userid, postdata) async {
+    print(postdata);
+    print('do trnasaction...');
     dotransactionloading = true;
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;

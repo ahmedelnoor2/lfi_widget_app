@@ -485,7 +485,7 @@ class _BuyCardState extends State<BuyCard> {
                                                       'verificationType']);
 
                                               await dotransaction(
-                                                  args.productID, args.amount);
+                                                  args.productID, args.totalprice);
                                             }
                                           }),
                                           text: 'Buy Now',

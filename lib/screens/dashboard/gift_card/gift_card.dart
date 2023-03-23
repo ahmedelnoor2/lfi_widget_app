@@ -342,7 +342,8 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                       ),
                     ),
                   ),
-                  Expanded(
+                  SizedBox(
+                    height: height * 0.35,
                     child: giftcardprovider.cardloading
                         ? Center(
                             child: CircularProgressIndicator(),
@@ -409,13 +410,13 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                  'Min price: ${(num.parse(currentindex['min'].replaceAll(',', "")) * giftcardprovider.toActiveCountry['rate']['rate'])..toStringAsFixed(2)}   ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                                                  'Min price: ${currentindex['min'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
                                               Text(
-                                                  'Max price: ${(num.parse(currentindex['max'].replaceAll(',', "")) * giftcardprovider.toActiveCountry['rate']['rate'])..toStringAsFixed(2)}   ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                                                  'Max price: ${currentindex['max'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
                                             ],
                                           )
                                         : Text(
-                                            'Price: ${(num.parse(currentindex['max'].replaceAll(',', "")) * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsFixed(2)}   ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                                            'Price: ${currentindex['max'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
                                     trailing: Icon(Icons.chevron_right),
                                   );
                                 },
