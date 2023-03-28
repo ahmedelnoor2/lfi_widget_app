@@ -146,7 +146,7 @@ class _BuyCrptoySliderState extends State<BuyCrptoySlider> {
                                       FittedBox(
                                         fit: BoxFit.fitWidth,
                                         child: Text(
-                                   languageprovider.getlanguage['home']['${slider['lan_text']}'] ?? '',
+                                               languageprovider.getlanguage['home']['${slider['lan_text']}'] ?? '',
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16,

@@ -378,7 +378,6 @@ class _GiftDetailState extends State<GiftDetail> {
                                     _amountcontroller.text,
                                     widget.data['currency']['code']);
                                 print(widget.data['currency']['code']);
-
                                 estprice = double.parse(value);
                                 var price =
                                     giftcardprovider.amountsystm / estprice;

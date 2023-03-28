@@ -55,7 +55,7 @@ var redIndicator = Color(0xffD84646);
 var redPercentageIndicator = Color.fromARGB(77, 216, 70, 70);
 var greenPercentageIndicator = Color.fromARGB(77, 70, 216, 138);
 var linkColor = Color.fromARGB(255, 1, 254, 246);
-var onboardText=Color(0xFF5E6292);
+var onboardText = Color(0xFF5E6292);
 var geryTextColor = Color(0xFF39434a);
 var buttonBGColor = Color(0xFF10255c);
 var tabBarindicatorColor = Color(0xFF305dc3);
@@ -105,16 +105,16 @@ var listselectcolor = Color(0xFF484D87);
 var listcolorinner = Color(0xFF3B3F72);
 var neturalcolor = Color(0xFFF6F9FC);
 var cardcolor = Color(0xFF292C51);
-var marketcharcolor1=Color(0xff3F4374);
-var marketcharcolor2=Color(0xff3F4374);
-var tradechallengbtn=Color(0xff018EF0);
+var marketcharcolor1 = Color(0xff3F4374);
+var marketcharcolor2 = Color(0xff3F4374);
+var tradechallengbtn = Color(0xff018EF0);
 
 /// trade challenge colour//
-var tradegreen=Color(0xff199B56);
- var icongreen=Color(0xff00C7A1);
- var trade_txtColour=Color(0xff4C515E);
- var clipcolor=Color(0xffE1E5F2);
- var tradelistcolor=Color(0xffF7CB1C);
+var tradegreen = Color(0xff199B56);
+var icongreen = Color(0xff00C7A1);
+var trade_txtColour = Color(0xff4C515E);
+var clipcolor = Color(0xffE1E5F2);
+var tradelistcolor = Color(0xffF7CB1C);
 // Referral
 var clipCircle = {
   'in_1': Color(0xffF6B708),
