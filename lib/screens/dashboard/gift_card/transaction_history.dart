@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -7,6 +8,10 @@ import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/giftcard.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/common/no_data.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
+import 'package:lyotrade/screens/dashboard/gift_card/catalog.dart';
+
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -100,7 +105,6 @@ class _GiftCardTransactionState extends State<GiftCardTransaction> {
                           onRefresh: () {
                             setState(() {
                               getAllTransaction();
-                              
                             });
                           },
                           child: ListView.builder(
@@ -308,9 +312,162 @@ class _GiftCardTransactionState extends State<GiftCardTransaction> {
                                           padding: EdgeInsets.only(left: 5),
                                           child: LyoButton(
                                             onPressed: () async {
-                                              _launchPDF(currentIndex[
-                                                      'giftCardDetails'][0]
-                                                  ['Redemption URL']);
+                                              if (currentIndex[
+                                                          'giftCardDetails'][0]
+                                                      ['Redemption URL'] ==
+                                                  null) {
+                                                showModalBottomSheet<void>(
+                                                  context: context,
+                                                  isScrollControlled: true,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return StatefulBuilder(
+                                                      builder:
+                                                          (BuildContext context,
+                                                              StateSetter
+                                                                  setState) {
+                                                        return Container(
+                                                            height: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .height *
+                                                                0.55,
+                                                            child: Container(
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: Colors
+                                                                    .transparent,
+                                                              ),
+                                                              width: width,
+                                                              child: Column(
+                                                                children: <
+                                                                    Widget>[
+                                                                  Container(
+                                                                    child: Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .end,
+                                                                      children: [
+                                                                        IconButton(
+                                                                          onPressed:
+                                                                              () {
+                                                                            Navigator.pop(context);
+                                                                          },
+                                                                          icon:
+                                                                              Icon(
+                                                                            Icons.close,
+                                                                            color:
+                                                                                secondaryTextColor,
+                                                                            size:
+                                                                                20,
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                  Padding(
+                                                                    padding: const EdgeInsets
+                                                                            .only(
+                                                                        top: 10,
+                                                                        left:
+                                                                            8.0,
+                                                                        right:
+                                                                            8.0),
+                                                                    child: Card(
+                                                                      color:
+                                                                          cardcolor,
+                                                                      child:
+                                                                          Padding(
+                                                                        padding:
+                                                                            const EdgeInsets.all(8.0),
+                                                                        child:
+                                                                            ListView(
+                                                                          shrinkWrap:
+                                                                              true,
+                                                                          children: [
+                                                                            Padding(
+                                                                              padding: const EdgeInsets.only(top: 10.0),
+                                                                              child: SizedBox(
+                                                                                  height: 50,
+                                                                                  child: Row(
+                                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                                    children: [
+                                                                                      Text("Serial:"),
+                                                                                      Text(currentIndex['giftCardDetails'][0]['Serial']),
+                                                                                    ],
+                                                                                  )),
+                                                                            ),
+                                                                            SizedBox(
+                                                                                height: 50,
+                                                                                child: Row(
+                                                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                                  children: [
+                                                                                    Text("Claim Code:"),
+                                                                                    Row(
+                                                                                      children: [
+                                                                                        Text(currentIndex['giftCardDetails'][0]['Claim Code']),
+
+                                                                                        
+                                                                                        GestureDetector(
+                                                                                          onTap: () {
+                                                                                             Navigator.pop(context);
+                                                                                            Clipboard.setData(
+                                                                                              ClipboardData(
+                                                                                                text: currentIndex['giftCardDetails'][0]['Claim Code'],
+                                                                                              ),
+                                                                                            );
+                                                                                           
+                                                                                            snackAlert(context, SnackTypes.success, 'Copied');
+                                                                                          },
+                                                                                          child: Container(
+                                                                                            padding: EdgeInsets.only(left: 10,right: 10),
+                                                                                            child: Image.asset(
+                                                                                              'assets/img/copy.png',
+                                                                                              width: 18,
+                                                                                            ),
+                                                                                          ),
+                                                                                        ),
+                                                                                      ],
+                                                                                    ),
+                                                                                  ],
+                                                                                )),
+                                                                            SizedBox(
+                                                                                height: 50,
+                                                                                child: Row(
+                                                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                                  children: [
+                                                                                    Text("Expiration Date:"),
+                                                                                    Text(currentIndex['giftCardDetails'][0]['Expiration Date']),
+                                                                                  ],
+                                                                                )),
+                                                                            SizedBox(
+                                                                                child: Column(
+                                                                              mainAxisAlignment: MainAxisAlignment.start,
+                                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                                              children: [
+                                                                                Text("Redemption Details:"),
+                                                                                SizedBox(height: 10),
+                                                                                Container(height: height * 0.20, width: width * 0.90, child: SingleChildScrollView(scrollDirection: Axis.vertical, child: Text(currentIndex['giftCardDetails'][0]['Redemption Details'] + currentIndex['giftCardDetails'][0]['Redemption Details']))),
+                                                                              ],
+                                                                            )),
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ));
+                                                      },
+                                                    );
+                                                  },
+                                                );
+                                              } else {
+                                                _launchPDF(currentIndex[
+                                                        'giftCardDetails'][0]
+                                                    ['Redemption URL']);
+                                              }
+
                                               // print('i am calling ');
                                               // ///   print(currentIndex);
                                               // print(

@@ -515,6 +515,7 @@ class GiftCardProvider with ChangeNotifier {
       if (responseData['code'] == '200' || responseData['code'] == 200) {
         istransactionloading = false;
         _transaction = responseData['data'].reversed.toList();
+        print(_transaction.first);
 
         return notifyListeners();
       } else {

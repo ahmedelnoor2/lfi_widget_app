@@ -11,7 +11,9 @@ import 'forgotlphoneform.dart';
 
 class Forgotpassword extends StatefulWidget {
   static const routeName = '/forgotForgotpassword';
-  const Forgotpassword({Key? key,}) : super(key: key);
+  const Forgotpassword({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<Forgotpassword> createState() => _ForgotpasswordState();
