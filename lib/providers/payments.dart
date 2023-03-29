@@ -724,7 +724,6 @@ class Payments with ChangeNotifier {
       lyoApiUrl,
       '/payment_gateway/pix/get_client_kyc_transactions/$uuid',
     );
-
     try {
       final response = await http.get(
         url,
@@ -1219,18 +1218,53 @@ class Payments with ChangeNotifier {
     try {
       final response =
           await http.post(url, headers: headers, body: jsonEncode(formdata));
-      print(response.body);
+
       final responseData = json.decode(response.body);
-      print('Pix payment detail ...........');
+
       if (responseData['code'] == '0') {
         _ispixdetailLoading = false;
         _pixdetail = responseData['data'];
+        print(pixdetail);
         if (_payQr.isEmpty) {
           _payQr = _pixdetail['qrCode'];
         }
         notifyListeners();
       } else {
         _pixdetail = {};
+
+        return notifyListeners();
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  //// copy qr code as a decoded form for user copy code
+  Map _copyQr = {};
+
+  Map get copyQr {
+    return _copyQr;
+  }
+
+  Future<void> getCopyQrCodeTransaction(auth, formdata, uuid) async {
+    print(formdata);
+    var url = Uri.https(
+        lyoApiUrl, '/payment_gateway/pix/get_client_transaction/$uuid');
+
+    print(url);
+
+    try {
+      final response = await http.post(url, body: formdata);
+
+      final responseData = json.decode(response.body);
+
+      print(responseData);
+
+      if (responseData['code'] == '0') {
+        _copyQr = responseData['data'];
+        notifyListeners();
+      } else {
+        _copyQr = {};
 
         return notifyListeners();
       }

@@ -38,6 +38,7 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
 
   @override
   void initState() {
+    resetqr();
     getdetailinfo();
     startOrderCheckTimer();
     _controller = AnimationController(vsync: this);
@@ -56,6 +57,11 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
     super.dispose();
   }
 
+  Future<void> resetqr() async {
+    var payments = Provider.of<Payments>(context, listen: false);
+    payments.resetPayQr();
+  }
+
   void startOrderCheckTimer() {
     _timerForOrderUpdate = Timer.periodic(
       const Duration(seconds: 5),
@@ -71,40 +77,9 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
 
     await payments
         .getPixDetailInfo(auth, {'id': '${payments.pixCreateOrder['id']}'});
-
-    if (payments.pixdetail.isNotEmpty) {
-      //   for (var transaction in payments.allPixTransactions) {
-      //     if (transaction['uuid_transaction'] ==
-      //         payments.pixNewTransaction['uuid_transaction']) {
-      //       setState(() {
-      //         _currentTransaction = transaction;
-      //       });
-      //       if (_timer == null) {
-      //         payments.decryptPixQR({"qr_code": transaction['qr_code']});
-      //         setState(() {
-      //           _timer = Timer.periodic(
-      //             const Duration(seconds: 1),
-      //             (Timer timer) {
-      //               final nowDate = DateTime.now().toLocal();
-      //               var endDate = DateTime.parse(transaction['date_end'])
-      //                   .toLocal()
-      //                   .add(Duration(
-      //                       hours: int.parse(nowDate.timeZoneOffset
-      //                           .toString()
-      //                           .split(":")[0])));
-      //               final difference = nowDate.difference(endDate).toString();
-      //               final hour =
-      //                   difference.split(':')[0].replaceAll(RegExp('-'), '');
-      //               final minute = difference.split(':')[1];
-      //               final second = difference.split(':')[2].split('.')[0];
-      //               payments.setAwaitingTime('0$hour:$minute:$second');
-      //             },
-      //           );
-      //         });
-      //       }
-      //     }
-      //   }
-    }
+    var uuid = await payments.pixdetail['uuid'];
+    await payments.getCopyQrCodeTransaction(auth,
+        {'transaction_uuid': '${payments.pixdetail['uuidTransaction']}'}, uuid);
   }
 
   @override
@@ -404,12 +379,9 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
                                     ? Container()
                                     : InkWell(
                                         onTap: () {
-                                          Clipboard.setData(
-                                            ClipboardData(
+                                          Clipboard.setData(ClipboardData(
                                               text:
-                                                  payments.pixdetail['qrCode'],
-                                            ),
-                                          );
+                                                  payments.copyQr['qr_code']));
                                           snackAlert(context,
                                               SnackTypes.success, 'Copied');
                                         },
