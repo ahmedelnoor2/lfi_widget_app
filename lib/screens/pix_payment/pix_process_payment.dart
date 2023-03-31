@@ -74,7 +74,6 @@ class _PixProcessPaymentState extends State<PixProcessPayment>
   Future<void> getdetailinfo() async {
     var auth = Provider.of<Auth>(context, listen: false);
     var payments = Provider.of<Payments>(context, listen: false);
-
     await payments
         .getPixDetailInfo(auth, {'id': '${payments.pixCreateOrder['id']}'});
     var uuid = await payments.pixdetail['uuid'];
