@@ -64,10 +64,12 @@ class LanguageChange with ChangeNotifier {
       final response = await http.get(url, headers: headers);
 
       final responseData = json.decode(response.body);
+      print(responseData);
 
       if (responseData['code'] == 0) {
         _islanguageloading = false;
         _getlanguage = responseData['data']['mobile'];
+
         print(_getlanguage);
 
         return notifyListeners();

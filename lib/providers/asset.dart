@@ -198,7 +198,6 @@ class Asset with ChangeNotifier {
 
       final responseData = json.decode(response.body);
 
-
       if (responseData['code'] == '0') {
         _totalAccountBalance = responseData['data'];
       } else {
@@ -264,7 +263,7 @@ class Asset with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-          
+
       if (responseData['code'] == '0') {
         _p2pBalance = responseData['data'];
 
@@ -402,7 +401,7 @@ class Asset with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-      
+
       if (responseData['code'] == '0') {
         _getCost = responseData['data'];
       } else if (responseData['code'] == '10002') {
@@ -897,7 +896,7 @@ class Asset with ChangeNotifier {
         snackAlert(ctx, SnackTypes.errors, '${responseData['msg']}');
       } else {
         snackAlert(ctx, SnackTypes.success, '${responseData['msg']}');
-      } 
+      }
     } catch (error) {
       snackAlert(ctx, SnackTypes.errors, 'Server error, please try again');
       // throw error;
@@ -988,7 +987,7 @@ class Asset with ChangeNotifier {
     return _selectedGiftAsset;
   }
 
-  void setSelectedGiftAsset(asset){
+  void setSelectedGiftAsset(asset) {
     _selectedGiftAsset = asset;
     return notifyListeners();
   }

@@ -83,6 +83,7 @@ import 'package:lyotrade/utils/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'screens/dashboard/gift_card/serviceprovider/giftcard-serviceprovider.dart';
 import 'screens/pix_payment/pix_cpf_detail.dart';
 import 'screens/dashboard/gift_card/gift_detail.dart';
 
@@ -207,14 +208,16 @@ class MyApp extends StatelessWidget {
               Setting.routeName: ((context) => const Setting()),
               FutureMarketTransaction.routeName: (context) =>
                   const FutureMarketTransaction(),
+              GiftCard.routeName: (context) =>  GiftCardServiceProvider(),
               GiftCard.routeName: (context) => const GiftCard(),
               GiftDetail.routeName: (context) =>  GiftDetail(),
+              GiftCardTransaction.routeName: (context) =>
+                  const GiftCardTransaction(),
               TradeChallengeScreen.routeName: (context) =>
                   const TradeChallengeScreen(),
               RewardCenterScreen.routeName: (context) =>
                   const RewardCenterScreen(),
-              GiftCardTransaction.routeName: (context) =>
-                  const GiftCardTransaction(),
+           
               BuyCard.routeName: (context) => BuyCard(),
               ChooseLanguage.routeName: (context) => ChooseLanguage()
             },
