@@ -167,7 +167,7 @@ class MyApp extends StatelessWidget {
               Security.routeName: (context) => const Security(),
               Phone.routeName: (context) => const Phone(),
               Password.routeName: (context) => const Password(),
-              Forgotpassword.routeName: (context) =>  Forgotpassword(),
+              Forgotpassword.routeName: (context) => Forgotpassword(),
               GoogleAuth.routeName: (context) => const GoogleAuth(),
               EmailChange.routeName: (context) => const EmailChange(),
               Transactions.routeName: (context) => const Transactions(),
@@ -208,16 +208,16 @@ class MyApp extends StatelessWidget {
               Setting.routeName: ((context) => const Setting()),
               FutureMarketTransaction.routeName: (context) =>
                   const FutureMarketTransaction(),
-              GiftCard.routeName: (context) =>  GiftCardServiceProvider(),
+              GiftCardServiceProvider.routeName: (context) =>
+                  GiftCardServiceProvider(),
               GiftCard.routeName: (context) => const GiftCard(),
-              GiftDetail.routeName: (context) =>  GiftDetail(),
+              GiftDetail.routeName: (context) => GiftDetail(),
               GiftCardTransaction.routeName: (context) =>
                   const GiftCardTransaction(),
               TradeChallengeScreen.routeName: (context) =>
                   const TradeChallengeScreen(),
               RewardCenterScreen.routeName: (context) =>
                   const RewardCenterScreen(),
-           
               BuyCard.routeName: (context) => BuyCard(),
               ChooseLanguage.routeName: (context) => ChooseLanguage()
             },

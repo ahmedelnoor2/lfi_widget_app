@@ -1,141 +1,181 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lyotrade/providers/giftcard.dart';
+import 'package:lyotrade/screens/common/header.dart';
+import 'package:lyotrade/utils/AppConstant.utils.dart';
+import 'package:lyotrade/utils/Colors.utils.dart';
+import 'package:provider/provider.dart';
 
 class GiftCardServiceProvider extends StatefulWidget {
-   static const routeName = '/gift_card_service_provider';
+  static const routeName = '/gift_card_service_provider';
   @override
-  _GiftCardServiceProviderState createState() => _GiftCardServiceProviderState();
+  _GiftCardServiceProviderState createState() =>
+      _GiftCardServiceProviderState();
 }
 
 class _GiftCardServiceProviderState extends State<GiftCardServiceProvider> {
-  final List<String> _listItem = [
-    'assets/images/two.jpg',
-    'assets/images/three.jpg',
-    'assets/images/four.jpg',
-    'assets/images/five.jpg',
-    'assets/images/one.jpg',
-    'assets/images/two.jpg',
-    'assets/images/three.jpg',
-    'assets/images/four.jpg',
-    'assets/images/five.jpg',
-  ];
+  @override
+  void initState() {
+    getAllGiftProvider();
+    // TODO: implement initState
+    super.initState();
+  }
+
+  Future<void> getAllGiftProvider() async {
+    var giftcardprovider =
+        Provider.of<GiftCardProvider>(context, listen: false);
+    await giftcardprovider.getAllGiftProvider();
+  }
 
   @override
   Widget build(BuildContext context) {
+    var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
     return Scaffold(
-      backgroundColor: Colors.grey[600],
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: Icon(Icons.menu),
-        title: Text("Home"),
-        actions: <Widget>[
-          Padding(
-            padding: EdgeInsets.all(10.0),
-            child: Container(
-              width: 36,
-              height: 30,
-              decoration: BoxDecoration(
-                  color: Colors.grey[800],
-                  borderRadius: BorderRadius.circular(10)),
-              child: Center(child: Text("0")),
-            ),
-          )
-        ],
-      ),
-      body: SafeArea(
-        child: Container(
-          padding: EdgeInsets.all(20.0),
-          child: Column(
-            children: <Widget>[
-              Container(
-                width: double.infinity,
-                height: 250,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    image: DecorationImage(
-                        image: AssetImage('assets/images/one.jpg'),
-                        fit: BoxFit.cover)),
-                child: Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      gradient:
-                          LinearGradient(begin: Alignment.bottomRight, colors: [
-                        Colors.black.withOpacity(.4),
-                        Colors.black.withOpacity(.2),
-                      ])),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      Text(
-                        "Lifestyle Sale",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 35,
-                            fontWeight: FontWeight.bold),
+      appBar: hiddenAppBar(),
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: Icon(Icons.chevron_left),
+                    ),
+                    Text(
+                      'Providers',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
-                      SizedBox(
-                        height: 30,
-                      ),
-                      Container(
-                        height: 50,
-                        margin: EdgeInsets.symmetric(horizontal: 40),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.white),
-                        child: Center(
-                            child: Text(
-                          "Shop Now",
-                          style: TextStyle(
-                              color: Colors.grey[900],
-                              fontWeight: FontWeight.bold),
-                        )),
-                      ),
-                      SizedBox(
-                        height: 30,
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
+              ],
+            ),
+            Divider(),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                width: width,
+                height: height * 0.20,
+                decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.all(Radius.circular(16.0)),
+                    image: DecorationImage(
+                        image: AssetImage('assets/img/gift_provider.png'),
+                        fit: BoxFit.cover)),
               ),
-              SizedBox(
-                height: 20,
-              ),
-              Expanded(
-                  child: GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                children: _listItem
-                    .map((item) => Card(
-                          color: Colors.transparent,
-                          elevation: 0,
-                          child: Container(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                image: DecorationImage(
-                                    image: AssetImage(item),
-                                    fit: BoxFit.cover)),
-                            child: Transform.translate(
-                              offset: Offset(50, -50),
-                              child: Container(
-                                margin: EdgeInsets.symmetric(
-                                    horizontal: 65, vertical: 63),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.white),
-                                child: Icon(
-                                  Icons.bookmark_border,
-                                  size: 15,
-                                ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Container(
+              height: height,
+              padding: EdgeInsets.only(top: 20, left: 10, right: 10),
+              decoration: BoxDecoration(
+                  color: giftcardcolor,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(12),
+                      topRight: Radius.circular(12))),
+              child: Column(
+                children: [
+                  Center(
+                    child: GridView.builder(
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      itemCount: giftcardprovider.allgiftprovider.length,
+                      itemBuilder: (ctx, i) {
+                        var data = giftcardprovider.allgiftprovider[i];
+                        return InkWell(
+                          onTap: () {
+                             giftcardprovider.setproiverid(data['providerId'].toString());
+                            print(giftcardprovider.providerid);
+                            Navigator.pushNamed(context, '/gift_card');
+                             
+                          },
+                          child: Card(
+                            child: Container(
+                              height: 100,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20)),
+                              margin: EdgeInsets.all(5),
+                              padding: EdgeInsets.all(5),
+                              child: Stack(
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Center(
+                                        child: Text(
+                                          data['name'].toString(),
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ),
                           ),
-                        ))
-                    .toList(),
-              ))
-            ],
-          ),
+                        );
+                      },
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 1.0,
+                        crossAxisSpacing: 0.0,
+                        mainAxisSpacing: 5,
+                        mainAxisExtent: 100,
+                      ),
+                    ),
+                  ),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //   crossAxisAlignment: CrossAxisAlignment.start,
+                  //   children: [
+                  //     Container(
+                  //       width: width * 0.45,
+                  //       height: height * 0.15,
+                  //       padding: EdgeInsets.all(20),
+                  //       decoration: BoxDecoration(
+                  //         color: Colors.white,
+                  //         borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  //       ),
+                  //       child: Image.asset(
+                  //         'assets/img/reloadly.png',
+                  //       ),
+                  //     ),
+                  //     InkWell(
+                  //       onTap: () {
+                  //         Navigator.pushNamed(context, '/gift_card');
+                  //       },
+                  //       child: Container(
+                  //         width: width * 0.45,
+                  //         height: height * 0.15,
+                  //         padding: EdgeInsets.all(20),
+                  //         decoration: BoxDecoration(
+                  //           color: Colors.white,
+                  //           borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  //         ),
+                  //         child: Image.asset('assets/img/globe.png'),
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
+                ],
+              ),
+            )
+          ],
         ),
       ),
     );

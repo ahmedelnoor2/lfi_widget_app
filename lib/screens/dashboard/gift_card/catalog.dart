@@ -174,7 +174,6 @@ class _CatalogBottomSheetState extends State<CatalogBottomSheet> {
                               giftcardprovider.toActiveCountry['iso2'])
                           ? InkWell(
                               onTap: () async {
-                               
                                 Navigator.pop(context);
                                 giftcardprovider.settActiveCatalog(data);
                                 //print(giftcardprovider.toActiveCatalog);
