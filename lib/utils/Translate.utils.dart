@@ -51,7 +51,7 @@ String getTranslate(String text) {
     case '验证码不正确':
       return 'Incorrect verification code';
     case '每日签到已完成':
-    return 'Daily check-in completed';
+      return 'Daily check-in completed';
     default:
       return text;
   }
@@ -215,5 +215,4 @@ String convertpaymentmethodText(String text) {
     default:
       return text;
   }
-  
 }

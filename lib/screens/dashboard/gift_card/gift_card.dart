@@ -404,19 +404,19 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                                       ),
                                     ),
                                     title: Text('${currentindex['name']}'),
-                                    subtitle: currentindex['is_a_range']
-                                        ? Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                  'Min price: ${currentindex['min'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
-                                              Text(
-                                                  'Max price: ${currentindex['max'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
-                                            ],
-                                          )
-                                        : Text(
-                                            'Price: ${currentindex['max'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                                    subtitle: priceType(currentindex),
+                                    // ? Column(
+                                    //     crossAxisAlignment:
+                                    //         CrossAxisAlignment.start,
+                                    //     children: [
+                                    //       Text(
+                                    //           'Min price: ${currentindex['min'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                                    //       Text(
+                                    //           'Max price: ${currentindex['max'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                                    //     ],
+                                    //   )
+                                    // : Text(
+                                    //     'Price: ${currentindex['max'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
                                     trailing: Icon(Icons.chevron_right),
                                   );
                                 },
@@ -429,5 +429,32 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
         ),
       ),
     );
+  }
+
+  Widget priceType(Map data) {
+    var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
+    print(data);
+    print(data['price']['fixed']['min']);
+    return data['price_type'] == "list"
+        ? Column(
+            children: [
+              Text('List data'),
+            ],
+          )
+        : data['price_type'] == "Range"
+            ? Column(
+                children: [
+                  Text('Range'),
+                ],
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                      'Min price: ${data['price']['fixed']['min'].toString().replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                  Text(
+                      'Max price: ${data['price']['fixed']['max'].toString().replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                ],
+              );
   }
 }
