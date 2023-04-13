@@ -135,6 +135,7 @@ class GiftCardProvider with ChangeNotifier {
         _allCountries = responseData['data']['countries'];
 
         _toActiveCountry = responseData['data']['active_country'];
+        print(_toActiveCountry);
         return notifyListeners();
       } else {
         _allCountries = [];
@@ -191,6 +192,8 @@ class GiftCardProvider with ChangeNotifier {
       if (responseData['code'] == 200) {
         IsCatalogloading = false;
         _allCatalog = responseData['data'];
+        print("catelogue...");
+        print(_allCatalog[0]);
         if (_toActiveCatalog.isEmpty) {
           _toActiveCatalog = _allCatalog[0];
         } else if (catUpdate) {
@@ -236,11 +239,9 @@ class GiftCardProvider with ChangeNotifier {
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
     headers['provider'] = providerid;
-    // print(_toActiveCatalog);
-    var countrycode =
-        await _toActiveCountry['iso3'] ?? _toActiveCountry['iso2'];
-    print(countrycode);
-    var catid = await _toActiveCatalog['id'];
+
+    var countrycode = _toActiveCountry['iso3'] ?? _toActiveCountry['iso2'];
+    var catid = _toActiveCatalog['id'];
     var name = _toActiveCatalog['brand'].split(" ")[0];
 
     var url = Uri.http(
@@ -250,7 +251,6 @@ class GiftCardProvider with ChangeNotifier {
       final response = await http.get(url, headers: headers);
 
       final responseData = json.decode(response.body);
-      print(responseData);
 
       if (responseData['code'] == 200) {
         cardloading = false;
@@ -271,7 +271,7 @@ class GiftCardProvider with ChangeNotifier {
   }
 
   //// Estimate////
-  var amountsystm;
+
   bool isEstimate = false;
 
   Map _estimateRate = {};
@@ -305,9 +305,7 @@ class GiftCardProvider with ChangeNotifier {
       if (responseData['code'] == 200) {
         isEstimate = false;
         _estimateRate = responseData['data']['records'][0];
-        // print(_estimateRate);
-        amountsystm = double.parse(_estimateRate['amount_system']);
-        //    print(amountsystm);
+
         return notifyListeners();
       } else {
         //snackAlert(ctx, SnackTypes.warning, responseData['msg']);

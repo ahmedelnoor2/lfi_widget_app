@@ -364,11 +364,12 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
 
                                   return ListTile(
                                     onTap: () {
-                                      var min = double.parse(currentindex['min']
-                                          .replaceAll(',', ""));
-                                      var max = double.parse(currentindex['max']
-                                          .replaceAll(',', ""));
-                                      print(min == max);
+                                      // if()
+                                      // var min = double.parse(currentindex['min']
+                                      //     .replaceAll(',', ""));
+                                      // var max = double.parse(currentindex['max']
+                                      //     .replaceAll(',', ""));
+                                      // print(min == max);
 
                                       Navigator.push(
                                         context,
@@ -381,7 +382,10 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                                               GiftDetail(
                                             data: currentindex,
                                             isEqualMinMax:
-                                                min == max ? false : true,
+                                                currentindex['price_type'] ==
+                                                        "fixed"
+                                                    ? false
+                                                    : true,
                                           ),
                                           transitionDuration:
                                               Duration(seconds: 0),
@@ -433,28 +437,41 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
 
   Widget priceType(Map data) {
     var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
-    print(data);
-    print(data['price']['fixed']['min']);
-    return data['price_type'] == "list"
-        ? Column(
-            children: [
-              Text('List data'),
-            ],
-          )
-        : data['price_type'] == "Range"
-            ? Column(
-                children: [
-                  Text('Range'),
-                ],
-              )
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                      'Min price: ${data['price']['fixed']['min'].toString().replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
-                  Text(
-                      'Max price: ${data['price']['fixed']['max'].toString().replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
-                ],
-              );
+
+    if (data['price_type'] == "list") {
+      return Container(
+        child: Wrap(
+          children: [
+            Text('Amount:'),
+            Text(data['price']['list']
+                .map((item) => item.toString())
+                .join(', ')),
+            Text(giftcardprovider.toActiveCountry['currency']['code'])
+          ],
+        ),
+      );
+    } else if (data['price_type'] == "range") {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+              'Min price: ${data['price']['range']['min'].toString().replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+          Text(
+              'Max price: ${data['price']['range']['max'].toString().replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+        ],
+      );
+    } else if (data['price_type'] == "fixed") {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+              'Min price: ${data['price']['fixed']['min'].toString().replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+          Text(
+              'Max price: ${data['price']['fixed']['max'].toString().replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+        ],
+      );
+    } else {
+      return Container();
+    }
   }
 }

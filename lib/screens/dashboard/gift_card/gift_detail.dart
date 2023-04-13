@@ -61,23 +61,18 @@ class _GiftDetailState extends State<GiftDetail> {
 
     var giftcardprovider =
         Provider.of<GiftCardProvider>(context, listen: false);
-    var cardrate = widget.data['max'].replaceAll(',', "");
+    var cardrate = widget.data['price']['fixed']['max'].toString();
+
     var _payment = double.parse(cardrate);
     if (widget.isEqualMinMax == false) {
       _amountcontroller.text = cardrate.toString();
 
       var userid = await auth.userInfo['id'];
+
       await giftcardprovider.getEstimateRate(context, auth, userid, {
-        "currency": "${widget.data['currency']['code']}",
+        "currency": "${giftcardprovider.toActiveCountry['currency']['code']}",
         "payment": _payment,
         "productID": widget.data['BillerID']
-      });
-
-      estprice = double.parse(widget.data['max'].replaceAll(',', ""));
-      var price = giftcardprovider.amountsystm / estprice;
-      var finalprice = estprice / price;
-      setState(() {
-        estimateprice = finalprice;
       });
     }
 
@@ -182,6 +177,7 @@ class _GiftDetailState extends State<GiftDetail> {
     var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
     var asset = Provider.of<Asset>(context, listen: true);
     var public = Provider.of<Public>(context, listen: true);
+    print(widget.data);
 //print(giftcardprovider.toActiveCountry);
     return Scaffold(
       key: _scaffoldKey,
@@ -355,10 +351,9 @@ class _GiftDetailState extends State<GiftDetail> {
                             controller: _amountcontroller,
                             enabled: widget.isEqualMinMax,
                             validator: (value) {
-                              var min = double.parse(
-                                  widget.data['min'].replaceAll(',', ""));
-                              var max = double.parse(
-                                  widget.data['max'].replaceAll(',', ""));
+                              var min = widget.data['price']['range']['min'];
+
+                              var max = widget.data['price']['range']['max'];
                               if (value == null || value.isEmpty) {
                                 return 'Please enter Amount';
                               } else if (double.parse(value.toString()) < min) {
@@ -376,17 +371,8 @@ class _GiftDetailState extends State<GiftDetail> {
                                 await getEstimateRate(
                                     widget.data['BillerID'],
                                     _amountcontroller.text,
-                                    widget.data['currency']['code']);
-                                print(widget.data['currency']['code']);
-                                estprice = double.parse(value);
-                                var price =
-                                    giftcardprovider.amountsystm / estprice;
-                                var finalprice = estprice / price;
-                                setState(() {
-                                  estimateprice = finalprice;
-                                });
-                              } else {
-                                estimateprice = 0.0;
+                                    giftcardprovider.toActiveCountry['currency']
+                                        ['code']);
                               }
                             }),
                             keyboardType: TextInputType.number,
@@ -447,38 +433,15 @@ class _GiftDetailState extends State<GiftDetail> {
                                 ),
                                 giftcardprovider.isEstimate
                                     ? CircularProgressIndicator()
-                                    : Text('${estimateprice.toStringAsFixed(4)}'
-                                            ' ' +
-                                        _coinShowName)
+                                    : Text(
+                                        '${giftcardprovider.estimateRate['amount_system']}'
+                                                ' ' +
+                                            _coinShowName)
                               ]),
                         ),
-                        widget.data['is_a_range']
-                            ? Container(
-                                padding: EdgeInsets.only(bottom: 30),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                        'Min price: ${widget.data['min'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
-                                    Text(
-                                        'Max price: ${widget.data['max'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
-                                  ],
-                                ),
-                              )
-                            : Container(
-                                padding: EdgeInsets.only(bottom: 30),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                        'Min price: ${widget.data['min'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
-                                    Text(
-                                        'Max price: ${widget.data['max'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
-                                  ],
-                                ),
-                              ),
+                        priceType(widget.data),
+
+                        ///price type widget //
                         LyoButton(
                           onPressed: (() async {
                             if (_formKey.currentState!.validate()) {
@@ -525,5 +488,51 @@ class _GiftDetailState extends State<GiftDetail> {
         ],
       ),
     );
+  }
+
+  Widget priceType(Map data) {
+    var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
+
+    if (data['price_type'] == "list") {
+      return Container(
+        child: Wrap(
+          children: [
+            Text('Amount:'),
+            Text(data['price']['list']
+                .map((item) => item.toString())
+                .join(', ')),
+            Text(giftcardprovider.toActiveCountry['currency']['code'])
+          ],
+        ),
+      );
+    } else if (data['price_type'] == "range") {
+      return Container(
+        padding: EdgeInsets.only(bottom: 30),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+                'Min price: ${data['price']['range']['min'].toString().replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+            Text(
+                'Max price: ${data['price']['range']['max'].toString().replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+          ],
+        ),
+      );
+    } else if (data['price_type'] == "fixed") {
+      return Container(
+        padding: EdgeInsets.only(bottom: 30),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+                'Min price: ${data['price']['fixed']['min'].toString().replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+            Text(
+                'Max price: ${data['price']['fixed']['max'].toString().replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+          ],
+        ),
+      );
+    } else {
+      return Container();
+    }
   }
 }
