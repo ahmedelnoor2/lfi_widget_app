@@ -71,7 +71,7 @@ class GiftCardProvider with ChangeNotifier {
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
 
-    var url = Uri.https(lyoApiUrl, 'gift-card/wallets');
+    var url = Uri.http(gifttesturl, 'gift-card/wallets');
     // print(url);
 
     try {
@@ -289,7 +289,7 @@ class GiftCardProvider with ChangeNotifier {
 
     var mydata = json.encode(postdata);
 
-    var url = Uri.https(lyoApiUrl, 'gift-card/estimate');
+    var url = Uri.http(gifttesturl, 'gift-card/estimate');
 
     try {
       final response = await http.post(
@@ -304,8 +304,8 @@ class GiftCardProvider with ChangeNotifier {
 
       if (responseData['code'] == 200) {
         isEstimate = false;
-        _estimateRate = responseData['data']['records'][0];
-
+        _estimateRate = responseData['data'][0];
+        print(_estimateRate);
         return notifyListeners();
       } else {
         //snackAlert(ctx, SnackTypes.warning, responseData['msg']);
@@ -365,7 +365,7 @@ class GiftCardProvider with ChangeNotifier {
 
     var mydata = json.encode(postdata);
 
-    var url = Uri.https(lyoApiUrl, 'gift-card/send_verification_request');
+    var url = Uri.http(gifttesturl, 'gift-card/send_verification_request');
 
     try {
       final response = await http.post(
@@ -422,12 +422,11 @@ class GiftCardProvider with ChangeNotifier {
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
-
     var mydata = json.encode(postdata);
     print("with drwawal response...");
     print(mydata);
 
-    var url = Uri.https(lyoApiUrl, 'gift-card/withdraw');
+    var url = Uri.http(gifttesturl, 'gift-card/withdraw');
     print(url);
     try {
       final response = await http.post(
@@ -485,7 +484,7 @@ class GiftCardProvider with ChangeNotifier {
 
     var mydata = json.encode(postdata);
 
-    var url = Uri.https(lyoApiUrl, 'gift-card/transaction');
+    var url = Uri.http(gifttesturl, 'gift-card/transaction');
 
     try {
       final response = await http.post(
@@ -524,7 +523,6 @@ class GiftCardProvider with ChangeNotifier {
   }
 
   /// Get All Gift Card Transaction ///
-  //// Do Transaction////
 
   bool istransactionloading = false;
 
@@ -544,7 +542,7 @@ class GiftCardProvider with ChangeNotifier {
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
 
-    var url = Uri.https(lyoApiUrl, 'gift-card/transaction');
+    var url = Uri.http(gifttesturl, 'gift-card/transaction');
 
     try {
       final response = await http.get(
@@ -553,11 +551,12 @@ class GiftCardProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-      // print(responseData);
+      print(responseData);
 
       if (responseData['code'] == '200' || responseData['code'] == 200) {
         istransactionloading = false;
         _transaction = responseData['data'].reversed.toList();
+        print('check....transactionj');
         print(_transaction.last);
 
         return notifyListeners();
@@ -571,6 +570,50 @@ class GiftCardProvider with ChangeNotifier {
       istransactionloading = false;
       print(error);
       snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return notifyListeners();
+    }
+  }
+
+  //// get redeem deatils
+  bool isredeemloading = false;
+  Map _redeem = {};
+
+  Map get redeem {
+    return _redeem;
+  }
+
+  Future<void> getRedeem(
+    ctx,
+    auth,
+    userid,
+    transactionId,
+    brandId,
+  ) async {
+    isredeemloading = true;
+    notifyListeners();
+    headers['token'] = auth.loginVerificationToken;
+    headers['userid'] = '${userid}';
+
+    var url =
+        Uri.http(gifttesturl, 'gift-card/redeem/${brandId}/${transactionId}');
+    print(url);
+    try {
+      final response = await http.get(url, headers: headers);
+
+      final responseData = json.decode(response.body);
+      print(responseData);
+
+      if (responseData['code'] == 200) {
+        _redeem = responseData['data'];
+        isredeemloading = false;
+        return notifyListeners();
+      } else {
+        _redeem = {};
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
       return notifyListeners();
     }
   }

@@ -102,36 +102,36 @@ class _BuyCardState extends State<BuyCard> {
     });
   }
 
-  Future<void> withDrawal(coin, totalprice, verifitypre) async {
-    var giftcardprovider =
-        Provider.of<GiftCardProvider>(context, listen: false);
-    var auth = Provider.of<Auth>(context, listen: false);
-    var asset = Provider.of<Asset>(context, listen: false);
-    var userid = await auth.userInfo['id'];
+  // Future<void> withDrawal(coin, totalprice, verifitypre) async {
+  //   var giftcardprovider =
+  //       Provider.of<GiftCardProvider>(context, listen: false);
+  //   var auth = Provider.of<Auth>(context, listen: false);
+  //   var asset = Provider.of<Asset>(context, listen: false);
+  //   var userid = await auth.userInfo['id'];
 
-    withdrwalResponse =
-        await giftcardprovider.getDoWithDrawal(context, auth, userid, {
-      "symbol": '$coin',
-      "fee": '${asset.getCost['defaultFee']}',
-      "amount": "$totalprice",
-      "verificationType": "$verifitypre",
-      "emailValidCode":
-          verifitypre == 'emailValidCode' ? _optcontroller.text : "",
-      "smsValidCode": verifitypre == 'smsValidCode' ? _optcontroller.text : "",
-      "googleCode": _googlecodecontroller.text
-    });
-    // print(withdrwalResponse);
-  }
+  //   withdrwalResponse =
+  //       await giftcardprovider.getDoWithDrawal(context, auth, userid, {
+  //     "symbol": '$coin',
+  //     "fee": '${asset.getCost['defaultFee']}',
+  //     "amount": "$totalprice",
+  //     "verificationType": "$verifitypre",
+  //     "emailValidCode":
+  //         verifitypre == 'emailValidCode' ? _optcontroller.text : "",
+  //     "smsValidCode": verifitypre == 'smsValidCode' ? _optcontroller.text : "",
+  //     "googleCode": _googlecodecontroller.text
+  //   });
+  //   // print(withdrwalResponse);
+  // }
 
   Future<void> dotransaction(productid, amount) async {
     var giftcardprovider =
         Provider.of<GiftCardProvider>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
     var userid = await auth.userInfo['id'];
-    if (withdrwalResponse == true) {
-      await giftcardprovider.getDoTransaction(context, auth, userid,
-          {"productID": "$productid", "amount": "$amount", "quantity": 1});
-    }
+    //   if (withdrwalResponse == true) {
+    await giftcardprovider.getDoTransaction(context, auth, userid,
+        {"productID": "$productid", "amount": "$amount", "quantity": 1});
+    //   }
   }
 
   @override
@@ -478,11 +478,11 @@ class _BuyCardState extends State<BuyCard> {
                                           onPressed: (() async {
                                             if (_formKey.currentState!
                                                 .validate()) {
-                                              await withDrawal(
-                                                  args.defaultcoin,
-                                                  args.totalprice,
-                                                  giftcardprovider.doverify[
-                                                      'verificationType']);
+                                              // await withDrawal(
+                                              //     args.defaultcoin,
+                                              //     args.totalprice,
+                                              //     giftcardprovider.doverify[
+                                              //         'verificationType']);
 
                                               await dotransaction(
                                                   args.productID,
