@@ -443,9 +443,14 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
         child: Wrap(
           children: [
             Text('Amount:'),
-            Text(data['price']['list']
-                .map((item) => item.toString())
-                .join(', ')),
+            Text(data['price']['list'].map((item) {
+              if (giftcardprovider.toActiveCountry['currency']['code'] !=
+                  'AED') {
+                return item * giftcardprovider.toActiveCountry['rate']['rate'];
+              } else {
+                return item;
+              }
+            }).join(', ')),
             Text(giftcardprovider.toActiveCountry['currency']['code'])
           ],
         ),
@@ -455,9 +460,9 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-              'Min price: ${data['price']['range']['min'].toString().replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+              'Min price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? data['price']['range']['min'] * giftcardprovider.toActiveCountry['rate']['rate'] : data['price']['range']['min']} ${giftcardprovider.toActiveCountry['currency']['code']}'),
           Text(
-              'Max price: ${data['price']['range']['max'].toString().replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+              'Max price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? data['price']['range']['max'].toString().replaceAll(',', "") * giftcardprovider.toActiveCountry['rate']['rate'] : data['price']['range']['max'].toString().replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
         ],
       );
     } else if (data['price_type'] == "fixed") {
@@ -465,9 +470,9 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-              'Min price: ${data['price']['fixed']['min'].toString().replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+              'Min price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? data['price']['fixed']['min'] * giftcardprovider.toActiveCountry['rate']['rate'] : data['price']['fixed']['min']} ${giftcardprovider.toActiveCountry['currency']['code']}'),
           Text(
-              'Max price: ${data['price']['fixed']['max'].toString().replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+              'Max price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? data['price']['fixed']['max'] * giftcardprovider.toActiveCountry['rate']['rate'] : data['price']['fixed']['max']} ${giftcardprovider.toActiveCountry['currency']['code']}'),
         ],
       );
     } else {

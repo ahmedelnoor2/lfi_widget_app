@@ -205,21 +205,6 @@ class _GiftCardTransactionState extends State<GiftCardTransaction> {
                                                                     ),
                                                                   ),
                                                                 ),
-                                                                SizedBox(
-                                                                  height: 5,
-                                                                ),
-                                                                SizedBox(
-                                                                  child: Text(
-                                                                    'Expiration Date :',
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontSize:
-                                                                          12,
-                                                                      color:
-                                                                          secondaryTextColor,
-                                                                    ),
-                                                                  ),
-                                                                ),
                                                               ],
                                                             ),
                                                           ),

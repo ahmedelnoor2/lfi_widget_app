@@ -503,7 +503,6 @@ class GiftCardProvider with ChangeNotifier {
         paymentstatus = 'Completed';
 
         snackAlert(ctx, SnackTypes.success, responseData['msg']);
-        Navigator.pushNamed(ctx, '/gift_transaction_detail');
 
         return notifyListeners();
       } else {
@@ -596,7 +595,7 @@ class GiftCardProvider with ChangeNotifier {
 
     var url =
         Uri.http(gifttesturl, 'gift-card/redeem/${brandId}/${transactionId}');
-    print(url);
+
     try {
       final response = await http.get(url, headers: headers);
 

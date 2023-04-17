@@ -16,7 +16,7 @@ import 'package:provider/provider.dart';
 
 class BuyCard extends StatefulWidget {
   static const routeName = '/buy_card';
-  const BuyCard(
+  BuyCard(
       {Key? key,
       this.amount,
       this.totalprice,
@@ -26,7 +26,7 @@ class BuyCard extends StatefulWidget {
       : super(key: key);
 
   final String? amount;
-  final double? totalprice;
+  var totalprice;
   final String? defaultcoin;
   final String? ShowName;
   final String? productID;
@@ -120,7 +120,7 @@ class _BuyCardState extends State<BuyCard> {
       "smsValidCode": verifitypre == 'smsValidCode' ? _optcontroller.text : "",
       "googleCode": _googlecodecontroller.text
     });
-    // print(withdrwalResponse);
+    print(withdrwalResponse);
   }
 
   Future<void> dotransaction(productid, amount) async {
@@ -128,10 +128,10 @@ class _BuyCardState extends State<BuyCard> {
         Provider.of<GiftCardProvider>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
     var userid = await auth.userInfo['id'];
-    if (withdrwalResponse == true) {
-      await giftcardprovider.getDoTransaction(context, auth, userid,
-          {"productID": "$productid", "amount": "$amount", "quantity": 1});
-    }
+    //  if (withdrwalResponse == true) {
+    await giftcardprovider.getDoTransaction(context, auth, userid,
+        {"productID": "$productid", "amount": "$amount", "quantity": 1});
+    //   }
   }
 
   @override
@@ -273,8 +273,8 @@ class _BuyCardState extends State<BuyCard> {
                       Container(
                         padding: EdgeInsets.only(top: 5),
                         child: Text(
-                          args.amount.toString() +
-                              ' ' +
+                          '${double.parse(args.amount!)}'
+                                  ' ' +
                               giftcardprovider.toActiveCountry['currency']
                                   ['code'],
                           style: TextStyle(
@@ -299,18 +299,44 @@ class _BuyCardState extends State<BuyCard> {
                           'Completed',
                           style: TextStyle(color: successColor),
                         ),
-                        Container(
-                          padding: EdgeInsets.only(top: 20, right: 4, left: 4),
-                          child: LyoButton(
-                            onPressed: (() async {
-                              Navigator.pop(context);
-                            }),
-                            text: 'Back',
-                            active: true,
-                            isLoading: giftcardprovider.iswithdrwal,
-                            activeColor: linkColor,
-                            activeTextColor: Colors.black,
-                          ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: width * 0.45,
+                              padding:
+                                  EdgeInsets.only(top: 20, right: 4, left: 4),
+                              child: LyoButton(
+                                onPressed: (() async {
+                                  Navigator.pop(context);
+                                }),
+                                text: 'Back',
+                                active: true,
+                                isLoading: giftcardprovider.iswithdrwal,
+                                activeColor: linkColor,
+                                activeTextColor: Colors.black,
+                              ),
+                            ),
+                            Container(
+                              width: width * 0.45,
+                              padding:
+                                  EdgeInsets.only(top: 20, right: 4, left: 4),
+                              child: LyoButton(
+                                onPressed: (() async {
+                                  Navigator.pushNamed(
+                                      context, '/gift_transaction_detail');
+                                }),
+                                text: 'View Redeem',
+                                active: true,
+                                isLoading: giftcardprovider.iswithdrwal,
+                                activeColor: linkColor,
+                                activeTextColor: Colors.black,
+                              ),
+                            )
+                          ],
                         )
                       ],
                     )
@@ -486,7 +512,12 @@ class _BuyCardState extends State<BuyCard> {
 
                                               await dotransaction(
                                                   args.productID,
-                                                  args.totalprice);
+                                                  giftcardprovider.toActiveCountry[
+                                                                  'currency']
+                                                              ['code'] !=
+                                                          'AED'
+                                                      ? args.totalprice
+                                                      : args.amount);
                                             }
                                           }),
                                           text: 'Buy Now',

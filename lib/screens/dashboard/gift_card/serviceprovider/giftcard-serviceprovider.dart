@@ -94,10 +94,10 @@ class _GiftCardServiceProviderState extends State<GiftCardServiceProvider> {
                         var data = giftcardprovider.allgiftprovider[i];
                         return InkWell(
                           onTap: () {
-                             giftcardprovider.setproiverid(data['providerId'].toString());
+                            giftcardprovider
+                                .setproiverid(data['providerId'].toString());
                             print(giftcardprovider.providerid);
                             Navigator.pushNamed(context, '/gift_card');
-                             
                           },
                           child: Card(
                             child: Container(
