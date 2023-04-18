@@ -128,10 +128,10 @@ class _BuyCardState extends State<BuyCard> {
         Provider.of<GiftCardProvider>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
     var userid = await auth.userInfo['id'];
-    //  if (withdrwalResponse == true) {
-    await giftcardprovider.getDoTransaction(context, auth, userid,
-        {"productID": "$productid", "amount": "$amount", "quantity": 1});
-    //   }
+    if (withdrwalResponse == true) {
+      await giftcardprovider.getDoTransaction(context, auth, userid,
+          {"productID": "$productid", "amount": "$amount", "quantity": 1});
+    }
   }
 
   @override

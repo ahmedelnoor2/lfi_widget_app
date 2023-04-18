@@ -251,8 +251,9 @@ class _GiftCardTransactionState extends State<GiftCardTransaction> {
                                                     children: [
                                                       Text(
                                                         currentIndex['summary'][
-                                                                'totalCustomerCostUSD']
-                                                            .toString(),
+                                                                    'totalCustomerCostUSD']
+                                                                .toString() +
+                                                            ' USD',
                                                         style: TextStyle(
                                                           fontSize: 12,
                                                         ),
@@ -328,12 +329,12 @@ class _GiftCardTransactionState extends State<GiftCardTransaction> {
     );
   }
 
-  Future<void> _launchPDF(url) async {
-    var _url = Uri.parse(url);
-    if (await canLaunch(url)) {
-      await launchUrl(_url, mode: LaunchMode.externalApplication);
-    } else {
-      throw 'Could not launch PDF';
-    }
-  }
+  // Future<void> _launchPDF(url) async {
+  //   var _url = Uri.parse(url);
+  //   if (await canLaunch(url)) {
+  //     await launchUrl(_url, mode: LaunchMode.externalApplication);
+  //   } else {
+  //     throw 'Could not launch PDF';
+  //   }
+  // }
 }

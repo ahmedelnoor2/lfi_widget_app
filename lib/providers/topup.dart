@@ -8,7 +8,7 @@ import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Translate.utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class GiftCardProvider with ChangeNotifier {
+class TopupProvider with ChangeNotifier {
   Map<String, String> headers = {
     'Content-type': 'application/json;charset=utf-8',
     'Accept': 'application/json',
