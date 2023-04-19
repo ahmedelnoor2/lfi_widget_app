@@ -14,49 +14,8 @@ class TopupProvider with ChangeNotifier {
     'Accept': 'application/json',
     'token': '',
     'userId': '',
-    'provider': '',
   };
   String paymentstatus = 'Waiting for payment';
-
-  // get provider list
-
-  String _provierid = '';
-  String get providerid {
-    return _provierid;
-  }
-
-  void setproiverid(value) {
-    _provierid = value;
-    notifyListeners();
-  }
-
-  List _allgiftprovider = [];
-
-  List get allgiftprovider {
-    return _allgiftprovider;
-  }
-
-  Future<void> getAllGiftProvider() async {
-    var url = Uri.http(gifttesturl, 'gift-card/providers');
-
-    try {
-      final response = await http.get(url, headers: headers);
-
-      final responseData = json.decode(response.body);
-
-      if (responseData['code'] == 200) {
-        _allgiftprovider = responseData['data'];
-        return notifyListeners();
-      } else {
-        _allgiftprovider = [];
-        return notifyListeners();
-      }
-    } catch (error) {
-      print(error);
-
-      return notifyListeners();
-    }
-  }
 
   //// Get Wallet//
   List _allwallet = [];
@@ -127,9 +86,8 @@ class TopupProvider with ChangeNotifier {
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
-    headers['provider'] = providerid;
 
-    var url = Uri.http(gifttesturl, 'gift-card/countries');
+    var url = Uri.http(gifttesturl, 'top-up/countries');
 
     try {
       final response = await http.get(url, headers: headers);
@@ -155,72 +113,65 @@ class TopupProvider with ChangeNotifier {
     }
   }
 
-  //// Get All Catalog ///
-  Map _toActiveCatalog = {};
+  //// Get All topup provider ///
+  Map _toActiveNetWorkprovider = {};
 
-  Map get toActiveCatalog {
-    return _toActiveCatalog;
+  Map get toActiveNetWorkprovider {
+    return _toActiveNetWorkprovider;
   }
 
-  void settActiveCatalog(catlog) {
-    _toActiveCatalog = catlog;
+  void setActiveNetWorkprovider(topupnetwork) {
+    _toActiveNetWorkprovider = topupnetwork;
 
     return notifyListeners();
   }
 
-  bool IsCatalogloading = false;
+  bool IstopupnetWorkloading = false;
 
-  List _allCatalog = [];
+  List _allTopupNetwork = [];
 
-  List get allCatalog {
-    return _allCatalog;
+  List get allTopupNetwork {
+    return _allTopupNetwork;
   }
 
-  List _sliderlist = [];
-
-  List get sliderlist {
-    return _sliderlist;
-  }
-
-  Future<void> getAllCatalog(ctx, auth, userid, postdata, catUpdate) async {
-    IsCatalogloading = true;
+  Future<void> getAllNetWorkprovider(
+      ctx, auth, userid, postdata, catUpdate) async {
+    IstopupnetWorkloading = true;
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
-    headers['provider'] = providerid;
-    var mydata = json.encode(postdata);
-    var url = Uri.http(gifttesturl, 'gift-card/catalogues');
+    var activeContryName = toActiveCountry['isoName'];
 
+    var url = Uri.http(gifttesturl, 'top-up/operators/$activeContryName');
+    print(url);
     try {
-      final response = await http.post(url, body: mydata, headers: headers);
+      final response = await http.get(url, headers: headers);
 
       final responseData = json.decode(response.body);
-
+      print(responseData);
       if (responseData['code'] == 200) {
-        IsCatalogloading = false;
-        _allCatalog = responseData['data'];
+        IstopupnetWorkloading = false;
+        _allTopupNetwork = responseData['data'];
         print("catelogue...");
-        print(_allCatalog[0]);
-        if (_toActiveCatalog.isEmpty) {
-          _toActiveCatalog = _allCatalog[0];
+        print(_allTopupNetwork[0]);
+        if (_toActiveNetWorkprovider.isEmpty) {
+          _toActiveNetWorkprovider = _allTopupNetwork[0];
         } else if (catUpdate) {
-          if (_allCatalog.length > 0) {
-            _toActiveCatalog = _allCatalog[0];
+          if (_allTopupNetwork.length > 0) {
+            _toActiveNetWorkprovider = _allTopupNetwork[0];
           } else {
-            _toActiveCatalog = {};
+            _toActiveNetWorkprovider = {};
           }
         }
 
-        _sliderlist = _allCatalog.take(5).toList();
-
         return notifyListeners();
       } else {
-        IsCatalogloading = false;
-        _allCatalog = [];
+        IstopupnetWorkloading = false;
+        _allTopupNetwork = [];
         return notifyListeners();
       }
     } catch (error) {
-      IsCatalogloading = false;
+      IstopupnetWorkloading = false;
       print(error);
       // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
       return notifyListeners();
@@ -245,11 +196,10 @@ class TopupProvider with ChangeNotifier {
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
-    headers['provider'] = providerid;
 
     var countrycode = _toActiveCountry['iso3'] ?? _toActiveCountry['iso2'];
-    var catid = _toActiveCatalog['id'];
-    var name = _toActiveCatalog['brand'].split(" ")[0];
+    var catid = _toActiveNetWorkprovider['id'];
+    var name = _toActiveNetWorkprovider['brand'].split(" ")[0];
 
     var url = Uri.http(
         gifttesturl, 'gift-card/cards/$catid/$countrycode', {'name': '$name'});
@@ -296,7 +246,7 @@ class TopupProvider with ChangeNotifier {
 
     var mydata = json.encode(postdata);
 
-    var url = Uri.http(gifttesturl, 'gift-card/estimate');
+    var url = Uri.http(gifttesturl, 'top-up/estimate');
 
     try {
       final response = await http.post(

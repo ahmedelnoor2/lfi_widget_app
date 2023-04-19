@@ -30,7 +30,7 @@ class _HotlinksState extends State<Hotlinks> {
         children: [
           GestureDetector(
             onTap: () {
-              Navigator.popAndPushNamed(context, '/topup');
+              Navigator.pushNamed(context, '/topup');
             },
             child: Column(
               children: [

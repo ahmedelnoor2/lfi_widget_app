@@ -1,18 +1,26 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/giftcard.dart';
 import 'package:lyotrade/providers/public.dart';
+import 'package:lyotrade/providers/topup.dart';
 import 'package:lyotrade/screens/common/drawer.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/dashboard/gift_card/country_drawer.dart';
+
+import 'package:lyotrade/screens/topup/widget/confirm_topup.dart';
+import 'package:lyotrade/screens/topup/widget/networkbottomsheet.dart';
+import 'package:lyotrade/screens/topup/widget/topupCountryDrawer.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class TopUp extends StatefulWidget {
-  static const routeNmame = '/topup';
+  static const routeName = '/topup';
   const TopUp({Key? key}) : super(key: key);
 
   @override
@@ -26,14 +34,16 @@ class _TopUpState extends State<TopUp> {
   String _defaultNetwork = 'BSC';
   String _coinShowName = 'USDT';
   bool _tagType = false;
-  int? _selectedAmount;
+  double? _selectedAmount;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _numberController = TextEditingController();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   void initState() {
     super.initState();
     getDigitalBalance();
+    getAllCountries();
   }
 
   Future<void> getDigitalBalance() async {
@@ -41,15 +51,13 @@ class _TopUpState extends State<TopUp> {
     var public = Provider.of<Public>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
 
-    var giftcardprovider =
-        Provider.of<GiftCardProvider>(context, listen: false);
     // if (widget.isEqualMinMax == false) {
     //   var cardrate = widget.data['price']['fixed']['max'].toString();
     //   var _payment = double.parse(cardrate);
     //   _amountcontroller.text = cardrate.toString();
     //   var userid = await auth.userInfo['id'];
-    //   await giftcardprovider.getEstimateRate(context, auth, userid, {
-    //     "currency": "${giftcardprovider.toActiveCountry['currency']['code']}",
+    //   await topupProvider.getEstimateRate(context, auth, userid, {
+    //     "currency": "${topupProvider.toActiveCountry['currency']['code']}",
     //     "payment": _payment,
     //     "productID": widget.data['BillerID']
     //   });
@@ -59,8 +67,8 @@ class _TopUpState extends State<TopUp> {
     //   var _payment = double.parse(cardrate);
     //   var userid = await auth.userInfo['id'];
 
-    //   await giftcardprovider.getEstimateRate(context, auth, userid, {
-    //     "currency": "${giftcardprovider.toActiveCountry['currency']['code']}",
+    //   await topupProvider.getEstimateRate(context, auth, userid, {
+    //     "currency": "${topupProvider.toActiveCountry['currency']['code']}",
     //     "payment": _payment,
     //     "productID": widget.data['BillerID']
     //   });
@@ -153,14 +161,48 @@ class _TopUpState extends State<TopUp> {
     asset.setDigAssets(_digitialAss);
   }
 
+  Future<void> getAllCountries() async {
+    var topupProvider = Provider.of<TopupProvider>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
+    var userid = await auth.userInfo['id'];
+    await topupProvider.getAllCountries(context, auth, userid);
+    await getAllTopUpNetwork();
+  }
+
+  Future<void> getAllTopUpNetwork() async {
+    var topupProvider = Provider.of<TopupProvider>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
+    var userid = await auth.userInfo['id'];
+    await topupProvider.getAllNetWorkprovider(context, auth, userid,
+        {"country": topupProvider.toActiveCountry['isoName']}, true);
+    _selectedAmount =
+        topupProvider.toActiveNetWorkprovider['price_type']['price'][0];
+    await topupProvider.getEstimateRate(context, auth, userid, {
+      "currency": "${topupProvider.toActiveCountry['currencyCode']}",
+      "payment": _selectedAmount,
+    });
+  }
+
+  // Get Estimate Rate//
+  Future<void> getEstimateRate() async {
+    var topupProvider = Provider.of<TopupProvider>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
+    var userid = await auth.userInfo['id'];
+    await topupProvider.getEstimateRate(context, auth, userid, {
+      "currency": "${topupProvider.toActiveCountry['currencyCode']}",
+      "payment": _selectedAmount,
+    });
+    return;
+  }
+
   @override
   Widget build(BuildContext context) {
-    var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
+    var topupProvider = Provider.of<TopupProvider>(context, listen: true);
     var asset = Provider.of<Asset>(context, listen: true);
     var public = Provider.of<Public>(context, listen: true);
     return Scaffold(
       key: _scaffoldKey,
-      drawer: const CountryDrawer(),
+      drawer: const TopupConfirmDrawer(),
       endDrawer: drawer(
         context,
         width,
@@ -169,7 +211,7 @@ class _TopUpState extends State<TopUp> {
         public,
         _searchController,
         getCoinCosts,
-        giftcardprovider.allwallet,
+        topupProvider.allwallet,
       ),
       appBar: hiddenAppBar(),
       body: SingleChildScrollView(
@@ -211,7 +253,7 @@ class _TopUpState extends State<TopUp> {
             ),
             Divider(),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -235,13 +277,19 @@ class _TopUpState extends State<TopUp> {
                             _scaffoldKey.currentState!.openDrawer();
                           },
                           child: Container(
-                            width: width * 0.30,
+                            width: width * 0.25,
+                            height: height * 0.07,
                             padding: EdgeInsets.all(8),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Icon(Icons.image),
-                                Text('+91'),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 8),
+                                  child: topupProvider.isCountryLoading
+                                      ? CircularProgressIndicator()
+                                      : Text(topupProvider
+                                          .toActiveCountry['callingCodes'][0]),
+                                ),
                                 Icon(Icons.arrow_drop_down),
                               ],
                             ),
@@ -253,15 +301,22 @@ class _TopUpState extends State<TopUp> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
-                                width: width * 0.60,
+                                width: width * 0.65,
                                 child: TextFormField(
                                   // The validator receives the text that the user has entered.
+                                  keyboardType: TextInputType.phone,
+                                  autocorrect: false,
+                                  controller: _numberController,
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Please enter some text';
+                                      return 'Please enter phone number';
                                     }
                                     return null;
                                   },
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    hintText: 'Enter phone number',
+                                  ),
                                 ),
                               ),
                             ],
@@ -273,24 +328,56 @@ class _TopUpState extends State<TopUp> {
                   Container(
                       padding: EdgeInsets.only(bottom: 10, top: 10),
                       child: Text('Network Provider')),
-                  Container(
-                    width: width,
-                    height: height * 0.07,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      border: Border.all(
-                        style: BorderStyle.solid,
-                        width: 0.3,
-                        color: Color(0xff5E6292),
+                  InkWell(
+                    onTap: () {
+                      showModalBottomSheet<void>(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (BuildContext context) {
+                          return StatefulBuilder(
+                            builder:
+                                (BuildContext context, StateSetter setState) {
+                              return Container(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.85,
+                                  child: const TopupNetworkBottomSheet());
+                            },
+                          );
+                        },
+                      );
+                    },
+                    child: Container(
+                      width: width,
+                      height: height * 0.07,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(
+                          style: BorderStyle.solid,
+                          width: 0.3,
+                          color: Color(0xff5E6292),
+                        ),
                       ),
-                    ),
-                    padding: EdgeInsets.all(8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Reloadly'),
-                        Icon(Icons.arrow_drop_down),
-                      ],
+                      padding: EdgeInsets.all(8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(50.0),
+                            child: FadeInImage.memoryNetwork(
+                              width: 40,
+                              height: 40,
+                              placeholder: kTransparentImage,
+                              image: topupProvider
+                                  .toActiveNetWorkprovider['logo'][0]
+                                  .toString(),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          Text(topupProvider
+                              .toActiveNetWorkprovider['operatorName']),
+                          Icon(Icons.arrow_drop_down),
+                        ],
+                      ),
                     ),
                   ),
                   Container(
@@ -307,7 +394,7 @@ class _TopUpState extends State<TopUp> {
                         color: Color(0xff5E6292),
                       ),
                     ),
-                    child: DropdownButton<int>(
+                    child: DropdownButton<double>(
                         isDense: true,
                         value: _selectedAmount,
                         icon: Container(
@@ -321,26 +408,16 @@ class _TopUpState extends State<TopUp> {
                         underline: Container(
                           height: 0,
                         ),
-                        onChanged: (int? newValue) {
+                        onChanged: (newValue) {
                           setState(() {
                             _selectedAmount = newValue;
                           });
+                          getEstimateRate();
                         },
-                        items: [
-                          2,
-                          10,
-                          15,
-                          20,
-                          23,
-                          45,
-                          6,
-                          43,
-                          23,
-                          1,
-                          12,
-                          324,
-                        ].map<DropdownMenuItem<int>>((value) {
-                          return DropdownMenuItem<int>(
+                        items: topupProvider
+                            .toActiveNetWorkprovider['price_type']['price']
+                            .map<DropdownMenuItem<double>>((value) {
+                          return DropdownMenuItem<double>(
                             value: value,
                             child: Text(
                               value.toString(),
@@ -352,7 +429,7 @@ class _TopUpState extends State<TopUp> {
                         }).toList()),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(top: 10, bottom: 20),
+                    padding: const EdgeInsets.only(top: 20, bottom: 20),
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -360,11 +437,11 @@ class _TopUpState extends State<TopUp> {
                             'Estimated Rate',
                             style: TextStyle(color: secondaryTextColor400),
                           ),
-                          giftcardprovider.isEstimate
+                          topupProvider.isEstimate
                               ? CircularProgressIndicator()
-                              : Text('${giftcardprovider.estimateRate['rate']}'
+                              : Text('${topupProvider.estimateRate['rate']}'
                                       ' ' +
-                                  '_coinShowName')
+                                  topupProvider.toActiveCountry['currencyCode'])
                         ]),
                   ),
                 ],
@@ -378,57 +455,62 @@ class _TopUpState extends State<TopUp> {
                   // _amountcontroller.clear();
                 });
               },
-              child: Container(
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  border: Border.all(
-                    style: BorderStyle.solid,
-                    width: 0.3,
-                    color: Color(0xff5E6292),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(right: 10),
-                          child: CircleAvatar(
-                            radius: 12,
-                            child: Image.network(
-                              '${public.publicInfoMarket['market']['coinList'][_coinShowName]['icon']}',
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.only(right: 5),
-                          child: Text(
-                            _coinShowName,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          '${public.publicInfoMarket['market']['coinList'][_coinShowName]['longName']}',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                      ],
+              child: Padding(
+                padding: const EdgeInsets.only(
+                    top: 20, bottom: 10, left: 16, right: 16),
+                child: Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(
+                      style: BorderStyle.solid,
+                      width: 0.3,
+                      color: Color(0xff5E6292),
                     ),
-                    Icon(Icons.keyboard_arrow_down),
-                  ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(right: 10),
+                            child: CircleAvatar(
+                              radius: 12,
+                              child: Image.network(
+                                '${public.publicInfoMarket['market']['coinList'][_coinShowName]['icon']}',
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(right: 5),
+                            child: Text(
+                              _coinShowName,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            '${public.publicInfoMarket['market']['coinList'][_coinShowName]['longName']}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Icon(Icons.keyboard_arrow_down),
+                    ],
+                  ),
+                  height: 60,
                 ),
-                height: 60,
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 20, bottom: 10),
+              padding: const EdgeInsets.only(
+                  top: 20, bottom: 10, left: 16, right: 16),
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -457,7 +539,27 @@ class _TopUpState extends State<TopUp> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: LyoButton(
-                onPressed: () {},
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    showModalBottomSheet<void>(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (BuildContext context) {
+                        return StatefulBuilder(
+                          builder:
+                              (BuildContext context, StateSetter setState) {
+                            return ConfirmTopup(
+                               topupamount:_selectedAmount,
+                               
+
+
+                            );
+                          },
+                        );
+                      },
+                    );
+                  }
+                },
                 text: 'Confirm',
                 isLoading: false,
                 active: true,
