@@ -15,7 +15,19 @@ class TopupProvider with ChangeNotifier {
     'token': '',
     'userId': '',
   };
+
   String paymentstatus = 'Waiting for payment';
+
+  dynamic _topupamount;
+
+  dynamic get topupamount {
+    return _topupamount;
+  }
+
+  void settopupamount(value) {
+    _topupamount = value;
+    notifyListeners();
+  }
 
   //// Get Wallet//
   List _allwallet = [];
@@ -152,8 +164,10 @@ class TopupProvider with ChangeNotifier {
       if (responseData['code'] == 200) {
         IstopupnetWorkloading = false;
         _allTopupNetwork = responseData['data'];
-        print("catelogue...");
-        print(_allTopupNetwork[0]);
+        settopupamount(_allTopupNetwork[0]['price_type']['type'] == 'FIXED'
+            ? _allTopupNetwork[0]['price_type']['price'][0]
+            : _allTopupNetwork[0]['price_type']['price']['suggestedPrice'][0]);
+
         if (_toActiveNetWorkprovider.isEmpty) {
           _toActiveNetWorkprovider = _allTopupNetwork[0];
         } else if (catUpdate) {
@@ -178,62 +192,62 @@ class TopupProvider with ChangeNotifier {
     }
   }
 
-  // Get all cards
-  bool cardloading = false;
+  // // Get all cards
+  // bool cardloading = false;
 
-  List _allCard = [];
+  // List _allCard = [];
 
-  List get allCard {
-    return _allCard;
-  }
+  // List get allCard {
+  //   return _allCard;
+  // }
 
-  Future<void> getAllCard(
-    ctx,
-    auth,
-    userid,
-  ) async {
-    cardloading = true;
-    notifyListeners();
-    headers['token'] = auth.loginVerificationToken;
-    headers['userid'] = '${userid}';
+  // Future<void> getAllCard(
+  //   ctx,
+  //   auth,
+  //   userid,
+  // ) async {
+  //   cardloading = true;
+  //   notifyListeners();
+  //   headers['token'] = auth.loginVerificationToken;
+  //   headers['userid'] = '${userid}';
 
-    var countrycode = _toActiveCountry['iso3'] ?? _toActiveCountry['iso2'];
-    var catid = _toActiveNetWorkprovider['id'];
-    var name = _toActiveNetWorkprovider['brand'].split(" ")[0];
+  //   var countrycode = _toActiveCountry['iso3'] ?? _toActiveCountry['iso2'];
+  //   var catid = _toActiveNetWorkprovider['id'];
+  //   var name = _toActiveNetWorkprovider['brand'].split(" ")[0];
 
-    var url = Uri.http(
-        gifttesturl, 'gift-card/cards/$catid/$countrycode', {'name': '$name'});
+  //   var url = Uri.http(
+  //       gifttesturl, 'gift-card/cards/$catid/$countrycode', {'name': '$name'});
 
-    try {
-      final response = await http.get(url, headers: headers);
+  //   try {
+  //     final response = await http.get(url, headers: headers);
 
-      final responseData = json.decode(response.body);
+  //     final responseData = json.decode(response.body);
 
-      if (responseData['code'] == 200) {
-        cardloading = false;
-        _allCard = responseData['data'];
+  //     if (responseData['code'] == 200) {
+  //       cardloading = false;
+  //       _allCard = responseData['data'];
 
-        return notifyListeners();
-      } else {
-        cardloading = false;
-        _allCard = [];
-        return notifyListeners();
-      }
-    } catch (error) {
-      cardloading = false;
-      print(error);
-      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
-      return notifyListeners();
-    }
-  }
+  //       return notifyListeners();
+  //     } else {
+  //       cardloading = false;
+  //       _allCard = [];
+  //       return notifyListeners();
+  //     }
+  //   } catch (error) {
+  //     cardloading = false;
+  //     print(error);
+  //     // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+  //     return notifyListeners();
+  //   }
+  // }
 
   //// Estimate////
 
   bool isEstimate = false;
 
-  Map _estimateRate = {};
+  var _estimateRate;
 
-  Map get estimateRate {
+  get estimateRate {
     return _estimateRate;
   }
 
@@ -247,7 +261,7 @@ class TopupProvider with ChangeNotifier {
     var mydata = json.encode(postdata);
 
     var url = Uri.http(gifttesturl, 'top-up/estimate');
-
+    print(url);
     try {
       final response = await http.post(
         url,
@@ -261,7 +275,9 @@ class TopupProvider with ChangeNotifier {
 
       if (responseData['code'] == 200) {
         isEstimate = false;
-        _estimateRate = responseData['data'][0];
+        var rate = responseData['data'][0]['rate'];
+        print(toActiveNetWorkprovider);
+        _estimateRate = rate * toActiveNetWorkprovider['fx']['rate'];
         print(_estimateRate);
         return notifyListeners();
       } else {
@@ -441,7 +457,9 @@ class TopupProvider with ChangeNotifier {
 
     var mydata = json.encode(postdata);
 
-    var url = Uri.http(gifttesturl, 'gift-card/transaction');
+    print(mydata);
+
+    var url = Uri.http(gifttesturl, 'top-up/transaction');
 
     try {
       final response = await http.post(
@@ -498,7 +516,7 @@ class TopupProvider with ChangeNotifier {
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
 
-    var url = Uri.http(gifttesturl, 'gift-card/transaction');
+    var url = Uri.http(gifttesturl, 'top-up/transaction');
 
     try {
       final response = await http.get(
@@ -530,41 +548,35 @@ class TopupProvider with ChangeNotifier {
     }
   }
 
-  //// get redeem deatils
-  bool isredeemloading = false;
-  Map _redeem = {};
+  Map _accountBalance = {};
 
-  Map get redeem {
-    return _redeem;
+  Map get accountBalance {
+    return _accountBalance;
   }
 
-  Future<void> getRedeem(
+  Future<void> getaccountBalance(
     ctx,
     auth,
     userid,
-    transactionId,
-    brandId,
   ) async {
-    isredeemloading = true;
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
 
-    var url =
-        Uri.http(gifttesturl, 'gift-card/redeem/${brandId}/${transactionId}');
-
+    var url = Uri.http(gifttesturl, 'top-up/account/balance');
+    print(url);
     try {
       final response = await http.get(url, headers: headers);
 
       final responseData = json.decode(response.body);
+      print('accouht balance..');
       print(responseData);
 
       if (responseData['code'] == 200) {
-        _redeem = responseData['data'];
-        isredeemloading = false;
+        _accountBalance = responseData['data'];
         return notifyListeners();
       } else {
-        _redeem = {};
+        _accountBalance = {};
         return notifyListeners();
       }
     } catch (error) {

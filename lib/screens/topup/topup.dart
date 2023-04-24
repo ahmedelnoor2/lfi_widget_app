@@ -3,15 +3,15 @@ import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
-import 'package:lyotrade/providers/giftcard.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/topup.dart';
 import 'package:lyotrade/screens/common/drawer.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
-import 'package:lyotrade/screens/dashboard/gift_card/country_drawer.dart';
-
-import 'package:lyotrade/screens/topup/widget/confirm_topup.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
+import 'package:lyotrade/screens/topup/mobile_topup_payment.dart';
+import 'package:lyotrade/screens/topup/widget/amount_select_Bottom_sheet.dart';
 import 'package:lyotrade/screens/topup/widget/networkbottomsheet.dart';
 import 'package:lyotrade/screens/topup/widget/topupCountryDrawer.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
@@ -34,7 +34,7 @@ class _TopUpState extends State<TopUp> {
   String _defaultNetwork = 'BSC';
   String _coinShowName = 'USDT';
   bool _tagType = false;
-  double? _selectedAmount;
+
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _numberController = TextEditingController();
@@ -43,6 +43,7 @@ class _TopUpState extends State<TopUp> {
   void initState() {
     super.initState();
     getDigitalBalance();
+    getAcountBalance();
     getAllCountries();
   }
 
@@ -50,30 +51,6 @@ class _TopUpState extends State<TopUp> {
     var auth = Provider.of<Auth>(context, listen: false);
     var public = Provider.of<Public>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
-
-    // if (widget.isEqualMinMax == false) {
-    //   var cardrate = widget.data['price']['fixed']['max'].toString();
-    //   var _payment = double.parse(cardrate);
-    //   _amountcontroller.text = cardrate.toString();
-    //   var userid = await auth.userInfo['id'];
-    //   await topupProvider.getEstimateRate(context, auth, userid, {
-    //     "currency": "${topupProvider.toActiveCountry['currency']['code']}",
-    //     "payment": _payment,
-    //     "productID": widget.data['BillerID']
-    //   });
-    // } else if (widget.data['price_type'] == "list") {
-    //   var cardrate = widget.data['price']['list'][0].toString();
-    //   _selectedAmount = int.parse(cardrate);
-    //   var _payment = double.parse(cardrate);
-    //   var userid = await auth.userInfo['id'];
-
-    //   await topupProvider.getEstimateRate(context, auth, userid, {
-    //     "currency": "${topupProvider.toActiveCountry['currency']['code']}",
-    //     "payment": _payment,
-    //     "productID": widget.data['BillerID']
-    //   });
-    // }
-
     if (asset.selectedAsset.isNotEmpty) {
       setState(() {
         _defaultCoin =
@@ -144,11 +121,7 @@ class _TopUpState extends State<TopUp> {
             '${public.publicInfoMarket['market']['coinList'][netwrkType]['showName']}';
       });
     }
-
     await asset.getCoinCosts(auth, _defaultCoin);
-
-    // await asset.getChangeAddress(context, auth, _defaultCoin);
-
     List _digitialAss = [];
     asset.accountBalance['allCoinMap'].forEach((k, v) {
       if (v['depositOpen'] == 1) {
@@ -175,12 +148,23 @@ class _TopUpState extends State<TopUp> {
     var userid = await auth.userInfo['id'];
     await topupProvider.getAllNetWorkprovider(context, auth, userid,
         {"country": topupProvider.toActiveCountry['isoName']}, true);
-    _selectedAmount =
-        topupProvider.toActiveNetWorkprovider['price_type']['price'][0];
+    topupProvider.settopupamount(
+        topupProvider.toActiveNetWorkprovider['price_type']['type'] == 'FIXED'
+            ? topupProvider.toActiveNetWorkprovider['price_type']['price'][0]
+            : topupProvider.toActiveNetWorkprovider['price_type']['price']
+                ['suggestedPrice'][0]);
     await topupProvider.getEstimateRate(context, auth, userid, {
       "currency": "${topupProvider.toActiveCountry['currencyCode']}",
-      "payment": _selectedAmount,
+      "payment": topupProvider.topupamount,
     });
+  }
+
+  // Get  Accout balance company lyo/
+  Future<void> getAcountBalance() async {
+    var topupProvider = Provider.of<TopupProvider>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
+    var userid = await auth.userInfo['id'];
+    await topupProvider.getaccountBalance(context, auth, userid);
   }
 
   // Get Estimate Rate//
@@ -190,7 +174,7 @@ class _TopUpState extends State<TopUp> {
     var userid = await auth.userInfo['id'];
     await topupProvider.getEstimateRate(context, auth, userid, {
       "currency": "${topupProvider.toActiveCountry['currencyCode']}",
-      "payment": _selectedAmount,
+      "payment": topupProvider.topupamount,
     });
     return;
   }
@@ -244,7 +228,7 @@ class _TopUpState extends State<TopUp> {
                   padding: EdgeInsets.only(right: 10),
                   child: IconButton(
                     onPressed: () {
-                      //     Navigator.pushNamed(context, '/gift_transaction_detail');
+                      Navigator.pushNamed(context, '/topup_transaction');
                     },
                     icon: Icon(Icons.history),
                   ),
@@ -287,8 +271,14 @@ class _TopUpState extends State<TopUp> {
                                   padding: const EdgeInsets.only(left: 8),
                                   child: topupProvider.isCountryLoading
                                       ? CircularProgressIndicator()
-                                      : Text(topupProvider
-                                          .toActiveCountry['callingCodes'][0]),
+                                      : Text(topupProvider.toActiveCountry[
+                                                  'callingCodes'] ==
+                                              null
+                                          ? ''
+                                          : topupProvider
+                                              .toActiveCountry['callingCodes']
+                                                  [0]
+                                              .toString()),
                                 ),
                                 Icon(Icons.arrow_drop_down),
                               ],
@@ -361,20 +351,23 @@ class _TopUpState extends State<TopUp> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(50.0),
-                            child: FadeInImage.memoryNetwork(
-                              width: 40,
-                              height: 40,
-                              placeholder: kTransparentImage,
-                              image: topupProvider
-                                  .toActiveNetWorkprovider['logo'][0]
-                                  .toString(),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
+                          topupProvider.toActiveNetWorkprovider['logo'] == null
+                              ? Container()
+                              : ClipRRect(
+                                  borderRadius: BorderRadius.circular(50.0),
+                                  child: FadeInImage.memoryNetwork(
+                                    width: 40,
+                                    height: 40,
+                                    placeholder: kTransparentImage,
+                                    image: topupProvider
+                                        .toActiveNetWorkprovider['logo'][0]
+                                        .toString(),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
                           Text(topupProvider
-                              .toActiveNetWorkprovider['operatorName']),
+                                  .toActiveNetWorkprovider['operatorName'] ??
+                              ''),
                           Icon(Icons.arrow_drop_down),
                         ],
                       ),
@@ -382,51 +375,46 @@ class _TopUpState extends State<TopUp> {
                   ),
                   Container(
                       padding: EdgeInsets.only(bottom: 10, top: 10),
-                      child: Text('Top Up Amount')),
-                  Container(
-                    width: width,
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      border: Border.all(
-                        style: BorderStyle.solid,
-                        width: 0.3,
-                        color: Color(0xff5E6292),
+                      child: Text('Topup Amount')),
+                  InkWell(
+                    onTap: () {
+                      showModalBottomSheet<void>(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (BuildContext context) {
+                          return StatefulBuilder(
+                            builder:
+                                (BuildContext context, StateSetter setState) {
+                              return Container(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.85,
+                                  child: const AmountSelectBottomSheet());
+                            },
+                          );
+                        },
+                      );
+                    },
+                    child: Container(
+                      width: width,
+                      height: height * 0.07,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(
+                          style: BorderStyle.solid,
+                          width: 0.3,
+                          color: Color(0xff5E6292),
+                        ),
+                      ),
+                      padding: EdgeInsets.all(8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                              "${(topupProvider.topupamount * topupProvider.toActiveNetWorkprovider['fx']['rate']).toStringAsFixed(2)}"),
+                          Icon(Icons.arrow_drop_down),
+                        ],
                       ),
                     ),
-                    child: DropdownButton<double>(
-                        isDense: true,
-                        value: _selectedAmount,
-                        icon: Container(
-                          padding: EdgeInsets.only(left: width * 0.191),
-                          child: Icon(
-                            Icons.keyboard_arrow_down,
-                            color: Colors.white,
-                          ),
-                        ),
-                        style: const TextStyle(fontSize: 13),
-                        underline: Container(
-                          height: 0,
-                        ),
-                        onChanged: (newValue) {
-                          setState(() {
-                            _selectedAmount = newValue;
-                          });
-                          getEstimateRate();
-                        },
-                        items: topupProvider
-                            .toActiveNetWorkprovider['price_type']['price']
-                            .map<DropdownMenuItem<double>>((value) {
-                          return DropdownMenuItem<double>(
-                            value: value,
-                            child: Text(
-                              value.toString(),
-                              style: TextStyle(
-                                color: Colors.white,
-                              ),
-                            ),
-                          );
-                        }).toList()),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 20, bottom: 20),
@@ -439,9 +427,9 @@ class _TopUpState extends State<TopUp> {
                           ),
                           topupProvider.isEstimate
                               ? CircularProgressIndicator()
-                              : Text('${topupProvider.estimateRate['rate']}'
+                              : Text('${topupProvider.estimateRate}'
                                       ' ' +
-                                  topupProvider.toActiveCountry['currencyCode'])
+                                  'USDT')
                         ]),
                   ),
                 ],
@@ -450,10 +438,6 @@ class _TopUpState extends State<TopUp> {
             GestureDetector(
               onTap: () {
                 _scaffoldKey.currentState!.openEndDrawer();
-                setState(() {
-                  // estimateprice = 0.0;
-                  // _amountcontroller.clear();
-                });
               },
               child: Padding(
                 padding: const EdgeInsets.only(
@@ -534,13 +518,18 @@ class _TopUpState extends State<TopUp> {
                   ]),
             ),
             SizedBox(
-              height: height * 0.15,
+              height: height * 0.08,
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: LyoButton(
                 onPressed: () {
-                  if (_formKey.currentState!.validate()) {
+                  if (topupProvider.accountBalance['balance'] <
+                      double.parse(asset.accountBalance['allCoinMap']
+                          [_coinShowName]['allBalance'])) {
+                    snackAlert(context, SnackTypes.warning,
+                        'Please Contact Admin Balance is low ...');
+                  } else if (_formKey.currentState!.validate()) {
                     showModalBottomSheet<void>(
                       context: context,
                       isScrollControlled: true,
@@ -548,11 +537,138 @@ class _TopUpState extends State<TopUp> {
                         return StatefulBuilder(
                           builder:
                               (BuildContext context, StateSetter setState) {
-                            return ConfirmTopup(
-                               topupamount:_selectedAmount,
-                               
-
-
+                            return SingleChildScrollView(
+                              child: Container(
+                                  child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.transparent,
+                                ),
+                                width: width,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Container(
+                                    height: 400,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: <Widget>[
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Container(
+                                                child: Text('Confirm Top up')),
+                                            IconButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              icon: Icon(
+                                                Icons.close,
+                                                color: secondaryTextColor,
+                                                size: 20,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: height * 0.04,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                                "${(topupProvider.topupamount * topupProvider.toActiveNetWorkprovider['fx']['rate']).toStringAsFixed(2)}" +
+                                                    " " +
+                                                    topupProvider
+                                                            .toActiveCountry[
+                                                        'currencyCode'])
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: height * 0.04,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              'Payment Currency',
+                                              style: TextStyle(
+                                                  color: secondaryTextColor400),
+                                            ),
+                                            Text(topupProvider.estimateRate
+                                                .toString())
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: height * 0.03,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              'Payment Method',
+                                              style: TextStyle(
+                                                  color: secondaryTextColor400),
+                                            ),
+                                            Text('Funding wallet')
+                                          ],
+                                        ),
+                                        Spacer(),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Container(
+                                              width: width * 0.35,
+                                              child: LyoButton(
+                                                onPressed: () {},
+                                                text: 'Cancel',
+                                                isLoading: false,
+                                                active: true,
+                                                activeTextColor: Colors.black,
+                                              ),
+                                            ),
+                                            Container(
+                                              width: width * 0.55,
+                                              child: LyoButton(
+                                                onPressed: () {
+                                                  Navigator.pushNamed(
+                                                      context, '/mobile_topup',
+                                                      arguments: MobileTopup(
+                                                          number:
+                                                              _numberController
+                                                                  .text,
+                                                          amount: topupProvider
+                                                              .estimateRate,
+                                                          defaultcoin:
+                                                              _defaultCoin,
+                                                          topupamount:
+                                                              topupProvider
+                                                                  .topupamount,
+                                                          countrycode: topupProvider
+                                                                  .toActiveCountry[
+                                                              'isoName'],
+                                                          operatorid: topupProvider
+                                                                  .toActiveNetWorkprovider[
+                                                              'operatorId']));
+                                                },
+                                                text: 'Confirm',
+                                                isLoading: false,
+                                                active: true,
+                                                activeColor: linkColor,
+                                                activeTextColor: Colors.black,
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              )),
                             );
                           },
                         );

@@ -548,7 +548,7 @@ class GiftCardProvider with ChangeNotifier {
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
 
-    var url = Uri.http(gifttesturl, 'gift-card/transaction');
+    var url = Uri.http(gifttesturl, 'top-up/transaction');
 
     try {
       final response = await http.get(

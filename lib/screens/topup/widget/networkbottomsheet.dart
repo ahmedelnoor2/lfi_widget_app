@@ -65,6 +65,17 @@ class _TopupNetworkBottomSheetState extends State<TopupNetworkBottomSheet> {
     });
   }
 
+  Future<void> getEstimateRate() async {
+    var topupProvider = Provider.of<TopupProvider>(context, listen: true);
+    var auth = Provider.of<Auth>(context, listen: true);
+    var userid = await auth.userInfo['id'];
+    await topupProvider.getEstimateRate(context, auth, userid, {
+      "currency": "${topupProvider.toActiveCountry['currencyCode']}",
+      "payment": topupProvider.topupamount,
+    });
+    return;
+  }
+
   @override
   Widget build(BuildContext context) {
     var topupProvider = Provider.of<TopupProvider>(context, listen: true);
@@ -128,9 +139,20 @@ class _TopupNetworkBottomSheetState extends State<TopupNetworkBottomSheet> {
                       return InkWell(
                         onTap: () async {
                           Navigator.pop(context);
-                          topupProvider.setActiveNetWorkprovider(data);
-                          print(topupProvider.toActiveNetWorkprovider);
                           var userid = await auth.userInfo['id'];
+                          topupProvider.setActiveNetWorkprovider(data);
+
+                          await topupProvider.getAllNetWorkprovider(
+                              context,
+                              auth,
+                              userid,
+                              {
+                                "country":
+                                    topupProvider.toActiveCountry['isoName']
+                              },
+                              true);
+
+                          getEstimateRate();
                         },
                         child: Padding(
                           padding: EdgeInsets.symmetric(

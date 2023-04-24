@@ -72,7 +72,9 @@ import 'package:lyotrade/screens/staking/stake.dart';
 import 'package:lyotrade/screens/take_loan/confrim_loan.dart';
 import 'package:lyotrade/screens/take_loan/process_loan.dart';
 import 'package:lyotrade/screens/take_loan/take_loan.dart';
+import 'package:lyotrade/screens/topup/mobile_topup_payment.dart';
 import 'package:lyotrade/screens/topup/topup.dart';
+import 'package:lyotrade/screens/topup/topup_transaction.dart';
 import 'package:lyotrade/screens/trade/kline_chart.dart';
 import 'package:lyotrade/screens/trade/margin/margin_trade_history.dart';
 import 'package:lyotrade/screens/trade/market_margin_header.dart';
@@ -219,6 +221,8 @@ class MyApp extends StatelessWidget {
                   const GiftCardTransaction(),
               BuyCard.routeName: (context) => BuyCard(),
               TopUp.routeName: (context) => const TopUp(),
+              MobileTopup.routeName: (context) => MobileTopup(),
+              TopUpTransaction.routeName: (context) => TopUpTransaction(),
               TradeChallengeScreen.routeName: (context) =>
                   const TradeChallengeScreen(),
               RewardCenterScreen.routeName: (context) =>
