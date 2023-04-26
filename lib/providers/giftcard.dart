@@ -548,7 +548,7 @@ class GiftCardProvider with ChangeNotifier {
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
 
-    var url = Uri.http(gifttesturl, 'top-up/transaction');
+    var url = Uri.http(gifttesturl, 'gift-card/transaction');
 
     try {
       final response = await http.get(
@@ -615,6 +615,47 @@ class GiftCardProvider with ChangeNotifier {
         return notifyListeners();
       } else {
         _redeem = {};
+        return notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+      return notifyListeners();
+    }
+  }
+
+  /// Get Account balance //
+
+  Map _accountBalance = {};
+
+  Map get accountBalance {
+    return _accountBalance;
+  }
+
+  Future<void> getaccountBalance(
+    ctx,
+    auth,
+    userid,
+  ) async {
+    notifyListeners();
+    headers['token'] = auth.loginVerificationToken;
+    headers['userid'] = '${userid}';
+    headers['provider'] = providerid;
+
+    var url = Uri.http(gifttesturl, 'gift-card/account/balance');
+    print(url);
+    try {
+      final response = await http.get(url, headers: headers);
+
+      final responseData = json.decode(response.body);
+      print('accouht balance..');
+      print(responseData);
+
+      if (responseData['code'] == 200) {
+        _accountBalance = responseData['data'];
+        return notifyListeners();
+      } else {
+        _accountBalance = {};
         return notifyListeners();
       }
     } catch (error) {

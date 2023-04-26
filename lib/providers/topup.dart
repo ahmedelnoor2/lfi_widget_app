@@ -146,6 +146,18 @@ class TopupProvider with ChangeNotifier {
     return _allTopupNetwork;
   }
 
+  /// _active State for india country//
+  Map _activeState = {};
+
+  Map get activeState {
+    return _activeState;
+  }
+
+  void setactivestate(data) {
+    _activeState = data;
+    notifyListeners();
+  }
+
   Future<void> getAllNetWorkprovider(
       ctx, auth, userid, postdata, catUpdate) async {
     IstopupnetWorkloading = true;
@@ -164,9 +176,15 @@ class TopupProvider with ChangeNotifier {
       if (responseData['code'] == 200) {
         IstopupnetWorkloading = false;
         _allTopupNetwork = responseData['data'];
-        settopupamount(_allTopupNetwork[0]['price_type']['type'] == 'FIXED'
-            ? _allTopupNetwork[0]['price_type']['price'][0]
-            : _allTopupNetwork[0]['price_type']['price']['suggestedPrice'][0]);
+        if (toActiveCountry['isoName'] != 'IN') {
+          settopupamount(_allTopupNetwork[0]['price_type']['type'] == 'FIXED'
+              ? _allTopupNetwork[0]['price_type']['price'][0]
+              : _allTopupNetwork[0]['price_type']['price']['suggestedPrice']
+                  [0]);
+        } else if (toActiveCountry['isoName'] == 'IN') {
+          _activeState = _allTopupNetwork[0]['geographicalRechargePlans'][0];
+          settopupamount(_activeState['fixedAmounts'][0]);
+        }
 
         if (_toActiveNetWorkprovider.isEmpty) {
           _toActiveNetWorkprovider = _allTopupNetwork[0];
@@ -191,55 +209,6 @@ class TopupProvider with ChangeNotifier {
       return notifyListeners();
     }
   }
-
-  // // Get all cards
-  // bool cardloading = false;
-
-  // List _allCard = [];
-
-  // List get allCard {
-  //   return _allCard;
-  // }
-
-  // Future<void> getAllCard(
-  //   ctx,
-  //   auth,
-  //   userid,
-  // ) async {
-  //   cardloading = true;
-  //   notifyListeners();
-  //   headers['token'] = auth.loginVerificationToken;
-  //   headers['userid'] = '${userid}';
-
-  //   var countrycode = _toActiveCountry['iso3'] ?? _toActiveCountry['iso2'];
-  //   var catid = _toActiveNetWorkprovider['id'];
-  //   var name = _toActiveNetWorkprovider['brand'].split(" ")[0];
-
-  //   var url = Uri.http(
-  //       gifttesturl, 'gift-card/cards/$catid/$countrycode', {'name': '$name'});
-
-  //   try {
-  //     final response = await http.get(url, headers: headers);
-
-  //     final responseData = json.decode(response.body);
-
-  //     if (responseData['code'] == 200) {
-  //       cardloading = false;
-  //       _allCard = responseData['data'];
-
-  //       return notifyListeners();
-  //     } else {
-  //       cardloading = false;
-  //       _allCard = [];
-  //       return notifyListeners();
-  //     }
-  //   } catch (error) {
-  //     cardloading = false;
-  //     print(error);
-  //     // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
-  //     return notifyListeners();
-  //   }
-  // }
 
   //// Estimate////
 
@@ -416,7 +385,7 @@ class TopupProvider with ChangeNotifier {
         //    print('i am calling');
         _iswithdrwal = false;
         _dowithdrawal = responseData;
-        paymentstatus = 'Card is Processing';
+        paymentstatus = 'Topup is Processing';
 
         snackAlert(ctx, SnackTypes.success, responseData['msg']);
 
@@ -531,7 +500,7 @@ class TopupProvider with ChangeNotifier {
         istransactionloading = false;
         _transaction = responseData['data'].reversed.toList();
         print('check....transactionj');
-        print(_transaction.last);
+        print(_transaction.first);
 
         return notifyListeners();
       } else {

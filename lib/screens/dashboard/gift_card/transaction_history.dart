@@ -113,6 +113,8 @@ class _GiftCardTransactionState extends State<GiftCardTransaction> {
                             itemBuilder: (BuildContext context, int index) {
                               var currentIndex =
                                   giftcardprovider.transaction[index];
+                              print(currentIndex);
+                              print("currentIndex....");
 
                               return Card(
                                 child: Padding(

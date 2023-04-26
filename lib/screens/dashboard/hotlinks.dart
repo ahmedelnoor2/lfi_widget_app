@@ -30,7 +30,11 @@ class _HotlinksState extends State<Hotlinks> {
         children: [
           GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, '/topup');
+              if (auth.isAuthenticated) {
+                Navigator.pushNamed(context, '/topup');
+              } else {
+                Navigator.pushNamed(context, '/authentication');
+              }
             },
             child: Column(
               children: [

@@ -33,6 +33,7 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
     super.initState();
 
     getAllWallet();
+    getAcountBalance();
     getAllCountries();
   }
 
@@ -74,6 +75,15 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
       auth,
       userid,
     );
+  }
+
+  // Get  Accout balance company lyo/
+  Future<void> getAcountBalance() async {
+    var giftcardprovider =
+        Provider.of<GiftCardProvider>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
+    var userid = await auth.userInfo['id'];
+    await giftcardprovider.getaccountBalance(context, auth, userid);
   }
 
   int _current = 0;

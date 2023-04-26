@@ -69,88 +69,168 @@ class _AmountSelectBottomSheetState extends State<AmountSelectBottomSheet> {
               ],
             ),
           ),
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3),
-              scrollDirection: Axis.vertical,
-              shrinkWrap: true,
-              itemCount: topupProvider.toActiveNetWorkprovider['price_type']
-                          ['type'] ==
-                      'FIXED'
-                  ? topupProvider
-                      .toActiveNetWorkprovider['price_type']['price'].length
-                  : topupProvider
-                      .toActiveNetWorkprovider['price_type']['price']
-                          ['suggestedPrice']
-                      .length,
-              itemBuilder: (context, index) {
-                var currentindex = topupProvider
-                            .toActiveNetWorkprovider['price_type']['type'] ==
-                        'FIXED'
-                    ? topupProvider.toActiveNetWorkprovider['price_type']
-                        ['price'][index]
-                    : topupProvider.toActiveNetWorkprovider['price_type']
-                        ['price']['suggestedPrice'][index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 10.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      GestureDetector(
-                        onTap: () {
-                          topupProvider.settopupamount(currentindex);
-                          getEstimateRate();
-                          Navigator.pop(context);
-                        },
-                        child: Container(
-                          height: 100,
-                          width: 100,
-                          decoration: BoxDecoration(
-                            // border: Border.all(color: Color(0xff940D5A)),
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(17.0),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  top: 40.0,
-                                ),
-                                child: Text(
-                                  "${(currentindex * topupProvider.toActiveNetWorkprovider['fx']['rate']).toStringAsFixed(2)}",
-                                  style: TextStyle(
-                                      color: Color(0xff00315C),
-                                      fontSize: 14.0,
-                                      fontFamily: 'Poppins',
-                                      fontWeight: FontWeight.w600),
-                                  // textAlign: TextAlign.center,
-                                ),
-                              ),
-                              Container(
-                                height: 20,
-                                width: width,
+          topupProvider.toActiveCountry['isoName'] != 'IN'
+              ? Expanded(
+                  child: GridView.builder(
+                    gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3),
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    itemCount:
+                        topupProvider.toActiveNetWorkprovider['price_type']
+                                    ['type'] ==
+                                'FIXED'
+                            ? topupProvider
+                                .toActiveNetWorkprovider['price_type']['price']
+                                .length
+                            : topupProvider
+                                .toActiveNetWorkprovider['price_type']['price']
+                                    ['suggestedPrice']
+                                .length,
+                    itemBuilder: (context, index) {
+                      var currentindex = topupProvider
+                                      .toActiveNetWorkprovider['price_type']
+                                  ['type'] ==
+                              'FIXED'
+                          ? topupProvider.toActiveNetWorkprovider['price_type']
+                              ['price'][index]
+                          : topupProvider.toActiveNetWorkprovider['price_type']
+                              ['price']['suggestedPrice'][index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            GestureDetector(
+                              onTap: () {
+                                topupProvider.settopupamount(currentindex);
+                                getEstimateRate();
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                height: 100,
+                                width: 100,
                                 decoration: BoxDecoration(
-                                  color: seconadarytextcolour,
+                                  // border: Border.all(color: Color(0xff940D5A)),
+                                  color: Colors.white,
                                   borderRadius: BorderRadius.circular(17.0),
                                 ),
-                                child: Center(
-                                    child: Text(
-                                  'Amount',
-                                  style: TextStyle(fontWeight: FontWeight.w400),
-                                )),
-                              )
-                            ],
-                          ),
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        top: 40.0,
+                                      ),
+                                      child: Text(
+                                        "${(currentindex * topupProvider.toActiveNetWorkprovider['fx']['rate']).toStringAsFixed(2)}",
+                                        style: TextStyle(
+                                            color: Color(0xff00315C),
+                                            fontSize: 14.0,
+                                            fontFamily: 'Poppins',
+                                            fontWeight: FontWeight.w600),
+                                        // textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                    Container(
+                                      height: 20,
+                                      width: width,
+                                      decoration: BoxDecoration(
+                                        color: seconadarytextcolour,
+                                        borderRadius:
+                                            BorderRadius.circular(17.0),
+                                      ),
+                                      child: Center(
+                                          child: Text(
+                                        'Amount',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w400),
+                                      )),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-          ),
+                )
+              : Expanded(
+                  child: GridView.builder(
+                    gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3),
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    itemCount: topupProvider.activeState['fixedAmounts'].length,
+                    itemBuilder: (context, index) {
+                      var currentindex =
+                          topupProvider.activeState['fixedAmounts'][index];
+                      print(currentindex);
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            GestureDetector(
+                              onTap: () {
+                                topupProvider.settopupamount(currentindex);
+                                getEstimateRate();
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                height: 100,
+                                width: 100,
+                                decoration: BoxDecoration(
+                                  // border: Border.all(color: Color(0xff940D5A)),
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(17.0),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        top: 40.0,
+                                      ),
+                                      child: Text(
+                                        "${(currentindex * topupProvider.toActiveNetWorkprovider['fx']['rate']).toStringAsFixed(2)}",
+                                        style: TextStyle(
+                                            color: Color(0xff00315C),
+                                            fontSize: 14.0,
+                                            fontFamily: 'Poppins',
+                                            fontWeight: FontWeight.w600),
+                                        // textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                    Container(
+                                      height: 20,
+                                      width: width,
+                                      decoration: BoxDecoration(
+                                        color: seconadarytextcolour,
+                                        borderRadius:
+                                            BorderRadius.circular(17.0),
+                                      ),
+                                      child: Center(
+                                          child: Text(
+                                        'Amount',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w400),
+                                      )),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
         ],
       ),
     );

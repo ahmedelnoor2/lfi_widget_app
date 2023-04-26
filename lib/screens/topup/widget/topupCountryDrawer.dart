@@ -129,7 +129,6 @@ class _TopupConfirmDrawerState extends State<TopupConfirmDrawer> {
                         return ListTile(
                           onTap: () async {
                             topupProvider.setActiveCountry(data);
-
                             searchController.clear();
                             var userid = await auth.userInfo['id'];
                             Navigator.pop(context);
@@ -142,8 +141,6 @@ class _TopupConfirmDrawerState extends State<TopupConfirmDrawer> {
                                       topupProvider.toActiveCountry['isoName']
                                 },
                                 true);
-                            print('check ........');
-                            print(topupProvider.toActiveNetWorkprovider);
 
                             // await topupProvider.getAllCard(
                             //     context, auth, userid);

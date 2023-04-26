@@ -142,15 +142,15 @@ class _TopupNetworkBottomSheetState extends State<TopupNetworkBottomSheet> {
                           var userid = await auth.userInfo['id'];
                           topupProvider.setActiveNetWorkprovider(data);
 
-                          await topupProvider.getAllNetWorkprovider(
-                              context,
-                              auth,
-                              userid,
-                              {
-                                "country":
-                                    topupProvider.toActiveCountry['isoName']
-                              },
-                              true);
+                          // await topupProvider.getAllNetWorkprovider(
+                          //     context,
+                          //     auth,
+                          //     userid,
+                          //     {
+                          //       "country":
+                          //           topupProvider.toActiveCountry['isoName']
+                          //     },
+                          //     true);
 
                           getEstimateRate();
                         },

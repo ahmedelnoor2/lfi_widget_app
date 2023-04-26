@@ -6,6 +6,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:intl/intl.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/giftcard.dart';
+import 'package:lyotrade/providers/topup.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/common/no_data.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
@@ -43,7 +44,7 @@ class _TopUpTransactionState extends State<TopUpTransaction> {
   }
 
   Future<void> getAllTransaction() async {
-    var topupProvider = Provider.of<GiftCardProvider>(context, listen: false);
+    var topupProvider = Provider.of<TopupProvider>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
     var userid = await auth.userInfo['id'];
     await topupProvider.getAllTransaction(context, auth, userid);
@@ -51,7 +52,7 @@ class _TopUpTransactionState extends State<TopUpTransaction> {
 
   @override
   Widget build(BuildContext context) {
-    var topupProvider = Provider.of<GiftCardProvider>(context, listen: true);
+    var topupProvider = Provider.of<TopupProvider>(context, listen: true);
 
     return Scaffold(
       body: SafeArea(

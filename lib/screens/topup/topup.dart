@@ -12,6 +12,7 @@ import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/screens/topup/mobile_topup_payment.dart';
 import 'package:lyotrade/screens/topup/widget/amount_select_Bottom_sheet.dart';
+import 'package:lyotrade/screens/topup/widget/location_wise_bottemsheet.dart';
 import 'package:lyotrade/screens/topup/widget/networkbottomsheet.dart';
 import 'package:lyotrade/screens/topup/widget/topupCountryDrawer.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
@@ -39,6 +40,11 @@ class _TopUpState extends State<TopUp> {
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _numberController = TextEditingController();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  var _selectedItem;
+  String? _selectedSubItem;
+  List<String> _items = ['Item 1', 'Item 2', 'Item 3'];
+  List _subItems = [];
   @override
   void initState() {
     super.initState();
@@ -373,49 +379,179 @@ class _TopUpState extends State<TopUp> {
                       ),
                     ),
                   ),
-                  Container(
-                      padding: EdgeInsets.only(bottom: 10, top: 10),
-                      child: Text('Topup Amount')),
-                  InkWell(
-                    onTap: () {
-                      showModalBottomSheet<void>(
-                        context: context,
-                        isScrollControlled: true,
-                        builder: (BuildContext context) {
-                          return StatefulBuilder(
-                            builder:
-                                (BuildContext context, StateSetter setState) {
-                              return Container(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.85,
-                                  child: const AmountSelectBottomSheet());
-                            },
-                          );
-                        },
-                      );
-                    },
-                    child: Container(
-                      width: width,
-                      height: height * 0.07,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        border: Border.all(
-                          style: BorderStyle.solid,
-                          width: 0.3,
-                          color: Color(0xff5E6292),
+                  topupProvider.toActiveCountry['isoName'] == 'IN'
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                                padding: EdgeInsets.only(bottom: 10, top: 10),
+                                child: Text('Select State')),
+                            InkWell(
+                              onTap: () {
+                                showModalBottomSheet<void>(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  builder: (BuildContext context) {
+                                    return StatefulBuilder(
+                                      builder: (BuildContext context,
+                                          StateSetter setState) {
+                                        return Container(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.85,
+                                            child:
+                                                const LocationWiseBottomsheet());
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                              child: Container(
+                                width: width,
+                                height: height * 0.07,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  border: Border.all(
+                                    style: BorderStyle.solid,
+                                    width: 0.3,
+                                    color: Color(0xff5E6292),
+                                  ),
+                                ),
+                                padding: EdgeInsets.all(8),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    topupProvider.IstopupnetWorkloading
+                                        ? CircularProgressIndicator()
+                                        : Text(topupProvider
+                                            .activeState['locationName']),
+                                    Icon(Icons.arrow_drop_down),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                    padding:
+                                        EdgeInsets.only(bottom: 10, top: 10),
+                                    child: Text('Topup Amount')),
+                                InkWell(
+                                  onTap: () {
+                                    showModalBottomSheet<void>(
+                                      context: context,
+                                      isScrollControlled: true,
+                                      builder: (BuildContext context) {
+                                        return StatefulBuilder(
+                                          builder: (BuildContext context,
+                                              StateSetter setState) {
+                                            return Container(
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.85,
+                                                child:
+                                                    const AmountSelectBottomSheet());
+                                          },
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: Container(
+                                    width: width,
+                                    height: height * 0.07,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5),
+                                      border: Border.all(
+                                        style: BorderStyle.solid,
+                                        width: 0.3,
+                                        color: Color(0xff5E6292),
+                                      ),
+                                    ),
+                                    padding: EdgeInsets.all(8),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        topupProvider.IstopupnetWorkloading
+                                            ? CircularProgressIndicator()
+                                            : Text(topupProvider
+                                                            .toActiveNetWorkprovider[
+                                                        'fx'] ==
+                                                    null
+                                                ? ''
+                                                : "${(topupProvider.topupamount * topupProvider.toActiveNetWorkprovider['fx']['rate']).toStringAsFixed(2)}"),
+                                        Icon(Icons.arrow_drop_down),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        )
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                                padding: EdgeInsets.only(bottom: 10, top: 10),
+                                child: Text('Topup Amount')),
+                            InkWell(
+                              onTap: () {
+                                showModalBottomSheet<void>(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  builder: (BuildContext context) {
+                                    return StatefulBuilder(
+                                      builder: (BuildContext context,
+                                          StateSetter setState) {
+                                        return Container(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.85,
+                                            child:
+                                                const AmountSelectBottomSheet());
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                              child: Container(
+                                width: width,
+                                height: height * 0.07,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  border: Border.all(
+                                    style: BorderStyle.solid,
+                                    width: 0.3,
+                                    color: Color(0xff5E6292),
+                                  ),
+                                ),
+                                padding: EdgeInsets.all(8),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    topupProvider.IstopupnetWorkloading
+                                        ? CircularProgressIndicator()
+                                        : Text(topupProvider
+                                                        .toActiveNetWorkprovider[
+                                                    'fx'] ==
+                                                null
+                                            ? ''
+                                            : "${(topupProvider.topupamount * topupProvider.toActiveNetWorkprovider['fx']['rate']).toStringAsFixed(2)}"),
+                                    Icon(Icons.arrow_drop_down),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      padding: EdgeInsets.all(8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                              "${(topupProvider.topupamount * topupProvider.toActiveNetWorkprovider['fx']['rate']).toStringAsFixed(2)}"),
-                          Icon(Icons.arrow_drop_down),
-                        ],
-                      ),
-                    ),
-                  ),
                   Padding(
                     padding: const EdgeInsets.only(top: 20, bottom: 20),
                     child: Row(
@@ -525,8 +661,7 @@ class _TopUpState extends State<TopUp> {
               child: LyoButton(
                 onPressed: () {
                   if (topupProvider.accountBalance['balance'] <
-                      double.parse(asset.accountBalance['allCoinMap']
-                          [_coinShowName]['allBalance'])) {
+                      topupProvider.estimateRate) {
                     snackAlert(context, SnackTypes.warning,
                         'Please Contact Admin Balance is low ...');
                   } else if (_formKey.currentState!.validate()) {
@@ -578,11 +713,14 @@ class _TopUpState extends State<TopUp> {
                                               MainAxisAlignment.center,
                                           children: [
                                             Text(
-                                                "${(topupProvider.topupamount * topupProvider.toActiveNetWorkprovider['fx']['rate']).toStringAsFixed(2)}" +
-                                                    " " +
-                                                    topupProvider
-                                                            .toActiveCountry[
-                                                        'currencyCode'])
+                                              "${(topupProvider.topupamount * topupProvider.toActiveNetWorkprovider['fx']['rate']).toStringAsFixed(2)}" +
+                                                  " " +
+                                                  topupProvider.toActiveCountry[
+                                                      'currencyCode'],
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w600),
+                                            )
                                           ],
                                         ),
                                         SizedBox(
@@ -597,8 +735,15 @@ class _TopUpState extends State<TopUp> {
                                               style: TextStyle(
                                                   color: secondaryTextColor400),
                                             ),
-                                            Text(topupProvider.estimateRate
-                                                .toString())
+                                            Text(
+                                              topupProvider.estimateRate
+                                                      .toStringAsFixed(4) +
+                                                  ' ' +
+                                                  'USDT',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w600),
+                                            )
                                           ],
                                         ),
                                         SizedBox(
@@ -688,4 +833,73 @@ class _TopUpState extends State<TopUp> {
       ),
     );
   }
+
+  // Widget locationwisecuurency() {
+  //   var topupProvider = Provider.of<TopupProvider>(context, listen: true);
+  //   //print(topupProvider.toActiveNetWorkprovider['geographicalRechargePlans']);
+  //   return Column(
+  //     children: [
+  //       DropdownButton<String>(
+  //         isDense: true,
+  //         hint: Text('Select an item'),
+  //         value: _selectedItem,
+  //         onChanged: (value) {
+  //           setState(() {
+  //             _selectedItem = value as String?;
+  //             _selectedSubItem = null;
+  //           });
+  //           print(value);
+  //           print(topupProvider
+  //               .toActiveNetWorkprovider['geographicalRechargePlans']
+  //               .map((data) {
+  //             return Text(data.toString());
+  //           }));
+  //         },
+  //         icon: Container(
+  //           padding: EdgeInsets.only(left: width * 0.191),
+  //           child: Icon(
+  //             Icons.keyboard_arrow_down,
+  //             color: Colors.white,
+  //           ),
+  //         ),
+  //         style: const TextStyle(fontSize: 13),
+  //         underline: Container(
+  //           height: 0,
+  //         ),
+  //         items: topupProvider
+  //             .toActiveNetWorkprovider['geographicalRechargePlans']
+  //             .map<DropdownMenuItem<String>>((value) {
+  //           return DropdownMenuItem<String>(
+  //             value: value['locationName'],
+  //             child: Text(
+  //               value['locationName'],
+  //               style: TextStyle(
+  //                 color: Colors.white,
+  //               ),
+  //             ),
+  //           );
+  //         }).toList(),
+  //       ),
+  //       // if (_selectedItem != null)
+  //       //   DropdownButton(
+  //       //     hint: Text('Select a subitem'),
+  //       //     value: _selectedSubItem,
+  //       //     onChanged: (value) {
+  //       //       setState(() {
+  //       //         _selectedSubItem = value as String?;
+  //       //       });
+  //       //     },
+  //       //     items: topupProvider
+  //       //         .toActiveNetWorkprovider['geographicalRechargePlans']
+  //       //             [_selectedItem]['fixedAmounts']!
+  //       //         .map((subitem) {
+  //       //       return DropdownMenuItem(
+  //       //         value: subitem,
+  //       //         child: Text(subitem.toString()),
+  //       //       );
+  //       //     }).toList(),
+  //       //   ),
+  //     ],
+  //   );
+  // }
 }

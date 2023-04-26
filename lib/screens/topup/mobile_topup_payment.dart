@@ -128,23 +128,16 @@ class _MobileTopupState extends State<MobileTopup> {
     var topupProvider = Provider.of<TopupProvider>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
     var userid = await auth.userInfo['id'];
-    //  if (withdrwalResponse == true) {
-    await topupProvider.getDoTransaction(context, auth, userid, {
-      "amount": "$topupamount",
-      "operatorId": "$operatorid",
-      "recipientPhone": {
-        "countryCode": "$countrycode",
-        "number": topupProvider.toActiveCountry['callingCodes'][0] + number
-      }
-    });
-    print({
-      "amount": topupamount,
-      "operatorId": operatorid,
-      "recipientPhone": {
-        "countryCode": countrycode,
-        "number": topupProvider.toActiveCountry['callingCodes'][0] + number
-      }
-    });
+    if (withdrwalResponse == true) {
+      await topupProvider.getDoTransaction(context, auth, userid, {
+        "amount": "$topupamount",
+        "operatorId": "$operatorid",
+        "recipientPhone": {
+          "countryCode": "$countrycode",
+          "number": topupProvider.toActiveCountry['callingCodes'][0] + number
+        }
+      });
+    }
   }
 
   @override
@@ -248,7 +241,7 @@ class _MobileTopupState extends State<MobileTopup> {
                     Container(
                         padding: EdgeInsets.only(top: 20, bottom: 5),
                         child: Text(
-                          '${double.parse(args.amount.toString()).toStringAsPrecision(4)}' +
+                          '${double.parse(args.amount.toString()).toStringAsPrecision(5)}' +
                               ' USDT',
                           style: TextStyle(
                               fontSize: 32, fontWeight: FontWeight.bold),
@@ -517,11 +510,11 @@ class _MobileTopupState extends State<MobileTopup> {
                                           onPressed: (() async {
                                             if (_formKey.currentState!
                                                 .validate()) {
-                                              // await withDrawal(
-                                              //     args.defaultcoin,
-                                              //     args.amount,
-                                              //     topupProvider.doverify[
-                                              //         'verificationType']);
+                                              await withDrawal(
+                                                  args.defaultcoin,
+                                                  args.amount,
+                                                  topupProvider.doverify[
+                                                      'verificationType']);
 
                                               await dotransaction(
                                                   args.amount,

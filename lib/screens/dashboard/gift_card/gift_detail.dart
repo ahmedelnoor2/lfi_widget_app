@@ -7,6 +7,8 @@ import 'package:lyotrade/screens/common/drawer.dart';
 
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/screens/dashboard/gift_card/buycard.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Coins.utils.dart';
@@ -545,8 +547,11 @@ class _GiftDetailState extends State<GiftDetail> {
                         ///price type widget //
                         LyoButton(
                           onPressed: (() async {
-                            print(_selectedAmount);
-                            if (widget.data['price_type'] == "list") {
+                            if (giftcardprovider.accountBalance['balance'] <
+                                giftcardprovider.estimateRate['rate']) {
+                              snackAlert(context, SnackTypes.warning,
+                                  'Please contact admin balance is low');
+                            } else if (widget.data['price_type'] == "list") {
                               Navigator.pushNamed(context, '/buy_card',
                                   arguments: BuyCard(
                                       amount: _selectedAmount.toString(),
@@ -557,8 +562,6 @@ class _GiftDetailState extends State<GiftDetail> {
                                       productID:
                                           widget.data['BillerID'].toString()));
                             } else if (_formKey.currentState!.validate()) {
-                              print(giftcardprovider
-                                  .estimateRate['rate'].runtimeType);
                               Navigator.pushNamed(context, '/buy_card',
                                   arguments: BuyCard(
                                       amount: _amountcontroller.text,
