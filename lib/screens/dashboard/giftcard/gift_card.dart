@@ -8,9 +8,9 @@ import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/no_data.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
-import 'package:lyotrade/screens/dashboard/gift_card/catalog.dart';
-import 'package:lyotrade/screens/dashboard/gift_card/country_drawer.dart';
-import 'package:lyotrade/screens/dashboard/gift_card/gift_detail.dart';
+import 'package:lyotrade/screens/dashboard/giftcard/catalog.dart';
+import 'package:lyotrade/screens/dashboard/giftcard/country_drawer.dart';
+import 'package:lyotrade/screens/dashboard/giftcard/gift_detail.dart';
 
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';

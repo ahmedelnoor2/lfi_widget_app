@@ -36,9 +36,9 @@ import 'package:lyotrade/screens/buy_sell/buy_sell_transactions.dart';
 import 'package:lyotrade/screens/buy_sell/common/process_payment.dart';
 import 'package:lyotrade/screens/dashboard.dart';
 import 'package:lyotrade/screens/dashboard/announcement/announcement_details.dart';
-import 'package:lyotrade/screens/dashboard/gift_card/buycard.dart';
-import 'package:lyotrade/screens/dashboard/gift_card/gift_card.dart';
-import 'package:lyotrade/screens/dashboard/gift_card/transaction_history.dart';
+import 'package:lyotrade/screens/dashboard/giftcard/buycard.dart';
+import 'package:lyotrade/screens/dashboard/giftcard/gift_card.dart';
+import 'package:lyotrade/screens/dashboard/giftcard/transaction_history.dart';
 import 'package:lyotrade/screens/dashboard/market_search.dart';
 import 'package:lyotrade/screens/dex_swap/dex_swap.dart';
 import 'package:lyotrade/screens/future_trade/future_market_transaction.dart';
@@ -87,9 +87,9 @@ import 'package:lyotrade/utils/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'screens/dashboard/gift_card/serviceprovider/giftcard-serviceprovider.dart';
+import 'screens/dashboard/giftcard/serviceprovider/giftcard-serviceprovider.dart';
 import 'screens/pix_payment/pix_cpf_detail.dart';
-import 'screens/dashboard/gift_card/gift_detail.dart';
+import 'screens/dashboard/giftcard/gift_detail.dart';
 
 int? initScreen;
 void main() async {

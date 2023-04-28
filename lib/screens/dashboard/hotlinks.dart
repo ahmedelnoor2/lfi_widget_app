@@ -43,7 +43,7 @@ class _HotlinksState extends State<Hotlinks> {
                     bottom: 2,
                   ),
                   child: Image.asset(
-                    'assets/img/new_listing.png',
+                    'assets/img/top-up.png',
                     width: 28,
                   ),
                 ),

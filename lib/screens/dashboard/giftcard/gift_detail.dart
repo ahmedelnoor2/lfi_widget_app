@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
@@ -9,7 +11,7 @@ import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
-import 'package:lyotrade/screens/dashboard/gift_card/buycard.dart';
+import 'package:lyotrade/screens/dashboard/giftcard/buycard.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Coins.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
@@ -32,7 +34,7 @@ class _GiftDetailState extends State<GiftDetail> {
   String _coinShowName = 'USDT';
 
   double estprice = 0.0;
-  int? _selectedAmount;
+  double? _selectedAmount;
 
   final TextEditingController _searchController = TextEditingController();
   bool _tagType = false;
@@ -65,9 +67,12 @@ class _GiftDetailState extends State<GiftDetail> {
     var giftcardprovider =
         Provider.of<GiftCardProvider>(context, listen: false);
     if (widget.isEqualMinMax == false) {
-      var cardrate = widget.data['price']['fixed']['max'].toString();
-      var _payment = double.parse(cardrate);
-      _amountcontroller.text = cardrate.toString();
+      var cardrate = widget.data['price']['fixed']['max'].toDouble() *
+          giftcardprovider.toActiveCountry['rate']['rate'];
+
+      var _payment = cardrate;
+
+      _amountcontroller.text = _payment.toString();
       var userid = await auth.userInfo['id'];
       await giftcardprovider.getEstimateRate(context, auth, userid, {
         "currency": "${giftcardprovider.toActiveCountry['currency']['code']}",
@@ -75,9 +80,11 @@ class _GiftDetailState extends State<GiftDetail> {
         "productID": widget.data['BillerID']
       });
     } else if (widget.data['price_type'] == "list") {
-      var cardrate = widget.data['price']['list'][0].toString();
-      _selectedAmount = int.parse(cardrate);
-      var _payment = double.parse(cardrate);
+      var cardrate = widget.data['price']['list'][0].toDouble() *
+          giftcardprovider.toActiveCountry['rate']['rate'];
+      print(cardrate.runtimeType);
+      _selectedAmount = cardrate;
+      var _payment = cardrate;
       var userid = await auth.userInfo['id'];
 
       await giftcardprovider.getEstimateRate(context, auth, userid, {
@@ -373,7 +380,7 @@ class _GiftDetailState extends State<GiftDetail> {
                                         color: Color(0xff5E6292),
                                       ),
                                     ),
-                                    child: DropdownButton<int>(
+                                    child: DropdownButton<double>(
                                         isDense: true,
                                         value: _selectedAmount,
                                         icon: Container(
@@ -388,10 +395,11 @@ class _GiftDetailState extends State<GiftDetail> {
                                         underline: Container(
                                           height: 0,
                                         ),
-                                        onChanged: (int? newValue) {
+                                        onChanged: (double? newValue) {
                                           setState(() {
                                             _selectedAmount = newValue;
                                           });
+                                          print(_selectedAmount);
                                           getEstimateRate(
                                               widget.data['BillerID'],
                                               _selectedAmount,
@@ -399,12 +407,17 @@ class _GiftDetailState extends State<GiftDetail> {
                                                   'currency']['code']);
                                         },
                                         items: widget.data['price']['list']
-                                            .map<DropdownMenuItem<int>>(
+                                            .map<DropdownMenuItem<double>>(
                                                 (value) {
-                                          return DropdownMenuItem<int>(
-                                            value: value,
+                                          var data = value *
+                                              giftcardprovider
+                                                      .toActiveCountry['rate']
+                                                  ['rate'];
+
+                                          return DropdownMenuItem<double>(
+                                            value: data,
                                             child: Text(
-                                              value.toString(),
+                                              data.toString(),
                                               style: TextStyle(
                                                 color: Colors.white,
                                               ),

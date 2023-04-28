@@ -560,7 +560,7 @@
 //                                           ? payments
 //                                               .selectedTransaction['qr_code']
 //                                           : payments
-//                                               .pixNewTransaction['qr_code']),
+//                                               .pixNewTransaction['_code']),
 //                                     ),
 //                                   ),
 //                                 );

@@ -108,7 +108,9 @@ class _ReferalState extends State<Referal> {
                             ),
                           ),
                           Text(
-                        languageprovider.getlanguage['referral_detail']['title']??    'Referral',
+                            languageprovider.getlanguage['referral_detail']
+                                    ['title'] ??
+                                'Referral',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -166,7 +168,10 @@ class _ReferalState extends State<Referal> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                             languageprovider.getlanguage['referral_detail']['sub_header1']??     'Top Referrer Bonus(USDT) ',
+                                  languageprovider
+                                              .getlanguage['referral_detail']
+                                          ['sub_header1'] ??
+                                      'Top Referrer Bonus(USDT) ',
                                   style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w400),
@@ -176,7 +181,10 @@ class _ReferalState extends State<Referal> {
                                     _buildBottomSheet(context);
                                   },
                                   child: Text(
-                                 languageprovider.getlanguage['referral_detail']['info']['title']??   'Info',
+                                    languageprovider
+                                                .getlanguage['referral_detail']
+                                            ['info']['title'] ??
+                                        'Info',
                                     style: TextStyle(
                                         color: linkColor,
                                         fontWeight: FontWeight.w400),
@@ -204,7 +212,11 @@ class _ReferalState extends State<Referal> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(languageprovider.getlanguage['referral_detail']['sub_text1']?? 'Friends',
+                                      Text(
+                                          languageprovider.getlanguage[
+                                                      'referral_detail']
+                                                  ['sub_text1'] ??
+                                              'Friends',
                                           style: TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.w400)),
@@ -226,7 +238,11 @@ class _ReferalState extends State<Referal> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(languageprovider.getlanguage['referral_detail']['sub_text2']??'Rewards(USDT)',
+                                        Text(
+                                            languageprovider.getlanguage[
+                                                        'referral_detail']
+                                                    ['sub_text2'] ??
+                                                'Rewards(USDT)',
                                             style: TextStyle(
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w400)),
@@ -254,148 +270,156 @@ class _ReferalState extends State<Referal> {
                         Image.asset('assets/img/ref-icon1.png'),
                         Container(
                           padding: EdgeInsets.only(left: 8),
-                          child: Text(languageprovider.getlanguage['referral_detail']['sub_header2']??'How to get rebate income?',
+                          child: Text(
+                              languageprovider.getlanguage['referral_detail']
+                                      ['sub_header2'] ??
+                                  'How to get rebate income?',
                               style: TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w400)),
                         ),
                       ],
                     ),
                   ),
-                 
-                      Container(
-                          margin: EdgeInsets.only(top: 8, left: 16, bottom: 10),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Row(
-                                children: [
-                                  Container(
-                                    alignment: Alignment.center,
-                                    height: height * 0.04,
-                                    width: width * 0.1,
-                                    decoration: BoxDecoration(
-                                      color: selectboxcolour,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Text(
-                                      '1',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                    languageprovider.getlanguage['referral_detail']['step1']??    ' Send invitation',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(fontSize: 14),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                  Container(
+                    margin: EdgeInsets.only(top: 8, left: 16, bottom: 10),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Row(
+                          children: [
+                            Container(
+                              alignment: Alignment.center,
+                              height: height * 0.04,
+                              width: width * 0.1,
+                              decoration: BoxDecoration(
+                                color: selectboxcolour,
+                                shape: BoxShape.circle,
                               ),
-                              Container(
-                                margin: EdgeInsets.only(left: 20),
-                                child: DottedLine(
-                                  direction: Axis.vertical,
-                                  lineLength: height * 0.04,
-                                  lineThickness: 1.0,
-                                  dashLength: 2.0,
-                                  dashColor: Colors.black,
-                                  dashGapLength: 4.0,
-                                  dashGapColor: darkgreyColor,
-                                  dashGapRadius: 0.0,
+                              child: Text(
+                                '1',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  languageprovider
+                                              .getlanguage['referral_detail']
+                                          ['step1'] ??
+                                      ' Send invitation',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 14),
                                 ),
-                              ),
-                              Row(
-                                children: [
-                                  Container(
-                                    alignment: Alignment.center,
-                                    height: height * 0.04,
-                                    width: width * 0.1,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: selectboxcolour),
-                                    child: Text(
-                                      '2',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                 languageprovider.getlanguage['referral_detail']['step2']??' Friends complete registration and trade',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(fontSize: 14),
-                                      ),
-                                      // Text(
-                                      //   'They hit the road',
-                                      //   textAlign: TextAlign.center,
-                                      //   style: TextStyle(fontSize: 10),
-                                      // ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(left: 20),
-                                child: DottedLine(
-                                  direction: Axis.vertical,
-                                  lineLength: height * 0.04,
-                                  lineThickness: 1.0,
-                                  dashLength: 2.0,
-                                  dashColor: Colors.black,
-                                  dashRadius: 0.0,
-                                  dashGapLength: 4.0,
-                                  dashGapColor: darkgreyColor,
-                                  dashGapRadius: 0.0,
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Container(
-                                    alignment: Alignment.center,
-                                    height: height * 0.04,
-                                    width: width * 0.1,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: selectboxcolour),
-                                    child: Text(
-                                      '3',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                 languageprovider.getlanguage['referral_detail']['step3']??' Get rebate income',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(fontSize: 14),
-                                      ),
-                                      // Text(
-                                      //   'You make savings!',
-                                      //   textAlign: TextAlign.center,
-                                      //   style: TextStyle(fontSize: 10),
-                                      // ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ],
+                              ],
+                            ),
+                          ],
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(left: 20),
+                          child: DottedLine(
+                            direction: Axis.vertical,
+                            lineLength: height * 0.04,
+                            lineThickness: 1.0,
+                            dashLength: 2.0,
+                            dashColor: Colors.black,
+                            dashGapLength: 4.0,
+                            dashGapColor: darkgreyColor,
+                            dashGapRadius: 0.0,
                           ),
                         ),
+                        Row(
+                          children: [
+                            Container(
+                              alignment: Alignment.center,
+                              height: height * 0.04,
+                              width: width * 0.1,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: selectboxcolour),
+                              child: Text(
+                                '2',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  languageprovider
+                                              .getlanguage['referral_detail']
+                                          ['step2'] ??
+                                      ' Friends complete registration and trade',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                                // Text(
+                                //   'They hit the road',
+                                //   textAlign: TextAlign.center,
+                                //   style: TextStyle(fontSize: 10),
+                                // ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(left: 20),
+                          child: DottedLine(
+                            direction: Axis.vertical,
+                            lineLength: height * 0.04,
+                            lineThickness: 1.0,
+                            dashLength: 2.0,
+                            dashColor: Colors.black,
+                            dashRadius: 0.0,
+                            dashGapLength: 4.0,
+                            dashGapColor: darkgreyColor,
+                            dashGapRadius: 0.0,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                              alignment: Alignment.center,
+                              height: height * 0.04,
+                              width: width * 0.1,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: selectboxcolour),
+                              child: Text(
+                                '3',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  languageprovider
+                                              .getlanguage['referral_detail']
+                                          ['step3'] ??
+                                      ' Get rebate income',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                                // Text(
+                                //   'You make savings!',
+                                //   textAlign: TextAlign.center,
+                                //   style: TextStyle(fontSize: 10),
+                                // ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                   Container(
                     padding: EdgeInsets.only(bottom: 10),
                     child: Container(
@@ -434,7 +458,9 @@ class _ReferalState extends State<Referal> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                           languageprovider.getlanguage['referral_detail']['invitation-code']??   'Invitation code',
+                              languageprovider.getlanguage['referral_detail']
+                                      ['invitation-code'] ??
+                                  'Invitation code',
                             ),
                             Row(
                               children: [
@@ -490,7 +516,9 @@ class _ReferalState extends State<Referal> {
                           children: [
                             SizedBox(
                               child: Text(
-                              languageprovider.getlanguage['referral_detail']['referral-link']??  'Referral Link',
+                                languageprovider.getlanguage['referral_detail']
+                                        ['referral-link'] ??
+                                    'Referral Link',
                                 style: TextStyle(fontSize: 14),
                               ),
                             ),
@@ -533,28 +561,32 @@ class _ReferalState extends State<Referal> {
                       ),
                     ),
                   ),
-                 kIsWeb
-                      ? Container():Container(
-                    padding: EdgeInsets.all(15),
-                    child: LyoButton(
-                      onPressed: _isLoading
-                          ? null
-                          : () {
-                              setState(() {
-                                _isLoading = true;
-                              });
-                              share(
-                                '${referalprovider.referralinvitationdata['inviteCode']}',
-                                '${referalprovider.referralinvitationdata['inviteUrl']}',
-                              );
-                            },
-                      text:languageprovider.getlanguage['referral_detail']['invite-button']?? 'Invite Friends',
-                      active: true,
-                      activeColor: linkColor,
-                      activeTextColor: Colors.black,
-                      isLoading: _isLoading,
-                    ),
-                  ),
+                  kIsWeb
+                      ? Container()
+                      : Container(
+                          padding: EdgeInsets.all(15),
+                          child: LyoButton(
+                            onPressed: _isLoading
+                                ? null
+                                : () {
+                                    setState(() {
+                                      _isLoading = true;
+                                    });
+                                    share(
+                                      '${referalprovider.referralinvitationdata['inviteCode']}',
+                                      '${referalprovider.referralinvitationdata['inviteUrl']}',
+                                    );
+                                  },
+                            text:
+                                languageprovider.getlanguage['referral_detail']
+                                        ['invite-button'] ??
+                                    'Invite Friends',
+                            active: true,
+                            activeColor: linkColor,
+                            activeTextColor: Colors.black,
+                            isLoading: _isLoading,
+                          ),
+                        ),
                 ],
               ),
       ),
@@ -600,12 +632,17 @@ Future _buildBottomSheet(BuildContext context) {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(languageprovider.getlanguage['referral_detail']['info']['heading']??'Reward distribution condition:',
+                    Text(
+                        languageprovider.getlanguage['referral_detail']['info']
+                                ['heading'] ??
+                            'Reward distribution condition:',
                         style: TextStyle(color: linkColor)),
                     Container(
                       padding: EdgeInsets.only(top: 15),
                       child: Text(
-                       languageprovider.getlanguage['referral_detail']['info']['info1']??   'Friends who complete the following tasks within 30 days after registration, you can get the corresponding inviter rewards',
+                          languageprovider.getlanguage['referral_detail']
+                                  ['info']['info1'] ??
+                              'Friends who complete the following tasks within 30 days after registration, you can get the corresponding inviter rewards',
                           style: TextStyle()),
                     ),
                     Container(
@@ -617,7 +654,10 @@ Future _buildBottomSheet(BuildContext context) {
                             size: 14,
                             color: linkColor,
                           ),
-                          Text(languageprovider.getlanguage['referral_detail']['info']['task1']??'Complete identity verification',
+                          Text(
+                              languageprovider.getlanguage['referral_detail']
+                                      ['info']['task1'] ??
+                                  'Complete identity verification',
                               style: TextStyle(color: seconadarytextcolour)),
                         ],
                       ),
@@ -628,7 +668,10 @@ Future _buildBottomSheet(BuildContext context) {
                         children: [
                           Icon(Icons.star_border_outlined,
                               size: 14, color: linkColor),
-                          Text(languageprovider.getlanguage['referral_detail']['info']['task2']??'Recharge amount≥25USDT',
+                          Text(
+                              languageprovider.getlanguage['referral_detail']
+                                      ['info']['task2'] ??
+                                  'Recharge amount≥25USDT',
                               style: TextStyle(color: seconadarytextcolour)),
                         ],
                       ),
@@ -641,7 +684,11 @@ Future _buildBottomSheet(BuildContext context) {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(languageprovider.getlanguage['referral_detail']['info']['reward1-title']??'Inviter Reward Amount:',
+                                Text(
+                                    languageprovider
+                                                .getlanguage['referral_detail']
+                                            ['info']['reward1-title'] ??
+                                        'Inviter Reward Amount:',
                                     style: TextStyle(color: linkColor)),
                                 Container(
                                   padding: EdgeInsets.only(top: 0),
@@ -649,7 +696,11 @@ Future _buildBottomSheet(BuildContext context) {
                                     children: [
                                       Icon(Icons.star_border_outlined,
                                           size: 14, color: linkColor),
-                                      Text(languageprovider.getlanguage['referral_detail']['info']['reward1-title']??'Inviter Reward Amount',
+                                      Text(
+                                          languageprovider.getlanguage[
+                                                      'referral_detail']['info']
+                                                  ['reward1-title'] ??
+                                              'Inviter Reward Amount',
                                           style: TextStyle(
                                             color: seconadarytextcolour,
                                           )),
@@ -669,7 +720,10 @@ Future _buildBottomSheet(BuildContext context) {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(languageprovider.getlanguage['referral_detail']['info']['reward2-title']??'Registrant Reward Amount:',
+                          Text(
+                              languageprovider.getlanguage['referral_detail']
+                                      ['info']['reward2-title'] ??
+                                  'Registrant Reward Amount:',
                               style: TextStyle(
                                 color: linkColor,
                               )),
@@ -679,7 +733,11 @@ Future _buildBottomSheet(BuildContext context) {
                               children: [
                                 Icon(Icons.star_border_outlined,
                                     size: 14, color: linkColor),
-                                Text(languageprovider.getlanguage['referral_detail']['info']['reward2-title']??'Registrant Reward Amount',
+                                Text(
+                                    languageprovider
+                                                .getlanguage['referral_detail']
+                                            ['info']['reward2-title'] ??
+                                        'Registrant Reward Amount',
                                     style: TextStyle(
                                       color: seconadarytextcolour,
                                     )),
@@ -696,7 +754,10 @@ Future _buildBottomSheet(BuildContext context) {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(languageprovider.getlanguage['referral_detail']['info']['reward-method']??'Reward Distribution Method:',
+                          Text(
+                              languageprovider.getlanguage['referral_detail']
+                                      ['info']['reward-method'] ??
+                                  'Reward Distribution Method:',
                               style: TextStyle(color: linkColor)),
                           Container(
                             padding: EdgeInsets.only(top: 4, bottom: 10),
@@ -707,9 +768,12 @@ Future _buildBottomSheet(BuildContext context) {
                                 Container(
                                   width: 300,
                                   child: Text(
-                                   languageprovider.getlanguage['referral_detail']['info']['method-text']??   'After meeting the reward conditions,T+2 Days',
-                                      style:
-                                          TextStyle(color: seconadarytextcolour)),
+                                      languageprovider.getlanguage[
+                                                  'referral_detail']['info']
+                                              ['method-text'] ??
+                                          'After meeting the reward conditions,T+2 Days',
+                                      style: TextStyle(
+                                          color: seconadarytextcolour)),
                                 ),
                               ],
                             ),

@@ -11,8 +11,8 @@ import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/common/no_data.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
-import 'package:lyotrade/screens/dashboard/gift_card/cardRedeem.dart';
-import 'package:lyotrade/screens/dashboard/gift_card/catalog.dart';
+import 'package:lyotrade/screens/dashboard/giftcard/cardRedeem.dart';
+import 'package:lyotrade/screens/dashboard/giftcard/catalog.dart';
 
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
