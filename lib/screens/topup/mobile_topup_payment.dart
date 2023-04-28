@@ -108,12 +108,12 @@ class _MobileTopupState extends State<MobileTopup> {
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
     var userid = await auth.userInfo['id'];
-
+    print(amount.toStringAsPrecision(5));
     withdrwalResponse =
         await topupProvider.getDoWithDrawal(context, auth, userid, {
       "symbol": '$coin',
       "fee": '${asset.getCost['defaultFee']}',
-      "number": "$amount",
+      "amount": amount.toStringAsPrecision(5),
       "verificationType": "$verifitypre",
       "emailValidCode":
           verifitypre == 'emailValidCode' ? _optcontroller.text : "",
@@ -333,7 +333,7 @@ class _MobileTopupState extends State<MobileTopup> {
                               child: LyoButton(
                                 onPressed: (() async {
                                   Navigator.pushNamed(
-                                      context, '/top_transaction');
+                                      context, '/topup_transaction');
                                 }),
                                 text: 'Transactions',
                                 active: true,

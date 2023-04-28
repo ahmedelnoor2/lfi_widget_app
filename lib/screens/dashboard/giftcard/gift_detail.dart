@@ -399,7 +399,7 @@ class _GiftDetailState extends State<GiftDetail> {
                                           setState(() {
                                             _selectedAmount = newValue;
                                           });
-                                          print(_selectedAmount);
+
                                           getEstimateRate(
                                               widget.data['BillerID'],
                                               _selectedAmount,
@@ -415,7 +415,7 @@ class _GiftDetailState extends State<GiftDetail> {
                                                   ['rate'];
 
                                           return DropdownMenuItem<double>(
-                                            value: data,
+                                            value: data.toDouble(),
                                             child: Text(
                                               data.toString(),
                                               style: TextStyle(
