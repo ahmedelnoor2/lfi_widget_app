@@ -12,6 +12,7 @@ import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
 import 'package:lyotrade/screens/dashboard/giftcard/buycard.dart';
+import 'package:lyotrade/screens/dashboard/giftcard/widget/card_amount_select.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Coins.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
@@ -34,7 +35,6 @@ class _GiftDetailState extends State<GiftDetail> {
   String _coinShowName = 'USDT';
 
   double estprice = 0.0;
-  double? _selectedAmount;
 
   final TextEditingController _searchController = TextEditingController();
   bool _tagType = false;
@@ -46,6 +46,14 @@ class _GiftDetailState extends State<GiftDetail> {
   void initState() {
     super.initState();
     getDigitalBalance();
+  }
+
+  // get amount
+  double getamount(String country, String amount, String rate) {
+    if (country == 'AED') {
+      return double.parse(amount);
+    }
+    return double.parse(amount) * double.parse(rate);
   }
 
   // Get Estimate Rate//
@@ -80,13 +88,15 @@ class _GiftDetailState extends State<GiftDetail> {
         "productID": widget.data['BillerID']
       });
     } else if (widget.data['price_type'] == "list") {
-      var cardrate = widget.data['price']['list'][0].toDouble() *
-          giftcardprovider.toActiveCountry['rate']['rate'];
-      print(cardrate.runtimeType);
-      _selectedAmount = cardrate;
-      var _payment = cardrate;
-      var userid = await auth.userInfo['id'];
+      var cardrate = getamount(
+          giftcardprovider.toActiveCountry['currency']['code'],
+          widget.data['price']['list'][0].toString(),
+          giftcardprovider.toActiveCountry['rate']['rate'].toString());
 
+      giftcardprovider.setgiftcardamount(cardrate);
+      print(giftcardprovider.giftcardamount);
+      var _payment = giftcardprovider.giftcardamount;
+      var userid = await auth.userInfo['id'];
       await giftcardprovider.getEstimateRate(context, auth, userid, {
         "currency": "${giftcardprovider.toActiveCountry['currency']['code']}",
         "payment": _payment,
@@ -353,77 +363,66 @@ class _GiftDetailState extends State<GiftDetail> {
                         ),
 
                         (widget.data['price_type'] == "list")
-                            ? Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 20, bottom: 20),
-                                    child: Container(
-                                      child: Row(children: [
-                                        Text(
-                                          'Select Amount' +
-                                              ' ' +
-                                              '(${giftcardprovider.toActiveCountry['currency']['code']})',
-                                        ),
-                                      ]),
-                                    ),
-                                  ),
                                   Container(
-                                    padding: EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(5),
-                                      border: Border.all(
-                                        style: BorderStyle.solid,
-                                        width: 0.3,
-                                        color: Color(0xff5E6292),
+                                      padding:
+                                          EdgeInsets.only(bottom: 10, top: 10),
+                                      child: Text('Topup Amount')),
+                                  InkWell(
+                                    onTap: () {
+                                      showModalBottomSheet<void>(
+                                        context: context,
+                                        isScrollControlled: true,
+                                        builder: (BuildContext context) {
+                                          return StatefulBuilder(
+                                            builder: (BuildContext context,
+                                                StateSetter setState) {
+                                              return Container(
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.85,
+                                                  child: CardAmountSelect(
+                                                      widget.data['price']
+                                                          ['list'],
+                                                      widget.data['BillerID']));
+                                            },
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: Container(
+                                      width: width,
+                                      height: height * 0.07,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5),
+                                        border: Border.all(
+                                          style: BorderStyle.solid,
+                                          width: 0.3,
+                                          color: Color(0xff5E6292),
+                                        ),
+                                      ),
+                                      padding: EdgeInsets.all(8),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(giftcardprovider.giftcardamount
+                                              .toString()),
+                                          // giftcardprovider.IstopupnetWorkloading
+                                          //     ? CircularProgressIndicator()
+                                          //     : Text(topupProvider
+                                          //                     .toActiveNetWorkprovider[
+                                          //                 'fx'] ==
+                                          //             null
+                                          //         ? ''
+                                          //         : "${(topupProvider.topupamount * topupProvider.toActiveNetWorkprovider['fx']['rate']).toStringAsFixed(2)}"),
+                                          Icon(Icons.arrow_drop_down),
+                                        ],
                                       ),
                                     ),
-                                    child: DropdownButton<double>(
-                                        isDense: true,
-                                        value: _selectedAmount,
-                                        icon: Container(
-                                          padding: EdgeInsets.only(
-                                              left: width * 0.191),
-                                          child: Icon(
-                                            Icons.keyboard_arrow_down,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        style: const TextStyle(fontSize: 13),
-                                        underline: Container(
-                                          height: 0,
-                                        ),
-                                        onChanged: (double? newValue) {
-                                          setState(() {
-                                            _selectedAmount = newValue;
-                                          });
-
-                                          getEstimateRate(
-                                              widget.data['BillerID'],
-                                              _selectedAmount,
-                                              giftcardprovider.toActiveCountry[
-                                                  'currency']['code']);
-                                        },
-                                        items: widget.data['price']['list']
-                                            .map<DropdownMenuItem<double>>(
-                                                (value) {
-                                          var data = value *
-                                              giftcardprovider
-                                                      .toActiveCountry['rate']
-                                                  ['rate'];
-
-                                          return DropdownMenuItem<double>(
-                                            value: data.toDouble(),
-                                            child: Text(
-                                              data.toString(),
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          );
-                                        }).toList()),
                                   ),
                                 ],
                               )
@@ -549,8 +548,9 @@ class _GiftDetailState extends State<GiftDetail> {
                                 ),
                                 giftcardprovider.isEstimate
                                     ? CircularProgressIndicator()
-                                    : Text(
-                                        '${giftcardprovider.estimateRate['rate']}'
+                                    : Text(giftcardprovider.estimateRate == null
+                                        ? ''
+                                        : '${giftcardprovider.estimateRate['rate'].toStringAsPrecision(5)}'
                                                 ' ' +
                                             _coinShowName)
                               ]),
@@ -567,9 +567,11 @@ class _GiftDetailState extends State<GiftDetail> {
                             } else if (widget.data['price_type'] == "list") {
                               Navigator.pushNamed(context, '/buy_card',
                                   arguments: BuyCard(
-                                      amount: _selectedAmount.toString(),
-                                      totalprice:
-                                          giftcardprovider.estimateRate['rate'],
+                                      amount: giftcardprovider.giftcardamount
+                                          .toString(),
+                                      totalprice: giftcardprovider
+                                          .estimateRate['rate']
+                                          .toStringAsPrecision(5),
                                       defaultcoin: _defaultCoin,
                                       ShowName: _coinShowName,
                                       productID:
@@ -578,8 +580,9 @@ class _GiftDetailState extends State<GiftDetail> {
                               Navigator.pushNamed(context, '/buy_card',
                                   arguments: BuyCard(
                                       amount: _amountcontroller.text,
-                                      totalprice:
-                                          giftcardprovider.estimateRate['rate'],
+                                      totalprice: giftcardprovider
+                                          .estimateRate['rate']
+                                          .toStringAsPrecision(5),
                                       defaultcoin: _defaultCoin,
                                       ShowName: _coinShowName,
                                       productID:

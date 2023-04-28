@@ -30,6 +30,7 @@ class _GiftCardServiceProviderState extends State<GiftCardServiceProvider> {
   @override
   Widget build(BuildContext context) {
     var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
+
     return Scaffold(
       appBar: hiddenAppBar(),
       body: SingleChildScrollView(

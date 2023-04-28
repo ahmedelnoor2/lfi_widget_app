@@ -30,6 +30,17 @@ class GiftCardProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  dynamic _giftcardamount;
+
+  dynamic get giftcardamount {
+    return _giftcardamount;
+  }
+
+  void setgiftcardamount(value) {
+    _giftcardamount = value;
+    notifyListeners();
+  }
+
   List _allgiftprovider = [];
 
   List get allgiftprovider {

@@ -462,7 +462,8 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
             Text(data['price']['list'].map((item) {
               if (giftcardprovider.toActiveCountry['currency']['code'] !=
                   'AED') {
-                return item * giftcardprovider.toActiveCountry['rate']['rate'];
+                return (item * giftcardprovider.toActiveCountry['rate']['rate'])
+                    .toStringAsPrecision(4);
               } else {
                 return item;
               }
@@ -476,9 +477,9 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-              'Min price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? data['price']['range']['min'] * giftcardprovider.toActiveCountry['rate']['rate'] : data['price']['range']['min']} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+              'Min price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['range']['min'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsPrecision(4) : data['price']['range']['min'].toStringAsPrecision(5)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
           Text(
-              'Max price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? data['price']['range']['max'].toString().replaceAll(',', "") * giftcardprovider.toActiveCountry['rate']['rate'] : data['price']['range']['max'].toString().replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+              'Max price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['range']['max'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsPrecision(4) : data['price']['range']['max'].toStringAsPrecision(5)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
         ],
       );
     } else if (data['price_type'] == "fixed") {
@@ -486,9 +487,9 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-              'Min price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? data['price']['fixed']['min'] * giftcardprovider.toActiveCountry['rate']['rate'] : data['price']['fixed']['min']} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+              'Min price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['fixed']['min'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsPrecision(4) : data['price']['fixed']['min'].toStringAsPrecision(5)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
           Text(
-              'Max price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? data['price']['fixed']['max'] * giftcardprovider.toActiveCountry['rate']['rate'] : data['price']['fixed']['max']} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+              'Max price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['fixed']['max'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsPrecision(4) : data['price']['fixed']['max'].toStringAsPrecision(5)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
         ],
       );
     } else {

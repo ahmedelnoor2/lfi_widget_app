@@ -235,9 +235,7 @@ class _BuyCardState extends State<BuyCard> {
                     Container(
                         padding: EdgeInsets.only(top: 20, bottom: 5),
                         child: Text(
-                          '${double.parse(args.totalprice.toString()).toStringAsPrecision(7)}' +
-                              ' ' +
-                              args.ShowName.toString(),
+                          '${args.totalprice}' + ' ' + args.ShowName.toString(),
                           style: TextStyle(
                               fontSize: 32, fontWeight: FontWeight.bold),
                         )),

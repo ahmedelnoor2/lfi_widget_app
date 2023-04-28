@@ -196,7 +196,7 @@ class _TopGatewayState extends State<TopGateway>
                   snackAlert(context, SnackTypes.warning,
                       ' (Please check KYC status)');
                 } else {
-                Navigator.pushNamed(context, '/gift_card_service_provider');
+                  Navigator.pushNamed(context, '/gift_card_service_provider');
                 }
               } else {
                 Navigator.pushNamed(context, '/authentication');
