@@ -25,7 +25,7 @@ class GiftCardProvider with ChangeNotifier {
     return _provierid;
   }
 
-  void setproiverid(value) {
+  void setproviderid(value) {
     _provierid = value;
     notifyListeners();
   }
@@ -649,12 +649,14 @@ class GiftCardProvider with ChangeNotifier {
     userid,
   ) async {
     notifyListeners();
+    print(userid);
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
     headers['provider'] = providerid;
-
+    print(headers['provider'].runtimeType);
     var url = Uri.http(gifttesturl, 'gift-card/account/balance');
     print(url);
+    print(headers);
     try {
       final response = await http.get(url, headers: headers);
 

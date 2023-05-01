@@ -4,6 +4,7 @@ import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/ticker_provider.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/giftcard.dart';
 import 'package:lyotrade/providers/language_provider.dart';
 import 'package:lyotrade/providers/payments.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
@@ -26,7 +27,14 @@ class _TopGatewayState extends State<TopGateway>
   @override
   void initState() {
     super.initState();
+
     _controller = AnimationController(vsync: this);
+  }
+
+  Future<void> getAllGiftProvider() async {
+    var giftcardprovider =
+        Provider.of<GiftCardProvider>(context, listen: false);
+    await giftcardprovider.getAllGiftProvider();
   }
 
   @override
@@ -40,6 +48,7 @@ class _TopGatewayState extends State<TopGateway>
     var auth = Provider.of<Auth>(context, listen: true);
     var payments = Provider.of<Payments>(context, listen: true);
     var languageprovider = Provider.of<LanguageChange>(context, listen: true);
+    var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
 
     // print(auth.userInfo);
 
@@ -189,14 +198,22 @@ class _TopGatewayState extends State<TopGateway>
         Expanded(
           flex: 2,
           child: InkWell(
-            onTap: () {
+            onTap: () async {
               if (auth.isAuthenticated) {
+                await getAllGiftProvider();
+                print(giftcardprovider.allgiftprovider.length);
                 if (auth.userInfo['realAuthType'] == 0 ||
                     auth.userInfo['authLevel'] == 0) {
                   snackAlert(context, SnackTypes.warning,
                       ' (Please check KYC status)');
                 } else {
-                  Navigator.pushNamed(context, '/gift_card_service_provider');
+                  if (giftcardprovider.allgiftprovider.length > 1) {
+                    Navigator.pushNamed(context, '/gift_card_service_provider');
+                  } else {
+                    String reloadlyid = '2';
+                    giftcardprovider.setproviderid(reloadlyid);
+                    Navigator.pushNamed(context, '/gift_card');
+                  }
                 }
               } else {
                 Navigator.pushNamed(context, '/authentication');

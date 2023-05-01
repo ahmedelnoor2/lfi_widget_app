@@ -75,12 +75,14 @@ class _GiftDetailState extends State<GiftDetail> {
     var giftcardprovider =
         Provider.of<GiftCardProvider>(context, listen: false);
     if (widget.isEqualMinMax == false) {
-      var cardrate = widget.data['price']['fixed']['max'].toDouble() *
-          giftcardprovider.toActiveCountry['rate']['rate'];
+      var cardrate = getamount(
+          giftcardprovider.toActiveCountry['currency']['code'],
+          widget.data['price']['fixed']['max'].toString(),
+          giftcardprovider.toActiveCountry['rate']['rate'].toString());
 
       var _payment = cardrate;
 
-      _amountcontroller.text = _payment.toString();
+      _amountcontroller.text = _payment.toStringAsPrecision(4);
       var userid = await auth.userInfo['id'];
       await giftcardprovider.getEstimateRate(context, auth, userid, {
         "currency": "${giftcardprovider.toActiveCountry['currency']['code']}",
@@ -205,7 +207,7 @@ class _GiftDetailState extends State<GiftDetail> {
     var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
     var asset = Provider.of<Asset>(context, listen: true);
     var public = Provider.of<Public>(context, listen: true);
-    print(widget.data);
+
 //print(giftcardprovider.toActiveCountry);
     return Scaffold(
       key: _scaffoldKey,
@@ -548,11 +550,11 @@ class _GiftDetailState extends State<GiftDetail> {
                                 ),
                                 giftcardprovider.isEstimate
                                     ? CircularProgressIndicator()
-                                    : Text(giftcardprovider.estimateRate == null
-                                        ? ''
-                                        : '${giftcardprovider.estimateRate['rate'].toStringAsPrecision(5)}'
-                                                ' ' +
-                                            _coinShowName)
+                                    : Text((giftcardprovider
+                                            .estimateRate['rate']
+                                            .toString() +
+                                        " " +
+                                        _coinShowName))
                               ]),
                         ),
                         priceType(widget.data),
@@ -561,9 +563,15 @@ class _GiftDetailState extends State<GiftDetail> {
                         LyoButton(
                           onPressed: (() async {
                             if (giftcardprovider.accountBalance['balance'] <
-                                giftcardprovider.estimateRate['rate']) {
+                                double.parse(
+                                    giftcardprovider.estimateRate['rate'])) {
                               snackAlert(context, SnackTypes.warning,
                                   'Please contact admin balance is low');
+                            } else if (double.parse(
+                                    giftcardprovider.estimateRate['rate']) <
+                                asset.getCost['withdraw_min']) {
+                              snackAlert(context, SnackTypes.warning,
+                                  'Minimum withdrawal amount is ${asset.getCost['withdraw_min']}');
                             } else if (widget.data['price_type'] == "list") {
                               Navigator.pushNamed(context, '/buy_card',
                                   arguments: BuyCard(
@@ -632,9 +640,9 @@ class _GiftDetailState extends State<GiftDetail> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-                'Min price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? data['price']['range']['min'] * giftcardprovider.toActiveCountry['rate']['rate'] : data['price']['range']['min']} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                'Min price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['range']['min'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsPrecision(4) : data['price']['range']['min']..toStringAsPrecision(4)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
             Text(
-                'Max price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? data['price']['range']['max'] * giftcardprovider.toActiveCountry['rate']['rate'] : data['price']['range']['max']} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                'Max price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['range']['max'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsPrecision(4) : data['price']['range']['max'].toStringAsPrecision(4)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
           ],
         ),
       );
@@ -645,9 +653,9 @@ class _GiftDetailState extends State<GiftDetail> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-                'Min price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? data['price']['fixed']['min'] * giftcardprovider.toActiveCountry['rate']['rate'] : data['price']['fixed']['min']} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                'Min price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['fixed']['min'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsPrecision(4) : data['price']['fixed']['min'].toStringAsPrecision(4)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
             Text(
-                'Max price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? data['price']['fixed']['max'] * giftcardprovider.toActiveCountry['rate']['rate'] : data['price']['fixed']['max']} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                'Max price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['fixed']['max'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsPrecision(4) : data['price']['fixed']['max'].toStringAsPrecision(4)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
           ],
         ),
       );

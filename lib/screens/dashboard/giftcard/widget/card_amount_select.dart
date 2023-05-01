@@ -39,6 +39,13 @@ class _CardAmountSelectState extends State<CardAmountSelect> {
     return;
   }
 
+  double getamount(String country, String amount, String rate) {
+    if (country == 'AED') {
+      return double.parse(amount);
+    }
+    return double.parse(amount) * double.parse(rate);
+  }
+
   @override
   Widget build(BuildContext context) {
     var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
@@ -83,7 +90,11 @@ class _CardAmountSelectState extends State<CardAmountSelect> {
               shrinkWrap: true,
               itemCount: widget.amountlist!.length,
               itemBuilder: (context, index) {
-                var currentindex = widget.amountlist![index];
+                var currentindex = getamount(
+                    giftcardprovider.toActiveCountry['currency']['code'],
+                    widget.amountlist![index].toString(),
+                    giftcardprovider.toActiveCountry['rate']['rate']
+                        .toString());
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 10.0),
                   child: Row(
@@ -111,7 +122,7 @@ class _CardAmountSelectState extends State<CardAmountSelect> {
                                   top: 40.0,
                                 ),
                                 child: Text(
-                                  "${(currentindex.toStringAsFixed(2))}",
+                                  "${(currentindex.toStringAsFixed(2)) + ' ' + giftcardprovider.toActiveCountry['currency']['code']}",
                                   style: TextStyle(
                                       color: Color(0xff00315C),
                                       fontSize: 14.0,

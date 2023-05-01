@@ -16,15 +16,7 @@ class GiftCardServiceProvider extends StatefulWidget {
 class _GiftCardServiceProviderState extends State<GiftCardServiceProvider> {
   @override
   void initState() {
-    getAllGiftProvider();
-    // TODO: implement initState
     super.initState();
-  }
-
-  Future<void> getAllGiftProvider() async {
-    var giftcardprovider =
-        Provider.of<GiftCardProvider>(context, listen: false);
-    await giftcardprovider.getAllGiftProvider();
   }
 
   @override
@@ -96,7 +88,7 @@ class _GiftCardServiceProviderState extends State<GiftCardServiceProvider> {
                         return InkWell(
                           onTap: () {
                             giftcardprovider
-                                .setproiverid(data['providerId'].toString());
+                                .setproviderid(data['providerId'].toString());
                             print(giftcardprovider.providerid);
                             Navigator.pushNamed(context, '/gift_card');
                           },
@@ -140,39 +132,6 @@ class _GiftCardServiceProviderState extends State<GiftCardServiceProvider> {
                       ),
                     ),
                   ),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   crossAxisAlignment: CrossAxisAlignment.start,
-                  //   children: [
-                  //     Container(
-                  //       width: width * 0.45,
-                  //       height: height * 0.15,
-                  //       padding: EdgeInsets.all(20),
-                  //       decoration: BoxDecoration(
-                  //         color: Colors.white,
-                  //         borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                  //       ),
-                  //       child: Image.asset(
-                  //         'assets/img/reloadly.png',
-                  //       ),
-                  //     ),
-                  //     InkWell(
-                  //       onTap: () {
-                  //         Navigator.pushNamed(context, '/gift_card');
-                  //       },
-                  //       child: Container(
-                  //         width: width * 0.45,
-                  //         height: height * 0.15,
-                  //         padding: EdgeInsets.all(20),
-                  //         decoration: BoxDecoration(
-                  //           color: Colors.white,
-                  //           borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                  //         ),
-                  //         child: Image.asset('assets/img/globe.png'),
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
                 ],
               ),
             )
