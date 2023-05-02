@@ -13,6 +13,7 @@ import 'package:lyotrade/providers/payments.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/referral.dart';
 import 'package:lyotrade/providers/staking.dart';
+import 'package:lyotrade/providers/topup.dart';
 import 'package:lyotrade/providers/trade.dart';
 import 'package:lyotrade/providers/trade_challenge.dart';
 import 'package:lyotrade/providers/user.dart';
@@ -35,9 +36,9 @@ import 'package:lyotrade/screens/buy_sell/buy_sell_transactions.dart';
 import 'package:lyotrade/screens/buy_sell/common/process_payment.dart';
 import 'package:lyotrade/screens/dashboard.dart';
 import 'package:lyotrade/screens/dashboard/announcement/announcement_details.dart';
-import 'package:lyotrade/screens/dashboard/gift_card/buycard.dart';
-import 'package:lyotrade/screens/dashboard/gift_card/gift_card.dart';
-import 'package:lyotrade/screens/dashboard/gift_card/transaction_history.dart';
+import 'package:lyotrade/screens/dashboard/giftcard/buycard.dart';
+import 'package:lyotrade/screens/dashboard/giftcard/gift_card.dart';
+import 'package:lyotrade/screens/dashboard/giftcard/transaction_history.dart';
 import 'package:lyotrade/screens/dashboard/market_search.dart';
 import 'package:lyotrade/screens/dex_swap/dex_swap.dart';
 import 'package:lyotrade/screens/future_trade/future_market_transaction.dart';
@@ -71,6 +72,9 @@ import 'package:lyotrade/screens/staking/stake.dart';
 import 'package:lyotrade/screens/take_loan/confrim_loan.dart';
 import 'package:lyotrade/screens/take_loan/process_loan.dart';
 import 'package:lyotrade/screens/take_loan/take_loan.dart';
+import 'package:lyotrade/screens/topup/mobile_topup_payment.dart';
+import 'package:lyotrade/screens/topup/topup.dart';
+import 'package:lyotrade/screens/topup/topup_transaction.dart';
 import 'package:lyotrade/screens/trade/kline_chart.dart';
 import 'package:lyotrade/screens/trade/margin/margin_trade_history.dart';
 import 'package:lyotrade/screens/trade/market_margin_header.dart';
@@ -83,9 +87,9 @@ import 'package:lyotrade/utils/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'screens/dashboard/gift_card/serviceprovider/giftcard-serviceprovider.dart';
+import 'screens/dashboard/giftcard/serviceprovider/giftcard-serviceprovider.dart';
 import 'screens/pix_payment/pix_cpf_detail.dart';
-import 'screens/dashboard/gift_card/gift_detail.dart';
+import 'screens/dashboard/giftcard/gift_detail.dart';
 
 int? initScreen;
 void main() async {
@@ -130,7 +134,8 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider<GiftCardProvider>(
           create: (_) => GiftCardProvider(),
-        )
+        ),
+        ChangeNotifierProvider<TopupProvider>(create: (_) => TopupProvider())
       ],
       child: Consumer<Auth>(
         builder: (context, auth, _) {
@@ -167,7 +172,7 @@ class MyApp extends StatelessWidget {
               Security.routeName: (context) => const Security(),
               Phone.routeName: (context) => const Phone(),
               Password.routeName: (context) => const Password(),
-              Forgotpassword.routeName: (context) =>  Forgotpassword(),
+              Forgotpassword.routeName: (context) => Forgotpassword(),
               GoogleAuth.routeName: (context) => const GoogleAuth(),
               EmailChange.routeName: (context) => const EmailChange(),
               Transactions.routeName: (context) => const Transactions(),
@@ -208,17 +213,20 @@ class MyApp extends StatelessWidget {
               Setting.routeName: ((context) => const Setting()),
               FutureMarketTransaction.routeName: (context) =>
                   const FutureMarketTransaction(),
-              GiftCard.routeName: (context) =>  GiftCardServiceProvider(),
+              GiftCardServiceProvider.routeName: (context) =>
+                  GiftCardServiceProvider(),
               GiftCard.routeName: (context) => const GiftCard(),
-              GiftDetail.routeName: (context) =>  GiftDetail(),
+              GiftDetail.routeName: (context) => GiftDetail(),
               GiftCardTransaction.routeName: (context) =>
                   const GiftCardTransaction(),
+              BuyCard.routeName: (context) => BuyCard(),
+              TopUp.routeName: (context) => const TopUp(),
+              MobileTopup.routeName: (context) => MobileTopup(),
+              TopUpTransaction.routeName: (context) => TopUpTransaction(),
               TradeChallengeScreen.routeName: (context) =>
                   const TradeChallengeScreen(),
               RewardCenterScreen.routeName: (context) =>
                   const RewardCenterScreen(),
-           
-              BuyCard.routeName: (context) => BuyCard(),
               ChooseLanguage.routeName: (context) => ChooseLanguage()
             },
           );

@@ -124,3 +124,6 @@ var clipCircle = {
   'in_3': Color(0xff9DA8B0),
   'out_3': Color(0xffE5E5E5),
 };
+
+//gift card 
+var giftcardcolor=Color(0xff25284A);

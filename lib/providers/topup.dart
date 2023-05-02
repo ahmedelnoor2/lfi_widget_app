@@ -8,65 +8,25 @@ import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Translate.utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class GiftCardProvider with ChangeNotifier {
+class TopupProvider with ChangeNotifier {
   Map<String, String> headers = {
     'Content-type': 'application/json;charset=utf-8',
     'Accept': 'application/json',
     'token': '',
     'userId': '',
-    'provider': '',
   };
+
   String paymentstatus = 'Waiting for payment';
 
-  // get provider list
+  dynamic _topupamount;
 
-  String _provierid = '';
-  String get providerid {
-    return _provierid;
+  dynamic get topupamount {
+    return _topupamount;
   }
 
-  void setproviderid(value) {
-    _provierid = value;
+  void settopupamount(value) {
+    _topupamount = value;
     notifyListeners();
-  }
-
-  dynamic _giftcardamount;
-
-  dynamic get giftcardamount {
-    return _giftcardamount;
-  }
-
-  void setgiftcardamount(value) {
-    _giftcardamount = value;
-    notifyListeners();
-  }
-
-  List _allgiftprovider = [];
-
-  List get allgiftprovider {
-    return _allgiftprovider;
-  }
-
-  Future<void> getAllGiftProvider() async {
-    var url = Uri.https(lyoApiUrl, 'gift-card/providers');
-
-    try {
-      final response = await http.get(url, headers: headers);
-
-      final responseData = json.decode(response.body);
-
-      if (responseData['code'] == 200) {
-        _allgiftprovider = responseData['data'];
-        return notifyListeners();
-      } else {
-        _allgiftprovider = [];
-        return notifyListeners();
-      }
-    } catch (error) {
-      print(error);
-
-      return notifyListeners();
-    }
   }
 
   //// Get Wallet//
@@ -95,6 +55,7 @@ class GiftCardProvider with ChangeNotifier {
           _allwallet.add(wallet['coinType']);
           _allwallet.add(wallet['coin']);
         }
+
         return notifyListeners();
       } else {
         _allwallet = [];
@@ -102,7 +63,7 @@ class GiftCardProvider with ChangeNotifier {
       }
     } catch (error) {
       print(error);
-      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+
       return notifyListeners();
     }
   }
@@ -133,9 +94,8 @@ class GiftCardProvider with ChangeNotifier {
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
-    headers['provider'] = providerid;
 
-    var url = Uri.https(lyoApiUrl, 'gift-card/countries');
+    var url = Uri.https(lyoApiUrl, 'top-up/countries');
 
     try {
       final response = await http.get(url, headers: headers);
@@ -161,103 +121,48 @@ class GiftCardProvider with ChangeNotifier {
     }
   }
 
-  //// Get All Catalog ///
-  Map _toActiveCatalog = {};
+  //// Get All topup provider ///
+  Map _toActiveNetWorkprovider = {};
 
-  Map get toActiveCatalog {
-    return _toActiveCatalog;
+  Map get toActiveNetWorkprovider {
+    return _toActiveNetWorkprovider;
   }
 
-  void settActiveCatalog(catlog) {
-    _toActiveCatalog = catlog;
+  void setActiveNetWorkprovider(topupnetwork) {
+    _toActiveNetWorkprovider = topupnetwork;
 
     return notifyListeners();
   }
 
-  bool IsCatalogloading = false;
+  bool IstopupnetWorkloading = false;
 
-  List _allCatalog = [];
+  List _allTopupNetwork = [];
 
-  List get allCatalog {
-    return _allCatalog;
+  List get allTopupNetwork {
+    return _allTopupNetwork;
   }
 
-  List _sliderlist = [];
+  /// _active State for india country//
+  Map _activeState = {};
 
-  List get sliderlist {
-    return _sliderlist;
+  Map get activeState {
+    return _activeState;
   }
 
-  Future<void> getAllCatalog(ctx, auth, userid, postdata, catUpdate) async {
-    IsCatalogloading = true;
+  void setactivestate(data) {
+    _activeState = data;
+    notifyListeners();
+  }
+
+  Future<void> getAllNetWorkprovider(
+      ctx, auth, userid, postdata, catUpdate) async {
+    IstopupnetWorkloading = true;
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
-    headers['provider'] = providerid;
-    var mydata = json.encode(postdata);
-    var url = Uri.https(lyoApiUrl, 'gift-card/catalogues');
+    var activeContryName = toActiveCountry['isoName'];
 
-    try {
-      final response = await http.post(url, body: mydata, headers: headers);
-
-      final responseData = json.decode(response.body);
-
-      if (responseData['code'] == 200) {
-        IsCatalogloading = false;
-        _allCatalog = responseData['data'];
-
-        if (_toActiveCatalog.isEmpty) {
-          _toActiveCatalog = _allCatalog[0];
-        } else if (catUpdate) {
-          if (_allCatalog.length > 0) {
-            _toActiveCatalog = _allCatalog[0];
-          } else {
-            _toActiveCatalog = {};
-          }
-        }
-
-        _sliderlist = _allCatalog.take(5).toList();
-
-        return notifyListeners();
-      } else {
-        IsCatalogloading = false;
-        _allCatalog = [];
-        return notifyListeners();
-      }
-    } catch (error) {
-      IsCatalogloading = false;
-      print(error);
-      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
-      return notifyListeners();
-    }
-  }
-
-  // Get all cards
-  bool cardloading = false;
-
-  List _allCard = [];
-
-  List get allCard {
-    return _allCard;
-  }
-
-  Future<void> getAllCard(
-    ctx,
-    auth,
-    userid,
-  ) async {
-    cardloading = true;
-    notifyListeners();
-    headers['token'] = auth.loginVerificationToken;
-    headers['userid'] = '${userid}';
-    headers['provider'] = providerid;
-
-    var countrycode = _toActiveCountry['iso3'] ?? _toActiveCountry['iso2'];
-    var catid = _toActiveCatalog['id'];
-    var name = _toActiveCatalog['brand'].split(" ")[0];
-
-    var url = Uri.https(
-        lyoApiUrl, 'gift-card/cards/$catid/$countrycode', {'name': '$name'});
+    var url = Uri.https(lyoApiUrl, 'top-up/operators/$activeContryName');
 
     try {
       final response = await http.get(url, headers: headers);
@@ -265,17 +170,36 @@ class GiftCardProvider with ChangeNotifier {
       final responseData = json.decode(response.body);
 
       if (responseData['code'] == 200) {
-        cardloading = false;
-        _allCard = responseData['data'];
+        IstopupnetWorkloading = false;
+        _allTopupNetwork = responseData['data'];
+        if (toActiveCountry['isoName'] != 'IN') {
+          settopupamount(_allTopupNetwork[0]['price_type']['type'] == 'FIXED'
+              ? _allTopupNetwork[0]['price_type']['price'][0]
+              : _allTopupNetwork[0]['price_type']['price']['suggestedPrice']
+                  [0]);
+        } else if (toActiveCountry['isoName'] == 'IN') {
+          _activeState = _allTopupNetwork[0]['geographicalRechargePlans'][0];
+          settopupamount(_activeState['fixedAmounts'][0]);
+        }
+
+        if (_toActiveNetWorkprovider.isEmpty) {
+          _toActiveNetWorkprovider = _allTopupNetwork[0];
+        } else if (catUpdate) {
+          if (_allTopupNetwork.length > 0) {
+            _toActiveNetWorkprovider = _allTopupNetwork[0];
+          } else {
+            _toActiveNetWorkprovider = {};
+          }
+        }
 
         return notifyListeners();
       } else {
-        cardloading = false;
-        _allCard = [];
+        IstopupnetWorkloading = false;
+        _allTopupNetwork = [];
         return notifyListeners();
       }
     } catch (error) {
-      cardloading = false;
+      IstopupnetWorkloading = false;
       print(error);
       // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
       return notifyListeners();
@@ -286,9 +210,9 @@ class GiftCardProvider with ChangeNotifier {
 
   bool isEstimate = false;
 
-  Map _estimateRate = {};
+  var _estimateRate;
 
-  Map get estimateRate {
+  get estimateRate {
     return _estimateRate;
   }
 
@@ -300,7 +224,7 @@ class GiftCardProvider with ChangeNotifier {
 
     var mydata = json.encode(postdata);
 
-    var url = Uri.https(lyoApiUrl, 'gift-card/estimate');
+    var url = Uri.https(lyoApiUrl, 'top-up/estimate');
 
     try {
       final response = await http.post(
@@ -313,7 +237,9 @@ class GiftCardProvider with ChangeNotifier {
 
       if (responseData['code'] == 200) {
         isEstimate = false;
-        _estimateRate = responseData['data'][0];
+        var rate = responseData['data'][0]['rate'];
+
+        _estimateRate = rate * toActiveNetWorkprovider['fx']['rate'];
 
         return notifyListeners();
       } else {
@@ -441,7 +367,7 @@ class GiftCardProvider with ChangeNotifier {
       if (responseData['code'] == '0' || responseData['code'] == 0) {
         _iswithdrwal = false;
         _dowithdrawal = responseData;
-        paymentstatus = 'Card is Processing';
+        paymentstatus = 'Topup is Processing';
 
         snackAlert(ctx, SnackTypes.success, responseData['msg']);
 
@@ -480,7 +406,7 @@ class GiftCardProvider with ChangeNotifier {
 
     var mydata = json.encode(postdata);
 
-    var url = Uri.https(lyoApiUrl, 'gift-card/transaction');
+    var url = Uri.https(lyoApiUrl, 'top-up/transaction');
 
     try {
       final response = await http.post(
@@ -535,7 +461,7 @@ class GiftCardProvider with ChangeNotifier {
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
 
-    var url = Uri.https(lyoApiUrl, 'gift-card/transaction');
+    var url = Uri.https(lyoApiUrl, 'top-up/transaction');
 
     try {
       final response = await http.get(
@@ -564,51 +490,6 @@ class GiftCardProvider with ChangeNotifier {
     }
   }
 
-  //// get redeem deatils
-  bool isredeemloading = false;
-  Map _redeem = {};
-
-  Map get redeem {
-    return _redeem;
-  }
-
-  Future<void> getRedeem(
-    ctx,
-    auth,
-    userid,
-    transactionId,
-    brandId,
-  ) async {
-    isredeemloading = true;
-    notifyListeners();
-    headers['token'] = auth.loginVerificationToken;
-    headers['userid'] = '${userid}';
-
-    var url =
-        Uri.https(lyoApiUrl, 'gift-card/redeem/${brandId}/${transactionId}');
-    print(url);
-    try {
-      final response = await http.get(url, headers: headers);
-
-      final responseData = json.decode(response.body);
-      print(responseData);
-      if (responseData['code'] == 200) {
-        _redeem = responseData['data'];
-        isredeemloading = false;
-        return notifyListeners();
-      } else {
-        _redeem = {};
-        return notifyListeners();
-      }
-    } catch (error) {
-      print(error);
-      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
-      return notifyListeners();
-    }
-  }
-
-  /// Get Account balance //
-
   Map _accountBalance = {};
 
   Map get accountBalance {
@@ -621,10 +502,10 @@ class GiftCardProvider with ChangeNotifier {
     userid,
   ) async {
     notifyListeners();
+    headers['token'] = auth.loginVerificationToken;
+    headers['userid'] = '${userid}';
 
-    headers['provider'] = providerid;
-
-    var url = Uri.https(lyoApiUrl, 'gift-card/account/balance');
+    var url = Uri.https(lyoApiUrl, 'top-up/account/balance');
 
     try {
       final response = await http.get(url, headers: headers);

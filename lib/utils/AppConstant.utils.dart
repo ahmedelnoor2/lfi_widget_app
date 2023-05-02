@@ -6,6 +6,7 @@ var currentindex = 0;
 
 var apiUrl = kIsWeb ? 'api.m.lyotrade.com' : 'www.lyotrade.com';
 var lyoApiUrl = 'api.m.lyotrade.com';
+
 var futApiUrl = 'futures.lyotrade.com';
 var serviceApi = kIsWeb ? 'api.m.lyotrade.com' : 'service.lyotrade.com';
 var loanApiUrl = 'staging.api.crypto-loan.lyotrade.com';

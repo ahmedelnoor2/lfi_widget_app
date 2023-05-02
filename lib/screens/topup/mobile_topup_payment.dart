@@ -5,6 +5,7 @@ import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
 import 'package:lyotrade/providers/dex_provider.dart';
 import 'package:lyotrade/providers/giftcard.dart';
+import 'package:lyotrade/providers/topup.dart';
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
 import 'package:lyotrade/screens/dex_swap/common/exchange_now.dart';
@@ -14,28 +15,30 @@ import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:lyotrade/utils/ScreenControl.utils.dart';
 import 'package:provider/provider.dart';
 
-class BuyCard extends StatefulWidget {
-  static const routeName = '/buy_card';
-  const BuyCard(
+class MobileTopup extends StatefulWidget {
+  static const routeName = '/mobile_topup';
+  MobileTopup(
       {Key? key,
+      this.number,
       this.amount,
-      this.totalprice,
       this.defaultcoin,
-      this.ShowName,
-      this.productID})
+      this.countrycode,
+      this.operatorid,
+      this.topupamount})
       : super(key: key);
 
-  final String? amount;
-  final double? totalprice;
-  final String? defaultcoin;
-  final String? ShowName;
-  final String? productID;
+  String? number;
+  var amount;
+  final defaultcoin;
+  final countrycode;
+  final operatorid;
+  final topupamount;
 
   @override
-  State<BuyCard> createState() => _BuyCardState();
+  State<MobileTopup> createState() => _MobileTopupState();
 }
 
-class _BuyCardState extends State<BuyCard> {
+class _MobileTopupState extends State<MobileTopup> {
   final _formKey = GlobalKey<FormState>();
   final _optcontroller = TextEditingController();
   final _googlecodecontroller = TextEditingController();
@@ -79,58 +82,59 @@ class _BuyCardState extends State<BuyCard> {
   }
 
   Future changeverifystatus() async {
-    var giftcardprovider =
-        Provider.of<GiftCardProvider>(context, listen: false);
-    giftcardprovider.setverify(false);
-    giftcardprovider.setgoolgeCode(false);
-    giftcardprovider.paymentstatus = 'Waiting for payment';
+    var topupProvider = Provider.of<TopupProvider>(context, listen: false);
+    topupProvider.setverify(false);
+    topupProvider.setgoolgeCode(false);
+    topupProvider.paymentstatus = 'Waiting for payment';
   }
 
   Future<void> optVerify(coin) async {
-    var giftcardprovider =
-        Provider.of<GiftCardProvider>(context, listen: false);
+    var topupProvider = Provider.of<TopupProvider>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
 
     var userid = await auth.userInfo['id'];
-    //print(auth.userInfo['email']);
 
-    await giftcardprovider.getDoVerify(context, auth, userid, {
+    await topupProvider.getDoVerify(context, auth, userid, {
       "address": asset.changeAddress['addressStr'],
       "symbol": '$coin',
       "verificationType": auth.userInfo['email'].isNotEmpty ? '17' : '4'
     });
   }
 
-  Future<void> withDrawal(coin, totalprice, verifitypre) async {
-    var giftcardprovider =
-        Provider.of<GiftCardProvider>(context, listen: false);
+  Future<void> withDrawal(coin, amount, verifitypre) async {
+    var topupProvider = Provider.of<TopupProvider>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
     var userid = await auth.userInfo['id'];
 
     withdrwalResponse =
-        await giftcardprovider.getDoWithDrawal(context, auth, userid, {
+        await topupProvider.getDoWithDrawal(context, auth, userid, {
       "symbol": '$coin',
       "fee": '${asset.getCost['defaultFee']}',
-      "amount": "$totalprice",
+      "amount": amount.toStringAsPrecision(5),
       "verificationType": "$verifitypre",
       "emailValidCode":
           verifitypre == 'emailValidCode' ? _optcontroller.text : "",
       "smsValidCode": verifitypre == 'smsValidCode' ? _optcontroller.text : "",
       "googleCode": _googlecodecontroller.text
     });
-    // print(withdrwalResponse);
   }
 
-  Future<void> dotransaction(productid, amount) async {
-    var giftcardprovider =
-        Provider.of<GiftCardProvider>(context, listen: false);
+  Future<void> dotransaction(
+      amount, operatorid, countrycode, number, topupamount) async {
+    var topupProvider = Provider.of<TopupProvider>(context, listen: false);
     var auth = Provider.of<Auth>(context, listen: false);
     var userid = await auth.userInfo['id'];
     if (withdrwalResponse == true) {
-      await giftcardprovider.getDoTransaction(context, auth, userid,
-          {"productID": "$productid", "amount": "$amount", "quantity": 1});
+      await topupProvider.getDoTransaction(context, auth, userid, {
+        "amount": "$topupamount",
+        "operatorId": "$operatorid",
+        "recipientPhone": {
+          "countryCode": "$countrycode",
+          "number": topupProvider.toActiveCountry['callingCodes'][0] + number
+        }
+      });
     }
   }
 
@@ -138,11 +142,11 @@ class _BuyCardState extends State<BuyCard> {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
-    var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
-    var asset = Provider.of<Asset>(context, listen: true);
-    final args = ModalRoute.of(context)!.settings.arguments as BuyCard;
 
-    //print(args.ShowName);
+    var topupProvider = Provider.of<TopupProvider>(context, listen: true);
+    var asset = Provider.of<Asset>(context, listen: true);
+    final args = ModalRoute.of(context)!.settings.arguments as MobileTopup;
+
     return Scaffold(
         appBar: AppBar(
           leading: IconButton(
@@ -152,7 +156,7 @@ class _BuyCardState extends State<BuyCard> {
             icon: Icon(Icons.chevron_left),
           ),
           title: Text(
-            'Buy Card',
+            'Topup',
             style: TextStyle(
               fontSize: 20,
               fontStyle: FontStyle.normal,
@@ -170,15 +174,15 @@ class _BuyCardState extends State<BuyCard> {
                 ),
                 padding: EdgeInsets.only(bottom: 10),
                 child: Text(
-                  giftcardprovider.paymentstatus == 'Waiting for payment'
+                  topupProvider.paymentstatus == 'Waiting for payment'
                       ? 'Waiting for payment'
-                      : giftcardprovider.paymentstatus == 'Card is Processing'
+                      : topupProvider.paymentstatus == 'Card is Processing'
                           ? 'Card is Processing'
-                          : giftcardprovider.paymentstatus == 'Completed'
+                          : topupProvider.paymentstatus == 'Completed'
                               ? 'Completed'
-                              : giftcardprovider.paymentstatus ==
-                                      'Failed to process a Gift Card, Please Contact Admin.'
-                                  ? 'Failed to process a Gift Card, Please Contact Admin.'
+                              : topupProvider.paymentstatus ==
+                                      'Failed to process Top Up, Please Contact Admin.'
+                                  ? 'Failed to process a Top Up, Please Contact Admin.'
                                   : 'Waiting for payment',
                 ),
               ),
@@ -202,16 +206,15 @@ class _BuyCardState extends State<BuyCard> {
                           Radius.circular(10),
                         ),
                         child: Container(
-                          width: giftcardprovider.paymentstatus ==
+                          width: topupProvider.paymentstatus ==
                                   'Waiting for payment'
                               ? width * 0.3
-                              : giftcardprovider.paymentstatus ==
+                              : topupProvider.paymentstatus ==
                                       'Card is Processing'
                                   ? width * 0.5
-                                  : giftcardprovider.paymentstatus ==
-                                          'Completed'
+                                  : topupProvider.paymentstatus == 'Completed'
                                       ? width * 1.0
-                                      : giftcardprovider.paymentstatus ==
+                                      : topupProvider.paymentstatus ==
                                               'Failed to process a Gift Card, Please Contact Admin.'
                                           ? width * 0.0
                                           : width * 0.3,
@@ -235,19 +238,15 @@ class _BuyCardState extends State<BuyCard> {
                     Container(
                         padding: EdgeInsets.only(top: 20, bottom: 5),
                         child: Text(
-                          '${double.parse(args.totalprice.toString()).toStringAsPrecision(7)}' +
-                              ' ' +
-                              args.ShowName.toString(),
+                          '${double.parse(args.amount.toString()).toStringAsPrecision(5)}' +
+                              ' USDT',
                           style: TextStyle(
                               fontSize: 32, fontWeight: FontWeight.bold),
                         )),
                     Container(
-                        padding: EdgeInsets.only(bottom: 10),
-                        child: Text('Amount')),
-                    Container(
                       padding: EdgeInsets.only(bottom: 10),
                       child: Text(
-                        'WithDrawal Fee:' +
+                        'Withdrawal Fee:' +
                             '${asset.getCost['defaultFee'] ?? ''}',
                         style: TextStyle(color: warningColor),
                       ),
@@ -264,7 +263,7 @@ class _BuyCardState extends State<BuyCard> {
                       Container(
                         padding: EdgeInsets.only(top: 5),
                         child: Text(
-                          'Payment',
+                          'Mobile Number',
                           style: TextStyle(
                             fontSize: 20,
                           ),
@@ -272,21 +271,25 @@ class _BuyCardState extends State<BuyCard> {
                       ),
                       Container(
                         padding: EdgeInsets.only(top: 5),
-                        child: Text(
-                          args.amount.toString() +
-                              ' ' +
-                              giftcardprovider.toActiveCountry['currency']
-                                  ['code'],
-                          style: TextStyle(
-                            fontSize: 14,
-                          ),
+                        child: Row(
+                          children: [
+                            Text(topupProvider.toActiveCountry['callingCodes']
+                                    [0] +
+                                ''.toString()),
+                            Text(
+                              '${args.number}',
+                              style: TextStyle(
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-              giftcardprovider.paymentstatus == 'Completed'
+              topupProvider.paymentstatus == 'Completed'
                   ? Column(
                       children: [
                         Center(
@@ -299,22 +302,48 @@ class _BuyCardState extends State<BuyCard> {
                           'Completed',
                           style: TextStyle(color: successColor),
                         ),
-                        Container(
-                          padding: EdgeInsets.only(top: 20, right: 4, left: 4),
-                          child: LyoButton(
-                            onPressed: (() async {
-                              Navigator.pop(context);
-                            }),
-                            text: 'Back',
-                            active: true,
-                            isLoading: giftcardprovider.iswithdrwal,
-                            activeColor: linkColor,
-                            activeTextColor: Colors.black,
-                          ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: width * 0.45,
+                              padding:
+                                  EdgeInsets.only(top: 20, right: 4, left: 4),
+                              child: LyoButton(
+                                onPressed: (() async {
+                                  Navigator.pop(context);
+                                }),
+                                text: 'Back',
+                                active: true,
+                                isLoading: topupProvider.iswithdrwal,
+                                activeColor: linkColor,
+                                activeTextColor: Colors.black,
+                              ),
+                            ),
+                            Container(
+                              width: width * 0.45,
+                              padding:
+                                  EdgeInsets.only(top: 20, right: 4, left: 4),
+                              child: LyoButton(
+                                onPressed: (() async {
+                                  Navigator.pushNamed(
+                                      context, '/topup_transaction');
+                                }),
+                                text: 'Transactions',
+                                active: true,
+                                isLoading: topupProvider.iswithdrwal,
+                                activeColor: linkColor,
+                                activeTextColor: Colors.black,
+                              ),
+                            )
+                          ],
                         )
                       ],
                     )
-                  : giftcardprovider.paymentstatus ==
+                  : topupProvider.paymentstatus ==
                           'Failed to process a Gift Card, Please Contact Admin.'
                       ? Column(
                           children: [
@@ -337,7 +366,7 @@ class _BuyCardState extends State<BuyCard> {
                                 }),
                                 text: 'Back',
                                 active: true,
-                                isLoading: giftcardprovider.iswithdrwal,
+                                isLoading: topupProvider.iswithdrwal,
                                 activeColor: linkColor,
                                 activeTextColor: Colors.black,
                               ),
@@ -415,7 +444,7 @@ class _BuyCardState extends State<BuyCard> {
                                         ),
                                         // errorText: _errorText,
                                       ),
-                                      giftcardprovider.isgoogleCode == true
+                                      topupProvider.isgoogleCode == true
                                           ? Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
@@ -469,7 +498,7 @@ class _BuyCardState extends State<BuyCard> {
                                     ],
                                   ),
                                 ),
-                                giftcardprovider.isverify == true
+                                topupProvider.isverify == true
                                     ? Container(
                                         padding: EdgeInsets.only(
                                           top: 35,
@@ -480,19 +509,21 @@ class _BuyCardState extends State<BuyCard> {
                                                 .validate()) {
                                               await withDrawal(
                                                   args.defaultcoin,
-                                                  args.totalprice,
-                                                  giftcardprovider.doverify[
+                                                  args.amount,
+                                                  topupProvider.doverify[
                                                       'verificationType']);
 
                                               await dotransaction(
-                                                  args.productID,
-                                                  args.totalprice);
+                                                  args.amount,
+                                                  args.operatorid,
+                                                  args.countrycode,
+                                                  args.number,
+                                                  args.topupamount);
                                             }
                                           }),
                                           text: 'Buy Now',
                                           active: true,
-                                          isLoading:
-                                              giftcardprovider.iswithdrwal,
+                                          isLoading: topupProvider.iswithdrwal,
                                           activeColor: linkColor,
                                           activeTextColor: Colors.black,
                                         ),

@@ -159,6 +159,7 @@ class _NotificationsscreenState extends State<Notificationsscreen>
                       child: Text(
                       languageprovider.getlanguage['notification']['read-button']??  'Mark all as read',
                         style: TextStyle(color: linkColor),
+                        
                       ),
                     ),
                   ),

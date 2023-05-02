@@ -31,7 +31,7 @@ class _CountryDrawerState extends State<CountryDrawer> {
 
   // This function is called whenever the text field changes
   void _runFilter(String enteredKeyword) {
-    // print(enteredKeyword);
+    ;
     var giftcardprovider =
         Provider.of<GiftCardProvider>(context, listen: false);
     setState(() {
@@ -39,7 +39,6 @@ class _CountryDrawerState extends State<CountryDrawer> {
     });
     List results = [];
     if (enteredKeyword.isEmpty) {
-      // if the search field is empty or only contains white-space, we'll display all users
       results = giftcardprovider.allCountries;
     } else {
       giftcardprovider.allCountries.where(
@@ -128,7 +127,7 @@ class _CountryDrawerState extends State<CountryDrawer> {
                       itemBuilder: (context, index) {
                         var data = _foundCountry[index];
 
-                    ///  print(data['rate']['rate']);
+                        ///  print(data['rate']['rate']);
 
                         return ListTile(
                           onTap: () async {

@@ -8,9 +8,9 @@ import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/no_data.dart';
 import 'package:lyotrade/screens/common/snackalert.dart';
 import 'package:lyotrade/screens/common/types.dart';
-import 'package:lyotrade/screens/dashboard/gift_card/catalog.dart';
-import 'package:lyotrade/screens/dashboard/gift_card/country_drawer.dart';
-import 'package:lyotrade/screens/dashboard/gift_card/gift_detail.dart';
+import 'package:lyotrade/screens/dashboard/giftcard/catalog.dart';
+import 'package:lyotrade/screens/dashboard/giftcard/country_drawer.dart';
+import 'package:lyotrade/screens/dashboard/giftcard/gift_detail.dart';
 
 import 'package:lyotrade/utils/Colors.utils.dart';
 import 'package:provider/provider.dart';
@@ -33,6 +33,7 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
     super.initState();
 
     getAllWallet();
+    getAcountBalance();
     getAllCountries();
   }
 
@@ -74,6 +75,15 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
       auth,
       userid,
     );
+  }
+
+  // Get  Accout balance company lyo/
+  Future<void> getAcountBalance() async {
+    var giftcardprovider =
+        Provider.of<GiftCardProvider>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
+    var userid = await auth.userInfo['id'];
+    await giftcardprovider.getaccountBalance(context, auth, userid);
   }
 
   int _current = 0;
@@ -191,12 +201,18 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                       ),
                     ),
                     child: ListTile(
-                      title: giftcardprovider.toActiveCountry['name'] == null
-                          ? Container()
-                          : Text(
-                              '${giftcardprovider.toActiveCountry['name']}',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
+                      title: giftcardprovider.isCountryLoading
+                          ? Row(
+                              children: [
+                                CircularProgressIndicator(),
+                              ],
+                            )
+                          : giftcardprovider.toActiveCountry['name'] == null
+                              ? Container()
+                              : Text(
+                                  '${giftcardprovider.toActiveCountry['name']}',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
                       subtitle: giftcardprovider.toActiveCountry['currency'] ==
                               null
                           ? Container()
@@ -353,6 +369,7 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                                 child: noData('No Cards Available'),
                               )
                             : ListView.separated(
+                                padding: EdgeInsets.only(bottom: 30),
                                 separatorBuilder:
                                     (BuildContext context, int index) =>
                                         const Divider(),
@@ -364,11 +381,12 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
 
                                   return ListTile(
                                     onTap: () {
-                                      var min = double.parse(currentindex['min']
-                                          .replaceAll(',', ""));
-                                      var max = double.parse(currentindex['max']
-                                          .replaceAll(',', ""));
-                                      print(min == max);
+                                      // if()
+                                      // var min = double.parse(currentindex['min']
+                                      //     .replaceAll(',', ""));
+                                      // var max = double.parse(currentindex['max']
+                                      //     .replaceAll(',', ""));
+                                      // print(min == max);
 
                                       Navigator.push(
                                         context,
@@ -381,7 +399,10 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                                               GiftDetail(
                                             data: currentindex,
                                             isEqualMinMax:
-                                                min == max ? false : true,
+                                                currentindex['price_type'] ==
+                                                        "fixed"
+                                                    ? false
+                                                    : true,
                                           ),
                                           transitionDuration:
                                               Duration(seconds: 0),
@@ -404,19 +425,19 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                                       ),
                                     ),
                                     title: Text('${currentindex['name']}'),
-                                    subtitle: currentindex['is_a_range']
-                                        ? Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                  'Min price: ${currentindex['min'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
-                                              Text(
-                                                  'Max price: ${currentindex['max'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
-                                            ],
-                                          )
-                                        : Text(
-                                            'Price: ${currentindex['max'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                                    subtitle: priceType(currentindex),
+                                    // ? Column(
+                                    //     crossAxisAlignment:
+                                    //         CrossAxisAlignment.start,
+                                    //     children: [
+                                    //       Text(
+                                    //           'Min price: ${currentindex['min'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                                    //       Text(
+                                    //           'Max price: ${currentindex['max'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                                    //     ],
+                                    //   )
+                                    // : Text(
+                                    //     'Price: ${currentindex['max'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
                                     trailing: Icon(Icons.chevron_right),
                                   );
                                 },
@@ -429,5 +450,51 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
         ),
       ),
     );
+  }
+
+  Widget priceType(Map data) {
+    var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
+
+    if (data['price_type'] == "list") {
+      return Container(
+        child: Wrap(
+          children: [
+            Text('Amount:'),
+            Text(data['price']['list'].map((item) {
+              if (giftcardprovider.toActiveCountry['currency']['code'] !=
+                  'AED') {
+                return (item * giftcardprovider.toActiveCountry['rate']['rate'])
+                    .toStringAsPrecision(4);
+              } else {
+                return item;
+              }
+            }).join(', ')),
+            Text(giftcardprovider.toActiveCountry['currency']['code'])
+          ],
+        ),
+      );
+    } else if (data['price_type'] == "range") {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+              'Min price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['range']['min'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsFixed(4) : data['price']['range']['min'].toStringAsFixed(4)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+          Text(
+              'Max price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['range']['max'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsFixed(4) : data['price']['range']['max']..toStringAsFixed(4)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+        ],
+      );
+    } else if (data['price_type'] == "fixed") {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+              'Min price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['fixed']['min'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsFixed(4) : data['price']['fixed']['min'].toStringAsFixed(4)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+          Text(
+              'Max price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['fixed']['max'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsFixed(4) : data['price']['fixed']['max'].toStringAsFixed(4)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+        ],
+      );
+    } else {
+      return Container();
+    }
   }
 }

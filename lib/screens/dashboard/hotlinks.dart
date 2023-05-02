@@ -30,9 +30,11 @@ class _HotlinksState extends State<Hotlinks> {
         children: [
           GestureDetector(
             onTap: () {
-            
-
-            snackAlert(context, SnackTypes.warning, 'Coming Soon...');
+              if (auth.isAuthenticated) {
+                Navigator.pushNamed(context, '/topup');
+              } else {
+                Navigator.pushNamed(context, '/authentication');
+              }
             },
             child: Column(
               children: [
@@ -41,12 +43,13 @@ class _HotlinksState extends State<Hotlinks> {
                     bottom: 2,
                   ),
                   child: Image.asset(
-                    'assets/img/new_listing.png',
+                    'assets/img/top-up.png',
                     width: 28,
                   ),
                 ),
                 Text(
-               languageprovider.getlanguage['home']['menu_item1']?? 'New Listing',
+                  //  languageprovider.getlanguage['home']['menu_item1']?? 'New Listing',
+                  'Topup',
                   style: TextStyle(
                     fontSize: 12,
                   ),
@@ -74,7 +77,8 @@ class _HotlinksState extends State<Hotlinks> {
                   ),
                 ),
                 Text(
-               languageprovider.getlanguage['home']['menu_item2']??   'Referral',
+                  languageprovider.getlanguage['home']['menu_item2'] ??
+                      'Referral',
                   style: TextStyle(
                     fontSize: 12,
                   ),
@@ -111,7 +115,8 @@ class _HotlinksState extends State<Hotlinks> {
                   ),
                 ),
                 Text(
-            languageprovider.getlanguage['home']['menu_item3']??      'Deposit',
+                  languageprovider.getlanguage['home']['menu_item3'] ??
+                      'Deposit',
                   style: TextStyle(
                     fontSize: 12,
                   ),
@@ -141,7 +146,8 @@ class _HotlinksState extends State<Hotlinks> {
                   ),
                 ),
                 Text(
-              languageprovider.getlanguage['home']['menu_item4']??     'Crypto Loan',
+                  languageprovider.getlanguage['home']['menu_item4'] ??
+                      'Crypto Loan',
                   style: TextStyle(
                     fontSize: 12,
                   ),
@@ -178,7 +184,7 @@ class _HotlinksState extends State<Hotlinks> {
                   ),
                 ),
                 Text(
-              languageprovider.getlanguage['home']['menu_item5']??    'Swap',
+                  languageprovider.getlanguage['home']['menu_item5'] ?? 'Swap',
                   style: TextStyle(
                     fontSize: 12,
                   ),

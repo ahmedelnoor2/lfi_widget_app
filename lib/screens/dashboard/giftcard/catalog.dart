@@ -35,16 +35,14 @@ class _CatalogBottomSheetState extends State<CatalogBottomSheet> {
 
   // This function is called whenever the text field changes
   void _runFilter(String enteredKeyword) {
-    // print(enteredKeyword);
     var giftcardprovider =
         Provider.of<GiftCardProvider>(context, listen: false);
-    //print(giftcardprovider.allCatalog);
+
     setState(() {
       _foundCountry = [];
     });
     List results = [];
     if (enteredKeyword.isEmpty) {
-      // if the search field is empty or only contains white-space, we'll display all users
       results = giftcardprovider.allCatalog;
     } else {
       giftcardprovider.allCatalog.where(
@@ -93,10 +91,6 @@ class _CatalogBottomSheetState extends State<CatalogBottomSheet> {
                     size: 20,
                   ),
                 ),
-                // Container(
-                //   padding: const EdgeInsets.only(left: 70),
-                //   child: const Text('Select Country'),
-                // ),
               ],
             ),
           ),
@@ -122,47 +116,6 @@ class _CatalogBottomSheetState extends State<CatalogBottomSheet> {
               ),
             ),
           ),
-          // Container(
-          //   padding: const EdgeInsets.only(
-          //     left: 15,
-          //     right: 15,
-          //   ),
-          //   child: SizedBox(
-          //     height: width * 0.13,
-          //     child: TextField(
-          //       onChanged: (text) async {
-          //         if (text.length > 0) {
-          //           searching = true;
-          //           filtered.value = [];
-          //           giftcardprovider.allCountries.forEach((country) {
-          //             if (country['name']
-          //                 .toString()
-          //                 .toLowerCase()
-          //                 .contains(text.toLowerCase())||
-          //                   country['name'].toString().toUpperCase().contains(text)) {
-          //               filtered.value.add(country);
-          //             }
-          //           });
-          //         } else {
-          //           searching = false;
-          //           filtered.value = [];
-          //         }
-          //       },
-
-          //       controller: searchController,
-          //       decoration: const InputDecoration(
-          //         labelText: "Search",
-          //         hintText: "Search",
-          //         prefixIcon: Icon(Icons.search),
-          //         border: OutlineInputBorder(
-          //           borderRadius: BorderRadius.all(
-          //             Radius.circular(25.0),
-          //           ),
-          //         ),
-          //       ),
-          //     ),
-          //   ),
-          // ),
           Expanded(
             child: _foundCountry.isNotEmpty
                 ? ListView.builder(
@@ -174,20 +127,19 @@ class _CatalogBottomSheetState extends State<CatalogBottomSheet> {
                               giftcardprovider.toActiveCountry['iso2'])
                           ? InkWell(
                               onTap: () async {
-                               
                                 Navigator.pop(context);
                                 giftcardprovider.settActiveCatalog(data);
                                 //print(giftcardprovider.toActiveCatalog);
                                 var userid = await auth.userInfo['id'];
-                                await giftcardprovider.getAllCatalog(
-                                    context,
-                                    auth,
-                                    userid,
-                                    {
-                                      "country": giftcardprovider
-                                          .toActiveCountry['iso2'],
-                                    },
-                                    false);
+                                // await giftcardprovider.getAllCatalog(
+                                //     context,
+                                //     auth,
+                                //     userid,
+                                //     {
+                                //       "country": giftcardprovider
+                                //           .toActiveCountry['iso2'],
+                                //     },
+                                //     false);
                                 await giftcardprovider.getAllCard(
                                     context, auth, userid);
                               },

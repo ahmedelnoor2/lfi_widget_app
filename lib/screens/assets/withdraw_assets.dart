@@ -665,18 +665,18 @@ class _WithdrawAssetsState extends State<WithdrawAssets> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text('Wallet Address'),
-                                    GestureDetector(
-                                      onTap: () {},
-                                      child: Text(
-                                        languageprovider.getlanguage[
-                                                    'withdraw_detail']
-                                                ['addr_list_btn'] ??
-                                            'Address List',
-                                        style: TextStyle(
-                                          color: linkColor,
-                                        ),
-                                      ),
-                                    ),
+                                    // GestureDetector(
+                                    //   onTap: () {},
+                                    //   child: Text(
+                                    //     languageprovider.getlanguage[
+                                    //                 'withdraw_detail']
+                                    //             ['addr_list_btn'] ??
+                                    //         'Address List',
+                                    //     style: TextStyle(
+                                    //       color: linkColor,
+                                    //     ),
+                                    //   ),
+                                    // ),
                                   ],
                                 ),
                               ),

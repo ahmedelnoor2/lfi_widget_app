@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/asset.dart';
 import 'package:lyotrade/providers/auth.dart';
@@ -7,7 +9,10 @@ import 'package:lyotrade/screens/common/drawer.dart';
 
 import 'package:lyotrade/screens/common/header.dart';
 import 'package:lyotrade/screens/common/lyo_buttons.dart';
-import 'package:lyotrade/screens/dashboard/gift_card/buycard.dart';
+import 'package:lyotrade/screens/common/snackalert.dart';
+import 'package:lyotrade/screens/common/types.dart';
+import 'package:lyotrade/screens/dashboard/giftcard/buycard.dart';
+import 'package:lyotrade/screens/dashboard/giftcard/widget/card_amount_select.dart';
 import 'package:lyotrade/utils/AppConstant.utils.dart';
 import 'package:lyotrade/utils/Coins.utils.dart';
 import 'package:lyotrade/utils/Colors.utils.dart';
@@ -28,7 +33,7 @@ class _GiftDetailState extends State<GiftDetail> {
   List _allNetworks = [];
   String _defaultNetwork = 'BSC';
   String _coinShowName = 'USDT';
-  double estimateprice = 0.0;
+
   double estprice = 0.0;
 
   final TextEditingController _searchController = TextEditingController();
@@ -41,6 +46,14 @@ class _GiftDetailState extends State<GiftDetail> {
   void initState() {
     super.initState();
     getDigitalBalance();
+  }
+
+  // get amount
+  double getamount(String country, String amount, String rate) {
+    if (country == 'AED') {
+      return double.parse(amount);
+    }
+    return double.parse(amount) * double.parse(rate);
   }
 
   // Get Estimate Rate//
@@ -61,23 +74,35 @@ class _GiftDetailState extends State<GiftDetail> {
 
     var giftcardprovider =
         Provider.of<GiftCardProvider>(context, listen: false);
-    var cardrate = widget.data['max'].replaceAll(',', "");
-    var _payment = double.parse(cardrate);
     if (widget.isEqualMinMax == false) {
-      _amountcontroller.text = cardrate.toString();
+      var cardrate = getamount(
+          giftcardprovider.toActiveCountry['currency']['code'],
+          widget.data['price']['fixed']['max'].toString(),
+          giftcardprovider.toActiveCountry['rate']['rate'].toString());
 
+      var _payment = cardrate;
+
+      _amountcontroller.text = _payment.toStringAsPrecision(4);
       var userid = await auth.userInfo['id'];
       await giftcardprovider.getEstimateRate(context, auth, userid, {
-        "currency": "${widget.data['currency']['code']}",
+        "currency": "${giftcardprovider.toActiveCountry['currency']['code']}",
         "payment": _payment,
         "productID": widget.data['BillerID']
       });
+    } else if (widget.data['price_type'] == "list") {
+      var cardrate = getamount(
+          giftcardprovider.toActiveCountry['currency']['code'],
+          widget.data['price']['list'][0].toString(),
+          giftcardprovider.toActiveCountry['rate']['rate'].toString());
 
-      estprice = double.parse(widget.data['max'].replaceAll(',', ""));
-      var price = giftcardprovider.amountsystm / estprice;
-      var finalprice = estprice / price;
-      setState(() {
-        estimateprice = finalprice;
+      giftcardprovider.setgiftcardamount(cardrate);
+
+      var _payment = giftcardprovider.giftcardamount;
+      var userid = await auth.userInfo['id'];
+      await giftcardprovider.getEstimateRate(context, auth, userid, {
+        "currency": "${giftcardprovider.toActiveCountry['currency']['code']}",
+        "payment": _payment,
+        "productID": widget.data['BillerID']
       });
     }
 
@@ -182,7 +207,6 @@ class _GiftDetailState extends State<GiftDetail> {
     var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
     var asset = Provider.of<Asset>(context, listen: true);
     var public = Provider.of<Public>(context, listen: true);
-//print(giftcardprovider.toActiveCountry);
     return Scaffold(
       key: _scaffoldKey,
       drawer: drawer(
@@ -337,78 +361,155 @@ class _GiftDetailState extends State<GiftDetail> {
                             height: 60,
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 20, bottom: 20),
-                          child: Container(
-                            child: Row(children: [
-                              Text(
-                                'Amount' +
-                                    ' ' +
-                                    '(${giftcardprovider.toActiveCountry['currency']['code']})',
+
+                        (widget.data['price_type'] == "list")
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                      padding:
+                                          EdgeInsets.only(bottom: 10, top: 10),
+                                      child: Text('Topup Amount')),
+                                  InkWell(
+                                    onTap: () {
+                                      showModalBottomSheet<void>(
+                                        context: context,
+                                        isScrollControlled: true,
+                                        builder: (BuildContext context) {
+                                          return StatefulBuilder(
+                                            builder: (BuildContext context,
+                                                StateSetter setState) {
+                                              return Container(
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.85,
+                                                  child: CardAmountSelect(
+                                                      widget.data['price']
+                                                          ['list'],
+                                                      widget.data['BillerID']));
+                                            },
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: Container(
+                                      width: width,
+                                      height: height * 0.07,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5),
+                                        border: Border.all(
+                                          style: BorderStyle.solid,
+                                          width: 0.3,
+                                          color: Color(0xff5E6292),
+                                        ),
+                                      ),
+                                      padding: EdgeInsets.all(8),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(giftcardprovider.giftcardamount
+                                              .toString()),
+                                          // giftcardprovider.IstopupnetWorkloading
+                                          //     ? CircularProgressIndicator()
+                                          //     : Text(topupProvider
+                                          //                     .toActiveNetWorkprovider[
+                                          //                 'fx'] ==
+                                          //             null
+                                          //         ? ''
+                                          //         : "${(topupProvider.topupamount * topupProvider.toActiveNetWorkprovider['fx']['rate']).toStringAsFixed(2)}"),
+                                          Icon(Icons.arrow_drop_down),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Container(
+                                child: Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 20, bottom: 20),
+                                      child: Container(
+                                        child: Row(children: [
+                                          Text(
+                                            'Amount' +
+                                                ' ' +
+                                                '(${giftcardprovider.toActiveCountry['currency']['code']})',
+                                          ),
+                                        ]),
+                                      ),
+                                    ),
+                                    Form(
+                                      key: _formKey,
+                                      child: TextFormField(
+                                        controller: _amountcontroller,
+                                        enabled: widget.isEqualMinMax,
+                                        validator: (value) {
+                                          if (widget.data['price_type'] ==
+                                              "range") {
+                                            var min = widget.data['price']
+                                                ['range']['min'];
+
+                                            var max = widget.data['price']
+                                                ['range']['max'];
+
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return 'Please enter Amount';
+                                            } else if (double.parse(
+                                                    value.toString()) <
+                                                min) {
+                                              return 'Minimum Amount:$min';
+                                            } else if (double.parse(
+                                                    value.toString()) >
+                                                max) {
+                                              return 'Max Amount:$max';
+                                            } else if (double.parse(value) <
+                                                asset.getCost['withdraw_min']) {
+                                              return 'Minimum withdrawal amount is ${asset.getCost['withdraw_min']}';
+                                            }
+                                            return null;
+                                          }
+                                        },
+                                        onChanged: ((value) async {
+                                          if (value.isNotEmpty) {
+                                            await getEstimateRate(
+                                                widget.data['BillerID'],
+                                                _amountcontroller.text,
+                                                giftcardprovider
+                                                        .toActiveCountry[
+                                                    'currency']['code']);
+                                          }
+                                        }),
+                                        keyboardType: TextInputType.number,
+                                        decoration: InputDecoration(
+                                            enabledBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  width: 0.5,
+                                                  color:
+                                                      secondaryTextColor400), //<-- SEE HERE
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: secondaryTextColor400,
+                                                  width: 0.5),
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                            ),
+                                            hintText: 'Amount',
+                                            // errorText: _errorText,
+                                            suffixText: giftcardprovider
+                                                .toActiveCountry['currency']
+                                                    ['code']
+                                                .toString()),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ]),
-                          ),
-                        ),
-                        Form(
-                          key: _formKey,
-                          child: TextFormField(
-                            controller: _amountcontroller,
-                            enabled: widget.isEqualMinMax,
-                            validator: (value) {
-                              var min = double.parse(
-                                  widget.data['min'].replaceAll(',', ""));
-                              var max = double.parse(
-                                  widget.data['max'].replaceAll(',', ""));
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter Amount';
-                              } else if (double.parse(value.toString()) < min) {
-                                return 'Minimum Amount:$min';
-                              } else if (double.parse(value.toString()) > max) {
-                                return 'Max Amount:$max';
-                              } else if (double.parse(value) <
-                                  asset.getCost['withdraw_min']) {
-                                return 'Minimum withdrawal amount is ${asset.getCost['withdraw_min']} ${giftcardprovider.toActiveCountry['currency']['code']}';
-                              }
-                              return null;
-                            },
-                            onChanged: ((value) async {
-                              if (value.isNotEmpty) {
-                                await getEstimateRate(
-                                    widget.data['BillerID'],
-                                    _amountcontroller.text,
-                                    widget.data['currency']['code']);
-                                print(widget.data['currency']['code']);
-                                estprice = double.parse(value);
-                                var price =
-                                    giftcardprovider.amountsystm / estprice;
-                                var finalprice = estprice / price;
-                                setState(() {
-                                  estimateprice = finalprice;
-                                });
-                              } else {
-                                estimateprice = 0.0;
-                              }
-                            }),
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      width: 0.5,
-                                      color:
-                                          secondaryTextColor400), //<-- SEE HERE
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: secondaryTextColor400, width: 0.5),
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
-                                hintText: 'Amount',
-                                // errorText: _errorText,
-                                suffixText: giftcardprovider
-                                    .toActiveCountry['currency']['code']
-                                    .toString()),
-                          ),
-                        ),
                         Padding(
                           padding: const EdgeInsets.only(top: 20, bottom: 10),
                           child: Row(
@@ -447,47 +548,49 @@ class _GiftDetailState extends State<GiftDetail> {
                                 ),
                                 giftcardprovider.isEstimate
                                     ? CircularProgressIndicator()
-                                    : Text('${estimateprice.toStringAsFixed(4)}'
-                                            ' ' +
-                                        _coinShowName)
+                                    : Text((giftcardprovider
+                                            .estimateRate['rate']
+                                            .toString() +
+                                        " " +
+                                        _coinShowName))
                               ]),
                         ),
-                        widget.data['is_a_range']
-                            ? Container(
-                                padding: EdgeInsets.only(bottom: 30),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                        'Min price: ${widget.data['min'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
-                                    Text(
-                                        'Max price: ${widget.data['max'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
-                                  ],
-                                ),
-                              )
-                            : Container(
-                                padding: EdgeInsets.only(bottom: 30),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                        'Min price: ${widget.data['min'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
-                                    Text(
-                                        'Max price: ${widget.data['max'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
-                                  ],
-                                ),
-                              ),
+                        priceType(widget.data),
+
+                        ///price type widget //
                         LyoButton(
                           onPressed: (() async {
-                            if (_formKey.currentState!.validate()) {
+                            if (giftcardprovider.accountBalance['balance'] <
+                                double.parse(giftcardprovider
+                                    .estimateRate['rate']
+                                    .toString())) {
+                              snackAlert(context, SnackTypes.warning,
+                                  'Please contact admin balance is low');
+                            } else if (double.parse(giftcardprovider
+                                    .estimateRate['rate']
+                                    .toString()) <
+                                asset.getCost['withdraw_min']) {
+                              snackAlert(context, SnackTypes.warning,
+                                  'Minimum withdrawal amount is ${asset.getCost['withdraw_min']}');
+                            } else if (widget.data['price_type'] == "list") {
+                              Navigator.pushNamed(context, '/buy_card',
+                                  arguments: BuyCard(
+                                      amount: giftcardprovider.giftcardamount
+                                          .toString(),
+                                      totalprice: giftcardprovider
+                                          .estimateRate['rate']
+                                          .toStringAsPrecision(5),
+                                      defaultcoin: _defaultCoin,
+                                      ShowName: _coinShowName,
+                                      productID:
+                                          widget.data['BillerID'].toString()));
+                            } else if (_formKey.currentState!.validate()) {
                               Navigator.pushNamed(context, '/buy_card',
                                   arguments: BuyCard(
                                       amount: _amountcontroller.text,
-                                      totalprice: double.parse(
-                                          double.parse('${estimateprice}')
-                                              .toStringAsFixed(4)),
+                                      totalprice: giftcardprovider
+                                          .estimateRate['rate']
+                                          .toStringAsPrecision(5),
                                       defaultcoin: _defaultCoin,
                                       ShowName: _coinShowName,
                                       productID:
@@ -525,5 +628,39 @@ class _GiftDetailState extends State<GiftDetail> {
         ],
       ),
     );
+  }
+
+  Widget priceType(Map data) {
+    var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
+
+    if (data['price_type'] == "range") {
+      return Container(
+        padding: EdgeInsets.only(bottom: 30),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+                'Min price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['range']['min'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsPrecision(4) : data['price']['range']['min']..toStringAsPrecision(4)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+            Text(
+                'Max price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['range']['max'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsPrecision(4) : data['price']['range']['max'].toStringAsPrecision(4)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+          ],
+        ),
+      );
+    } else if (data['price_type'] == "fixed") {
+      return Container(
+        padding: EdgeInsets.only(bottom: 30),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+                'Min price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['fixed']['min'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsPrecision(4) : data['price']['fixed']['min'].toStringAsPrecision(4)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+            Text(
+                'Max price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['fixed']['max'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsPrecision(4) : data['price']['fixed']['max'].toStringAsPrecision(4)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+          ],
+        ),
+      );
+    } else {
+      return Container();
+    }
   }
 }
