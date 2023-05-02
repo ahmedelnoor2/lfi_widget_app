@@ -42,8 +42,7 @@ class TopupProvider with ChangeNotifier {
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
 
-    var url = Uri.http(gifttesturl, 'gift-card/wallets');
-    // print(url);
+    var url = Uri.https(lyoApiUrl, 'gift-card/wallets');
 
     try {
       final response = await http.get(url, headers: headers);
@@ -56,10 +55,7 @@ class TopupProvider with ChangeNotifier {
           _allwallet.add(wallet['coinType']);
           _allwallet.add(wallet['coin']);
         }
-        // _allwallet = responseData['data'];
-        print('check..');
-        // print(_allwallet['tota']);
-        //walletBalance= _allwallet['total_balance']
+
         return notifyListeners();
       } else {
         _allwallet = [];
@@ -67,7 +63,7 @@ class TopupProvider with ChangeNotifier {
       }
     } catch (error) {
       print(error);
-      // snackAlert(ctx, SnackTypes.errors, 'Failed to update, please try again.');
+
       return notifyListeners();
     }
   }
@@ -99,7 +95,7 @@ class TopupProvider with ChangeNotifier {
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
 
-    var url = Uri.http(gifttesturl, 'top-up/countries');
+    var url = Uri.https(lyoApiUrl, 'top-up/countries');
 
     try {
       final response = await http.get(url, headers: headers);
@@ -109,7 +105,7 @@ class TopupProvider with ChangeNotifier {
         _allCountries = responseData['data']['countries'];
 
         _toActiveCountry = responseData['data']['active_country'];
-        print(_toActiveCountry);
+
         isCountryLoading = false;
         return notifyListeners();
       } else {
@@ -166,13 +162,13 @@ class TopupProvider with ChangeNotifier {
     headers['userid'] = '${userid}';
     var activeContryName = toActiveCountry['isoName'];
 
-    var url = Uri.http(gifttesturl, 'top-up/operators/$activeContryName');
-    print(url);
+    var url = Uri.https(lyoApiUrl, 'top-up/operators/$activeContryName');
+
     try {
       final response = await http.get(url, headers: headers);
 
       final responseData = json.decode(response.body);
-      print(responseData);
+
       if (responseData['code'] == 200) {
         IstopupnetWorkloading = false;
         _allTopupNetwork = responseData['data'];
@@ -221,7 +217,6 @@ class TopupProvider with ChangeNotifier {
   }
 
   Future<void> getEstimateRate(ctx, auth, userid, postdata) async {
-    print(postdata);
     isEstimate = true;
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
@@ -229,8 +224,8 @@ class TopupProvider with ChangeNotifier {
 
     var mydata = json.encode(postdata);
 
-    var url = Uri.http(gifttesturl, 'top-up/estimate');
-    print(url);
+    var url = Uri.https(lyoApiUrl, 'top-up/estimate');
+
     try {
       final response = await http.post(
         url,
@@ -240,14 +235,12 @@ class TopupProvider with ChangeNotifier {
 
       final responseData = json.decode(response.body);
 
-      print('estimate response:${responseData}');
-
       if (responseData['code'] == 200) {
         isEstimate = false;
         var rate = responseData['data'][0]['rate'];
-        print(toActiveNetWorkprovider);
+
         _estimateRate = rate * toActiveNetWorkprovider['fx']['rate'];
-        print(_estimateRate);
+
         return notifyListeners();
       } else {
         //snackAlert(ctx, SnackTypes.warning, responseData['msg']);
@@ -302,12 +295,10 @@ class TopupProvider with ChangeNotifier {
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
-    // print('verificatiom');
-    // print(postdata);
 
     var mydata = json.encode(postdata);
 
-    var url = Uri.http(gifttesturl, 'gift-card/send_verification_request');
+    var url = Uri.https(lyoApiUrl, 'gift-card/send_verification_request');
 
     try {
       final response = await http.post(
@@ -317,15 +308,11 @@ class TopupProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-      //  print('send verification Api.${responseData}');
 
       if (responseData['code'] == '200') {
         otpverifcation = false;
         _doverify = responseData['data'];
 
-        //verificationType = _doverify['verificationType'];
-
-        //   print(_doverify);
         setverify(true);
         setgoolgeCode(_doverify['googleCode']);
 
@@ -365,24 +352,19 @@ class TopupProvider with ChangeNotifier {
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
     var mydata = json.encode(postdata);
-    print("with drwawal response...");
-    print(mydata);
 
-    var url = Uri.http(gifttesturl, 'gift-card/withdraw');
-    print(url);
+    var url = Uri.https(lyoApiUrl, 'gift-card/withdraw');
+
     try {
       final response = await http.post(
         url,
         body: mydata,
         headers: headers,
       );
-      //  print(response);
+
       final responseData = json.decode(response.body);
-      //   print('with drawal process ....');
-      //   print(responseData);
 
       if (responseData['code'] == '0' || responseData['code'] == 0) {
-        //    print('i am calling');
         _iswithdrwal = false;
         _dowithdrawal = responseData;
         paymentstatus = 'Topup is Processing';
@@ -417,8 +399,6 @@ class TopupProvider with ChangeNotifier {
   }
 
   Future<void> getDoTransaction(ctx, auth, userid, postdata) async {
-    print(postdata);
-    print('do trnasaction...');
     dotransactionloading = true;
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
@@ -426,9 +406,7 @@ class TopupProvider with ChangeNotifier {
 
     var mydata = json.encode(postdata);
 
-    print(mydata);
-
-    var url = Uri.http(gifttesturl, 'top-up/transaction');
+    var url = Uri.https(lyoApiUrl, 'top-up/transaction');
 
     try {
       final response = await http.post(
@@ -438,8 +416,6 @@ class TopupProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-      print("Transactopn data...");
-      print(responseData);
 
       if (responseData['code'] == '200' || responseData['code'] == 200) {
         dotransactionloading = false;
@@ -485,7 +461,7 @@ class TopupProvider with ChangeNotifier {
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
 
-    var url = Uri.http(gifttesturl, 'top-up/transaction');
+    var url = Uri.https(lyoApiUrl, 'top-up/transaction');
 
     try {
       final response = await http.get(
@@ -494,13 +470,10 @@ class TopupProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-      print(responseData);
 
       if (responseData['code'] == '200' || responseData['code'] == 200) {
         istransactionloading = false;
         _transaction = responseData['data'].reversed.toList();
-        print('check....transactionj');
-        print(_transaction.first);
 
         return notifyListeners();
       } else {
@@ -532,14 +505,12 @@ class TopupProvider with ChangeNotifier {
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
 
-    var url = Uri.http(gifttesturl, 'top-up/account/balance');
-    print(url);
+    var url = Uri.https(lyoApiUrl, 'top-up/account/balance');
+
     try {
       final response = await http.get(url, headers: headers);
 
       final responseData = json.decode(response.body);
-      print('accouht balance..');
-      print(responseData);
 
       if (responseData['code'] == 200) {
         _accountBalance = responseData['data'];

@@ -96,7 +96,7 @@ class _GiftDetailState extends State<GiftDetail> {
           giftcardprovider.toActiveCountry['rate']['rate'].toString());
 
       giftcardprovider.setgiftcardamount(cardrate);
-      print(giftcardprovider.giftcardamount);
+
       var _payment = giftcardprovider.giftcardamount;
       var userid = await auth.userInfo['id'];
       await giftcardprovider.getEstimateRate(context, auth, userid, {
@@ -207,8 +207,6 @@ class _GiftDetailState extends State<GiftDetail> {
     var giftcardprovider = Provider.of<GiftCardProvider>(context, listen: true);
     var asset = Provider.of<Asset>(context, listen: true);
     var public = Provider.of<Public>(context, listen: true);
-
-//print(giftcardprovider.toActiveCountry);
     return Scaffold(
       key: _scaffoldKey,
       drawer: drawer(
@@ -563,12 +561,14 @@ class _GiftDetailState extends State<GiftDetail> {
                         LyoButton(
                           onPressed: (() async {
                             if (giftcardprovider.accountBalance['balance'] <
-                                double.parse(
-                                    giftcardprovider.estimateRate['rate'])) {
+                                double.parse(giftcardprovider
+                                    .estimateRate['rate']
+                                    .toString())) {
                               snackAlert(context, SnackTypes.warning,
                                   'Please contact admin balance is low');
-                            } else if (double.parse(
-                                    giftcardprovider.estimateRate['rate']) <
+                            } else if (double.parse(giftcardprovider
+                                    .estimateRate['rate']
+                                    .toString()) <
                                 asset.getCost['withdraw_min']) {
                               snackAlert(context, SnackTypes.warning,
                                   'Minimum withdrawal amount is ${asset.getCost['withdraw_min']}');

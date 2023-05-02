@@ -94,7 +94,6 @@ class _MobileTopupState extends State<MobileTopup> {
     var asset = Provider.of<Asset>(context, listen: false);
 
     var userid = await auth.userInfo['id'];
-    //print(auth.userInfo['email']);
 
     await topupProvider.getDoVerify(context, auth, userid, {
       "address": asset.changeAddress['addressStr'],
@@ -108,7 +107,7 @@ class _MobileTopupState extends State<MobileTopup> {
     var auth = Provider.of<Auth>(context, listen: false);
     var asset = Provider.of<Asset>(context, listen: false);
     var userid = await auth.userInfo['id'];
-    print(amount.toStringAsPrecision(5));
+
     withdrwalResponse =
         await topupProvider.getDoWithDrawal(context, auth, userid, {
       "symbol": '$coin',
@@ -120,7 +119,6 @@ class _MobileTopupState extends State<MobileTopup> {
       "smsValidCode": verifitypre == 'smsValidCode' ? _optcontroller.text : "",
       "googleCode": _googlecodecontroller.text
     });
-    print(withdrwalResponse);
   }
 
   Future<void> dotransaction(
@@ -149,7 +147,6 @@ class _MobileTopupState extends State<MobileTopup> {
     var asset = Provider.of<Asset>(context, listen: true);
     final args = ModalRoute.of(context)!.settings.arguments as MobileTopup;
 
-    //print(args.countrycode);
     return Scaffold(
         appBar: AppBar(
           leading: IconButton(

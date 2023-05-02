@@ -36,9 +36,8 @@ class _TopupNetworkBottomSheetState extends State<TopupNetworkBottomSheet> {
 
   // This function is called whenever the text field changes
   void _runFilter(String enteredKeyword) {
-    // print(enteredKeyword);
     var topupProvider = Provider.of<TopupProvider>(context, listen: false);
-    //print(topupProvider.allCatalog);
+
     setState(() {
       _foundCountry = [];
     });
@@ -48,7 +47,6 @@ class _TopupNetworkBottomSheetState extends State<TopupNetworkBottomSheet> {
     } else {
       topupProvider.allTopupNetwork.where(
         (element) {
-          //  print(element["brand"].toString());
           if (element["operatorName"]
               .toLowerCase()
               .contains(enteredKeyword.toLowerCase())) {

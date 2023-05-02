@@ -93,7 +93,6 @@ class _BuyCardState extends State<BuyCard> {
     var asset = Provider.of<Asset>(context, listen: false);
 
     var userid = await auth.userInfo['id'];
-    //print(auth.userInfo['email']);
 
     await giftcardprovider.getDoVerify(context, auth, userid, {
       "address": asset.changeAddress['addressStr'],
@@ -120,7 +119,6 @@ class _BuyCardState extends State<BuyCard> {
       "smsValidCode": verifitypre == 'smsValidCode' ? _optcontroller.text : "",
       "googleCode": _googlecodecontroller.text
     });
-    print(withdrwalResponse);
   }
 
   Future<void> dotransaction(productid, amount) async {
@@ -142,7 +140,6 @@ class _BuyCardState extends State<BuyCard> {
     var asset = Provider.of<Asset>(context, listen: true);
     final args = ModalRoute.of(context)!.settings.arguments as BuyCard;
 
-    //print(args.ShowName);
     return Scaffold(
         appBar: AppBar(
           leading: IconButton(

@@ -110,11 +110,10 @@ class _GiftCardTransactionState extends State<GiftCardTransaction> {
                           },
                           child: ListView.builder(
                             itemCount: giftcardprovider.transaction.length,
+                            reverse: true,
                             itemBuilder: (BuildContext context, int index) {
                               var currentIndex =
                                   giftcardprovider.transaction[index];
-                              print(currentIndex);
-                              print("currentIndex....");
 
                               return Card(
                                 child: Padding(
@@ -288,26 +287,44 @@ class _GiftCardTransactionState extends State<GiftCardTransaction> {
                                           padding: EdgeInsets.only(left: 5),
                                           child: LyoButton(
                                             onPressed: () async {
-                                              showModalBottomSheet<void>(
-                                                context: context,
-                                                isScrollControlled: true,
-                                                builder:
-                                                    (BuildContext context) {
-                                                  return StatefulBuilder(
-                                                    builder: (BuildContext
-                                                            context,
-                                                        StateSetter setState) {
-                                                      return CardRedeem(
-                                                          brandid: currentIndex[
-                                                                  'brand']
-                                                              ['brandId'],
-                                                          transactionId:
-                                                              currentIndex[
-                                                                  'transactionID']);
-                                                    },
-                                                  );
-                                                },
-                                              );
+                                              if (currentIndex['brand']
+                                                      ['brandId'] ==
+                                                  null) {
+                                                if (await canLaunch(currentIndex[
+                                                            'giftCardDetails']
+                                                        [0]['Redemption URL']
+                                                    .toString())) {
+                                                  await launch(currentIndex[
+                                                              'giftCardDetails']
+                                                          [0]['Redemption URL']
+                                                      .toString());
+                                                } else {
+                                                  throw 'Could not launch ';
+                                                }
+                                              } else {
+                                                showModalBottomSheet<void>(
+                                                  context: context,
+                                                  isScrollControlled: true,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return StatefulBuilder(
+                                                      builder:
+                                                          (BuildContext context,
+                                                              StateSetter
+                                                                  setState) {
+                                                        return CardRedeem(
+                                                            brandid:
+                                                                currentIndex[
+                                                                        'brand']
+                                                                    ['brandId'],
+                                                            transactionId:
+                                                                currentIndex[
+                                                                    'transactionID']);
+                                                      },
+                                                    );
+                                                  },
+                                                );
+                                              }
                                             },
                                             text: 'Redeem',
                                             active: true,

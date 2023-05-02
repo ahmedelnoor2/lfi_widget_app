@@ -124,7 +124,7 @@ class _AmountSelectBottomSheetState extends State<AmountSelectBottomSheet> {
                                         top: 40.0,
                                       ),
                                       child: Text(
-                                        "${(currentindex * topupProvider.toActiveNetWorkprovider['fx']['rate']).toStringAsFixed(2)}",
+                                        "${(currentindex * topupProvider.toActiveNetWorkprovider['fx']['rate']).toStringAsFixed(2) + ' ' + topupProvider.toActiveCountry['currencyCode']}",
                                         style: TextStyle(
                                             color: Color(0xff00315C),
                                             fontSize: 14.0,
@@ -168,7 +168,7 @@ class _AmountSelectBottomSheetState extends State<AmountSelectBottomSheet> {
                     itemBuilder: (context, index) {
                       var currentindex =
                           topupProvider.activeState['fixedAmounts'][index];
-                      print(currentindex);
+                      
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 10.0),
                         child: Row(

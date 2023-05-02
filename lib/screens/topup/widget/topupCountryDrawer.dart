@@ -28,14 +28,12 @@ class _TopupConfirmDrawerState extends State<TopupConfirmDrawer> {
 
   // This function is called whenever the text field changes
   void _runFilter(String enteredKeyword) {
-    // print(enteredKeyword);
     var topupProvider = Provider.of<TopupProvider>(context, listen: false);
     setState(() {
       _foundCountry = [];
     });
     List results = [];
     if (enteredKeyword.isEmpty) {
-      // if the search field is empty or only contains white-space, we'll display all users
       results = topupProvider.allCountries;
     } else {
       topupProvider.allCountries.where(
@@ -123,8 +121,6 @@ class _TopupConfirmDrawerState extends State<TopupConfirmDrawer> {
                       itemCount: _foundCountry.length,
                       itemBuilder: (context, index) {
                         var data = _foundCountry[index];
-
-                        ///  print(data['rate']['rate']);
 
                         return ListTile(
                           onTap: () async {

@@ -78,15 +78,7 @@ class _LocationWiseBottomsheetState extends State<LocationWiseBottomsheet> {
                     children: <Widget>[
                       GestureDetector(
                         onTap: () {
-                          print('object');
-                          print(
-                            topupProvider
-                                .toActiveNetWorkprovider[
-                                    'geographicalRechargePlans']
-                                .length,
-                          );
-                          print(currentindex);
-                          print(currentindex);
+                          
                           topupProvider.setactivestate(currentindex);
                           Navigator.pop(context);
                         },

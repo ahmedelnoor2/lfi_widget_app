@@ -553,7 +553,7 @@ class _TopUpState extends State<TopUp> {
                           ],
                         ),
                   Padding(
-                    padding: const EdgeInsets.only(top: 20, bottom: 20),
+                    padding: const EdgeInsets.only(top: 20, bottom: 10),
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -577,7 +577,7 @@ class _TopUpState extends State<TopUp> {
               },
               child: Padding(
                 padding: const EdgeInsets.only(
-                    top: 20, bottom: 10, left: 16, right: 16),
+                    top: 10, bottom: 10, left: 16, right: 16),
                 child: Container(
                   padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
@@ -654,7 +654,7 @@ class _TopUpState extends State<TopUp> {
                   ]),
             ),
             SizedBox(
-              height: height * 0.08,
+              height: height * 0.04,
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -833,73 +833,4 @@ class _TopUpState extends State<TopUp> {
       ),
     );
   }
-
-  // Widget locationwisecuurency() {
-  //   var topupProvider = Provider.of<TopupProvider>(context, listen: true);
-  //   //print(topupProvider.toActiveNetWorkprovider['geographicalRechargePlans']);
-  //   return Column(
-  //     children: [
-  //       DropdownButton<String>(
-  //         isDense: true,
-  //         hint: Text('Select an item'),
-  //         value: _selectedItem,
-  //         onChanged: (value) {
-  //           setState(() {
-  //             _selectedItem = value as String?;
-  //             _selectedSubItem = null;
-  //           });
-  //           print(value);
-  //           print(topupProvider
-  //               .toActiveNetWorkprovider['geographicalRechargePlans']
-  //               .map((data) {
-  //             return Text(data.toString());
-  //           }));
-  //         },
-  //         icon: Container(
-  //           padding: EdgeInsets.only(left: width * 0.191),
-  //           child: Icon(
-  //             Icons.keyboard_arrow_down,
-  //             color: Colors.white,
-  //           ),
-  //         ),
-  //         style: const TextStyle(fontSize: 13),
-  //         underline: Container(
-  //           height: 0,
-  //         ),
-  //         items: topupProvider
-  //             .toActiveNetWorkprovider['geographicalRechargePlans']
-  //             .map<DropdownMenuItem<String>>((value) {
-  //           return DropdownMenuItem<String>(
-  //             value: value['locationName'],
-  //             child: Text(
-  //               value['locationName'],
-  //               style: TextStyle(
-  //                 color: Colors.white,
-  //               ),
-  //             ),
-  //           );
-  //         }).toList(),
-  //       ),
-  //       // if (_selectedItem != null)
-  //       //   DropdownButton(
-  //       //     hint: Text('Select a subitem'),
-  //       //     value: _selectedSubItem,
-  //       //     onChanged: (value) {
-  //       //       setState(() {
-  //       //         _selectedSubItem = value as String?;
-  //       //       });
-  //       //     },
-  //       //     items: topupProvider
-  //       //         .toActiveNetWorkprovider['geographicalRechargePlans']
-  //       //             [_selectedItem]['fixedAmounts']!
-  //       //         .map((subitem) {
-  //       //       return DropdownMenuItem(
-  //       //         value: subitem,
-  //       //         child: Text(subitem.toString()),
-  //       //       );
-  //       //     }).toList(),
-  //       //   ),
-  //     ],
-  //   );
-  // }
 }

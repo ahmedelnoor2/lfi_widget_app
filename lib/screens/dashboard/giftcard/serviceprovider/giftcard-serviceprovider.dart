@@ -89,7 +89,7 @@ class _GiftCardServiceProviderState extends State<GiftCardServiceProvider> {
                           onTap: () {
                             giftcardprovider
                                 .setproviderid(data['providerId'].toString());
-                            print(giftcardprovider.providerid);
+
                             Navigator.pushNamed(context, '/gift_card');
                           },
                           child: Card(

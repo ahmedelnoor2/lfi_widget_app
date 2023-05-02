@@ -35,10 +35,9 @@ class _CatalogBottomSheetState extends State<CatalogBottomSheet> {
 
   // This function is called whenever the text field changes
   void _runFilter(String enteredKeyword) {
-    // print(enteredKeyword);
     var giftcardprovider =
         Provider.of<GiftCardProvider>(context, listen: false);
-    //print(giftcardprovider.allCatalog);
+
     setState(() {
       _foundCountry = [];
     });

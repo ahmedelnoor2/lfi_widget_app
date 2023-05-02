@@ -48,7 +48,7 @@ class GiftCardProvider with ChangeNotifier {
   }
 
   Future<void> getAllGiftProvider() async {
-    var url = Uri.http(gifttesturl, 'gift-card/providers');
+    var url = Uri.https(lyoApiUrl, 'gift-card/providers');
 
     try {
       final response = await http.get(url, headers: headers);
@@ -82,8 +82,7 @@ class GiftCardProvider with ChangeNotifier {
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
 
-    var url = Uri.http(gifttesturl, 'gift-card/wallets');
-    // print(url);
+    var url = Uri.https(lyoApiUrl, 'gift-card/wallets');
 
     try {
       final response = await http.get(url, headers: headers);
@@ -96,10 +95,6 @@ class GiftCardProvider with ChangeNotifier {
           _allwallet.add(wallet['coinType']);
           _allwallet.add(wallet['coin']);
         }
-        // _allwallet = responseData['data'];
-        print('check..');
-        // print(_allwallet['tota']);
-        //walletBalance= _allwallet['total_balance']
         return notifyListeners();
       } else {
         _allwallet = [];
@@ -140,7 +135,7 @@ class GiftCardProvider with ChangeNotifier {
     headers['userid'] = '${userid}';
     headers['provider'] = providerid;
 
-    var url = Uri.http(gifttesturl, 'gift-card/countries');
+    var url = Uri.https(lyoApiUrl, 'gift-card/countries');
 
     try {
       final response = await http.get(url, headers: headers);
@@ -150,7 +145,7 @@ class GiftCardProvider with ChangeNotifier {
         _allCountries = responseData['data']['countries'];
 
         _toActiveCountry = responseData['data']['active_country'];
-        print(_toActiveCountry);
+
         isCountryLoading = false;
         return notifyListeners();
       } else {
@@ -200,7 +195,7 @@ class GiftCardProvider with ChangeNotifier {
     headers['userid'] = '${userid}';
     headers['provider'] = providerid;
     var mydata = json.encode(postdata);
-    var url = Uri.http(gifttesturl, 'gift-card/catalogues');
+    var url = Uri.https(lyoApiUrl, 'gift-card/catalogues');
 
     try {
       final response = await http.post(url, body: mydata, headers: headers);
@@ -210,8 +205,7 @@ class GiftCardProvider with ChangeNotifier {
       if (responseData['code'] == 200) {
         IsCatalogloading = false;
         _allCatalog = responseData['data'];
-        print("catelogue...");
-        print(_allCatalog[0]);
+
         if (_toActiveCatalog.isEmpty) {
           _toActiveCatalog = _allCatalog[0];
         } else if (catUpdate) {
@@ -262,8 +256,8 @@ class GiftCardProvider with ChangeNotifier {
     var catid = _toActiveCatalog['id'];
     var name = _toActiveCatalog['brand'].split(" ")[0];
 
-    var url = Uri.http(
-        gifttesturl, 'gift-card/cards/$catid/$countrycode', {'name': '$name'});
+    var url = Uri.https(
+        lyoApiUrl, 'gift-card/cards/$catid/$countrycode', {'name': '$name'});
 
     try {
       final response = await http.get(url, headers: headers);
@@ -299,7 +293,6 @@ class GiftCardProvider with ChangeNotifier {
   }
 
   Future<void> getEstimateRate(ctx, auth, userid, postdata) async {
-    print(postdata);
     isEstimate = true;
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
@@ -307,7 +300,7 @@ class GiftCardProvider with ChangeNotifier {
 
     var mydata = json.encode(postdata);
 
-    var url = Uri.http(gifttesturl, 'gift-card/estimate');
+    var url = Uri.https(lyoApiUrl, 'gift-card/estimate');
 
     try {
       final response = await http.post(
@@ -318,12 +311,10 @@ class GiftCardProvider with ChangeNotifier {
 
       final responseData = json.decode(response.body);
 
-      print('estimate response:${responseData}');
-
       if (responseData['code'] == 200) {
         isEstimate = false;
         _estimateRate = responseData['data'][0];
-        print(_estimateRate);
+
         return notifyListeners();
       } else {
         //snackAlert(ctx, SnackTypes.warning, responseData['msg']);
@@ -378,12 +369,10 @@ class GiftCardProvider with ChangeNotifier {
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
-    // print('verificatiom');
-    // print(postdata);
 
     var mydata = json.encode(postdata);
 
-    var url = Uri.http(gifttesturl, 'gift-card/send_verification_request');
+    var url = Uri.https(lyoApiUrl, 'gift-card/send_verification_request');
 
     try {
       final response = await http.post(
@@ -393,15 +382,11 @@ class GiftCardProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-      //  print('send verification Api.${responseData}');
 
       if (responseData['code'] == '200') {
         otpverifcation = false;
         _doverify = responseData['data'];
 
-        //verificationType = _doverify['verificationType'];
-
-        //   print(_doverify);
         setverify(true);
         setgoolgeCode(_doverify['googleCode']);
 
@@ -441,24 +426,19 @@ class GiftCardProvider with ChangeNotifier {
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
     var mydata = json.encode(postdata);
-    print("with drwawal response...");
-    print(mydata);
 
-    var url = Uri.http(gifttesturl, 'gift-card/withdraw');
-    print(url);
+    var url = Uri.https(lyoApiUrl, 'gift-card/withdraw');
+
     try {
       final response = await http.post(
         url,
         body: mydata,
         headers: headers,
       );
-      //  print(response);
+
       final responseData = json.decode(response.body);
-      //   print('with drawal process ....');
-      //   print(responseData);
 
       if (responseData['code'] == '0' || responseData['code'] == 0) {
-        //    print('i am calling');
         _iswithdrwal = false;
         _dowithdrawal = responseData;
         paymentstatus = 'Card is Processing';
@@ -493,8 +473,6 @@ class GiftCardProvider with ChangeNotifier {
   }
 
   Future<void> getDoTransaction(ctx, auth, userid, postdata) async {
-    print(postdata);
-    print('do trnasaction...');
     dotransactionloading = true;
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
@@ -502,7 +480,7 @@ class GiftCardProvider with ChangeNotifier {
 
     var mydata = json.encode(postdata);
 
-    var url = Uri.http(gifttesturl, 'gift-card/transaction');
+    var url = Uri.https(lyoApiUrl, 'gift-card/transaction');
 
     try {
       final response = await http.post(
@@ -512,8 +490,6 @@ class GiftCardProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-      print("Transactopn data...");
-      print(responseData);
 
       if (responseData['code'] == '200' || responseData['code'] == 200) {
         dotransactionloading = false;
@@ -559,7 +535,7 @@ class GiftCardProvider with ChangeNotifier {
     headers['token'] = auth.loginVerificationToken;
     headers['userid'] = '${userid}';
 
-    var url = Uri.http(gifttesturl, 'gift-card/transaction');
+    var url = Uri.https(lyoApiUrl, 'gift-card/transaction');
 
     try {
       final response = await http.get(
@@ -568,13 +544,10 @@ class GiftCardProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-      print(responseData);
 
       if (responseData['code'] == '200' || responseData['code'] == 200) {
         istransactionloading = false;
         _transaction = responseData['data'].reversed.toList();
-        print('check....transactionj');
-        print(_transaction.last);
 
         return notifyListeners();
       } else {
@@ -612,14 +585,13 @@ class GiftCardProvider with ChangeNotifier {
     headers['userid'] = '${userid}';
 
     var url =
-        Uri.http(gifttesturl, 'gift-card/redeem/${brandId}/${transactionId}');
-
+        Uri.https(lyoApiUrl, 'gift-card/redeem/${brandId}/${transactionId}');
+    print(url);
     try {
       final response = await http.get(url, headers: headers);
 
       final responseData = json.decode(response.body);
       print(responseData);
-
       if (responseData['code'] == 200) {
         _redeem = responseData['data'];
         isredeemloading = false;
@@ -649,20 +621,15 @@ class GiftCardProvider with ChangeNotifier {
     userid,
   ) async {
     notifyListeners();
-    print(userid);
-    headers['token'] = auth.loginVerificationToken;
-    headers['userid'] = '${userid}';
+
     headers['provider'] = providerid;
-    print(headers['provider'].runtimeType);
-    var url = Uri.http(gifttesturl, 'gift-card/account/balance');
-    print(url);
-    print(headers);
+
+    var url = Uri.https(lyoApiUrl, 'gift-card/account/balance');
+
     try {
       final response = await http.get(url, headers: headers);
 
       final responseData = json.decode(response.body);
-      print('accouht balance..');
-      print(responseData);
 
       if (responseData['code'] == 200) {
         _accountBalance = responseData['data'];
