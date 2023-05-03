@@ -137,7 +137,12 @@ class _TopupConfirmDrawerState extends State<TopupConfirmDrawer> {
                                       topupProvider.toActiveCountry['isoName']
                                 },
                                 true);
-
+                            await topupProvider
+                                .getEstimateRate(context, auth, userid, {
+                              "currency":
+                                  "${topupProvider.toActiveCountry['currencyCode']}",
+                              "payment": topupProvider.topupamount,
+                            });
                             // await topupProvider.getAllCard(
                             //     context, auth, userid);
                           },

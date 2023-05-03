@@ -660,8 +660,9 @@ class _TopUpState extends State<TopUp> {
               padding: const EdgeInsets.all(8.0),
               child: LyoButton(
                 onPressed: () {
-                  if (topupProvider.accountBalance['balance'] <
-                      topupProvider.estimateRate) {
+                  if (double.parse(
+                          topupProvider.accountBalance['balance'].toString()) <
+                      double.parse(topupProvider.estimateRate.toString())) {
                     snackAlert(context, SnackTypes.warning,
                         'Please Contact Admin Balance is low ...');
                   } else if (_formKey.currentState!.validate()) {

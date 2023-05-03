@@ -216,7 +216,13 @@ class TopupProvider with ChangeNotifier {
     return _estimateRate;
   }
 
-  Future<void> getEstimateRate(ctx, auth, userid, postdata) async {
+  Future<void> getEstimateRate(
+    ctx,
+    auth,
+    userid,
+    postdata,
+  ) async {
+    print(postdata);
     isEstimate = true;
     notifyListeners();
     headers['token'] = auth.loginVerificationToken;
@@ -234,12 +240,10 @@ class TopupProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-
+      print(responseData);
       if (responseData['code'] == 200) {
         isEstimate = false;
-        var rate = responseData['data'][0]['rate'];
-
-        _estimateRate = rate * toActiveNetWorkprovider['fx']['rate'];
+        _estimateRate = responseData['data'][0]['rate'];
 
         return notifyListeners();
       } else {
