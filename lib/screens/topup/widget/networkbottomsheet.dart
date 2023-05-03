@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/container.dart';
@@ -64,8 +66,8 @@ class _TopupNetworkBottomSheetState extends State<TopupNetworkBottomSheet> {
   }
 
   Future<void> getEstimateRate() async {
-    var topupProvider = Provider.of<TopupProvider>(context, listen: true);
-    var auth = Provider.of<Auth>(context, listen: true);
+    var topupProvider = Provider.of<TopupProvider>(context, listen: false);
+    var auth = Provider.of<Auth>(context, listen: false);
     var userid = await auth.userInfo['id'];
     await topupProvider.getEstimateRate(context, auth, userid, {
       "currency": "${topupProvider.toActiveCountry['currencyCode']}",
@@ -133,22 +135,27 @@ class _TopupNetworkBottomSheetState extends State<TopupNetworkBottomSheet> {
                     itemCount: _foundCountry.length,
                     itemBuilder: (context, index) {
                       var data = _foundCountry[index];
-
+                      inspect(data);
                       return InkWell(
                         onTap: () async {
                           Navigator.pop(context);
                           var userid = await auth.userInfo['id'];
                           topupProvider.setActiveNetWorkprovider(data);
-
-                          // await topupProvider.getAllNetWorkprovider(
-                          //     context,
-                          //     auth,
-                          //     userid,
-                          //     {
-                          //       "country":
-                          //           topupProvider.toActiveCountry['isoName']
-                          //     },
-                          //     true);
+                          if (topupProvider.toActiveCountry['isoName'] !=
+                              'IN') {
+                            topupProvider.settopupamount(
+                                data['price_type']['type'] == 'FIXED'
+                                    ? data['price_type']['price'][0]
+                                    : data['price_type']['price']
+                                        ['suggestedPrice'][0]);
+                          } else if (topupProvider.toActiveCountry['isoName'] ==
+                              'IN') {
+                            var activeState =
+                                data['geographicalRechargePlans'][0];
+                            topupProvider
+                                .settopupamount(activeState['fixedAmounts'][0]);
+                            inspect(activeState);
+                          }
 
                           getEstimateRate();
                         },

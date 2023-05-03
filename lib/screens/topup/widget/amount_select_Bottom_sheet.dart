@@ -28,7 +28,8 @@ class _AmountSelectBottomSheetState extends State<AmountSelectBottomSheet> {
     var userid = await auth.userInfo['id'];
     await topupProvider.getEstimateRate(context, auth, userid, {
       "currency": "${topupProvider.toActiveCountry['currencyCode']}",
-      "payment": topupProvider.topupamount,
+      "payment": topupProvider.topupamount *
+          topupProvider.toActiveNetWorkprovider['fx']['rate'],
     });
     return;
   }
@@ -96,6 +97,10 @@ class _AmountSelectBottomSheetState extends State<AmountSelectBottomSheet> {
                               ['price'][index]
                           : topupProvider.toActiveNetWorkprovider['price_type']
                               ['price']['suggestedPrice'][index];
+
+                      print(currentindex);
+                      // print(
+                      //     topupProvider.toActiveNetWorkprovider['fx']['rate']);
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 10.0),
                         child: Row(
@@ -104,6 +109,7 @@ class _AmountSelectBottomSheetState extends State<AmountSelectBottomSheet> {
                             GestureDetector(
                               onTap: () {
                                 topupProvider.settopupamount(currentindex);
+                                print(currentindex);
                                 getEstimateRate();
                                 Navigator.pop(context);
                               },
@@ -124,7 +130,7 @@ class _AmountSelectBottomSheetState extends State<AmountSelectBottomSheet> {
                                         top: 40.0,
                                       ),
                                       child: Text(
-                                        "${(currentindex * topupProvider.toActiveNetWorkprovider['fx']['rate']).toStringAsFixed(2) + ' ' + topupProvider.toActiveCountry['currencyCode']}",
+                                        "${(currentindex * topupProvider.toActiveNetWorkprovider['fx']['rate']).toStringAsFixed(0) + ' ' + topupProvider.toActiveCountry['currencyCode']}",
                                         style: TextStyle(
                                             color: Color(0xff00315C),
                                             fontSize: 14.0,
@@ -166,9 +172,9 @@ class _AmountSelectBottomSheetState extends State<AmountSelectBottomSheet> {
                     shrinkWrap: true,
                     itemCount: topupProvider.activeState['fixedAmounts'].length,
                     itemBuilder: (context, index) {
-                      var currentindex =
+                      var currentindexdata =
                           topupProvider.activeState['fixedAmounts'][index];
-                      
+
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 10.0),
                         child: Row(
@@ -176,7 +182,7 @@ class _AmountSelectBottomSheetState extends State<AmountSelectBottomSheet> {
                           children: <Widget>[
                             GestureDetector(
                               onTap: () {
-                                topupProvider.settopupamount(currentindex);
+                                topupProvider.settopupamount(currentindexdata);
                                 getEstimateRate();
                                 Navigator.pop(context);
                               },
@@ -197,7 +203,7 @@ class _AmountSelectBottomSheetState extends State<AmountSelectBottomSheet> {
                                         top: 40.0,
                                       ),
                                       child: Text(
-                                        "${(currentindex * topupProvider.toActiveNetWorkprovider['fx']['rate']).toStringAsFixed(2)}",
+                                        "${(currentindexdata * topupProvider.toActiveNetWorkprovider['fx']['rate']).toStringAsFixed(0) + ' ' + topupProvider.toActiveCountry['currencyCode']}",
                                         style: TextStyle(
                                             color: Color(0xff00315C),
                                             fontSize: 14.0,
