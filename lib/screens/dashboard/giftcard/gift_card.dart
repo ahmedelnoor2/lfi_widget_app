@@ -381,13 +381,6 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
 
                                   return ListTile(
                                     onTap: () {
-                                      // if()
-                                      // var min = double.parse(currentindex['min']
-                                      //     .replaceAll(',', ""));
-                                      // var max = double.parse(currentindex['max']
-                                      //     .replaceAll(',', ""));
-                                      // print(min == max);
-
                                       Navigator.push(
                                         context,
                                         PageRouteBuilder(
@@ -408,11 +401,6 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                                               Duration(seconds: 0),
                                         ),
                                       );
-                                      // Navigator.pushNamed(
-                                      //   context,
-                                      //   '/gift_detail',
-                                      //   arguments: {'data': currentindex,'isEqualMinMax':min==max?false:true},
-                                      // );
                                     },
                                     leading: Container(
                                       width: 100,
@@ -424,20 +412,12 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
                                         fit: BoxFit.cover,
                                       ),
                                     ),
-                                    title: Text('${currentindex['name']}'),
+                                    title: Text(
+                                      '${currentindex['name']}',
+                                      style: TextStyle(
+                                          overflow: TextOverflow.ellipsis),
+                                    ),
                                     subtitle: priceType(currentindex),
-                                    // ? Column(
-                                    //     crossAxisAlignment:
-                                    //         CrossAxisAlignment.start,
-                                    //     children: [
-                                    //       Text(
-                                    //           'Min price: ${currentindex['min'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
-                                    //       Text(
-                                    //           'Max price: ${currentindex['max'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
-                                    //     ],
-                                    //   )
-                                    // : Text(
-                                    //     'Price: ${currentindex['max'].replaceAll(',', "")} ${giftcardprovider.toActiveCountry['currency']['code']}'),
                                     trailing: Icon(Icons.chevron_right),
                                   );
                                 },
@@ -457,19 +437,26 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
 
     if (data['price_type'] == "list") {
       return Container(
-        child: Wrap(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Amount:'),
-            Text(data['price']['list'].map((item) {
-              if (giftcardprovider.toActiveCountry['currency']['code'] !=
-                  'AED') {
-                return (item * giftcardprovider.toActiveCountry['rate']['rate'])
-                    .toStringAsPrecision(4);
-              } else {
-                return item;
-              }
-            }).join(', ')),
-            Text(giftcardprovider.toActiveCountry['currency']['code'])
+            Text(
+                'Amount: (${giftcardprovider.toActiveCountry['currency']['code']})'),
+            Text(
+              data['price']['list'].map((item) {
+                if (giftcardprovider.toActiveCountry['currency']['code'] !=
+                    'AED') {
+                  return (double.parse(item.toString()) *
+                          double.parse(giftcardprovider.toActiveCountry['rate']
+                                  ['rate']
+                              .toString()))
+                      .toStringAsFixed(0);
+                } else {
+                  return double.parse(item.toString()).toStringAsFixed(0);
+                }
+              }).join(', '),
+              style: TextStyle(overflow: TextOverflow.ellipsis),
+            ),
           ],
         ),
       );
@@ -478,9 +465,9 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-              'Min price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['range']['min'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsFixed(4) : data['price']['range']['min'].toStringAsFixed(4)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+              'Min price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['range']['min'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsFixed(0) : data['price']['range']['min'].toStringAsFixed(0)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
           Text(
-              'Max price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['range']['max'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsFixed(4) : data['price']['range']['max']..toStringAsFixed(4)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+              'Max price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['range']['max'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsFixed(0) : data['price']['range']['max'].toStringAsFixed(0)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
         ],
       );
     } else if (data['price_type'] == "fixed") {
@@ -488,9 +475,9 @@ class _GiftCardState extends State<GiftCard> with TickerProviderStateMixin {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-              'Min price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['fixed']['min'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsFixed(4) : data['price']['fixed']['min'].toStringAsFixed(4)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+              'Min price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['fixed']['min'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsFixed(0) : data['price']['fixed']['min'].toStringAsFixed(0)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
           Text(
-              'Max price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['fixed']['max'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsFixed(4) : data['price']['fixed']['max'].toStringAsFixed(4)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+              'Max price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['fixed']['max'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsFixed(0) : data['price']['fixed']['max'].toStringAsFixed(0)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
         ],
       );
     } else {
