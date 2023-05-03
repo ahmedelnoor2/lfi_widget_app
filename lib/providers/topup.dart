@@ -240,7 +240,7 @@ class TopupProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-
+      print(responseData);
       if (responseData['code'] == 200) {
         isEstimate = false;
         _estimateRate = responseData['data'][0]['rate'];
