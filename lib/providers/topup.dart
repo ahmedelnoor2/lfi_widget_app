@@ -48,6 +48,7 @@ class TopupProvider with ChangeNotifier {
       final response = await http.get(url, headers: headers);
 
       final responseData = json.decode(response.body);
+      print(responseData);
 
       if (responseData['code'] == 200) {
         _allwallet = [];
