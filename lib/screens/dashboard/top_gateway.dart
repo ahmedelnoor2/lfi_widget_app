@@ -31,12 +31,6 @@ class _TopGatewayState extends State<TopGateway>
     _controller = AnimationController(vsync: this);
   }
 
-  Future<void> getAllGiftProvider() async {
-    var giftcardprovider =
-        Provider.of<GiftCardProvider>(context, listen: false);
-    await giftcardprovider.getAllGiftProvider();
-  }
-
   @override
   void dispose() {
     super.dispose();
@@ -200,7 +194,7 @@ class _TopGatewayState extends State<TopGateway>
           child: InkWell(
             onTap: () async {
               if (auth.isAuthenticated) {
-                await getAllGiftProvider();
+                // await getAllGiftProvider();
                 print(giftcardprovider.allgiftprovider.length);
                 if (auth.userInfo['realAuthType'] == 0 ||
                     auth.userInfo['authLevel'] == 0) {

@@ -6,6 +6,7 @@ import 'package:archive/archive.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:lyotrade/providers/auth.dart';
+import 'package:lyotrade/providers/giftcard.dart';
 import 'package:lyotrade/providers/notification_provider.dart';
 import 'package:lyotrade/providers/public.dart';
 import 'package:lyotrade/providers/user.dart';
@@ -168,11 +169,18 @@ class _DashboardState extends State<Dashboard> {
     await public.getBanners();
     return;
   }
+  
+  Future<void> getAllGiftProvider() async {
+    var giftcardprovider =
+        Provider.of<GiftCardProvider>(context, listen: false);
+    await giftcardprovider.getAllGiftProvider();
+  }
 
   Future<void> waitCalls() async {
     await getPublicInfo();
     await getBanners();
     await getAssetsRate();
+    await getAllGiftProvider();
   }
 
   void extractStreamData(streamData, public) async {
@@ -209,7 +217,7 @@ class _DashboardState extends State<Dashboard> {
 
     var public = Provider.of<Public>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
-    // print(auth.authToken);
+    //print(auth.authToken);
 
     //print(auth.userInfo);
     return WillPopScope(

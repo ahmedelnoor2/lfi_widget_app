@@ -29,9 +29,14 @@ class _CountryDrawerState extends State<CountryDrawer> {
     super.initState();
   }
 
+  void clearCards() {
+    var giftcardprovider =
+        Provider.of<GiftCardProvider>(context, listen: false);
+    giftcardprovider.allCard.clear();
+  }
+
   // This function is called whenever the text field changes
   void _runFilter(String enteredKeyword) {
-    ;
     var giftcardprovider =
         Provider.of<GiftCardProvider>(context, listen: false);
     setState(() {
@@ -131,6 +136,7 @@ class _CountryDrawerState extends State<CountryDrawer> {
 
                         return ListTile(
                           onTap: () async {
+                            clearCards();
                             giftcardprovider.setActiveCountry(data);
 
                             searchController.clear();

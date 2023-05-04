@@ -45,7 +45,14 @@ class _GiftDetailState extends State<GiftDetail> {
   @override
   void initState() {
     super.initState();
+    clearEstimate();
     getDigitalBalance();
+  }
+
+  void clearEstimate() {
+    var giftcardprovider =
+        Provider.of<GiftCardProvider>(context, listen: false);
+    giftcardprovider.estimateRate.clear();
   }
 
   // get amount
@@ -411,14 +418,6 @@ class _GiftDetailState extends State<GiftDetail> {
                                         children: [
                                           Text(giftcardprovider.giftcardamount
                                               .toString()),
-                                          // giftcardprovider.IstopupnetWorkloading
-                                          //     ? CircularProgressIndicator()
-                                          //     : Text(topupProvider
-                                          //                     .toActiveNetWorkprovider[
-                                          //                 'fx'] ==
-                                          //             null
-                                          //         ? ''
-                                          //         : "${(topupProvider.topupamount * topupProvider.toActiveNetWorkprovider['fx']['rate']).toStringAsFixed(2)}"),
                                           Icon(Icons.arrow_drop_down),
                                         ],
                                       ),
@@ -548,11 +547,14 @@ class _GiftDetailState extends State<GiftDetail> {
                                 ),
                                 giftcardprovider.isEstimate
                                     ? CircularProgressIndicator()
-                                    : Text((giftcardprovider
-                                            .estimateRate['rate']
-                                            .toString() +
-                                        " " +
-                                        _coinShowName))
+                                    : giftcardprovider.estimateRate['rate'] !=
+                                            null
+                                        ? Text((giftcardprovider
+                                                .estimateRate['rate']
+                                                .toString() +
+                                            " " +
+                                            _coinShowName))
+                                        : Text('0.0' + _coinShowName)
                               ]),
                         ),
                         priceType(widget.data),
@@ -640,9 +642,9 @@ class _GiftDetailState extends State<GiftDetail> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-                'Min price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['range']['min'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsPrecision(4) : data['price']['range']['min']..toStringAsPrecision(4)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                'Min price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (double.parse(data['price']['range']['min'].toString()) * double.parse(giftcardprovider.toActiveCountry['rate']['rate'].toString())).toStringAsFixed(0) : double.parse(data['price']['range']['min'].toString()).toStringAsFixed(0)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
             Text(
-                'Max price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['range']['max'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsPrecision(4) : data['price']['range']['max'].toStringAsPrecision(4)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                'Max price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (double.parse(data['price']['range']['max'].toString()) * double.parse(giftcardprovider.toActiveCountry['rate']['rate'].toString())).toStringAsFixed(0) : double.parse(data['price']['range']['max'].toString()).toStringAsFixed(0)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
           ],
         ),
       );
@@ -653,9 +655,9 @@ class _GiftDetailState extends State<GiftDetail> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-                'Min price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['fixed']['min'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsPrecision(4) : data['price']['fixed']['min'].toStringAsPrecision(4)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                'Min price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (double.parse(data['price']['fixed']['min'].toString()) * double.parse(giftcardprovider.toActiveCountry['rate']['rate'].toString())).toStringAsFixed(0) : double.parse(data['price']['fixed']['min'].toString()).toStringAsFixed(0)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
             Text(
-                'Max price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (data['price']['fixed']['max'] * giftcardprovider.toActiveCountry['rate']['rate']).toStringAsPrecision(4) : data['price']['fixed']['max'].toStringAsPrecision(4)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
+                'Max price: ${giftcardprovider.toActiveCountry['currency']['code'] != 'AED' ? (double.parse(data['price']['fixed']['max'].toString()) * double.parse(giftcardprovider.toActiveCountry['rate']['rate'].toString())).toStringAsFixed(0) : double.parse(data['price']['fixed']['max'].toString()).toStringAsFixed(0)} ${giftcardprovider.toActiveCountry['currency']['code']}'),
           ],
         ),
       );

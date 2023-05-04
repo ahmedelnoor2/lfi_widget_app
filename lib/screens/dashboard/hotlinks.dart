@@ -31,64 +31,6 @@ class _HotlinksState extends State<Hotlinks> {
           GestureDetector(
             onTap: () {
               if (auth.isAuthenticated) {
-                Navigator.pushNamed(context, '/topup');
-              } else {
-                Navigator.pushNamed(context, '/authentication');
-              }
-            },
-            child: Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.only(
-                    bottom: 2,
-                  ),
-                  child: Image.asset(
-                    'assets/img/top-up.png',
-                    width: 28,
-                  ),
-                ),
-                Text(
-                  //  languageprovider.getlanguage['home']['menu_item1']?? 'New Listing',
-                  'Topup',
-                  style: TextStyle(
-                    fontSize: 12,
-                  ),
-                )
-              ],
-            ),
-          ),
-          GestureDetector(
-            onTap: () {
-              if (auth.isAuthenticated) {
-                Navigator.pushNamed(context, '/referal_screen');
-              } else {
-                Navigator.pushNamed(context, '/authentication');
-              }
-            },
-            child: Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.only(
-                    bottom: 2,
-                  ),
-                  child: Image.asset(
-                    'assets/img/refer.png',
-                    width: 28,
-                  ),
-                ),
-                Text(
-                  languageprovider.getlanguage['home']['menu_item2'] ??
-                      'Referral',
-                  style: TextStyle(
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          GestureDetector(
-            onTap: () {
-              if (auth.isAuthenticated) {
                 if (auth.userInfo['realAuthType'] == 0 ||
                     auth.userInfo['authLevel'] == 0) {
                   snackAlert(context, SnackTypes.warning,
@@ -189,6 +131,64 @@ class _HotlinksState extends State<Hotlinks> {
                     fontSize: 12,
                   ),
                 )
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              if (auth.isAuthenticated) {
+                Navigator.pushNamed(context, '/topup');
+              } else {
+                Navigator.pushNamed(context, '/authentication');
+              }
+            },
+            child: Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.only(
+                    bottom: 2,
+                  ),
+                  child: Image.asset(
+                    'assets/img/top-up.png',
+                    width: 28,
+                  ),
+                ),
+                Text(
+                  //  languageprovider.getlanguage['home']['menu_item1']?? 'New Listing',
+                  'Mobile Topup',
+                  style: TextStyle(
+                    fontSize: 12,
+                  ),
+                )
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              if (auth.isAuthenticated) {
+                Navigator.pushNamed(context, '/referal_screen');
+              } else {
+                Navigator.pushNamed(context, '/authentication');
+              }
+            },
+            child: Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.only(
+                    bottom: 2,
+                  ),
+                  child: Image.asset(
+                    'assets/img/refer.png',
+                    width: 28,
+                  ),
+                ),
+                Text(
+                  languageprovider.getlanguage['home']['menu_item2'] ??
+                      'Referral',
+                  style: TextStyle(
+                    fontSize: 12,
+                  ),
+                ),
               ],
             ),
           ),
