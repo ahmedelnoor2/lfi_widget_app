@@ -92,11 +92,11 @@ class _TradeFormState extends State<TradeForm> {
             ? double.parse(asset.accountBalance['allCoinMap']
                         [public.activeMarket['name'].split('/')[1]]
                     ['normal_balance'])
-                .toStringAsPrecision(6)
+                .toString()
             : double.parse(asset.accountBalance['allCoinMap']
                         [public.activeMarket['name'].split('/')[0]]
                     ['normal_balance'])
-                .toStringAsPrecision(6);
+                .toString();
       });
     }
   }
@@ -169,18 +169,22 @@ class _TradeFormState extends State<TradeForm> {
     double minSell = public.activeMarket.isNotEmpty
         ? public.activeMarket['marketSellMin']
         : 0.00;
-    String marketSellMin = public.activeMarket['multiple'].toString();
+    String marketSellMin = public.activeMarket['volume'].toString();
 
-    print(marketSellMin);
-    print(public.activeMarket);
+    ;
 
     var amountValue = (double.parse(asset.accountBalance['allCoinMap']
             [public.activeMarket['name'].split('/')[0]]['normal_balance']) *
         percentage);
+    print("amount value,..........");
+
+    print(amountValue);
     if (amountValue >= minSell) {
-      print(amountValue);
-      return truncateTo('$amountValue',
-          public.activeMarket.isNotEmpty ? int.parse(marketSellMin) : 4);
+      return truncateTo(
+          '$amountValue',
+          public.activeMarket.isNotEmpty
+              ? int.parse(marketSellMin)
+              : int.parse(marketSellMin));
     } else {
       return '0.00';
     }
@@ -214,10 +218,8 @@ class _TradeFormState extends State<TradeForm> {
       "side": _isBuy ? "BUY" : "SELL",
       "symbol": public.activeMarket['symbol'],
       "type": _orderType,
-      "volume": (_orderType == 2 && _isBuy)
-          ? _totalField.text
-          : double.parse(_amountField.text.toString())
-              .toStringAsPrecision(public.activeMarket['volume']),
+      "volume":
+          (_orderType == 2 && _isBuy) ? _totalField.text : _amountField.text
     };
     print(formData);
     await trading.createOrder(context, auth, formData);
@@ -621,7 +623,7 @@ class _TradeFormState extends State<TradeForm> {
                     Container(
                       padding: EdgeInsets.only(right: 2),
                       child: Text(
-                        '${double.parse(_availableBalance).toStringAsFixed(5)}',
+                        '${double.parse(_availableBalance.toString()).toStringAsPrecision(5)}',
                       ),
                     ),
                     Container(

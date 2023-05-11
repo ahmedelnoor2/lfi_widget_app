@@ -238,6 +238,8 @@ class Trading with ChangeNotifier {
   }
 
   Future<void> createOrder(ctx, auth, formData) async {
+    print(formData);
+    print('check,,,');
     _iscreateorder = true;
     notifyListeners();
     /**
