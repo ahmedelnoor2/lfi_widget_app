@@ -214,8 +214,10 @@ class _TradeFormState extends State<TradeForm> {
       "side": _isBuy ? "BUY" : "SELL",
       "symbol": public.activeMarket['symbol'],
       "type": _orderType,
-      "volume":
-          (_orderType == 2 && _isBuy) ? _totalField.text : _amountField.text,
+      "volume": (_orderType == 2 && _isBuy)
+          ? _totalField.text
+          : double.parse(_amountField.text.toString())
+              .toStringAsPrecision(public.activeMarket['volume']),
     };
     print(formData);
     await trading.createOrder(context, auth, formData);
@@ -246,6 +248,7 @@ class _TradeFormState extends State<TradeForm> {
     var asset = Provider.of<Asset>(context, listen: true);
     var auth = Provider.of<Auth>(context, listen: true);
     var languageprovider = Provider.of<LanguageChange>(context, listen: true);
+    var trading = Provider.of<Trading>(context, listen: true);
 
     if (public.amountFieldUpdate) {
       setPriceField();
@@ -638,7 +641,7 @@ class _TradeFormState extends State<TradeForm> {
           ),
           SizedBox(
             width: width * 0.7,
-            child: ElevatedButton(
+            child: ElevatedButton.icon(
               onPressed: () {
                 if (auth.isAuthenticated) {
                   if (_formTradeKey.currentState!.validate()) {
@@ -668,7 +671,18 @@ class _TradeFormState extends State<TradeForm> {
                 textStyle: TextStyle(),
                 padding: kIsWeb ? EdgeInsets.all(18) : EdgeInsets.zero,
               ),
-              child: Text(
+              icon: trading.iscreateoder
+                  ? Container(
+                      width: 24,
+                      height: 24,
+                      padding: const EdgeInsets.all(2.0),
+                      child: const CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 3,
+                      ),
+                    )
+                  : Container(),
+              label: Text(
                 auth.isAuthenticated
                     ? '${_isBuy ? 'Buy' : 'Sell'} ${public.activeMarket['showName'].split('/')[0]}'
                     : 'Login / Sign Up',

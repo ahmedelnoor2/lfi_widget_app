@@ -86,7 +86,7 @@ class Trading with ChangeNotifier {
 
       if (responseData['code'] == 0) {
         _openOrders = responseData['data']['orders'];
-        
+
         return notifyListeners();
       } else {
         _openOrders = [];
@@ -231,8 +231,17 @@ class Trading with ChangeNotifier {
     }
   }
 
+  bool _iscreateorder = false;
+
+  bool get iscreateoder {
+    return _iscreateorder;
+  }
+
   Future<void> createOrder(ctx, auth, formData) async {
+    _iscreateorder = true;
+    notifyListeners();
     /**
+     * 
      * params:
       price: "29695.06" (Price only for LIMIT orders null for MARKET)
       side: "BUY" (BUY or SELL)
@@ -261,14 +270,21 @@ class Trading with ChangeNotifier {
       print(responseData);
 
       if (responseData['code'] == '0') {
+        _iscreateorder = false;
+        notifyListeners();
         snackAlert(ctx, SnackTypes.success,
             getTranslate('Order successfully created.'));
+
         return;
       } else {
+        _iscreateorder = false;
+        notifyListeners();
         snackAlert(ctx, SnackTypes.errors, getTranslate(responseData['msg']));
         return;
       }
     } catch (error) {
+      _iscreateorder = false;
+      notifyListeners();
       snackAlert(
         ctx,
         SnackTypes.errors,

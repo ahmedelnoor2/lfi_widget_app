@@ -169,7 +169,7 @@ class _DashboardState extends State<Dashboard> {
     await public.getBanners();
     return;
   }
-  
+
   Future<void> getAllGiftProvider() async {
     var giftcardprovider =
         Provider.of<GiftCardProvider>(context, listen: false);
