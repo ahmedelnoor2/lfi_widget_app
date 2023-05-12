@@ -623,7 +623,7 @@ class _TradeFormState extends State<TradeForm> {
                     Container(
                       padding: EdgeInsets.only(right: 2),
                       child: Text(
-                        '${double.parse(_availableBalance.toString()).toStringAsPrecision(5)}',
+                        '${double.parse(_availableBalance.toString()).toStringAsPrecision(4)}',
                       ),
                     ),
                     Container(

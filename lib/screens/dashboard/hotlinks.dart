@@ -136,11 +136,12 @@ class _HotlinksState extends State<Hotlinks> {
           ),
           GestureDetector(
             onTap: () {
-              if (auth.isAuthenticated) {
-                Navigator.pushNamed(context, '/topup');
-              } else {
-                Navigator.pushNamed(context, '/authentication');
-              }
+              snackAlert(context, SnackTypes.warning, 'Coming Soon ....');
+              // if (auth.isAuthenticated) {
+              //   Navigator.pushNamed(context, '/topup');
+              // } else {
+              //   Navigator.pushNamed(context, '/authentication');
+              // }
             },
             child: Column(
               children: [

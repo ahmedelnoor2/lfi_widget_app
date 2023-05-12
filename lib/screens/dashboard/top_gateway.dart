@@ -82,7 +82,7 @@ class _TopGatewayState extends State<TopGateway>
                     tileMode: TileMode.mirror,
                   ),
                 ),
-                padding: EdgeInsets.only(right: 4, left: 8),
+                padding: EdgeInsets.only(right: 20, left: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -189,106 +189,109 @@ class _TopGatewayState extends State<TopGateway>
             ),
           ),
         ),
-        Expanded(
-          flex: 2,
-          child: InkWell(
-            onTap: () async {
-              if (auth.isAuthenticated) {
-                // await getAllGiftProvider();
-                print(giftcardprovider.allgiftprovider.length);
-                if (auth.userInfo['realAuthType'] == 0 ||
-                    auth.userInfo['authLevel'] == 0) {
-                  snackAlert(context, SnackTypes.warning,
-                      ' (Please check KYC status)');
-                } else {
-                  if (giftcardprovider.allgiftprovider.length > 1) {
-                    Navigator.pushNamed(context, '/gift_card_service_provider');
-                  } else {
-                    String reloadlyid = '2';
-                    giftcardprovider.setproviderid(reloadlyid);
-                    Navigator.pushNamed(context, '/gift_card');
-                  }
-                }
-              } else {
-                Navigator.pushNamed(context, '/authentication');
-              }
-            },
-            child: Container(
-              padding: EdgeInsets.all(5),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment(0.8, 1),
-                    colors: <Color>[
-                      Color(0xff3F4374),
-                      Color(0xff292C51),
-                    ],
-                    tileMode: TileMode.mirror,
-                  ),
-                ),
-                padding: EdgeInsets.only(left: 12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Gift Card',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Container(
-                      padding: EdgeInsets.only(right: 10),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.only(top: 5),
-                            width: 55,
-                            height: 60,
-                            child: Stack(
-                              children: [
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(50),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.5),
-                                          spreadRadius: 1,
-                                          blurRadius: 5,
-                                        ),
-                                      ],
-                                    ),
-                                    child: Image.asset(
-                                      'assets/img/gifCard.png',
-                                      width: 30,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
+        // Expanded(
+        //   flex: 2,
+        //   child: InkWell(
+        //     onTap: () async {
+        //       snackAlert(context, SnackTypes.warning, 'Coming Soon ....');
+        //       // if (auth.isAuthenticated) {
+
+        //       //   // await getAllGiftProvider();
+        //       //   //   print(giftcardprovider.allgiftprovider.length);
+        //       //   //   if (auth.userInfo['realAuthType'] == 0 ||
+        //       //   //       auth.userInfo['authLevel'] == 0) {
+        //       //   //     snackAlert(context, SnackTypes.warning,
+        //       //   //         ' (Please check KYC status)');
+        //       //   //   } else {
+        //       //   //     if (giftcardprovider.allgiftprovider.length > 1) {
+        //       //   //       Navigator.pushNamed(context, '/gift_card_service_provider');
+        //       //   //     } else {
+        //       //   //       String reloadlyid = '2';
+        //       //   //       giftcardprovider.setproviderid(reloadlyid);
+        //       //   //       Navigator.pushNamed(context, '/gift_card');
+        //       //   //     }
+        //       //   //   }
+        //       //   // } else {
+        //       //   //   Navigator.pushNamed(context, '/authentication');
+        //       //   // }
+        //       // }
+        //     },
+        //     child: Container(
+        //       padding: EdgeInsets.all(5),
+        //       child: Container(
+        //         decoration: BoxDecoration(
+        //           borderRadius: BorderRadius.circular(5),
+        //           gradient: const LinearGradient(
+        //             begin: Alignment.topLeft,
+        //             end: Alignment(0.8, 1),
+        //             colors: <Color>[
+        //               Color(0xff3F4374),
+        //               Color(0xff292C51),
+        //             ],
+        //             tileMode: TileMode.mirror,
+        //           ),
+        //         ),
+        //         padding: EdgeInsets.only(left: 12),
+        //         child: Row(
+        //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //           children: [
+        //             Row(
+        //               children: [
+        //                 Column(
+        //                   crossAxisAlignment: CrossAxisAlignment.start,
+        //                   children: [
+        //                     Text(
+        //                       'Gift Card',
+        //                       style: TextStyle(
+        //                         fontSize: 15,
+        //                         fontWeight: FontWeight.bold,
+        //                       ),
+        //                     ),
+        //                   ],
+        //                 ),
+        //               ],
+        //             ),
+        //             Container(
+        //               padding: EdgeInsets.only(right: 10),
+        //               child: Row(
+        //                 children: [
+        //                   Container(
+        //                     padding: EdgeInsets.only(top: 5),
+        //                     width: 55,
+        //                     height: 60,
+        //                     child: Stack(
+        //                       children: [
+        //                         Align(
+        //                           alignment: Alignment.centerRight,
+        //                           child: Container(
+        //                             decoration: BoxDecoration(
+        //                               borderRadius: BorderRadius.circular(50),
+        //                               boxShadow: [
+        //                                 BoxShadow(
+        //                                   color: Colors.black.withOpacity(0.5),
+        //                                   spreadRadius: 1,
+        //                                   blurRadius: 5,
+        //                                 ),
+        //                               ],
+        //                             ),
+        //                             child: Image.asset(
+        //                               'assets/img/gifCard.png',
+        //                               width: 30,
+        //                             ),
+        //                           ),
+        //                         ),
+        //                       ],
+        //                     ),
+        //                   ),
+        //                 ],
+        //               ),
+        //             ),
+        //           ],
+        //         ),
+        //       ),
+        //     ),
+        //   ),
+        // ),
       ],
     );
     ////test//
