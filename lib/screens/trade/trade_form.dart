@@ -505,10 +505,10 @@ class _TradeFormState extends State<TradeForm> {
                                 RegExp(r'^\d*\.?\d{0,9}')),
                             DecimalTextInputFormatter(
                                 decimalRange:
-                                    public.activeMarket['multiple'] == null ||
-                                            public.activeMarket['multiple'] == 0
-                                        ? 4
-                                        : public.activeMarket['multiple'],
+                                    public.activeMarket['volume'] == null ||
+                                            public.activeMarket['volume'] == 0
+                                        ? 0
+                                        : public.activeMarket['volume'],
                                 coUnit: 2),
                           ],
                           keyboardType:
@@ -634,6 +634,7 @@ class _TradeFormState extends State<TradeForm> {
                     // Icon(
                     //   Icons.add_circle,
                     //   size: 15,
+
                     //   color: linkColor,
                     // ),
                   ],
