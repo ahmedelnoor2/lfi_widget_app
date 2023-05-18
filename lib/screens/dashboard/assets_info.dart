@@ -158,10 +158,7 @@ class _AssetsInfoState extends State<AssetsInfo>
                                               ),
                                             ),
                                             Text(
-                                              getCoinName(public
-                                                          .publicInfoMarket[
-                                                      'market']['coinList']
-                                                  [item['coin']]['showName']),
+                                              getCoin(item['coin']),
                                               style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 16,
