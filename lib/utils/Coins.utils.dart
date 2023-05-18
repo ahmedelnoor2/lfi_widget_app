@@ -17,6 +17,8 @@ String getCoinName(String coinName) {
   switch (coinName) {
     case 'LYO1':
       return 'LYO';
+    case 'LFI1':
+      return 'LFi';
     case 'BUSD2':
       return 'BUSD';
     default:
